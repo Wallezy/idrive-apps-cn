@@ -46,7 +46,9 @@ function read() {
             !Array.isArray(l.rhmiTexts) || !l.words || typeof l.words !== 'object') {
             throw new Error(`locales/${n}: not a locale (hmiLanguages, rhmiTexts, words)`);
         }
-        return Object.assign({ code: n.slice(0, -5) }, l);
+        const messages = path.join(DIR, 'messages', n);
+        return Object.assign({ code: n.slice(0, -5) }, l, fs.existsSync(messages) ?
+            { messages: JSON.parse(fs.readFileSync(messages, 'utf8')) } : {});
     });
 }
 

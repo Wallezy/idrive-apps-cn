@@ -143,12 +143,12 @@ function page(list) {
         return '<li><a href="' + esc(a.name) + '" download>' + esc(a.name) + '</a><span>' +
             Math.max(1, Math.round(a.size / 1024)) + ' KB</span></li>';
     }).join('');
-    return '<!doctype html><html lang="en"><head><meta charset="utf-8">' +
-        '<meta name="viewport" content="width=device-width, initial-scale=1"><title>Waze on cluster logs</title>' +
+    return '<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">' +
+        '<meta name="viewport" content="width=device-width, initial-scale=1"><title>Waze 仪表盘显示日志</title>' +
         '<style>body{margin:0;padding:20px 16px;font:16px/1.4 system-ui,sans-serif;background:#111;color:#eee}' +
         'h1{font-size:20px}ul{list-style:none;padding:0}li{display:flex;justify-content:space-between;gap:12px;' +
         'padding:12px 0;border-bottom:1px solid #333}a{color:#6af;overflow-wrap:anywhere}span{color:#999;flex:none}</style>' +
-        '</head><body><h1>Waze on cluster logs</h1>' + (rows ? '<ul>' + rows + '</ul>' : '<p>No logs saved</p>') +
+        '</head><body><h1>Waze 仪表盘显示日志</h1>' + (rows ? '<ul>' + rows + '</ul>' : '<p>暂无已保存的日志</p>') +
         '</body></html>\n';
 }
 
@@ -192,7 +192,7 @@ Web.prototype.at = function (addr) {
             say('request failed: ' + err.message);
             if (res.headersSent) { res.destroy(); return; }
             res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' });
-            res.end('error\n');
+            res.end('请求失败\n');
         }
     });
     server.maxConnections = 16;
@@ -236,23 +236,23 @@ Web.prototype.handle = function (req, res) {
     }
     function text(code, body) { reply(code, 'text/plain; charset=utf-8', body + '\n'); }
     c.n++;
-    if (c.n > REQ_MAX || c.fails >= FAIL_MAX) return text(429, 'too many requests');
-    if (req.method !== 'GET' && req.method !== 'HEAD') return text(405, 'method not allowed');
-    if (req.url.length > 256) return text(414, 'too long');
-    if ((req.headers.host || '').toLowerCase() !== this.host) return text(421, 'misdirected request');
+    if (c.n > REQ_MAX || c.fails >= FAIL_MAX) return text(429, '请求过于频繁，请稍后再试');
+    if (req.method !== 'GET' && req.method !== 'HEAD') return text(405, '不支持此请求方式');
+    if (req.url.length > 256) return text(414, '请求地址过长');
+    if ((req.headers.host || '').toLowerCase() !== this.host) return text(421, '请求地址不匹配');
     var t = (/^\/([^/?#]*)/.exec(req.url) || [])[1];
     if (!/^[0-9a-f]{32}$/.test(t || '') || !this.tokenOk(t)) {
         c.fails++;
-        return text(404, 'not found');
+        return text(404, '未找到页面或文件');
     }
     var m = /^\/[0-9a-f]{32}\/([^/?#]*)(?:\?.*)?$/.exec(req.url);
-    if (!m) return text(404, 'not found');
+    if (!m) return text(404, '未找到页面或文件');
     var list = archives(this.dir);
     if (m[1] === '') return reply(200, 'text/html; charset=utf-8', page(list));
     var a = NAME.test(m[1]) && list.filter(function (x) { return x.name === m[1]; })[0];
-    if (!a) return text(404, 'not found');
+    if (!a) return text(404, '未找到页面或文件');
     var busy = this.downloads.get(ip) || 0;
-    if (busy >= DOWNLOADS) return text(429, 'too many downloads');
+    if (busy >= DOWNLOADS) return text(429, '同时下载数量过多，请稍后再试');
     var fd;
     try {
         fd = fs.openSync(path.join(this.dir, a.name), fs.constants.O_RDONLY | fs.constants.O_NOFOLLOW);
@@ -260,7 +260,7 @@ Web.prototype.handle = function (req, res) {
         if (!st.isFile() || st.size > ARCHIVE_MAX) throw new Error('not an archive');
     } catch (e) {
         if (fd !== undefined) fs.closeSync(fd);
-        return text(404, 'not found');
+        return text(404, '未找到页面或文件');
     }
     res.writeHead(200, { 'Content-Type': 'application/gzip', 'Content-Length': st.size,
         'Content-Disposition': 'attachment; filename="' + a.name + '"', 'Cache-Control': 'no-store',

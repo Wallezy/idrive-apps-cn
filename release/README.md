@@ -23,6 +23,15 @@ locally but neither pushes nor publishes.
 国内发行版在配套商店集成和恢复验证完成前不发布。发布状态必须对应实际验证的提交，
 不能把源码仓库、中文截图或上游镜像可用当成国内版安装就绪。
 
+The initial CN localization preserves the reviewed numeric versions recorded
+in `cn-localization-versions.json`; do not stamp that preparation. Run
+`node release/test/cn_localization_test.js` to check the catalog coverage and
+all version fields. An unpublished, isolated CN catalog can start with these
+versions, but an existing installation of the same number needs an explicitly
+validated migration/reinstall path. Never overwrite a published artifact at
+the same version. Later releases follow the versioning rules below. See
+[the localization scope and migration limits](../docs/LOCALIZATION.zh-CN.md).
+
 `release.js` builds the repository's components from HEAD and publishes
 them with the catalog the [mgu Store](https://github.com/robertnisipeanu/mgu-store)
 reads (its `docs/PUBLISHING.md`, "2. Catalog"): each tool with a

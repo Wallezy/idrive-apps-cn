@@ -38,11 +38,17 @@ French (France, Canada), Italian, Turkish, Spanish (Spain, Latin America),
 Portuguese (Portugal, Brazil), Greek, Russian, Ukrainian, Indonesian,
 Vietnamese, Japanese, Korean, Simplified Chinese (also Cantonese
 simplified), Traditional Chinese (also Cantonese traditional), Arabic,
-Hebrew and Thai. A word a language has no translation for is English, as
-is every language the HMI reports that the app does not know. A change of
-the display language shows at once. Values from the tools (reasons,
-addresses, numbers, file names, the cluster map's frame rate) are shown as
-they are; CarPlay and Android Auto are names.
+Hebrew and Thai. A word a language has no translation for is English.
+The CN edition uses Simplified Chinese before the HMI reports a supported
+language; an explicit English or another supported language is respected.
+A change of the display language shows at once. In Chinese, known native
+status messages and frame counters are translated for display. Unknown
+diagnostics carry a Chinese label and retain their original detail.
+Addresses, numbers, file names, CarPlay and Android Auto remain unchanged.
+
+国内版中文界面包括仪表盘/HUD 控制、补丁状态、日志保存、帧率及已知故障提示。
+修改只作用于界面文字，不改变车道信息、导航画面、协议字段或诊断日志。
+未识别的新错误保留原始详情，便于社区排查。
 
 A language is one file, `locales/<code>.json`: the HMI's languages it is
 for (`CommonTypes.Language`), its RHMI text files (named as the oap-sdk
@@ -58,6 +64,9 @@ names those languages) and its words, each keyed by the English (`{0}`,
 the RHMI text files, which hold the tile's name and the Logs page's title.
 `node tools/test_i18n.js` checks that every language has every word with
 the same `{n}`, and every HMI language its text file.
+`locales/messages/zh-CN.json` holds the supplemental native-message translations;
+the same generator includes them in `src/locales.js`. The presentation adapter
+in `src/native_text.js` preserves numeric fields and protocol payloads.
 
 ## Where the map shows
 
@@ -238,6 +247,7 @@ node tools/test_control.js           # the socket client against fake sockets
 node tools/test_page.js              # the page against a fake SDK and HMI
 node tools/test_profiles.js          # the driver profiles against fake sockets and SessionManager
 node tools/test_i18n.js              # every language: its words, placeholders, RHMI text files
+node tools/test_native_text.js       # Chinese native messages, preserved diagnostics and English return
 node tools/build.js                  # robertn_waze_cluster@<version>.src.tgz
 node tools/build.js --sdk <donor>    # also robertn_waze_cluster@<version>.tgz
 ```

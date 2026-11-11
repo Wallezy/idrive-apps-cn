@@ -6,7 +6,7 @@
     "name": "robertn_waze_cluster",
     "vendor": "Robert Nisipeanu",
     "version": "0.6.7",
-    "defaultLanguage": "en_GB",
+    "defaultLanguage": "zh_CN",
     "uiDescriptions": [
       {
         "applicationFilePath": "./uiDescriptions/ID7/application.xml",

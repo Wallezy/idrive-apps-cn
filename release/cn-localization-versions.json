@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "purpose": "Preserve numeric component versions during the initial CN localization",
+  "sourceCommit": "0014b6624f0f1bc69ceef7347a29947c34e20009",
+  "components": {
+    "cluster-render": "0.5.4",
+    "waze-on-cluster": "0.9.10",
+    "robertn_waze_cluster": "0.6.7"
+  }
+}

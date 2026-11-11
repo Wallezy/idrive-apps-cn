@@ -85,6 +85,7 @@ const EventEmitter = require('events');
 const fs = require('fs');
 const net = require('net');
 const { t } = require('./i18n.js');
+const { nativeText, mapPage, withDetail } = require('./native_text.js');
 
 const RENDER_PATH = '/dev/shm/waze-on-cluster/ctl.sock';
 const PATCH_PATH = '/dev/shm/waze-on-cluster/patch.sock';
@@ -635,13 +636,13 @@ class WazeClusterControl extends EventEmitter {
             return this._lastPatchCmd === 'revert' ? t('Removing patch…') : t('Patching…');
         }
         if (ps.state === 'error') {
-            return t('Failed');
+            return withDetail(t('Failed'), ps.reason);
         }
         if (ps.recovered && ps.state !== 'patched' && !headUnitRefused(ps.conflict)) {
             return t('Removed — head unit kept restarting');
         }
         if (ps.conflict && (ps.state !== 'patched' || headUnitRefused(ps.conflict))) {
-            return conflictText(ps.conflict);
+            return withDetail(conflictText(ps.conflict), ps.conflict);
         }
         if (ps.state === 'patched') {
             return this._outdated(ps) ? t('Update needed') : t('Patched');
@@ -667,17 +668,17 @@ class WazeClusterControl extends EventEmitter {
         const rs = this.renderStatus;
         switch (rs && rs.state) {
         case 'starting':
-            return t('Starting…');
+            return withDetail(t('Starting…'), rs.reason);
         case 'showing':
-            return t('Showing {0}', rs.page || t('Waze map')) + (rs.reason ? ` — ${rs.reason}` : '');
+            return t('Showing {0}', rs.page ? mapPage(rs.page) : t('Waze map')) + (rs.reason ? ` — ${nativeText(rs.reason)}` : '');
         case 'error':
-            return t('Error');
+            return withDetail(t('Error'), rs.reason);
         case 'frozen':
-            return t('Frozen');
+            return withDetail(t('Frozen'), rs.reason);
         case 'unsupported':
-            return t('Unavailable');
+            return withDetail(t('Unavailable'), rs.reason);
         default:
-            return (rs && rs.reason) || t('Waiting for the phone');
+            return (rs && rs.reason && nativeText(rs.reason)) || t('Waiting for the phone');
         }
     }
 
@@ -830,7 +831,7 @@ class WazeClusterControl extends EventEmitter {
             return aa.reason === 'reverting' ? t('Removing patch…') : t('Patching…');
         }
         if (aa.state === 'error' || aa.error) {
-            return t('Failed');
+            return withDetail(t('Failed'), aa.error || aa.reason);
         }
         if (aa.pending && !(aa.pending === 'apply' && headUnitRefused(aa.conflict))) {
             return aa.pending === 'revert' ? t('Removed after restart') : t('Patched after restart');
@@ -841,7 +842,7 @@ class WazeClusterControl extends EventEmitter {
         /* A conflict patchd refuses changes for is named also while patched,
          * since it greys Zoom and the turn card. */
         if (aa.state === 'absent' || (aa.conflict && (aa.state !== 'patched' || this._aaBlocked()))) {
-            return conflictText(aa.conflict || 'no Android Auto');
+            return withDetail(conflictText(aa.conflict || 'no Android Auto'), aa.conflict);
         }
         return aa.state === 'patched' ? t('Patched') : aa.state === 'original' ? t('Not patched') : t('Partly patched');
     }
@@ -933,7 +934,7 @@ class WazeClusterControl extends EventEmitter {
         const s = this.captureState;
         const value = s.state === 'unavailable' ? t('Unavailable') : s.state === 'open' ? t('On') : s.state === 'opening' ? t('Starting…')
             : s.state === 'closing' ? t('Stopping…') : s.error ? t('Failed') : t('Off');
-        return t('Capture: {0}', value);
+        return t('Capture: {0}', withDetail(value, s.error));
     }
 
     /* ---- internals ---- */

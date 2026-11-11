@@ -84,7 +84,12 @@ all.forEach((l) => {
     const n = `${l.code}.json`;
     ok(Array.isArray(l.hmiLanguages) && l.hmiLanguages.length && l.hmiLanguages.every((h) => SDK_TEXTS[h]), `${n}: hmiLanguages`);
     eq(l.rhmiTexts, l.hmiLanguages.map((h) => SDK_TEXTS[h]), `${n}: rhmiTexts, the oap-sdk's file of each of its HMI languages`);
-    eq(Object.keys(l).sort(), ['code', 'hmiLanguages', 'rhmiTexts', 'words'], `${n}: hmiLanguages, rhmiTexts, words`);
+    eq(Object.keys(l).sort(), (l.code === 'zh-CN' ? ['code', 'hmiLanguages', 'messages', 'rhmiTexts', 'words'] :
+        ['code', 'hmiLanguages', 'rhmiTexts', 'words']), `${n}: language fields`);
+    Object.keys(l.messages || {}).forEach((k) => {
+        ok(typeof l.messages[k] === 'string' && l.messages[k].trim(), `${n}: native message "${k}"`);
+        eq(placeholders(l.messages[k]), placeholders(k), `${n}: native message placeholders "${k}"`);
+    });
     Object.keys(l.words).forEach((k) => {
         ok(typeof l.words[k] === 'string' && l.words[k].trim() !== '', `${n}: "${k}" is translated`);
         eq(placeholders(l.words[k]), placeholders(k), `${n}: "${k}" has the placeholders of its English`);
@@ -99,8 +104,8 @@ all.forEach((l) => {
     l.rhmiTexts.forEach((name) => eq(readText(name), generated[`${name}.json`], `${name}.json: as tools/gen_locales.js writes it`));
 });
 ['en_GB', 'en_US'].forEach((name) => eq(readText(name), locales.RHMI_TEXTS, `${name}.json: English`));
-eq(JSON.parse(fs.readFileSync(path.join(TREE, 'rhmiData', 'application.json'), 'utf8')).application.defaultLanguage, 'en_GB',
-    'application.json: English by default');
+eq(JSON.parse(fs.readFileSync(path.join(TREE, 'rhmiData', 'application.json'), 'utf8')).application.defaultLanguage, 'zh_CN',
+    'application.json: CN default');
 // every HMI display language: English or one locale's, with its text file
 const covered = ['ENGLISCH__UK', 'ENGLISCH__US'].concat(...all.map((l) => l.hmiLanguages));
 eq(covered.slice().sort(), Object.keys(SDK_TEXTS).sort(), 'every HMI display language, once');
@@ -112,8 +117,8 @@ const LIVE = require(path.join(SRC, 'locales.js'));
 const de = LIVE.find((l) => l.code === 'de');
 const deWords = de.words;
 de.words = { 'Status: {0}': 'Zustand: {0}', Patched: 'Gepatcht', 'Possible in {0} min': 'Möglich in {0} Min.' };
-eq(i18n.language(), 'en', 'English at first');
-eq(i18n.t('Status: {0}', i18n.t('Patched')), 'Status: Patched', 'English with its arguments');
+eq(i18n.language(), 'zh-CN', 'Simplified Chinese before HMI reports a language');
+eq(i18n.t('Status: {0}', i18n.t('Patched')), '状态：已应用补丁', 'Chinese with its arguments');
 ok(i18n.setHmiLanguage('DEUTSCH'), 'German: a change');
 eq(i18n.language(), 'de', 'DEUTSCH: de');
 ok(!i18n.setHmiLanguage('DEUTSCH'), 'the same language: no change');
@@ -130,7 +135,8 @@ eq(i18n.t('Not a word the app has'), 'Not a word the app has', 'an unknown word:
 ['ENGLISCH__UK', 'ENGLISCH__US', 'SIGNAL_UNGUELTIG', 'KEINE_SPRACHE', 'KLINGONISCH', 11, null, undefined, {}].forEach((v) => {
     i18n.setHmiLanguage('DEUTSCH');
     ok(i18n.setHmiLanguage(v), `${JSON.stringify(v)}: a change`);
-    eq([i18n.language(), i18n.t('Status: {0}', i18n.t('Patched'))], ['en', 'Status: Patched'], `${JSON.stringify(v)}: English`);
+    const expected = ['ENGLISCH__UK', 'ENGLISCH__US'].indexOf(v) >= 0 ? ['en', 'Status: Patched'] : ['zh-CN', '状态：已应用补丁'];
+    eq([i18n.language(), i18n.t('Status: {0}', i18n.t('Patched'))], expected, `${JSON.stringify(v)}: explicit language or CN fallback`);
 });
 de.words = deWords;
 

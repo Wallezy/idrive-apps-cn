@@ -16,6 +16,7 @@
 const EventEmitter = require('events');
 const { LineSocket } = require('./waze_cluster_control.js');
 const { t } = require('./i18n.js');
+const { withDetail } = require('./native_text.js');
 
 const LOGS_PATH = '/dev/shm/waze-on-cluster/logs.sock';
 const ROWS = 5;
@@ -88,7 +89,7 @@ class LogsControl extends EventEmitter {
             return t('Saving…');
         }
         if (s.error) {
-            return t(ERRORS[s.error] || ERRORS.failed);
+            return withDetail(t(ERRORS[s.error] || ERRORS.failed), ERRORS[s.error] ? null : s.error);
         }
         return s.archives && s.archives.length ? String(s.archives.length) : t('None');
     }

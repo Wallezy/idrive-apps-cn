@@ -111,6 +111,20 @@ function get(url, opts) {
     assert(m, 'url ' + a.state.url);
     assert.deepStrictEqual(a.state.archives, []);
     assert(s.out().indexOf(m[2]) < 0, 'the token is not logged');
+    var empty = await get(a.state.url);
+    assert.strictEqual(empty.status, 200);
+    assert(empty.body.toString().indexOf('<html lang="zh-CN">') > 0);
+    assert(empty.body.toString().indexOf('<title>Waze 仪表盘显示日志</title>') > 0);
+    assert(empty.body.toString().indexOf('<p>暂无已保存的日志</p>') > 0);
+    assert.strictEqual(Number(empty.headers['content-length']), empty.body.length, 'UTF-8 length is in bytes');
+    assert.strictEqual(empty.headers['content-type'], 'text/html; charset=utf-8');
+    assert.strictEqual(empty.headers['cache-control'], 'no-store');
+    assert.strictEqual(empty.headers['x-frame-options'], 'DENY');
+    assert(empty.headers['content-security-policy'].indexOf("default-src 'none'") >= 0);
+    var emptyHead = await get(a.state.url, { method: 'HEAD' });
+    assert.strictEqual(emptyHead.body.length, 0);
+    assert.strictEqual(emptyHead.headers['content-length'], empty.headers['content-length']);
+    console.log('ok   Chinese page and empty state: UTF-8 length, HEAD and browser protections');
     a.send({ cmd: 'save' });
     await until('saved', function () { return a.state.saved && !a.state.saving; });
     assert(a.states.some(function (x) { return x.saving; }), 'saving shown while it runs');
@@ -124,11 +138,19 @@ function get(url, opts) {
     var r = await get(base);
     assert.strictEqual(r.status, 200);
     assert(r.body.toString().indexOf('href="' + name + '"') > 0, 'the page lists it');
+    assert(r.body.toString().indexOf('<h1>Waze 仪表盘显示日志</h1>') > 0);
+    assert(r.body.toString().indexOf('暂无已保存的日志') < 0);
+    var unsafeName = '<img src=x onerror=alert(1)>.tar.gz';
+    fs.writeFileSync(path.join(s.dir, unsafeName), 'not a log archive');
+    var listing = await get(base);
+    assert(listing.body.toString().indexOf('<img') < 0, 'untrusted filenames cannot inject HTML');
+    assert(!logs.archives(s.dir).some(function (x) { return x.name === unsafeName; }));
     r = await get(base + name);
     assert.strictEqual(r.status, 200);
     assert.strictEqual(r.headers['content-length'], '2048');
     assert.strictEqual(r.headers['content-disposition'], 'attachment; filename="' + name + '"');
     assert.strictEqual(r.body.length, 2048);
+    assert(r.body.equals(Buffer.alloc(2048)), 'archive bytes are unchanged');
     r = await get(base + name, { method: 'HEAD' });
     assert.strictEqual(r.status, 200);
     assert.strictEqual(r.body.length, 0);
@@ -146,20 +168,29 @@ function get(url, opts) {
     for (var i = 0; i < refused.length; i++) {
         r = await get('http://' + host + '/', { path: refused[i][0] });
         assert.strictEqual(r.status, refused[i][1], refused[i][0] + ' -> ' + r.status);
+        assert.strictEqual(r.body.toString(), '未找到页面或文件\n');
         assert(r.body.toString().indexOf('secret') < 0);
     }
     assert(!a.state.archives.some(function (x) { return x.name === 'woc-logs-20990101T000000Z.tar.gz'; }) &&
         !logs.archives(s.dir).some(function (x) { return /2099/.test(x.name); }), 'a link is no archive');
     console.log('ok   traversal: dot segments, encoded slashes, links, other files and paths refused');
 
-    assert.strictEqual((await get(base, { headers: { Host: 'evil.example:80' } })).status, 421);
-    assert.strictEqual((await get(base, { method: 'POST', body: 'x' })).status, 405);
-    assert.strictEqual((await get(base + 'a'.repeat(300))).status, 414);
+    r = await get(base, { headers: { Host: 'evil.example:80' } });
+    assert.strictEqual(r.status, 421);
+    assert.strictEqual(r.body.toString(), '请求地址不匹配\n');
+    r = await get(base, { method: 'POST', body: 'x' });
+    assert.strictEqual(r.status, 405);
+    assert.strictEqual(r.body.toString(), '不支持此请求方式\n');
+    r = await get(base + 'a'.repeat(300));
+    assert.strictEqual(r.status, 414);
+    assert.strictEqual(r.body.toString(), '请求地址过长\n');
     console.log('ok   another Host, another method, an overlong path refused');
 
     for (i = 0; i < 9; i++) assert.strictEqual((await get('http://' + host + '/' + 'f'.repeat(32) + '/')).status, 404);
     assert.strictEqual((await get('http://' + host + '/')).status, 404, 'no token');
-    assert.strictEqual((await get(base)).status, 429, 'locked out after 10 wrong tokens, the right one too');
+    r = await get(base);
+    assert.strictEqual(r.status, 429, 'locked out after 10 wrong tokens, the right one too');
+    assert.strictEqual(r.body.toString(), '请求过于频繁，请稍后再试\n');
     console.log('ok   a wrong token is 404; 10 in a minute lock the address out (429)');
 
     /* ---- caps ---- */

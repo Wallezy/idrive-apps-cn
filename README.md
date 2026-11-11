@@ -10,6 +10,13 @@ The application IDs and runtime behavior follow upstream; this repository
 adds distribution controls and the Chinese README with owner-provided photos.
 Existing upstream-mirror packages are not CN releases.
 
+Simplified Chinese covers menus, known dynamic status/error messages, the
+log-download page and catalog descriptions. The app defaults to Chinese until
+the head unit reports a supported language, then follows its explicit setting.
+Raw logs and unknown diagnostic details retain their original text.
+This localization keeps all numeric component versions; see
+[localization scope and migration constraints](docs/LOCALIZATION.zh-CN.md).
+
 The reserved CN catalog is `https://mgu.walle.pw/mgu/cn/idrive-apps/catalog.json`.
 It is separate from the upstream mirror at `/mgu/idrive-apps/catalog.json`;
 do not add both as sources for the same apps.

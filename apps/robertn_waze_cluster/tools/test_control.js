@@ -43,6 +43,7 @@
  * and the status following the service, its errors, and closing.
  */
 const assert = require('assert');
+require('../src/i18n.js').setHmiLanguage('ENGLISCH__UK');
 const fs = require('fs');
 const { WazeClusterControl, SIZE, SAFE, ZOOM_STEP, HUD_SIZE_STEPS } = require('../src/waze_cluster_control.js');
 const { LogsControl } = require('../src/logs_control.js');

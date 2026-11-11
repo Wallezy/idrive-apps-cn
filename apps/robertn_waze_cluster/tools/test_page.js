@@ -775,6 +775,13 @@ async function main() {
             'Status: {0}': 'Zustand: {0}', 'Saved logs: {0}': 'Gespeicherte Logs: {0}', "Hide BMW's turn box": 'BMW-Abbiegebox ausblenden',
             'HUD map: {0}': 'Karte im HUD: {0}', 'Show on': 'Anzeigen auf', 'HUD (experimental)': 'HUD (experimentell)', 'Move left': 'Nach links' };
         const before = ['wocStatus', 'wocAaStatus', 'wocMap', 'wocLogsStatus', 'wocHud'].map((n) => byName[n].text);
+        displayLanguage('CHINESISCH_SIMPLE');
+        await until('Chinese controls and logs', () => byName.wocEnable.text === '应用补丁' &&
+            byName.wocAaDisable.text === '移除补丁' && byName.wocHeadGeneral.text === '常规' &&
+            byName.wocLogsSave.text === '保存日志' && byName.wocShowOn.cells.HeaderText === '显示位置' &&
+            byName.wocShowOn.cells['1:ItemText'] === 'HUD（实验性）' && byName.wocHudLeft.text === '左移' &&
+            byName.wocGuide.text === '隐藏 BMW 转向提示' && byName.wocHudKeep.text === 'HUD 地图保持在 BMW 弹窗之上' &&
+            byName.wocLogsStatus.text.startsWith('已保存的日志：') && byName.wocStatus.text.startsWith('状态：'));
         displayLanguage('DEUTSCH');
         await until('German', () => byName.wocEnable.text === 'Patchen' && byName.wocAaDisable.text === 'Patch entfernen' &&
             byName.wocHeadGeneral.text === 'Allgemein' && byName.wocLogsSave.text === 'Logs speichern' &&

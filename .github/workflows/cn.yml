@@ -21,7 +21,11 @@ jobs:
           node-version: 22.12.0
       - name: Publication policy
         run: node release/test/cn_distribution_test.js
+      - name: Chinese catalog and version consistency
+        run: node release/test/cn_localization_test.js
       - name: Localization
         working-directory: apps/robertn_waze_cluster
         run: node tools/test_i18n.js
+      - name: Chinese dynamic status messages
+        run: node apps/robertn_waze_cluster/tools/test_native_text.js
 # Unit tests do not set release-check/cn-integration.

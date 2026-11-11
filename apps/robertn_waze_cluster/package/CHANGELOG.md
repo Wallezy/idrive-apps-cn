@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- The CN app defaults to Simplified Chinese while the HMI language is unavailable and follows explicit display-language selections. Chinese status rows translate known renderer and patch messages, frame counts and transfer limits; unknown diagnostics retain their original detail. Native protocol fields and logs are unchanged.
+
 ## 0.6.7
 
 Keep HUD map over BMW's pop-ups, a checkbox in HUD. Unticked, the default,
