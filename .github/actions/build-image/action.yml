@@ -34,7 +34,7 @@ runs:
         for host in archive.ubuntu.com security.ubuntu.com mirrors.edge.kernel.org github.com; do
           printf 'Resolver/HTTPS check: %s\n' "$host"
           timeout 4 getent ahostsv4 "$host" || true
-          curl -IsS --connect-timeout 3 --max-time 5 "https://$host/" || true
+          curl -IsS -o /dev/null -w 'HTTPS %{http_code}\n' --connect-timeout 3 --max-time 5 "https://$host/" || true
         done
         if [ -n "${HTTP_PROXY:-}${http_proxy:-}" ]; then echo 'HTTP proxy configured'; fi
         if [ -n "${HTTPS_PROXY:-}${https_proxy:-}" ]; then echo 'HTTPS proxy configured'; fi
