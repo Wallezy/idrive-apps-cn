@@ -31,11 +31,14 @@ runs:
       run: |
         echo 'Runner resolver'
         cat /etc/resolv.conf
-        timeout 15 getent ahostsv4 archive.ubuntu.com security.ubuntu.com || true
-        echo 'Pinned build image resolver'
-        timeout 20 docker run --rm --network=host \
-          ubuntu:18.04@sha256:dca176c9663a7ba4c1f0e710986f5a25e672842963d95b960191e2d9f7185ebe \
-          sh -c 'cat /etc/resolv.conf; getent ahostsv4 archive.ubuntu.com security.ubuntu.com' || true
+        for host in archive.ubuntu.com security.ubuntu.com mirrors.edge.kernel.org github.com; do
+          printf 'Resolver/HTTPS check: %s\n' "$host"
+          timeout 4 getent ahostsv4 "$host" || true
+          curl -IsS --connect-timeout 3 --max-time 5 "https://$host/" || true
+        done
+        if [ -n "${HTTP_PROXY:-}${http_proxy:-}" ]; then echo 'HTTP proxy configured'; fi
+        if [ -n "${HTTPS_PROXY:-}${https_proxy:-}" ]; then echo 'HTTPS proxy configured'; fi
+        if [ -n "${ALL_PROXY:-}${all_proxy:-}" ]; then echo 'ALL proxy configured'; fi
     - if: steps.cache.outputs.cache-hit != 'true'
       shell: bash
       env:
