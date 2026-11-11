@@ -38,7 +38,9 @@ JOBS    ?= $(shell nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 1)
 # The unit's toolchain ABI (docker/Dockerfile), tagged with the Dockerfile's
 # checksum: built when no image has that tag.
 IMAGE   := cluster-render-build:$(shell cksum < docker/Dockerfile | cut -d' ' -f1)
-DOCKER_IMAGE = docker image inspect $(IMAGE) >/dev/null 2>&1 || docker build --progress=plain --platform linux/amd64 -t $(IMAGE) docker
+# The ephemeral Actions runner resolves package hosts; its build bridge may not.
+DOCKER_BUILD_NETWORK ?= $(if $(filter true,$(GITHUB_ACTIONS)),host,default)
+DOCKER_IMAGE = docker image inspect $(IMAGE) >/dev/null 2>&1 || docker build --network=$(DOCKER_BUILD_NETWORK) --progress=plain --platform linux/amd64 -t $(IMAGE) docker
 
 CXXFLAGS = -std=c++14 -O2 -g -Wall -Wextra -Werror
 HOSTINC  = -Ikit -Iinclude -I. -Isrc -isystem dcsm/third_party/vsomeip/interface
