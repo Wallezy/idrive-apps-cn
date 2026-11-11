@@ -25,6 +25,17 @@ runs:
       run: |
         tag=$(make -s -C native/cluster-render image)
         printf 'tag=%s\n' "$tag" >> "$GITHUB_OUTPUT"
+    - name: Diagnose failed image networking
+      if: failure() && steps.image.outcome == 'failure'
+      shell: bash
+      run: |
+        echo 'Runner resolver'
+        cat /etc/resolv.conf
+        timeout 15 getent ahostsv4 archive.ubuntu.com security.ubuntu.com || true
+        echo 'Pinned build image resolver'
+        timeout 20 docker run --rm --network=host \
+          ubuntu:18.04@sha256:dca176c9663a7ba4c1f0e710986f5a25e672842963d95b960191e2d9f7185ebe \
+          sh -c 'cat /etc/resolv.conf; getent ahostsv4 archive.ubuntu.com security.ubuntu.com' || true
     - if: steps.cache.outputs.cache-hit != 'true'
       shell: bash
       env:
