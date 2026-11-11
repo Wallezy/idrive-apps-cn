@@ -1,5 +1,28 @@
 # Releases
 
+## CN distribution
+
+The GitHub publish target is `Wallezy/idrive-apps-cn`; `publish.js` refuses a
+different GitHub target. `MGU_PUBLISH=dir:<folder>` remains available for
+isolated local build and emulator catalogs. No push automatically publishes.
+
+The reserved public catalog is
+`https://mgu.walle.pw/mgu/cn/idrive-apps/catalog.json` (not published yet).
+It must contain validated CN artifacts and dependencies, never a relabelled
+upstream mirror. Application/component IDs remain upstream's for compatible
+migration; the CN Store owns source selection and migration.
+
+Before a real Release workflow run, commit the stamped versions, complete
+the CN Store integration, update-order and recovery tests, and record their
+evidence in a successful commit status named `release-check/cn-integration`
+on that exact commit. CI unit tests alone do not set this status. Publishing
+checks it before any remote write. A later source or version change needs its
+own validation. The Release workflow defaults to dry run; a dry run may stamp
+locally but neither pushes nor publishes.
+
+国内发行版在配套商店集成和恢复验证完成前不发布。发布状态必须对应实际验证的提交，
+不能把源码仓库、中文截图或上游镜像可用当成国内版安装就绪。
+
 `release.js` builds the repository's components from HEAD and publishes
 them with the catalog the [mgu Store](https://github.com/robertnisipeanu/mgu-store)
 reads (its `docs/PUBLISHING.md`, "2. Catalog"): each tool with a
@@ -12,7 +35,7 @@ node release/release.js build [<id>...]               # artifacts and catalog.js
 node release/release.js check [<id>...]               # build twice, compare byte for byte
 node release/release.js versions <base>               # a pull request's version and CHANGELOG checks
 node release/release.js stamp [<id>...] [--dry-run]   # next versions into the tree, the release commit
-node release/release.js publish [<id>...|--stamped] [--dry-run]  # (GitHub Actions) new versions, then the catalog
+node release/release.js publish [<id>...] [--dry-run] # validated committed versions, then the catalog
 MGU_PUBLISH=dir:<folder> node release/release.js publish   # a local catalog (test unit, USB stick)
 node release/test/release_test.js
 ```
@@ -78,12 +101,11 @@ The catalog is not signed: the Store fetches it over HTTPS and checks each
 artifact's size and sha256 against it.
 
 **Publishing.** Run `.github/workflows/release.yml` by hand (Actions,
-Release) on `main`, with the component ids or none for every changed one.
-It runs `stamp`, pushes the release commit to `main`, then `publish
---stamped` from that commit: the stamped components and any whose version
-the catalog does not list yet; it tags each new version `<id>@<version>`. **Dry run**
-stamps and builds without pushing or publishing, and lists what it would
-publish. A merge to `main` during a run makes the push fail; run it again.
+Release) on an already stamped and validated `main` commit, with component
+ids or none for all components. It publishes that exact commit after checking
+the CN validation status and tags each new version `<id>@<version>`.
+**Dry run** stamps and builds without pushing or publishing, and lists what
+it would publish.
 It uses the workflow's `GITHUB_TOKEN` (`contents: write`) and publishes
 whether this repository is private or public
 (`MGU_PUBLISH_VISIBILITY=any`). `.github/workflows/test.yml` runs every

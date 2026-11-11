@@ -1,6 +1,16 @@
-# idrive-apps
+# idrive-apps-cn
 
 [English](README.md) | 简体中文
+
+Wallezy 维护的 MGU 国内发行版应用仓库，基于
+[robertnisipeanu/idrive-apps](https://github.com/robertnisipeanu/idrive-apps)。
+**当前处于开发阶段，尚不能作为可安装的替换版本。**
+配套国内商店的集成、自更新和恢复验证完成后，才发布国内版目录。
+本仓库保留上游应用 ID 和运行行为，增加发行控制、中文 README 及车主实拍图。
+现有上游镜像包不等于国内版发布包。
+
+国内版目录预留地址：`https://mgu.walle.pw/mgu/cn/idrive-apps/catalog.json`。
+它与 `/mgu/idrive-apps/catalog.json` 上游镜像独立，不能把两者作为同一批应用的重复来源。
 
 适用于宝马 iDrive 7 车机（MGU）的工具和应用，通过
 [mgu Store](https://github.com/robertnisipeanu/mgu-store) 安装。
@@ -16,7 +26,8 @@
 ## 在 HUD 上显示地图
 
 应用中的**显示位置**可以选择仪表盘（默认）、**HUD（实验性）**，
-或**仪表盘和 HUD（实验性）**。同时显示时，HUD 按实际需要占用上传带宽，
+**仪表盘和 HUD（实验性）**或 **Off（关闭）**。关闭后两个区域恢复宝马原生内容，
+不需要重新连接手机或重启。同时显示时，HUD 按实际需要占用上传带宽，
 最多使用一半，为两个显示区域保留流畅显示所需的带宽。
 HUD 支持由 [eroobeeroo](https://github.com/eroobeeroo) 和
 [wesleyredhat](https://github.com/wesleyredhat) 贡献。
@@ -37,8 +48,9 @@ HUD 支持由 [eroobeeroo](https://github.com/eroobeeroo) 和
 - **适配 HUD**：在车机上将画面缩放到显示尺寸，每秒最多处理 10 帧，
   并添加圆角。夜间地图背景会变为黑色，让道路、路线和文字浮现在视野中；
   公园等绿色区域会保留。
-- **避让原生内容**：HUD 原生媒体或列表弹窗出现时，地图会让出显示区域，
-  不会替换宝马原生 HUD 内容。
+- **避让原生内容**：HUD 原生媒体来源列表等弹窗出现时，地图会让出显示区域，
+  不因导航引导让出，也不会替换宝马原生 HUD 内容；
+  **Keep HUD map over BMW's pop-ups** 可让地图在这些弹窗出现时保持显示。
 - **错误保护**：如果仪表盘在 HUD 地图出现后立即重启，且连续发生两次，
   HUD 地图会保持关闭（`HUD map: Disabled after errors`，即因错误停用），
   直到更新到下一版 cluster-render 或执行 `cluster-render guard-reset`。
@@ -68,7 +80,10 @@ HUD 地图：
 
 ## 安装
 
-在商店中添加 GitHub 来源 `robertnisipeanu/idrive-apps`，然后安装
+国内版目录尚未发布。保留现有可用安装，等待配套
+[mgu-store-cn](https://github.com/Wallezy/mgu-store-cn) 发布经过验证的安装与迁移流程。
+
+上游原版的安装方式：在商店中添加 GitHub 来源 `robertnisipeanu/idrive-apps`，然后安装
 **Waze on cluster**（中文界面为 **Waze 仪表盘显示**）。
 商店会先安装所需依赖：来自 mgu-store 的 `mgu-deploy` 0.7.11，
 然后是本仓库的 `cluster-render` 和 Waze 工具。
@@ -84,6 +99,7 @@ node apps/robertn_waze_cluster/tools/test_control.js
 node apps/robertn_waze_cluster/tools/test_page.js
 node apps/robertn_waze_cluster/tools/test_i18n.js
 node release/test/release_test.js
+node release/test/cn_distribution_test.js
 node release/release.js check                         # reproducible artifacts
 ```
 

@@ -1,0 +1,5 @@
+{
+  "repository": "Wallezy/idrive-apps-cn",
+  "catalog": "https://mgu.walle.pw/mgu/cn/idrive-apps/catalog.json",
+  "validationContext": "release-check/cn-integration"
+}

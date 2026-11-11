@@ -181,6 +181,7 @@ jobs:
         with:
           components: ${{ needs.changes.outputs.components }}
       - run: node release/test/release_test.js
+      - run: node release/test/cn_distribution_test.js
       # against the merge commit's base: versions stay as the base has them;
       # a changed component's CHANGELOG says what changed under ## Unreleased
       - if: github.event_name == 'pull_request'

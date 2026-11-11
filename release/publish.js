@@ -2,8 +2,8 @@
 // Copyright (C) 2026 Robert Nisipeanu
 'use strict';
 /**
- * Where release.js publishes, chosen by MGU_PUBLISH (default: the GitHub
- * repository the "origin" remote names):
+ * Where release.js publishes, chosen by MGU_PUBLISH (default: the CN
+ * repository in distribution.json):
  *
  *   github:<owner>/<repo>  GitHub Releases of the repository: each version is
  *                          the release <id>@<version> with its artifact as
@@ -31,21 +31,11 @@ const path = require('path');
 const cp = require('child_process');
 const crypto = require('crypto');
 const { parse } = require('./catalog.js');
+const cn = require('./cn_policy.js');
 
 const REPO = path.join(__dirname, '..');
 
-function originRepo() {
-    try {
-        const url = cp.execFileSync('git', ['remote', 'get-url', 'origin'],
-            { cwd: REPO, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
-        const m = /github\.com[:/]([^/]+\/[^/]+?)(\.git)?$/.exec(url);
-        return m ? `github:${m[1]}` : '';
-    } catch (e) {
-        return '';
-    }
-}
-
-const TARGET = process.env.MGU_PUBLISH || originRepo();
+const TARGET = process.env.MGU_PUBLISH || `github:${cn.distribution.repository}`;
 const KIND = TARGET.slice(0, TARGET.indexOf(':'));
 const WHERE = KIND === 'dir' ? path.resolve(REPO, TARGET.slice(TARGET.indexOf(':') + 1)) : TARGET.slice(TARGET.indexOf(':') + 1);
 const CATALOG_TAG = 'catalog';
@@ -87,8 +77,13 @@ function assetSha256(tag) {
 /* Publishing to GitHub runs in GitHub Actions (.github/workflows/release.yml),
  * and goes only to a repository of the visibility asked for. */
 function githubPreflight(dryRun) {
+    cn.checkTarget(WHERE);
     if (!dryRun && process.env.GITHUB_ACTIONS !== 'true') {
         throw new Error('publishing runs in GitHub Actions: run the Release workflow (release/README.md)');
+    }
+    if (!dryRun) {
+        const sha = cp.execFileSync('git', ['rev-parse', 'HEAD'], { cwd: REPO, encoding: 'utf8' }).trim();
+        cn.checkValidation(sha, JSON.parse(gh(['api', `repos/${WHERE}/commits/${sha}/status`])));
     }
     assertVisibility();
 }
