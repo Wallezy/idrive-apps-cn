@@ -22,7 +22,9 @@ runs:
     # builds it when the cache had none (or one with another tag)
     - id: image
       shell: bash
-      run: echo "tag=$(make -s -C native/cluster-render image)" >> "$GITHUB_OUTPUT"
+      run: |
+        tag=$(make -s -C native/cluster-render image)
+        printf 'tag=%s\n' "$tag" >> "$GITHUB_OUTPUT"
     - if: steps.cache.outputs.cache-hit != 'true'
       shell: bash
       env:
