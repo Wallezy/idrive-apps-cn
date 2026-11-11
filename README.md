@@ -14,8 +14,11 @@ The reserved CN catalog is `https://mgu.walle.pw/mgu/cn/idrive-apps/catalog.json
 It is separate from the upstream mirror at `/mgu/idrive-apps/catalog.json`;
 do not add both as sources for the same apps.
 
-Tools and apps for the iDrive 7 head unit (MGU) of a BMW, installed from the
-[mgu Store](https://github.com/robertnisipeanu/mgu-store).
+Tools and apps for the iDrive 7 head unit (MGU) of a BMW, intended for the
+paired [mgu-store-cn](https://github.com/Wallezy/mgu-store-cn) distribution.
+Its package installation and update path uses domestic HTTPS catalogs.
+GitHub links here identify source history, development and authorship; the
+CN package path does not require adding a GitHub source on the head unit.
 
 | Path | |
 |---|---|
@@ -66,12 +69,10 @@ The CN catalog is not yet published. Keep a working installation until the
 paired [mgu-store-cn](https://github.com/Wallezy/mgu-store-cn) release provides
 its validated installation and migration procedure.
 
-For the upstream distribution, add the GitHub source `robertnisipeanu/idrive-apps` and install
-**Waze on cluster**. The Store installs what it requires first: `mgu-deploy`
-0.7.11 from mgu-store, then `cluster-render` and the Waze tool from here. One
-head-unit start activates the CarPlay patch, and the Android Auto patch on a
-car that supports it. The Store removes them again:
-the app, then the tool, then the renderer.
+After that release is accepted, install **Waze on cluster** through the CN
+Store. The Store resolves the app's declared dependencies, including the
+deploy tool, cluster renderer and Waze tool, through the same CN channel.
+Follow the accepted release's activation and recovery procedure.
 
 ## Build
 

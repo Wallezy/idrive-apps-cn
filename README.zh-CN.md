@@ -12,8 +12,10 @@ Wallezy 维护的 MGU 国内发行版应用仓库，基于
 国内版目录预留地址：`https://mgu.walle.pw/mgu/cn/idrive-apps/catalog.json`。
 它与 `/mgu/idrive-apps/catalog.json` 上游镜像独立，不能把两者作为同一批应用的重复来源。
 
-适用于宝马 iDrive 7 车机（MGU）的工具和应用，通过
-[mgu Store](https://github.com/robertnisipeanu/mgu-store) 安装。
+适用于宝马 iDrive 7 车机（MGU）的工具和应用，面向配套的
+[mgu-store-cn](https://github.com/Wallezy/mgu-store-cn) 国内发行版。
+安装和更新包使用国内 HTTPS 目录。本文中的 GitHub 链接用于源码、
+开发和作者署名；国内版下载链路不需要在车机中添加 GitHub 来源。
 
 | 路径 | 说明 |
 |---|---|
@@ -83,12 +85,9 @@ HUD 地图：
 国内版目录尚未发布。保留现有可用安装，等待配套
 [mgu-store-cn](https://github.com/Wallezy/mgu-store-cn) 发布经过验证的安装与迁移流程。
 
-上游原版的安装方式：在商店中添加 GitHub 来源 `robertnisipeanu/idrive-apps`，然后安装
-**Waze on cluster**（中文界面为 **Waze 仪表盘显示**）。
-商店会先安装所需依赖：来自 mgu-store 的 `mgu-deploy` 0.7.11，
-然后是本仓库的 `cluster-render` 和 Waze 工具。
-重启车机一次后，CarPlay 补丁生效；支持 Android Auto 的车辆也会激活对应补丁。
-移除同样通过商店完成，顺序为应用、工具、渲染器。
+经过发布验收后，通过国内商店安装 **Waze 仪表盘显示**。
+商店会根据应用声明，从同一国内发行通道安装部署工具、仪表盘渲染器、
+Waze 工具等依赖。激活、重启和恢复以该正式发布版本的说明为准。
 
 ## 构建
 
