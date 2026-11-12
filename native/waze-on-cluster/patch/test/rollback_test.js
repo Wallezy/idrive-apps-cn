@@ -25,7 +25,8 @@
  *
  * With CARPLAY_BIN every release runs on a copy of carplay 22.28.3; without
  * it B-F run on a synthetic build (synthetic_carplay.js), A not at all.
- * The release tags come from the repository's git, fetched when missing.
+ * The release tags come from git, fetched from WOC_RELEASE_REMOTE (origin
+ * by default) when missing. A distribution fork can name upstream.
  *
  *   [CARPLAY_BIN=<carplay 22.28.3>] node rollback_test.js
  */
@@ -68,7 +69,8 @@ if (!list.length) {
     /* a shallow checkout (CI) fetches them shallow; a full clone stays full */
     var shallow = false;
     try { shallow = git(['rev-parse', '--is-shallow-repository']).trim() === 'true'; } catch (e) {}
-    try { git(['fetch', '--no-tags'].concat(shallow ? ['--depth=1'] : [], ['origin', '+refs/tags/waze-on-cluster@*:refs/tags/waze-on-cluster@*'])); } catch (e) {}
+    try { git(['fetch', '--no-tags'].concat(shallow ? ['--depth=1'] : [], [process.env.WOC_RELEASE_REMOTE || 'origin',
+        '+refs/tags/waze-on-cluster@*:refs/tags/waze-on-cluster@*'])); } catch (e) {}
     list = tags() || [];
 }
 ok('the release tags are at hand', list.length > 0, 'no waze-on-cluster@* tag, and fetching them failed');
