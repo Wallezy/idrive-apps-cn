@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 'use strict';
 
-/* Initial CN localization keeps the reviewed numeric versions. A future
- * upstream upgrade updates this baseline as a separate reviewed release. */
+/* Every CN release uses its reviewed numeric component versions. */
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
@@ -55,4 +54,4 @@ for (const [id, text] of Object.entries(chinese)) {
         assert(/[\u4e00-\u9fff]/.test(value) && !/\ufffd|[\r\n]/.test(value), `${id}.${field}: valid Chinese single-line text`);
     }
 }
-console.log(`CN catalog: ${Object.keys(found).length} components translated; ${checked.length} version fields unchanged`);
+console.log(`CN catalog: ${Object.keys(found).length} components translated; ${checked.length} version fields consistent`);
