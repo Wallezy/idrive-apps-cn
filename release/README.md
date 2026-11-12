@@ -6,13 +6,20 @@ The GitHub publish target is `Wallezy/idrive-apps-cn`; `publish.js` refuses a
 different GitHub target. `MGU_PUBLISH=dir:<folder>` remains available for
 isolated local build and emulator catalogs. No push automatically publishes.
 
-The reserved public catalog is
-`https://mgu.walle.pw/mgu/cn/idrive-apps/catalog.json` (not published yet).
+The public catalog is
+`https://mgu.walle.pw/mgu/cn/idrive-apps/catalog.json`.
 It must contain validated CN artifacts and dependencies, never a relabelled
 upstream mirror. Application/component IDs remain upstream's for compatible
 migration; the CN Store owns source selection and migration.
 
-Before a real Release workflow run, commit the stamped versions, complete
+CN OSS publication uses the CN Store's `prepare_cn.py`, `promote_cn.py` and
+`publish_cn.py`. Reviewed upstream synchronization and its CN compatibility
+adaptations publish identical payloads to Beta and Stable after source review,
+reproducibility and exact-commit CI. Runtime integration is explicitly pending
+when not tested, and does not block this route. A separately requested
+development trial publishes only Beta until the owner requests wider release.
+
+Before an optional GitHub Release workflow run, commit the stamped versions, complete
 the CN Store integration, update-order and recovery tests, and record their
 evidence in a successful commit status named `release-check/cn-integration`
 on that exact commit. CI unit tests alone do not set this status. Publishing
@@ -20,8 +27,8 @@ checks it before any remote write. A later source or version change needs its
 own validation. The Release workflow defaults to dry run; a dry run may stamp
 locally but neither pushes nor publishes.
 
-国内发行版在配套商店集成和恢复验证完成前不发布。发布状态必须对应实际验证的提交，
-不能把源码仓库、中文截图或上游镜像可用当成国内版安装就绪。
+国内版经审阅的上游同步更新同时发布到 Beta 和 Stable。源码测试、依赖和构建一致性
+检查必须对应实际发布提交；未做的车机验证如实保留为待验证状态。
 
 The initial CN localization preserves the reviewed numeric versions recorded
 in `cn-localization-versions.json`; do not stamp that preparation. Run
