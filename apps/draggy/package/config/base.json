@@ -1,0 +1,24 @@
+{
+  "settings": {
+    "draggy": {
+      "comment": "BMW's own scalings (M Laptimer TypeConverters)",
+      "scaling": {
+        "speed": {
+          "factor": 0.015625,
+          "offset": 0,
+          "invalid": 65535
+        },
+        "accel": {
+          "factor": 0.002,
+          "offset": -65,
+          "invalid": 65535
+        },
+        "rpm": {
+          "factor": 0.25,
+          "offset": 0,
+          "invalid": 65535
+        }
+      }
+    }
+  }
+}

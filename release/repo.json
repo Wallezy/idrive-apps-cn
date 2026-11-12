@@ -1,0 +1,15 @@
+{
+  "unprefixedAppIds": [
+    "brake_test",
+    "car_vitals",
+    "doom",
+    "draggy",
+    "dtc_scanner",
+    "dyno",
+    "edrive",
+    "gforce",
+    "redline",
+    "service",
+    "warmup"
+  ]
+}

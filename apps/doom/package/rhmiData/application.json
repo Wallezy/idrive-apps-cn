@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "1.3.0",
+  "application": {
+    "uuid": "0b21e1b2-2b0a-574e-b23e-63d2d22f09e4",
+    "type": "OnlineApp",
+    "name": "doom",
+    "vendor": "custom",
+    "version": "1.4.2",
+    "defaultLanguage": "en_GB",
+    "stringBundleUuid": "4217be99-7dfd-5342-a9de-df74e7008ac9",
+    "resourceBundleUuid": "88ef50e0-10cb-581b-88cb-748b2eb7c7eb",
+    "entryPoints": [
+      {
+        "name": "DOOM_ENTRY",
+        "uuid": "dd0fb4f1-b376-5d2a-a7e9-e55a870beb27",
+        "textId": "SID_DOOM_TITLE",
+        "icon": "doom_icon.png",
+        "insertionStateId": 20974,
+        "insertionFocusId": 2,
+        "insertionMode": "INSERT_BELOW",
+        "insertionOrder": 0,
+        "insertionPriority": 0,
+        "previewType": "NONE",
+        "bookmarkable": true,
+        "private": false,
+        "appearance": "DEFAULT",
+        "isGroupHeader": false,
+        "insertionGroup": 0
+      }
+    ],
+    "uiDescriptions": [
+      {
+        "applicationFilePath": "./uiDescriptions/ID7/application.xml",
+        "uiDescriptionFilePath": "./uiDescriptions/ID7/uiDescription.json",
+        "hmi": [
+          "ID7"
+        ]
+      }
+    ],
+    "variantGroups": [
+      {
+        "stringsPath": "./variantGroups/Common/texts",
+        "resourcesPath": "./variantGroups/Common/images",
+        "hmi": [
+          "ID7"
+        ],
+        "brands": [
+          "BMW"
+        ]
+      }
+    ]
+  }
+}

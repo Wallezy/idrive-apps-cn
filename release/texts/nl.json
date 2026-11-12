@@ -10,5 +10,49 @@
   "robertn_waze_cluster": {
     "title": "Waze in instrumentpaneel",
     "description": "Zet de CarPlay-Waze-kaart op het instrumentpaneel: schakel de patch in via de HMI en de kaart volgt CarPlay"
+  },
+  "brake_test": {
+    "title": "Brake Test (简体中文)",
+    "description": "Simplified Chinese edition. 100-0 and 200-0 braking distance, peak decel and brake-fade tracking"
+  },
+  "car_vitals": {
+    "title": "M Vitals (简体中文)",
+    "description": "Simplified Chinese edition. Live engine, thermal, intake / fuel / ignition, tyre and chassis gauges"
+  },
+  "doom": {
+    "title": "Doom (简体中文)",
+    "description": "Simplified Chinese edition. Doom (Freedoom: Phase 1) on the iDrive. Main menu with all settings; the game drawn in full resolution across the whole screen, on the controller; BACK returns to the menu and saves"
+  },
+  "draggy": {
+    "title": "Drag Timer (简体中文)",
+    "description": "Simplified Chinese edition. 0-100, 100-200 and 1/4 mile timer with best times"
+  },
+  "dtc_scanner": {
+    "title": "Fault Scanner (简体中文)",
+    "description": "Simplified Chinese edition. Read and clear fault memory of every control unit, plus active Check Control messages"
+  },
+  "dyno": {
+    "title": "Virtual Dyno (简体中文)",
+    "description": "Simplified Chinese edition. Power and torque curves from a full-throttle pull, saved and compared"
+  },
+  "edrive": {
+    "title": "eDrive (简体中文)",
+    "description": "Simplified Chinese edition. Real electric range, HV battery health (SOH) and energy, last charge, charge log and 12 V battery voltage"
+  },
+  "gforce": {
+    "title": "G-Force (简体中文)",
+    "description": "Simplified Chinese edition. Friction circle with grip envelope, peak g per direction and session records"
+  },
+  "redline": {
+    "title": "Redline (简体中文)",
+    "description": "Simplified Chinese edition. Full-screen rev tach with shift lights, gear, shift scoring and cold-engine rev guard"
+  },
+  "service": {
+    "title": "Service (简体中文)",
+    "description": "Simplified Chinese edition. Service requirements from the instrument cluster: oil, brakes, brake fluid, vehicle check, inspection - distance, date and details"
+  },
+  "warmup": {
+    "title": "Warm-Up (简体中文)",
+    "description": "Simplified Chinese edition. Oil and coolant warm-up calculator (time to ready), safe rev limit and turbo cool-down"
   }
 }

@@ -1,0 +1,205 @@
+{
+ "id": "doom",
+ "title": "\u6bc1\u706d\u6218\u58eb",
+ "version": "1.4.2",
+ "screens": [
+  {
+   "name": "MAIN",
+   "kind": "menu",
+   "title": "\u6bc1\u706d\u6218\u58eb",
+   "settings": true,
+   "items": [
+    [
+     "button",
+     "BTN_PLAY",
+     "\u5f00\u59cb\u6e38\u620f"
+    ],
+    [
+     "button",
+     "BTN_NEW",
+     "\u65b0\u6e38\u620f"
+    ],
+    [
+     "text",
+     "MENU_INFO",
+     ""
+    ]
+   ]
+  },
+  {
+   "name": "GAME",
+   "kind": "canvas",
+   "title": "\u6bc1\u706d\u6218\u58eb",
+   "chrome": false,
+   "buttons": [
+    [
+     "BTN_BACK",
+     "\u540e\u9000"
+    ],
+    [
+     "BTN_TL",
+     "\u5411\u5de6\u8f6c"
+    ],
+    [
+     "BTN_WL",
+     "\u5411\u5de6\u5e73\u79fb"
+    ],
+    [
+     "BTN_STAND",
+     "\u505c\u6b62\u79fb\u52a8"
+    ],
+    [
+     "BTN_WALK",
+     "\u884c\u8d70"
+    ],
+    [
+     "BTN_WR",
+     "\u5411\u53f3\u5e73\u79fb"
+    ],
+    [
+     "BTN_TR",
+     "\u5411\u53f3\u8f6c"
+    ],
+    [
+     "BTN_WEAPON",
+     "\u5207\u6362\u6b66\u5668"
+    ]
+   ]
+  }
+ ],
+ "settings": [
+  {
+   "key": "skill",
+   "label": "\u96be\u5ea6\uff08\u65b0\u6e38\u620f\uff09",
+   "type": "choice",
+   "default": "3",
+   "options": [
+    [
+     "1",
+     "\u5165\u95e8"
+    ],
+    [
+     "2",
+     "\u7b80\u5355"
+    ],
+    [
+     "3",
+     "\u666e\u901a"
+    ],
+    [
+     "4",
+     "\u56f0\u96be"
+    ],
+    [
+     "5",
+     "\u5669\u68a6\uff01"
+    ]
+   ]
+  },
+  {
+   "key": "episode",
+   "label": "\u7ae0\u8282\uff08\u65b0\u6e38\u620f\uff09",
+   "type": "choice",
+   "default": "1",
+   "options": [
+    [
+     "1",
+     "1\uff1a\u524d\u54e8\u5371\u673a"
+    ],
+    [
+     "2",
+     "2\uff1a\u519b\u4e8b\u5b9e\u9a8c\u5ba4"
+    ],
+    [
+     "3",
+     "3\uff1a\u4e8b\u4ef6\u89c6\u754c"
+    ],
+    [
+     "4",
+     "4\uff1a\u53cc\u91cd\u51b2\u51fb"
+    ]
+   ]
+  },
+  {
+   "key": "run",
+   "label": "\u79fb\u52a8\u901f\u5ea6",
+   "type": "choice",
+   "default": "slow",
+   "options": [
+    [
+     "slow",
+     "\u6162\u8d70\uff08\u65b9\u4fbf\u63a7\u5236\uff09"
+    ],
+    [
+     "walk",
+     "\u884c\u8d70"
+    ],
+    [
+     "run",
+     "\u5954\u8dd1"
+    ]
+   ]
+  },
+  {
+   "key": "aim",
+   "label": "\u7784\u51c6\u901f\u5ea6\uff08\u65cb\u8f6c\u63a7\u5236\u5668\uff09",
+   "type": "choice",
+   "default": "normal",
+   "options": [
+    [
+     "slow",
+     "\u6162"
+    ],
+    [
+     "normal",
+     "\u6b63\u5e38"
+    ],
+    [
+     "fast",
+     "\u5feb"
+    ]
+   ]
+  },
+  {
+   "key": "aimdir",
+   "label": "\u7784\u51c6\u65b9\u5411",
+   "type": "choice",
+   "default": "normal",
+   "options": [
+    [
+     "normal",
+     "\u6b63\u5e38"
+    ],
+    [
+     "reversed",
+     "\u53cd\u5411"
+    ]
+   ]
+  },
+  {
+   "key": "detail",
+   "label": "\u6e32\u67d3\u5206\u8fa8\u7387",
+   "type": "choice",
+   "default": "full",
+   "options": [
+    [
+     "full",
+     "\u5168\u5206\u8fa8\u7387\uff1a1920 \u00d7 504"
+    ],
+    [
+     "medium",
+     "\u4e2d\uff1a1440 \u00d7 378"
+    ],
+    [
+     "low",
+     "\u4f4e\uff1a960 \u00d7 252"
+    ]
+   ]
+  }
+ ],
+ "config": null,
+ "stateIds": {
+  "MAIN": 1,
+  "GAME": 15
+ }
+}

@@ -1,0 +1,135 @@
+{
+  "settings": {
+    "edrive": {
+      "comment": "HV battery values and the 12 V voltage are read with UDS ReadDataByIdentifier (0x22). Each value tries its candidates in order and keeps the first that answers with a plausible number: value = raw * factor + offset, raw = 'bytes' big-endian bytes from 'at' (0 = first data byte after the DID). 'ecu' on a candidate overrides battery.ecu (decimal: 7 = SME battery unit, 18 = DME engine unit). DIDs differ between models: check the Diagnostics page in the app and adjust here if a value shows n/a or looks wrong. F442 is the standard OBD 'control module voltage' (terminal 30, i.e. the 12 V battery).",
+      "battery": {
+        "ecu": 7,
+        "soc": [
+          {
+            "did": "DDBC",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.1,
+            "offset": 0,
+            "min": 0,
+            "max": 100
+          }
+        ],
+        "soh": [
+          {
+            "did": "DD7B",
+            "bytes": 1,
+            "at": 0,
+            "factor": 1,
+            "offset": 0,
+            "min": 40,
+            "max": 110
+          },
+          {
+            "did": "6335",
+            "bytes": 1,
+            "at": 0,
+            "factor": 1,
+            "offset": 0,
+            "min": 40,
+            "max": 110
+          }
+        ],
+        "v12": [
+          {
+            "ecu": 18,
+            "did": "F442",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.001,
+            "offset": 0,
+            "min": 5,
+            "max": 18
+          },
+          {
+            "ecu": 7,
+            "did": "F442",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.001,
+            "offset": 0,
+            "min": 5,
+            "max": 18
+          },
+          {
+            "ecu": 18,
+            "obd": "42",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.001,
+            "offset": 0,
+            "min": 5,
+            "max": 18,
+            "note": "the same PID with OBD service 01, for engine units that refuse F442 with NRC 31"
+          },
+          {
+            "ecu": 19,
+            "did": "F442",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.001,
+            "offset": 0,
+            "min": 5,
+            "max": 18,
+            "note": "second engine unit (0x13), on cars that have one"
+          },
+          {
+            "ecu": 19,
+            "obd": "42",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.001,
+            "offset": 0,
+            "min": 5,
+            "max": 18
+          },
+          {
+            "ecu": 24,
+            "did": "F442",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.001,
+            "offset": 0,
+            "min": 5,
+            "max": 18,
+            "note": "transmission unit EGS (0x18): control module voltage too, when the engine unit doesn't answer (e.g. G06 N63)"
+          },
+          {
+            "ecu": 24,
+            "obd": "42",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.001,
+            "offset": 0,
+            "min": 5,
+            "max": 18
+          }
+        ],
+        "chargeMinPct": 3
+      },
+      "scaling": {
+        "batteryTemp": {
+          "factor": 1,
+          "offset": -40,
+          "invalid": 255,
+          "comment": "HV battery temperature (Efficiencytainment2.statusBatteryTemperature, avg / min / max): raw on the Signals page - adjust if it doesn't match"
+        },
+        "ambient": {
+          "factor": 0.5,
+          "offset": -40,
+          "invalid": 255
+        },
+        "rpm": {
+          "factor": 0.25,
+          "offset": 0,
+          "invalid": 65535
+        }
+      }
+    }
+  }
+}

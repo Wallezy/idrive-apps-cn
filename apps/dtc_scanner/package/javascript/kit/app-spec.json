@@ -1,0 +1,141 @@
+{
+ "id": "dtc_scanner",
+ "title": "\u6545\u969c\u68c0\u6d4b",
+ "version": "2.6.4",
+ "screens": [
+  {
+   "name": "MAIN",
+   "kind": "canvas",
+   "title": "\u6545\u969c\u68c0\u6d4b",
+   "buttons": [
+    [
+     "BTN_SCAN",
+     "\u7acb\u5373\u626b\u63cf"
+    ],
+    [
+     "BTN_CLEAR",
+     "\u6e05\u9664\u5168\u90e8"
+    ],
+    [
+     "BTN_PAGE",
+     "\u4e0b\u4e00\u9875"
+    ],
+    [
+     "BTN_SETTINGS",
+     "\u8bbe\u7f6e"
+    ]
+   ]
+  }
+ ],
+ "settings": [
+  {
+   "key": "scope",
+   "label": "\u8bfb\u53d6\u7684\u6545\u969c\u8303\u56f4",
+   "type": "choice",
+   "default": "current",
+   "options": [
+    [
+     "current",
+     "\u5f53\u524d"
+    ],
+    [
+     "all",
+     "\u5305\u542b\u5386\u53f2"
+    ]
+   ]
+  },
+  {
+   "key": "info",
+   "label": "\u540c\u65f6\u8bfb\u53d6\u4fe1\u606f\u5b58\u50a8\u5668",
+   "type": "bool",
+   "default": false
+  },
+  {
+   "key": "autoScan",
+   "label": "\u6253\u5f00\u65f6\u626b\u63cf",
+   "type": "bool",
+   "default": true
+  },
+  {
+   "key": "theme",
+   "label": "\u914d\u8272\u4e3b\u9898",
+   "type": "choice",
+   "default": "m_tricolour",
+   "options": [
+    [
+     "m_red",
+     "M \u7ea2\u8272"
+    ],
+    [
+     "m_tricolour",
+     "M \u4e09\u8272"
+    ],
+    [
+     "ice",
+     "\u51b0\u6676\u767d"
+    ],
+    [
+     "amber",
+     "\u591c\u95f4\u7425\u73c0"
+    ]
+   ]
+  },
+  {
+   "key": "layout",
+   "label": "\u5c4f\u5e55\u5e03\u5c40",
+   "type": "choice",
+   "default": "full",
+   "options": [
+    [
+     "full",
+     "\u5168\u5c4f"
+    ],
+    [
+     "standard",
+     "\u6807\u51c6"
+    ]
+   ]
+  },
+  {
+   "key": "renderer",
+   "label": "\u6e32\u67d3\u5668",
+   "type": "choice",
+   "default": "auto",
+   "options": [
+    [
+     "auto",
+     "GPU 60 \u5e27\uff08\u9ed8\u8ba4\uff09"
+    ],
+    [
+     "software",
+     "\u8f6f\u4ef6\u6e32\u67d3"
+    ]
+   ]
+  },
+  {
+   "key": "demo",
+   "label": "\u6f14\u793a\u6570\u636e",
+   "type": "choice",
+   "default": "auto",
+   "options": [
+    [
+     "auto",
+     "\u81ea\u52a8"
+    ],
+    [
+     "on",
+     "\u59cb\u7ec8"
+    ],
+    [
+     "off",
+     "\u4ece\u4e0d"
+    ]
+   ]
+  }
+ ],
+ "config": null,
+ "stateIds": {
+  "MAIN": 1,
+  "SETTINGS": 11
+ }
+}

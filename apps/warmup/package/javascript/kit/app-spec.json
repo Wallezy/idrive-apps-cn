@@ -1,0 +1,187 @@
+{
+ "id": "warmup",
+ "title": "\u6696\u673a\u52a9\u624b",
+ "version": "1.4.5",
+ "screens": [
+  {
+   "name": "MAIN",
+   "kind": "canvas",
+   "title": "\u6696\u673a\u52a9\u624b",
+   "buttons": [
+    [
+     "BTN_SETTINGS",
+     "\u8bbe\u7f6e"
+    ]
+   ]
+  }
+ ],
+ "settings": [
+  {
+   "key": "warmOil",
+   "label": "\u673a\u6cb9\u6696\u673a\u76ee\u6807\u6e29\u5ea6",
+   "type": "number",
+   "unit": "\u00b0C",
+   "default": 80,
+   "steps": [
+    60,
+    70,
+    75,
+    80,
+    85,
+    90,
+    100
+   ]
+  },
+  {
+   "key": "warmCoolant",
+   "label": "\u51b7\u5374\u6db2\u6696\u673a\u76ee\u6807\u6e29\u5ea6",
+   "type": "number",
+   "unit": "\u00b0C",
+   "default": 80,
+   "steps": [
+    60,
+    70,
+    75,
+    80,
+    85,
+    90
+   ]
+  },
+  {
+   "key": "coldLimit",
+   "label": "\u51b7\u673a\u8f6c\u901f\u4e0a\u9650",
+   "type": "number",
+   "unit": "rpm",
+   "default": 3500,
+   "steps": [
+    2500,
+    3000,
+    3500,
+    4000,
+    4500
+   ]
+  },
+  {
+   "key": "redline",
+   "label": "\u6362\u6321\u8f6c\u901f",
+   "type": "number",
+   "unit": "rpm",
+   "default": 7000,
+   "steps": [
+    5000,
+    5500,
+    6000,
+    6500,
+    7000,
+    7200,
+    7500,
+    8000,
+    8500,
+    9000
+   ]
+  },
+  {
+   "key": "cooldown",
+   "label": "\u6fc0\u70c8\u9a7e\u9a76\u540e\u6da1\u8f6e\u51b7\u5374",
+   "type": "bool",
+   "default": true
+  },
+  {
+   "key": "tempUnit",
+   "label": "\u6e29\u5ea6\u5355\u4f4d",
+   "type": "choice",
+   "default": "c",
+   "options": [
+    [
+     "c",
+     "\u6444\u6c0f\u5ea6"
+    ],
+    [
+     "f",
+     "\u534e\u6c0f\u5ea6"
+    ]
+   ]
+  },
+  {
+   "key": "theme",
+   "label": "\u914d\u8272\u4e3b\u9898",
+   "type": "choice",
+   "default": "m_tricolour",
+   "options": [
+    [
+     "m_red",
+     "M \u7ea2\u8272"
+    ],
+    [
+     "m_tricolour",
+     "M \u4e09\u8272"
+    ],
+    [
+     "ice",
+     "\u51b0\u6676\u767d"
+    ],
+    [
+     "amber",
+     "\u591c\u95f4\u7425\u73c0"
+    ]
+   ]
+  },
+  {
+   "key": "layout",
+   "label": "\u5c4f\u5e55\u5e03\u5c40",
+   "type": "choice",
+   "default": "full",
+   "options": [
+    [
+     "full",
+     "\u5168\u5c4f"
+    ],
+    [
+     "standard",
+     "\u6807\u51c6"
+    ]
+   ]
+  },
+  {
+   "key": "renderer",
+   "label": "\u6e32\u67d3\u5668",
+   "type": "choice",
+   "default": "auto",
+   "options": [
+    [
+     "auto",
+     "GPU 60 \u5e27\uff08\u9ed8\u8ba4\uff09"
+    ],
+    [
+     "software",
+     "\u8f6f\u4ef6\u6e32\u67d3"
+    ]
+   ]
+  },
+  {
+   "key": "demo",
+   "label": "\u6f14\u793a\u6570\u636e",
+   "type": "choice",
+   "default": "auto",
+   "options": [
+    [
+     "auto",
+     "\u81ea\u52a8"
+    ],
+    [
+     "on",
+     "\u59cb\u7ec8"
+    ],
+    [
+     "off",
+     "\u4ece\u4e0d"
+    ]
+   ]
+  }
+ ],
+ "config": null,
+ "stateIds": {
+  "MAIN": 1,
+  "SETTINGS": 8
+ }
+}

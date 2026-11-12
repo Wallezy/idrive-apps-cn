@@ -1,0 +1,36 @@
+{
+  "name": "doom",
+  "version": "1.4.2",
+  "description": "Doom (Freedoom: Phase 1) on the iDrive. Main menu with all settings; the game drawn in full resolution across the whole screen, on the controller; BACK returns to the menu and saves",
+  "main": "javascript/localized-entry.js",
+  "private": false,
+  "author": "custom",
+  "license": "GPL-2.0-only",
+  "engines": {
+    "node": ">=8.7.0"
+  },
+  "oapAppSettings": {
+    "maxDiskUsage": 104857600,
+    "cpuLimit": 60,
+    "memoryThresholdKB": 196608,
+    "priority": "PRIO_LOW",
+    "visibility": "FOREGROUND",
+    "latencyClass": "FOREGROUND",
+    "loggingId": "OA9F",
+    "userLoginRequired": false,
+    "backgroundPriority": 200,
+    "someipManifest": "manifest.json"
+  },
+  "mguLocalOnly": true,
+  "files": [
+    "package.json",
+    "npm-shrinkwrap.json",
+    "manifest.json",
+    "permissions.json",
+    "config",
+    "javascript",
+    "rhmiData",
+    "LICENSE",
+    "NOTICE.zh-CN.md"
+  ]
+}

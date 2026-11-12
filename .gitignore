@@ -6,3 +6,5 @@ native/*/build/
 *.tgz
 release/out/
 release/published/
+__pycache__/
+*.pyc

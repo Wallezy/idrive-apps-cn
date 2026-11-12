@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "1.3.0",
+  "application": {
+    "uuid": "28f71ecf-9379-5087-b7b1-a70304e1e500",
+    "type": "OnlineApp",
+    "name": "gforce",
+    "vendor": "custom",
+    "version": "1.4.2",
+    "defaultLanguage": "en_GB",
+    "stringBundleUuid": "f97ef80e-bc3a-5be5-81d4-f1d04bb99253",
+    "resourceBundleUuid": "c1ce8540-1381-5c8d-afb4-133e36778b79",
+    "entryPoints": [
+      {
+        "name": "GFORCE_ENTRY",
+        "uuid": "bfa04466-6427-5e70-92ed-f6f7be8d6cb2",
+        "textId": "SID_GFORCE_TITLE",
+        "icon": "gforce_icon.png",
+        "insertionStateId": 20974,
+        "insertionFocusId": 2,
+        "insertionMode": "INSERT_BELOW",
+        "insertionOrder": 0,
+        "insertionPriority": 0,
+        "previewType": "NONE",
+        "bookmarkable": true,
+        "private": false,
+        "appearance": "DEFAULT",
+        "isGroupHeader": false,
+        "insertionGroup": 0
+      }
+    ],
+    "uiDescriptions": [
+      {
+        "applicationFilePath": "./uiDescriptions/ID7/application.xml",
+        "uiDescriptionFilePath": "./uiDescriptions/ID7/uiDescription.json",
+        "hmi": [
+          "ID7"
+        ]
+      }
+    ],
+    "variantGroups": [
+      {
+        "stringsPath": "./variantGroups/Common/texts",
+        "resourcesPath": "./variantGroups/Common/images",
+        "hmi": [
+          "ID7"
+        ],
+        "brands": [
+          "BMW"
+        ]
+      }
+    ]
+  }
+}

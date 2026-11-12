@@ -1,0 +1,36 @@
+{
+  "name": "redline",
+  "version": "1.8.2",
+  "description": "Full-screen rev tach with shift lights, gear, shift scoring and cold-engine rev guard",
+  "main": "javascript/localized-entry.js",
+  "private": false,
+  "author": "custom",
+  "license": "MIT",
+  "engines": {
+    "node": ">=8.7.0"
+  },
+  "oapAppSettings": {
+    "maxDiskUsage": 20971520,
+    "cpuLimit": 60,
+    "memoryThresholdKB": 196608,
+    "priority": "PRIO_LOW",
+    "visibility": "FOREGROUND",
+    "latencyClass": "FOREGROUND",
+    "loggingId": "OA97",
+    "userLoginRequired": false,
+    "backgroundPriority": 200,
+    "someipManifest": "manifest.json"
+  },
+  "mguLocalOnly": true,
+  "files": [
+    "package.json",
+    "npm-shrinkwrap.json",
+    "manifest.json",
+    "permissions.json",
+    "config",
+    "javascript",
+    "rhmiData",
+    "LICENSE",
+    "NOTICE.zh-CN.md"
+  ]
+}

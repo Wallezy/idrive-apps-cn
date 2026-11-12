@@ -1,0 +1,912 @@
+{
+ "id": "car_vitals",
+ "title": "M \u8f66\u8f86\u4eea\u8868",
+ "version": "2.13.1",
+ "screens": [
+  {
+   "name": "MAIN",
+   "kind": "canvas",
+   "title": "M \u8f66\u8f86\u4eea\u8868",
+   "buttons": [
+    [
+     "BTN_PAGE",
+     "\u4e0b\u4e00\u9875"
+    ],
+    [
+     "BTN_PREV",
+     "\u4e0a\u4e00\u9875"
+    ],
+    [
+     "BTN_SETTINGS",
+     "\u8bbe\u7f6e"
+    ]
+   ]
+  }
+ ],
+ "settings": [
+  {
+   "key": "page",
+   "label": "\u542f\u52a8\u9875\u9762",
+   "type": "choice",
+   "default": "engine",
+   "options": [
+    [
+     "engine",
+     "\u53d1\u52a8\u673a"
+    ],
+    [
+     "thermal",
+     "\u6e29\u5ea6"
+    ],
+    [
+     "fuel",
+     "\u71c3\u6cb9\u4e0e\u70b9\u706b"
+    ],
+    [
+     "chassis",
+     "\u5e95\u76d8"
+    ]
+   ]
+  },
+  {
+   "key": "tempUnit",
+   "label": "\u6e29\u5ea6",
+   "type": "choice",
+   "default": "C",
+   "options": [
+    [
+     "C",
+     "\u6444\u6c0f\u5ea6"
+    ],
+    [
+     "F",
+     "\u534e\u6c0f\u5ea6"
+    ]
+   ]
+  },
+  {
+   "key": "pressUnit",
+   "label": "\u538b\u529b\u5355\u4f4d",
+   "type": "choice",
+   "default": "bar",
+   "options": [
+    [
+     "bar",
+     "bar"
+    ],
+    [
+     "psi",
+     "psi"
+    ]
+   ]
+  },
+  {
+   "key": "speedUnit",
+   "label": "\u8f66\u901f",
+   "type": "choice",
+   "default": "kmh",
+   "options": [
+    [
+     "kmh",
+     "km/h"
+    ],
+    [
+     "mph",
+     "mph"
+    ]
+   ]
+  },
+  {
+   "key": "redline",
+   "label": "\u6362\u6321\u8f6c\u901f",
+   "type": "number",
+   "unit": "rpm",
+   "default": 7000,
+   "steps": [
+    5500,
+    6000,
+    6500,
+    7000,
+    7200,
+    7500,
+    8000
+   ]
+  },
+  {
+   "key": "maxPower",
+   "label": "\u6700\u5927\u529f\u7387\uff08\u8fd0\u52a8\u4eea\u8868\u7684 100%\uff09",
+   "type": "number",
+   "unit": "kW",
+   "default": 215,
+   "steps": [
+    100,
+    120,
+    135,
+    140,
+    150,
+    160,
+    170,
+    185,
+    190,
+    200,
+    215,
+    230,
+    240,
+    250,
+    260,
+    275,
+    285,
+    300,
+    320,
+    340,
+    360,
+    375,
+    390,
+    405,
+    420,
+    450,
+    460,
+    480,
+    500,
+    530,
+    550,
+    600
+   ]
+  },
+  {
+   "key": "powerUnit",
+   "label": "\u529f\u7387\u5355\u4f4d",
+   "type": "choice",
+   "default": "kw",
+   "options": [
+    [
+     "kw",
+     "kW"
+    ],
+    [
+     "hp",
+     "hp"
+    ],
+    [
+     "ps",
+     "PS"
+    ]
+   ]
+  },
+  {
+   "key": "torqueUnit",
+   "label": "\u626d\u77e9\u5355\u4f4d",
+   "type": "choice",
+   "default": "nm",
+   "options": [
+    [
+     "nm",
+     "Nm"
+    ],
+    [
+     "lbft",
+     "lb-ft"
+    ]
+   ]
+  },
+  {
+   "key": "powerSource",
+   "label": "\u529f\u7387\u6765\u6e90",
+   "type": "choice",
+   "default": "sport",
+   "options": [
+    [
+     "sport",
+     "\u8fd0\u52a8\u4eea\u8868"
+    ],
+    [
+     "calc",
+     "\u626d\u77e9 \u00d7 \u8f6c\u901f"
+    ]
+   ]
+  },
+  {
+   "key": "oilWarn",
+   "label": "\u673a\u6cb9\u6e29\u5ea6\u8b66\u544a",
+   "type": "number",
+   "unit": "\u00b0C",
+   "default": 125,
+   "steps": [
+    110,
+    115,
+    120,
+    125,
+    130,
+    135
+   ]
+  },
+  {
+   "key": "peaks",
+   "label": "\u663e\u793a\u5cf0\u503c\u6807\u8bb0",
+   "type": "bool",
+   "default": true
+  },
+  {
+   "key": "peakHold",
+   "label": "\u5cf0\u503c\u4fdd\u6301",
+   "type": "number",
+   "unit": "s",
+   "default": 15,
+   "steps": [
+    5,
+    10,
+    15,
+    30,
+    60
+   ]
+  },
+  {
+   "key": "xdrive",
+   "label": "xDrive \u9762\u677f",
+   "type": "choice",
+   "default": "auto",
+   "options": [
+    [
+     "auto",
+     "\u81ea\u52a8"
+    ],
+    [
+     "on",
+     "\u663e\u793a"
+    ],
+    [
+     "off",
+     "\u9690\u85cf\uff08\u540e\u8f6e\u9a71\u52a8\uff09"
+    ]
+   ]
+  },
+  {
+   "key": "showBoost",
+   "label": "\u589e\u538b\u538b\u529b",
+   "type": "choice",
+   "default": "auto",
+   "options": [
+    [
+     "auto",
+     "\u81ea\u52a8"
+    ],
+    [
+     "on",
+     "\u663e\u793a"
+    ],
+    [
+     "off",
+     "\u9690\u85cf"
+    ]
+   ]
+  },
+  {
+   "key": "boostSource",
+   "label": "\u589e\u538b\u538b\u529b\u6765\u6e90",
+   "type": "choice",
+   "default": "auto",
+   "options": [
+    [
+     "auto",
+     "\u81ea\u52a8\uff08\u9996\u4e2a\u53ef\u7528\u6765\u6e90\uff09"
+    ],
+    [
+     "fes",
+     "\u8fd0\u52a8\u4eea\u8868"
+    ],
+    [
+     "dme",
+     "\u53d1\u52a8\u673a\u63a7\u5236\u5355\u5143\uff08OBD\uff09"
+    ]
+   ]
+  },
+  {
+   "key": "showGearbox",
+   "label": "\u53d8\u901f\u7bb1\u6cb9\u6e29",
+   "type": "choice",
+   "default": "auto",
+   "options": [
+    [
+     "auto",
+     "\u81ea\u52a8"
+    ],
+    [
+     "on",
+     "\u663e\u793a"
+    ],
+    [
+     "off",
+     "\u9690\u85cf"
+    ]
+   ]
+  },
+  {
+   "key": "showEgs",
+   "label": "\u53d8\u901f\u7bb1\u6e29\u5ea6\uff08EGS\uff09",
+   "type": "choice",
+   "default": "auto",
+   "options": [
+    [
+     "auto",
+     "\u81ea\u52a8"
+    ],
+    [
+     "on",
+     "\u663e\u793a"
+    ],
+    [
+     "off",
+     "\u9690\u85cf"
+    ]
+   ]
+  },
+  {
+   "key": "showIat",
+   "label": "\u8fdb\u6c14\u6e29\u5ea6",
+   "type": "choice",
+   "default": "auto",
+   "options": [
+    [
+     "auto",
+     "\u81ea\u52a8"
+    ],
+    [
+     "on",
+     "\u663e\u793a"
+    ],
+    [
+     "off",
+     "\u9690\u85cf"
+    ]
+   ]
+  },
+  {
+   "key": "showHpfp",
+   "label": "\u9ad8\u538b\u71c3\u6cb9",
+   "type": "choice",
+   "default": "auto",
+   "options": [
+    [
+     "auto",
+     "\u81ea\u52a8"
+    ],
+    [
+     "on",
+     "\u663e\u793a"
+    ],
+    [
+     "off",
+     "\u9690\u85cf"
+    ]
+   ]
+  },
+  {
+   "key": "showLpfp",
+   "label": "\u4f4e\u538b\u71c3\u6cb9",
+   "type": "choice",
+   "default": "auto",
+   "options": [
+    [
+     "auto",
+     "\u81ea\u52a8"
+    ],
+    [
+     "on",
+     "\u663e\u793a"
+    ],
+    [
+     "off",
+     "\u9690\u85cf"
+    ]
+   ]
+  },
+  {
+   "key": "showTiming",
+   "label": "\u70b9\u706b\u63d0\u524d\u89d2",
+   "type": "choice",
+   "default": "auto",
+   "options": [
+    [
+     "auto",
+     "\u81ea\u52a8"
+    ],
+    [
+     "on",
+     "\u663e\u793a"
+    ],
+    [
+     "off",
+     "\u9690\u85cf"
+    ]
+   ]
+  },
+  {
+   "key": "showMisfire",
+   "label": "\u5931\u706b\u8ba1\u6570",
+   "type": "choice",
+   "default": "auto",
+   "options": [
+    [
+     "auto",
+     "\u81ea\u52a8"
+    ],
+    [
+     "on",
+     "\u663e\u793a"
+    ],
+    [
+     "off",
+     "\u9690\u85cf"
+    ]
+   ]
+  },
+  {
+   "key": "showTyres",
+   "label": "\u8f6e\u80ce\u9762\u677f",
+   "type": "choice",
+   "default": "auto",
+   "options": [
+    [
+     "auto",
+     "\u81ea\u52a8"
+    ],
+    [
+     "on",
+     "\u663e\u793a"
+    ],
+    [
+     "off",
+     "\u9690\u85cf"
+    ]
+   ]
+  },
+  {
+   "key": "showTyreTemp",
+   "label": "\u8f6e\u80ce\u6e29\u5ea6",
+   "type": "choice",
+   "default": "auto",
+   "options": [
+    [
+     "auto",
+     "\u81ea\u52a8"
+    ],
+    [
+     "on",
+     "\u663e\u793a"
+    ],
+    [
+     "off",
+     "\u9690\u85cf"
+    ]
+   ]
+  },
+  {
+   "key": "theme",
+   "label": "\u914d\u8272\u4e3b\u9898",
+   "type": "choice",
+   "default": "m_tricolour",
+   "options": [
+    [
+     "m_red",
+     "M \u7ea2\u8272"
+    ],
+    [
+     "m_tricolour",
+     "M \u4e09\u8272"
+    ],
+    [
+     "ice",
+     "\u51b0\u6676\u767d"
+    ],
+    [
+     "amber",
+     "\u591c\u95f4\u7425\u73c0"
+    ]
+   ]
+  },
+  {
+   "key": "speedRate",
+   "label": "\u901f\u5ea6\u5237\u65b0\u7387",
+   "type": "number",
+   "unit": "fps",
+   "default": 10,
+   "reset": 1,
+   "markDefault": true,
+   "steps": [
+    5,
+    10,
+    15,
+    30,
+    60
+   ]
+  },
+  {
+   "key": "layout",
+   "label": "\u5c4f\u5e55\u5e03\u5c40",
+   "type": "choice",
+   "default": "full",
+   "options": [
+    [
+     "full",
+     "\u5168\u5c4f"
+    ],
+    [
+     "standard",
+     "\u6807\u51c6"
+    ]
+   ]
+  },
+  {
+   "key": "renderer",
+   "label": "\u6e32\u67d3\u5668",
+   "type": "choice",
+   "default": "auto",
+   "options": [
+    [
+     "auto",
+     "GPU 60 \u5e27\uff08\u9ed8\u8ba4\uff09"
+    ],
+    [
+     "software",
+     "\u8f6f\u4ef6\u6e32\u67d3"
+    ]
+   ]
+  },
+  {
+   "key": "demo",
+   "label": "\u6f14\u793a\u6570\u636e",
+   "type": "choice",
+   "default": "auto",
+   "options": [
+    [
+     "auto",
+     "\u81ea\u52a8"
+    ],
+    [
+     "on",
+     "\u59cb\u7ec8"
+    ],
+    [
+     "off",
+     "\u4ece\u4e0d"
+    ]
+   ]
+  }
+ ],
+ "config": {
+  "comment": "raw -> value*factor + offset. CDS/CDS2/Vehicle2/ambient factors are BMW's own (M Laptimer's TypeConverters). FES boost and BasicDataSet scalings are best guesses: calibrate here against a known reading.",
+  "scaling": {
+   "rpm": {
+    "factor": 0.25,
+    "offset": 0,
+    "invalid": 65535
+   },
+   "speed": {
+    "factor": 0.015625,
+    "offset": 0,
+    "invalid": 65535
+   },
+   "accel": {
+    "factor": 0.002,
+    "offset": -65,
+    "invalid": 65535
+   },
+   "ambient": {
+    "factor": 0.5,
+    "offset": -40,
+    "invalid": 255
+   },
+   "engineTemp": {
+    "factor": 1,
+    "offset": -48,
+    "invalid": 255
+   },
+   "gearboxTemp": {
+    "factor": 1,
+    "offset": -48,
+    "invalid": 255,
+    "note": "a value that never changes is shown as no data (some cars don't fill this field); raw values go to the log ('raw gearbox oil')"
+   },
+   "boost": {
+    "factor": 0.01,
+    "offset": 0,
+    "invalid": 255,
+    "note": "sport display boost; raw values go to the log ('raw FES boost')"
+   },
+   "torque": {
+    "factor": 0.5,
+    "offset": -1023.5,
+    "invalid": 65535,
+    "invalidFrom": 4095,
+    "note": "12 bit, 0.5 Nm per bit, 0 Nm at raw 2047 (negative = engine braking), 4095 = no value. With factor 1 a running engine read as ~2047 Nm."
+   },
+   "tyreTemp": {
+    "factor": 1,
+    "offset": -40,
+    "invalid": 65535,
+    "note": "deg C + 40: a G05 PHEV sent raw 53-57 on a ~10 deg C day (2.8.0 log), not deci-Kelvin. Values outside -40..150 deg C are shown as no data; the raw values go to the log ('raw tyre temperature')"
+   },
+   "torqueSplitRear": {
+    "factor": 0.01,
+    "offset": 0,
+    "invalid": 65535
+   },
+   "tyrePress": {
+    "factor": 0.1,
+    "offset": 0,
+    "invalidFrom": 65532,
+    "note": "0.1 bar per bit (BMW x_call: raw * 0.1, valid up to 530; a car sent raw 22-25 = 2.2-2.5 bar). Read as 0.1 kPa before, every tyre came out at 0.02 bar and was hidden."
+   },
+   "sportPct": {
+    "factor": 1,
+    "offset": 0,
+    "invalid": 255,
+    "note": "sport display power / torque in % of the car maximum; calibrate if the raw value is not 0-100"
+   }
+  },
+  "xdrive": {
+   "comment": "xDrive split straight from the transfer case unit (LMV, address 0x19), read on the Chassis page when the car's own split signal has nothing. LMV_MOMENT (22 DB32): actual torque to the front axle, signed, Nm = raw / 4 (bytes 0-1); qualifier bytes 2-3, target torque 4-5 (layout from BMW's LMV_G11 description). Split % = front torque / (engine torque x gear ratio): an estimate (no converter multiplication, no losses).",
+   "front": [
+    {
+     "ecu": 25,
+     "did": "DB32",
+     "bytes": 2,
+     "at": 0,
+     "factor": 0.25,
+     "signed": true,
+     "min": -200,
+     "max": 2500,
+     "note": "LMV_MOMENT.ISTMOMENT, actual torque to the front axle"
+    }
+   ],
+   "gearRatios": [
+    5.0,
+    3.2,
+    2.143,
+    1.72,
+    1.313,
+    1.0,
+    0.823,
+    0.64
+   ],
+   "gearRatiosNote": "ZF 8HP, 1st..8th"
+  },
+  "dme": {
+   "comment": "Intake / fuel values from the engine unit (DME, ecu 18 = 0x12) with UDS 0x22. F4xx = the standard OBD PIDs (F40F = PID 0x0F); a candidate with \"obd\" instead of \"did\" asks for the same PID with OBD service 01 (some engine units refuse the F4xx identifiers with NRC 31). Candidates are tried in order; the first plausible one wins. value = raw * factor + offset (bar / deg C). If a tile says 'not available from this DME', add your engine's BMW-specific DID here. boost: tried in order when the sport display sends no boost (setting 'Boost from'); absolute pressure in kPa, the outside air pressure (baro) is subtracted. timing: OBD PID 0x0E, degrees before top dead centre. misfire: OBD service 06 monitor results (MID A2 = cylinder 1, A3 = cylinder 2 ...), tid 0C = misfires this driving cycle (0B = average of the last 10 cycles); engine units that only speak UDS are asked 0x22 F6A2... egs: gearbox temperature from the gearbox unit (EGS); give each candidate its \"ecu\".",
+   "ecu": 18,
+   "iat": [
+    {
+     "did": "F40F",
+     "bytes": 1,
+     "at": 0,
+     "factor": 1,
+     "offset": -40,
+     "min": -40,
+     "max": 150
+    },
+    {
+     "did": "F477",
+     "bytes": 1,
+     "at": 1,
+     "factor": 1,
+     "offset": -40,
+     "min": -40,
+     "max": 150,
+     "note": "charge air cooler temperature, bank 1 sensor 1"
+    },
+    {
+     "obd": "0F",
+     "bytes": 1,
+     "at": 0,
+     "factor": 1,
+     "offset": -40,
+     "min": -40,
+     "max": 150,
+     "note": "the same PID with OBD service 01, for engine units that refuse F40F with NRC 31"
+    }
+   ],
+   "hpfp": [
+    {
+     "did": "F423",
+     "bytes": 2,
+     "at": 0,
+     "factor": 0.1,
+     "offset": 0,
+     "min": 0,
+     "max": 500,
+     "note": "fuel rail gauge pressure (direct injection), 10 kPa per bit"
+    },
+    {
+     "did": "F459",
+     "bytes": 2,
+     "at": 0,
+     "factor": 0.1,
+     "offset": -1,
+     "min": 0,
+     "max": 500,
+     "note": "fuel rail absolute pressure, 10 kPa per bit"
+    },
+    {
+     "obd": "23",
+     "bytes": 2,
+     "at": 0,
+     "factor": 0.1,
+     "offset": 0,
+     "min": 0,
+     "max": 500,
+     "note": "OBD service 01 PID 0x23 (same as F423)"
+    }
+   ],
+   "lpfp": [
+    {
+     "did": "F40A",
+     "bytes": 1,
+     "at": 0,
+     "factor": 0.03,
+     "offset": 0,
+     "min": 0.5,
+     "max": 8,
+     "note": "fuel pressure (gauge), 3 kPa per bit"
+    },
+    {
+     "did": "F422",
+     "bytes": 2,
+     "at": 0,
+     "factor": 0.00079,
+     "offset": 0,
+     "min": 0.5,
+     "max": 15,
+     "note": "fuel rail pressure relative to manifold, 0.079 kPa per bit"
+    },
+    {
+     "obd": "0A",
+     "bytes": 1,
+     "at": 0,
+     "factor": 0.03,
+     "offset": 0,
+     "min": 0.5,
+     "max": 8,
+     "note": "OBD service 01 PID 0x0A (same as F40A)"
+    },
+    {
+     "obd": "22",
+     "bytes": 2,
+     "at": 0,
+     "factor": 0.00079,
+     "offset": 0,
+     "min": 0.5,
+     "max": 15,
+     "note": "OBD service 01 PID 0x22 (same as F422)"
+    }
+   ],
+   "oil": [
+    {
+     "obd": "5C",
+     "bytes": 1,
+     "at": 0,
+     "factor": 1,
+     "offset": -40,
+     "min": -40,
+     "max": 170,
+     "note": "engine oil temperature, OBD service 01 PID 0x5C - only read while the car's own signal (CDS) sends none"
+    },
+    {
+     "did": "F45C",
+     "bytes": 1,
+     "at": 0,
+     "factor": 1,
+     "offset": -40,
+     "min": -40,
+     "max": 170
+    }
+   ],
+   "boost": [
+    {
+     "did": "F470",
+     "bytes": 2,
+     "at": 5,
+     "factor": 0.03125,
+     "offset": 0,
+     "min": 20,
+     "max": 600,
+     "note": "OBD PID 0x70 boost pressure control: actual boost pressure sensor A (absolute), 1/32 kPa"
+    },
+    {
+     "did": "F487",
+     "bytes": 2,
+     "at": 1,
+     "factor": 0.03125,
+     "offset": 0,
+     "min": 20,
+     "max": 600,
+     "note": "OBD PID 0x87 intake manifold absolute pressure sensor A, 1/32 kPa"
+    },
+    {
+     "did": "F40B",
+     "bytes": 1,
+     "at": 0,
+     "factor": 1,
+     "offset": 0,
+     "min": 20,
+     "max": 255,
+     "note": "OBD PID 0x0B intake manifold absolute pressure, kPa (max 255 = 1.5 bar boost)"
+    },
+    {
+     "obd": "0B",
+     "bytes": 1,
+     "at": 0,
+     "factor": 1,
+     "offset": 0,
+     "min": 20,
+     "max": 255,
+     "note": "OBD service 01 PID 0x0B (same as F40B)"
+    }
+   ],
+   "baro": [
+    {
+     "did": "F433",
+     "bytes": 1,
+     "at": 0,
+     "factor": 1,
+     "offset": 0,
+     "min": 50,
+     "max": 115,
+     "note": "OBD PID 0x33 barometric pressure, kPa (101.3 when not available)"
+    },
+    {
+     "obd": "33",
+     "bytes": 1,
+     "at": 0,
+     "factor": 1,
+     "offset": 0,
+     "min": 50,
+     "max": 115,
+     "note": "OBD service 01 PID 0x33 (same as F433)"
+    }
+   ],
+   "timing": [
+    {
+     "obd": "0E",
+     "bytes": 1,
+     "at": 0,
+     "factor": 0.5,
+     "offset": -64,
+     "min": -64,
+     "max": 63.5,
+     "note": "OBD service 01 PID 0x0E timing advance, degrees before TDC (cylinder 1)"
+    },
+    {
+     "did": "F40E",
+     "bytes": 1,
+     "at": 0,
+     "factor": 0.5,
+     "offset": -64,
+     "min": -64,
+     "max": 63.5,
+     "note": "the same PID over UDS 0x22"
+    }
+   ],
+   "misfire": {
+    "tid": "0C",
+    "note": "set to {} to switch off; \"ecu\" to ask another unit"
+   },
+   "egs": [
+    {
+     "ecu": 24,
+     "did": "DA12",
+     "bytes": 1,
+     "at": 0,
+     "factor": 1,
+     "offset": -48,
+     "min": -40,
+     "max": 160,
+     "note": "gearbox unit (EGS, 0x18) transmission oil temperature, deg C + 48 (from a forum report, not confirmed on a car: only shown once it changes; the replies go to the log, \"raw EGS\")"
+    }
+   ]
+  }
+ },
+ "stateIds": {
+  "MAIN": 1,
+  "SETTINGS": 10
+ }
+}

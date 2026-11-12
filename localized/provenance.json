@@ -1,0 +1,7 @@
+{
+  "repository": "https://github.com/JackieZ123430/idrive7-apps-cn",
+  "commit": "60f0fd6727f81910485872c0d55ee4cff2b6fac9",
+  "language": "zh-CN",
+  "credits": "Existing 12px, 25% opacity Chinese credits retained",
+  "sdk": "Not included; linked on vehicle by mgu-deploy"
+}

@@ -10,5 +10,49 @@
   "robertn_waze_cluster": {
     "title": "Waze 仪表盘显示",
     "description": "管理 CarPlay 和 Android Auto 地图投屏：应用或移除补丁，查看运行状态与日志，选择仪表盘、HUD 或同时显示，并调整 HUD 画面大小和位置。HUD 为实验性功能；可用画面取决于手机地图应用和车机支持情况。"
+  },
+  "brake_test": {
+    "title": "制动测试",
+    "description": "记录制动距离、时间与减速度，提供简体中文菜单和设置。"
+  },
+  "car_vitals": {
+    "title": "M 车辆仪表",
+    "description": "显示车辆温度、转速、功率等实时信息，提供简体中文菜单和设置。"
+  },
+  "doom": {
+    "title": "毁灭战士",
+    "description": "Doom / Freedoom：简体中文启动菜单和设置，游戏内贴图保持原文。"
+  },
+  "draggy": {
+    "title": "弹射模式",
+    "description": "记录起步、加速分段和成绩，提供简体中文菜单和设置。"
+  },
+  "dtc_scanner": {
+    "title": "故障检测",
+    "description": "读取故障码与车辆诊断信息；内置常见说明汉化，未收录说明保留原文。"
+  },
+  "dyno": {
+    "title": "虚拟马力机",
+    "description": "根据车辆数据估算功率和扭矩，提供简体中文菜单和设置。"
+  },
+  "edrive": {
+    "title": "EDrive助手",
+    "description": "显示混动车辆电驱与电池信息，提供简体中文菜单和设置。"
+  },
+  "gforce": {
+    "title": "G 值仪表",
+    "description": "显示加速度和 G 值信息，提供简体中文菜单和设置。"
+  },
+  "redline": {
+    "title": "换挡转速",
+    "description": "显示转速与换挡提示，提供简体中文菜单和设置。"
+  },
+  "service": {
+    "title": "保养信息",
+    "description": "显示保养项目与车辆信息，提供简体中文菜单和设置。"
+  },
+  "warmup": {
+    "title": "暖机助手",
+    "description": "显示油温、水温及暖机状态，提供简体中文菜单和设置。"
   }
 }

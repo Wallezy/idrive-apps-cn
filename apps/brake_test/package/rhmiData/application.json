@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "1.3.0",
+  "application": {
+    "uuid": "ddeed81f-d7f3-5de3-947c-22fe31e5836e",
+    "type": "OnlineApp",
+    "name": "brake_test",
+    "vendor": "custom",
+    "version": "1.3.2",
+    "defaultLanguage": "en_GB",
+    "stringBundleUuid": "bf3aeb83-cf1e-5a7e-ab92-89ed604a4b2d",
+    "resourceBundleUuid": "bc613953-0f33-5f62-abcf-d7710facce69",
+    "entryPoints": [
+      {
+        "name": "BRAKE_TEST_ENTRY",
+        "uuid": "9e32823f-b71a-575e-9867-529145f4687f",
+        "textId": "SID_BRAKE_TEST_TITLE",
+        "icon": "brake_test_icon.png",
+        "insertionStateId": 20974,
+        "insertionFocusId": 2,
+        "insertionMode": "INSERT_BELOW",
+        "insertionOrder": 0,
+        "insertionPriority": 0,
+        "previewType": "NONE",
+        "bookmarkable": true,
+        "private": false,
+        "appearance": "DEFAULT",
+        "isGroupHeader": false,
+        "insertionGroup": 0
+      }
+    ],
+    "uiDescriptions": [
+      {
+        "applicationFilePath": "./uiDescriptions/ID7/application.xml",
+        "uiDescriptionFilePath": "./uiDescriptions/ID7/uiDescription.json",
+        "hmi": [
+          "ID7"
+        ]
+      }
+    ],
+    "variantGroups": [
+      {
+        "stringsPath": "./variantGroups/Common/texts",
+        "resourcesPath": "./variantGroups/Common/images",
+        "hmi": [
+          "ID7"
+        ],
+        "brands": [
+          "BMW"
+        ]
+      }
+    ]
+  }
+}

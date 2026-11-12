@@ -1,0 +1,159 @@
+{
+ "id": "brake_test",
+ "title": "\u5236\u52a8\u6d4b\u8bd5",
+ "version": "1.3.2",
+ "screens": [
+  {
+   "name": "MAIN",
+   "kind": "canvas",
+   "title": "\u5236\u52a8\u6d4b\u8bd5",
+   "buttons": [
+    [
+     "BTN_ACTION",
+     "\u53d6\u6d88\u672c\u6b21"
+    ],
+    [
+     "BTN_PAGE",
+     "\u4e0b\u4e00\u9875"
+    ],
+    [
+     "BTN_PREV",
+     "\u4e0a\u4e00\u9875"
+    ],
+    [
+     "BTN_SETTINGS",
+     "\u8bbe\u7f6e"
+    ]
+   ]
+  }
+ ],
+ "settings": [
+  {
+   "key": "speedUnit",
+   "label": "\u6d4b\u8bd5\u9879\u76ee",
+   "type": "choice",
+   "default": "kmh",
+   "options": [
+    [
+     "kmh",
+     "100-0 / 200-0 km/h"
+    ],
+    [
+     "mph",
+     "60-0 / 100-0 mph"
+    ]
+   ]
+  },
+  {
+   "key": "trigger",
+   "label": "\u6025\u5239\u8f66\u5224\u5b9a\u9608\u503c",
+   "type": "number",
+   "unit": "g",
+   "default": 0.4,
+   "steps": [
+    0.2,
+    0.3,
+    0.4,
+    0.5,
+    0.6
+   ]
+  },
+  {
+   "key": "distUnit",
+   "label": "\u8ddd\u79bb\u5355\u4f4d",
+   "type": "choice",
+   "default": "m",
+   "options": [
+    [
+     "m",
+     "\u7c73"
+    ],
+    [
+     "ft",
+     "\u82f1\u5c3a"
+    ]
+   ]
+  },
+  {
+   "key": "theme",
+   "label": "\u914d\u8272\u4e3b\u9898",
+   "type": "choice",
+   "default": "m_tricolour",
+   "options": [
+    [
+     "m_red",
+     "M \u7ea2\u8272"
+    ],
+    [
+     "m_tricolour",
+     "M \u4e09\u8272"
+    ],
+    [
+     "ice",
+     "\u51b0\u6676\u767d"
+    ],
+    [
+     "amber",
+     "\u591c\u95f4\u7425\u73c0"
+    ]
+   ]
+  },
+  {
+   "key": "layout",
+   "label": "\u5c4f\u5e55\u5e03\u5c40",
+   "type": "choice",
+   "default": "full",
+   "options": [
+    [
+     "full",
+     "\u5168\u5c4f"
+    ],
+    [
+     "standard",
+     "\u6807\u51c6"
+    ]
+   ]
+  },
+  {
+   "key": "renderer",
+   "label": "\u6e32\u67d3\u5668",
+   "type": "choice",
+   "default": "auto",
+   "options": [
+    [
+     "auto",
+     "GPU 60 \u5e27\uff08\u9ed8\u8ba4\uff09"
+    ],
+    [
+     "software",
+     "\u8f6f\u4ef6\u6e32\u67d3"
+    ]
+   ]
+  },
+  {
+   "key": "demo",
+   "label": "\u6f14\u793a\u6570\u636e",
+   "type": "choice",
+   "default": "auto",
+   "options": [
+    [
+     "auto",
+     "\u81ea\u52a8"
+    ],
+    [
+     "on",
+     "\u59cb\u7ec8"
+    ],
+    [
+     "off",
+     "\u4ece\u4e0d"
+    ]
+   ]
+  }
+ ],
+ "config": null,
+ "stateIds": {
+  "MAIN": 1,
+  "SETTINGS": 11
+ }
+}

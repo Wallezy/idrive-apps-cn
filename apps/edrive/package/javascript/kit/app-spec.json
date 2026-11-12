@@ -1,0 +1,464 @@
+{
+ "id": "edrive",
+ "title": "EDrive\u52a9\u624b",
+ "version": "2.0.2",
+ "screens": [
+  {
+   "name": "MAIN",
+   "kind": "canvas",
+   "title": "EDrive\u52a9\u624b",
+   "buttons": [
+    [
+     "BTN_READ",
+     "\u7acb\u5373\u8bfb\u53d6"
+    ],
+    [
+     "BTN_PAGE",
+     "\u4e0b\u4e00\u9875"
+    ],
+    [
+     "BTN_PREV",
+     "\u4e0a\u4e00\u9875"
+    ],
+    [
+     "BTN_SETTINGS",
+     "\u8bbe\u7f6e"
+    ]
+   ]
+  }
+ ],
+ "settings": [
+  {
+   "key": "range20",
+   "label": "20\u00b0C \u6ee1\u7535\u7eaf\u7535\u7eed\u822a",
+   "type": "number",
+   "unit": "km",
+   "default": 50,
+   "steps": [
+    30,
+    35,
+    40,
+    45,
+    50,
+    55,
+    60,
+    65,
+    70,
+    80,
+    90,
+    100
+   ]
+  },
+  {
+   "key": "reserve",
+   "label": "\u53d1\u52a8\u673a\u4ecb\u5165\u7535\u91cf",
+   "type": "choice",
+   "default": "auto",
+   "options": [
+    [
+     "auto",
+     "\u81ea\u52a8\u5b66\u4e60"
+    ],
+    [
+     "0",
+     "0 %"
+    ],
+    [
+     "4",
+     "4 %"
+    ],
+    [
+     "5",
+     "5 %"
+    ],
+    [
+     "6",
+     "6 %"
+    ],
+    [
+     "7",
+     "7 %"
+    ],
+    [
+     "8",
+     "8 %"
+    ],
+    [
+     "9",
+     "9 %"
+    ],
+    [
+     "10",
+     "10 %"
+    ],
+    [
+     "12",
+     "12 %"
+    ],
+    [
+     "15",
+     "15 %"
+    ]
+   ]
+  },
+  {
+   "key": "hybrid",
+   "label": "\u6df7\u5408\u52a8\u529b\u7cfb\u7edf",
+   "type": "choice",
+   "default": "auto",
+   "options": [
+    [
+     "auto",
+     "\u81ea\u52a8"
+    ],
+    [
+     "yes",
+     "\u662f"
+    ],
+    [
+     "no",
+     "\u5426\uff08\u4ec5 12 V \u7535\u6c60\uff09"
+    ]
+   ]
+  },
+  {
+   "key": "designKwh",
+   "label": "\u65b0\u7535\u6c60\u603b\u5bb9\u91cf",
+   "type": "number",
+   "unit": "kWh",
+   "default": 12,
+   "steps": [
+    7.6,
+    9.2,
+    10.4,
+    11.2,
+    12,
+    14.1,
+    17.7,
+    19.4,
+    24,
+    25.7,
+    42.2
+   ]
+  },
+  {
+   "key": "price",
+   "label": "\u7535\u4ef7",
+   "type": "number",
+   "unit": "EUR/kWh",
+   "default": 0.25,
+   "steps": [
+    0,
+    0.05,
+    0.1,
+    0.12,
+    0.15,
+    0.16,
+    0.17,
+    0.18,
+    0.19,
+    0.2,
+    0.21,
+    0.22,
+    0.23,
+    0.24,
+    0.25,
+    0.26,
+    0.27,
+    0.28,
+    0.29,
+    0.3,
+    0.31,
+    0.32,
+    0.33,
+    0.34,
+    0.35,
+    0.36,
+    0.37,
+    0.38,
+    0.39,
+    0.4,
+    0.45,
+    0.5,
+    0.55,
+    0.6,
+    0.7
+   ]
+  },
+  {
+   "key": "distUnit",
+   "label": "\u8ddd\u79bb\u5355\u4f4d",
+   "type": "choice",
+   "default": "km",
+   "options": [
+    [
+     "km",
+     "km"
+    ],
+    [
+     "mi",
+     "\u82f1\u91cc"
+    ]
+   ]
+  },
+  {
+   "key": "tempUnit",
+   "label": "\u6e29\u5ea6\u5355\u4f4d",
+   "type": "choice",
+   "default": "c",
+   "options": [
+    [
+     "c",
+     "\u6444\u6c0f\u5ea6"
+    ],
+    [
+     "f",
+     "\u534e\u6c0f\u5ea6"
+    ]
+   ]
+  },
+  {
+   "key": "poll",
+   "label": "\u5145\u7535\u6570\u636e\u8bfb\u53d6\u95f4\u9694",
+   "type": "number",
+   "unit": "s",
+   "default": 15,
+   "steps": [
+    5,
+    10,
+    15,
+    30,
+    60
+   ]
+  },
+  {
+   "key": "sohDays",
+   "label": "\u7535\u6c60\u5065\u5eb7\u8bfb\u53d6\u95f4\u9694",
+   "type": "number",
+   "unit": "days",
+   "default": 7,
+   "steps": [
+    1,
+    7,
+    30
+   ]
+  },
+  {
+   "key": "diagPage",
+   "label": "\u8bca\u65ad\u9875\u9762\uff08UDS \u54cd\u5e94\uff09",
+   "type": "bool",
+   "default": false
+  },
+  {
+   "key": "theme",
+   "label": "\u914d\u8272\u4e3b\u9898",
+   "type": "choice",
+   "default": "m_tricolour",
+   "options": [
+    [
+     "m_red",
+     "M \u7ea2\u8272"
+    ],
+    [
+     "m_tricolour",
+     "M \u4e09\u8272"
+    ],
+    [
+     "ice",
+     "\u51b0\u6676\u767d"
+    ],
+    [
+     "amber",
+     "\u591c\u95f4\u7425\u73c0"
+    ]
+   ]
+  },
+  {
+   "key": "layout",
+   "label": "\u5c4f\u5e55\u5e03\u5c40",
+   "type": "choice",
+   "default": "full",
+   "options": [
+    [
+     "full",
+     "\u5168\u5c4f"
+    ],
+    [
+     "standard",
+     "\u6807\u51c6"
+    ]
+   ]
+  },
+  {
+   "key": "renderer",
+   "label": "\u6e32\u67d3\u5668",
+   "type": "choice",
+   "default": "auto",
+   "options": [
+    [
+     "auto",
+     "GPU 60 \u5e27\uff08\u9ed8\u8ba4\uff09"
+    ],
+    [
+     "software",
+     "\u8f6f\u4ef6\u6e32\u67d3"
+    ]
+   ]
+  },
+  {
+   "key": "demo",
+   "label": "\u6f14\u793a\u6570\u636e",
+   "type": "choice",
+   "default": "auto",
+   "options": [
+    [
+     "auto",
+     "\u81ea\u52a8"
+    ],
+    [
+     "on",
+     "\u59cb\u7ec8"
+    ],
+    [
+     "off",
+     "\u4ece\u4e0d"
+    ]
+   ]
+  }
+ ],
+ "config": {
+  "comment": "HV battery values and the 12 V voltage are read with UDS ReadDataByIdentifier (0x22). Each value tries its candidates in order and keeps the first that answers with a plausible number: value = raw * factor + offset, raw = 'bytes' big-endian bytes from 'at' (0 = first data byte after the DID). 'ecu' on a candidate overrides battery.ecu (decimal: 7 = SME battery unit, 18 = DME engine unit). DIDs differ between models: check the Diagnostics page in the app and adjust here if a value shows n/a or looks wrong. F442 is the standard OBD 'control module voltage' (terminal 30, i.e. the 12 V battery).",
+  "battery": {
+   "ecu": 7,
+   "soc": [
+    {
+     "did": "DDBC",
+     "bytes": 2,
+     "at": 0,
+     "factor": 0.1,
+     "offset": 0,
+     "min": 0,
+     "max": 100
+    }
+   ],
+   "soh": [
+    {
+     "did": "DD7B",
+     "bytes": 1,
+     "at": 0,
+     "factor": 1,
+     "offset": 0,
+     "min": 40,
+     "max": 110
+    },
+    {
+     "did": "6335",
+     "bytes": 1,
+     "at": 0,
+     "factor": 1,
+     "offset": 0,
+     "min": 40,
+     "max": 110
+    }
+   ],
+   "v12": [
+    {
+     "ecu": 18,
+     "did": "F442",
+     "bytes": 2,
+     "at": 0,
+     "factor": 0.001,
+     "offset": 0,
+     "min": 5,
+     "max": 18
+    },
+    {
+     "ecu": 7,
+     "did": "F442",
+     "bytes": 2,
+     "at": 0,
+     "factor": 0.001,
+     "offset": 0,
+     "min": 5,
+     "max": 18
+    },
+    {
+     "ecu": 18,
+     "obd": "42",
+     "bytes": 2,
+     "at": 0,
+     "factor": 0.001,
+     "offset": 0,
+     "min": 5,
+     "max": 18,
+     "note": "the same PID with OBD service 01, for engine units that refuse F442 with NRC 31"
+    },
+    {
+     "ecu": 19,
+     "did": "F442",
+     "bytes": 2,
+     "at": 0,
+     "factor": 0.001,
+     "offset": 0,
+     "min": 5,
+     "max": 18,
+     "note": "second engine unit (0x13), on cars that have one"
+    },
+    {
+     "ecu": 19,
+     "obd": "42",
+     "bytes": 2,
+     "at": 0,
+     "factor": 0.001,
+     "offset": 0,
+     "min": 5,
+     "max": 18
+    },
+    {
+     "ecu": 24,
+     "did": "F442",
+     "bytes": 2,
+     "at": 0,
+     "factor": 0.001,
+     "offset": 0,
+     "min": 5,
+     "max": 18,
+     "note": "transmission unit EGS (0x18): control module voltage too, when the engine unit doesn't answer (e.g. G06 N63)"
+    },
+    {
+     "ecu": 24,
+     "obd": "42",
+     "bytes": 2,
+     "at": 0,
+     "factor": 0.001,
+     "offset": 0,
+     "min": 5,
+     "max": 18
+    }
+   ],
+   "chargeMinPct": 3
+  },
+  "scaling": {
+   "batteryTemp": {
+    "factor": 1,
+    "offset": -40,
+    "invalid": 255,
+    "comment": "HV battery temperature (Efficiencytainment2.statusBatteryTemperature, avg / min / max): raw on the Signals page - adjust if it doesn't match"
+   },
+   "ambient": {
+    "factor": 0.5,
+    "offset": -40,
+    "invalid": 255
+   },
+   "rpm": {
+    "factor": 0.25,
+    "offset": 0,
+    "invalid": 65535
+   }
+  }
+ },
+ "stateIds": {
+  "MAIN": 1,
+  "SETTINGS": 11
+ }
+}

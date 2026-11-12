@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "dtc_scanner",
+  "version": "2.6.4",
+  "tree": "package",
+  "modules": [
+    "src/sdk.js"
+  ],
+  "sdk": [
+    "oap-sdk/src/core/OnlineApp.js",
+    "oap-sdk/src/logging/logging"
+  ]
+}
