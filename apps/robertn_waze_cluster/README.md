@@ -123,7 +123,7 @@ and the restart's two, the page's last, so no row above them moves.
 
 Both sections' Status row uses the same words: `Patched`, `Not patched`,
 `Patching…`, `Removing patch…`, `Patched after restart`, `Removed after
-restart`, `Failed`, `Not supported on this car`, `Untested version`,
+restart`, `Failed`, `Not supported on this car`,
 `Changed by another tool`, `Partly patched`, `Connecting…`,
 `Unavailable`; CarPlay also `Update needed` (a patch from an older app,
 which Patch brings up to date), and `Removed — head unit kept
@@ -152,13 +152,22 @@ supported, HIGH F included.
 | | CarPlay Wi-Fi | `CarPlay Wi-Fi: 5 GHz` or `CarPlay Wi-Fi: 2.4 GHz`, the band of the head unit's Wi-Fi the phone joined; shown while CarPlay runs over Wi-Fi and the band is known (waze-on-cluster README, "CarPlay's Wi-Fi band") |
 | | (the line under it) | `Audio may cut out. On your iPhone, turn Wi-Fi off and on.`; shown on 2.4 GHz only, where CarPlay's streams and the cluster's can be more than the link carries |
 | **Android Auto** | Status | `Status: <state>`, in the words above; `Failed` also while the last zoom or turn-card change failed |
-| | Patch | applies its patch, also to an `Untested version`; enabled while it is off or partly patched, supported and nothing is pending |
+| | Patch | applies its patch, including a build outside the proven list; enabled while it is off or partly patched, supported and nothing is pending |
 | | Remove patch | reverts it; enabled as CarPlay's |
 | | Zoom | `Zoom: 180 dpi`, the density on disk, with `(after restart)` while it differs from the one aapd runs until the next head-unit start; `Zoom: —` without the patch |
-| | Zoom out / Zoom in | 10 dpi a press (150-400): out shows more map; enabled while patched, nothing is pending, no conflict stands but `Untested version`, and the 10 s between changes has passed |
+| | Zoom out / Zoom in | 10 dpi a press (150-400): out shows more map; enabled while patched, nothing is pending, no blocking conflict stands, and the 10 s between changes has passed |
 | | Hide phone's turn card | a checkbox, ticked while the turn card on disk is hidden, or as asked while its change runs: the phone's own turn card cropped off the map; `(after restart)` as for the zoom; enabled as Zoom out and Zoom in |
 | (the page's end) | Restart head unit | the Node State Manager's normal head-unit restart; shown while a written change, CarPlay's or Android Auto's, waits for the next head-unit start; enabled while nothing runs and the restart limit (one every 10 minutes) allows it |
 | | Restart | shown while it has something to say: `Restart: In progress`, `Restart: Failed, not accepted` (NSM did not take it), `Restart: Failed, the head unit stayed on`, `Restart: Failed, command failed`, each with `— possible in 8 min` while the limit holds, `Restart: Possible in 8 min` |
+
+CarPlay and Android Auto status rows show the actual patch state. Build-validation
+metadata stays in the daemon and recovery records. The Chinese turn-card label is
+“隐藏安卓导航转向卡片”: it crops the Android Auto stream and requires its patch.
+CarPlay users can use General's “隐藏 BMW 转向提示” for BMW's own guidance box.
+An unavailable Android Auto checkbox can also mean a pending restart, an operation
+in progress, the 10-second spacing between changes, unreadable cluster coding or
+a conflicting patch. The Android Auto status row and saved logs identify the
+vehicle-specific condition.
 
 | | |
 |---|---|

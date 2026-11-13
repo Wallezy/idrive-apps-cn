@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Show the actual CarPlay and Android Auto patch states without an untested-version label. Name the Chinese turn-card checkbox as Android-only.
+
 - Check page control IDs before packaging to prevent conflicting controls from breaking app startup.
 
 - The CN app defaults to Simplified Chinese while the HMI language is unavailable and follows explicit display-language selections. Chinese status rows translate known renderer and patch messages, frame counts and transfer limits; unknown diagnostics retain their original detail. Native protocol fields and logs are unchanged.

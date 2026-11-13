@@ -823,6 +823,46 @@ test('a refused restart reply clears the asked flag so the button returns', asyn
     c.close();
 });
 
+test('build validation labels do not replace either phone patch state or enable Android-only controls', async (render, patch) => {
+    const c = control();
+    c.open();
+    await until('connected', () => c.aa());
+    const i18n = require('../src/i18n.js');
+    try {
+        for (const language of ['ENGLISCH__UK', 'CHINESISCH_SIMPLE']) {
+            i18n.setHmiLanguage(language);
+            const t = i18n.t;
+            patch.conflict = 'untested carplay build';
+            patch.aa = { state: 'original', density: 180, conflict: 'untested aapd build' };
+            patch.announce('original', null, null);
+            await until('unpatched phone statuses', () => c.patchStatus && c.patchStatus.state === 'original' &&
+                c.aa().state === 'original' && c.aa().conflict === 'untested aapd build');
+            assert.strictEqual(c.statusText(), t('Status: {0}', t('Not patched')));
+            assert.strictEqual(c.aaStatusText(), t('Status: {0}', t('Not patched')));
+            assert.strictEqual(c.canEnable(), true);
+            assert.strictEqual(c.canEnableAa(), true);
+            assert.strictEqual(c.canToggleCard(), false, 'Android Auto must still be patched');
+            assert.strictEqual(c.patchStatus.conflict, 'untested carplay build', 'keep the daemon diagnostic');
+            if (language === 'CHINESISCH_SIMPLE') {
+                assert.strictEqual(c.cardText(), '隐藏安卓导航转向卡片');
+            }
+            patch.announce('patched', 'high', null);
+            await until('CarPlay patched', () => c.patchStatus.state === 'patched');
+            assert.strictEqual(c.statusText(), t('Status: {0}', t('Patched')));
+            assert.strictEqual(c.canToggleCard(), false, 'CarPlay alone does not enable Android Auto cropping');
+            patch.aa = { state: 'patched', dpi: 180, diskCard: 'shown', density: 180,
+                densities: [150, 400, 10], conflict: 'untested aapd build' };
+            patch.announce('patched', 'high', null);
+            await until('Android Auto patched', () => c.aa().state === 'patched');
+            assert.strictEqual(c.aaStatusText(), t('Status: {0}', t('Patched')));
+            assert.strictEqual(c.canToggleCard(), true, 'a validation label does not block the checkbox');
+        }
+    } finally {
+        i18n.setHmiLanguage('ENGLISCH__UK');
+        c.close();
+    }
+});
+
 test('Android Auto: its line per state; Patch, Remove patch and zoom only where they apply', async (render, patch) => {
     const c = control();
     c.open();
@@ -834,7 +874,7 @@ test('Android Auto: its line per state; Patch, Remove patch and zoom only where 
         [{ state: 'patched', dpi: 400, diskCard: 'shown', density: 400, densities: D }, 'Status: Patched', [false, true, true, false]],
         [{ state: 'unknown', density: 180, densities: D }, 'Status: Partly patched', [true, true, false, false]],
         [{ state: 'original', density: 180, conflict: 'not supported on this car (KI_KOMBI_VARIANT 9)' }, 'Status: Not supported on this car', [false, false, false, false]],
-        [{ state: 'original', density: 180, conflict: 'untested aapd build' }, 'Status: Untested version', [true, false, false, false]],
+        [{ state: 'original', density: 180, conflict: 'untested aapd build' }, 'Status: Not patched', [true, false, false, false]],
         [{ state: 'original', density: 180, conflict: 'not patchable: gate: variant check not found' }, 'Status: Not supported on this car', [false, false, false, false]],
         [{ state: 'original', density: 180, conflict: 'aapd.conf not usable: no number SCREENS/KOMBI_DISPLAY/DIMENSIONS/12.3/SA_WIDTHPIXELS' }, 'Status: Changed by another tool', [false, false, false, false]],
         [{ state: 'original', density: 180, conflict: 'aapd.service starts /opt/other/aapd (/etc/systemd/system/aapd.service.d/x.conf)' }, 'Status: Changed by another tool', [false, false, false, false]],
