@@ -62,6 +62,7 @@ const path = require('path');
 const { FakeRender, FakePatch, FakeLogs, RENDER_PAGE, RENDER_FPS } = require('./fakes.js');
 const { RENDER_PATH, PATCH_PATH, PENDING_PATH, SIZE, SAFE, HUD_SIZE_STEPS } = require('../src/waze_cluster_control.js');
 const { LOGS_PATH } = require('../src/logs_control.js');
+const { UNDERLAY_PATH } = require('../src/underlay_control.js');
 
 const MANIFEST = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'mgu-app.json'), 'utf8'));
 const PKG = path.join(__dirname, '..', MANIFEST.tree);
@@ -75,7 +76,8 @@ const RSOCK = `/tmp/woc-pr-${process.pid}.sock`;
 const PSOCK = `/tmp/woc-pp-${process.pid}.sock`;
 const PENDING = `/tmp/woc-ppend-${process.pid}.json`;
 const LSOCK = `/tmp/woc-pl-${process.pid}.sock`;
-const SOCKETS = { [RENDER_PATH]: RSOCK, [PATCH_PATH]: PSOCK, [LOGS_PATH]: LSOCK };
+const USOCK = `/tmp/woc-pu-${process.pid}.sock`;
+const SOCKETS = { [RENDER_PATH]: RSOCK, [PATCH_PATH]: PSOCK, [LOGS_PATH]: LSOCK, [UNDERLAY_PATH]: USOCK };
 const realConnect = net.connect;
 const exit = process.exit.bind(process);
 net.connect = (p, ...rest) => realConnect.call(net, SOCKETS[p] || p, ...rest);
@@ -331,7 +333,9 @@ async function main() {
     assert.deepStrictEqual(xmlIds('2').map(([id, type]) => `${id} ${type}`).sort(),
         Object.entries(logsPage.components).map(([id, d]) => `${id} ${d.type}`).sort(), 'application.xml and uiDescription agree on the Logs page');
     assert.deepStrictEqual(xmlIds('2').map(([id]) => logsPage.components[id].name), ['wocLogsTitle', 'wocCapture', 'wocCaptureStatus',
-        'wocLogsSave', 'wocLogsStatus', 'wocLogsQr', 'wocLogsUrl', 'wocLogsRow1', 'wocLogsRow2', 'wocLogsRow3', 'wocLogsRow4', 'wocLogsRow5']);
+        'wocLogsSave', 'wocLogsStatus', 'wocLogsQr', 'wocLogsUrl', 'wocLogsRow1', 'wocLogsRow2', 'wocLogsRow3', 'wocLogsRow4', 'wocLogsRow5',
+        'wocCalHead', 'wocCalParked', 'wocCalStandard', 'wocCalExpanded', 'wocCalStop', 'wocCalStatus']);
+    assert(/<component id="91" type="checkBox" widget="LT_CheckBox_1Row">/.test(XML), 'parking confirmation checkbox');
     assert(/<component id="83" type="label" widget="LT_Label_1Graphic_Scalable">/.test(XML), 'the QR code is a graphic');
     assert.strictEqual(APP_JSON.application.entryPoints.length, 1);
     assert.deepStrictEqual(xmlIds('2').slice(1).map(([id]) => logsPage.components[id].rows[0].Text && logsPage.components[id].rows[0].Text.value)
@@ -339,6 +343,28 @@ async function main() {
     console.log('ok   the Logs page: Start capture and its row, Save logs and its row, QR code, address, five archives; a child of the main page');
 
     const render = new FakeRender(RSOCK);
+    let calibrationSocket = null, calibrationActive = false;
+    const calibrationCommands = [];
+    const calibration = net.createServer((s) => {
+        calibrationSocket = s;
+        let b = Buffer.alloc(0);
+        s.on('close', () => { calibrationActive = false; if (calibrationSocket === s) calibrationSocket = null; });
+        s.on('error', () => {});
+        s.on('data', (d) => {
+            b = Buffer.concat([b, d]);
+            while (b.length >= 4 && b.length >= b.readUInt32LE(0) + 4) {
+                const n = b.readUInt32LE(0), j = JSON.parse(b.slice(5, n + 4)); b = b.slice(n + 4);
+                calibrationCommands.push(j);
+                if (['standard', 'expanded'].includes(j.action)) calibrationActive = true;
+                if (j.action === 'stop') calibrationActive = false;
+                const answer = j.op === 'hello' ? { ev: 'hello', proto: 1, backend: 'id7', underlay: 1 } :
+                    { ev: 'underlay', active: +calibrationActive, owned: +calibrationActive, w: 1632, h: 720, remaining_ms: 15000 };
+                const data = Buffer.from(JSON.stringify(answer)), f = Buffer.alloc(data.length + 5);
+                f.writeUInt32LE(data.length + 1); f[4] = 0x4a; data.copy(f, 5); s.write(f);
+            }
+        });
+    });
+    await new Promise((r) => calibration.listen(USOCK, r));
     let patch = new FakePatch(PSOCK);
     await render.listen();
     await patch.listen();
@@ -358,7 +384,7 @@ async function main() {
         const bound = logs.filter((l) => l.startsWith('info: BIND OK: ')).map((l) => l.split(' ')[3]).sort();
         assert.deepStrictEqual(bound, ['wocAaCard', 'wocAaDisable', 'wocAaEnable', 'wocAaZoomIn', 'wocAaZoomOut', 'wocCapture', 'wocDisable', 'wocEnable',
             'wocGuide', 'wocHudCentre', 'wocHudDown', 'wocHudKeep', 'wocHudLeft', 'wocHudRight', 'wocHudUp', 'wocLogs', 'wocLogsSave', 'wocProfile',
-            'wocRestart'],
+            'wocRestart', 'wocCalParked', 'wocCalStandard', 'wocCalExpanded', 'wocCalStop'].sort(),
             'bound buttons and checkbox');
         assert.strictEqual(byName.wocRestart.visible, false, 'restart button hidden while the map shows');
         console.log('ok   a page opened while the map is up shows it');
@@ -711,6 +737,22 @@ async function main() {
         assert.strictEqual(fs.statSync(qr1).mode & 0o777, 0o644, 'the HMI reads it');
         console.log('ok   Logs opens the Logs page; the app stays shown; the page shows the address and its QR code');
 
+        await until('calibration connected', () => byName.wocCalParked.enabled);
+        assert.strictEqual(byName.wocCalExpanded.enabled, false, 'preview needs parking confirmation');
+        byName.wocCalExpanded.emit('action');
+        assert(!calibrationCommands.some((j) => j.action === 'expanded'));
+        byName.wocCalParked.emit('action');
+        await until('parking confirmed', () => byName.wocCalStandard.enabled && byName.wocCalExpanded.enabled);
+        await sleep(450);
+        byName.wocCalExpanded.emit('action');
+        await until('preview starts', () => calibrationActive && byName.wocCalStop.enabled &&
+            byName.wocCalStatus.text === 'Calibration: 1632 px, 15 s remaining');
+        assert.strictEqual(byName.wocCalExpanded.enabled, false);
+        byName.wocCalStop.emit('action');
+        await until('stop acknowledged', () => !calibrationActive && byName.wocCalStatus.text === 'Calibration: Off');
+        assert.strictEqual(byName.wocCalStandard.enabled, false, 'confirmation is consumed');
+        console.log('ok   parking confirmation, preview, countdown and stop through the HMI');
+
         byName.wocLogsSave.emit('action');
         ['wocCaptureStatus', 'wocLogsStatus', 'wocLogsUrl'].forEach((n) => assert(/^[A-Z][a-z ]+: [A-Z0-9h]/.test(byName[n].text), byName[n].text));
         await until('saved', () => byName.wocLogsStatus.text === 'Saved logs: 1' &&
@@ -734,12 +776,18 @@ async function main() {
          * Logs page says nothing of its own */
         lserver.url = 'http://172.16.222.97:8475/0123456789abcdef0123456789abcdef/';
         lserver.announce();
+        await sleep(450);
+        byName.wocCalParked.emit('action'); byName.wocCalStandard.emit('action');
+        await until('calibration before overlay', () => calibrationActive);
         rhmi.emit('applicationStackChanged', { OVERLAY: 1 });
         await until('hidden: logs socket closed', () => lserver._clients.size === 0);
+        await until('overlay cancels calibration', () => !calibrationSocket && !calibrationActive);
         rhmi.emit('applicationStackChanged', { ROOT_APP: 1 });
         await until('back: logs socket open', () => lserver._clients.size === 1 && byName.wocLogsUrl.text === `Address: ${lserver.url}` &&
             byName.wocLogsStatus.text !== 'Saved logs: Connecting…');
         console.log('ok   back from an overlay on the Logs page, the logs socket opens again');
+        await until('calibration connection restored', () => byName.wocCalParked.enabled);
+        assert(!calibrationActive && !byName.wocCalExpanded.enabled, 'overlay return never resumes preview');
 
         logsState.emit('visible', { visible: false });
         main.emit('visible', { visible: true });
@@ -800,9 +848,12 @@ async function main() {
         console.log('ok   a display language change writes every row again in its words, English for a word it lacks');
         await lserver.close();
     } finally {
+        OnlineApp.instance._underlay.close();
+        if (calibrationSocket) calibrationSocket.destroy();
+        await new Promise((r) => calibration.close(r));
         await render.close();
         await patch.close();
-        [RSOCK, PSOCK, PENDING, LSOCK].forEach((p) => { try { fs.unlinkSync(p); } catch (e) { /* gone */ } });
+        [RSOCK, PSOCK, PENDING, LSOCK, USOCK].forEach((p) => { try { fs.unlinkSync(p); } catch (e) { /* gone */ } });
     }
 }
 

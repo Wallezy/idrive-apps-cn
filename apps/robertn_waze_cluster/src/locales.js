@@ -98,7 +98,18 @@ module.exports = [
    "2.4 GHz": "2.4 GHz",
    "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "قد ينقطع الصوت. على iPhone، أوقف Wi-Fi ثم شغّله.",
    "Own settings for this driver": "إعدادات خاصة لهذا السائق",
-   "Keep HUD map over BMW's pop-ups": "إبقاء خريطة HUD فوق النوافذ المنبثقة من BMW"
+   "Keep HUD map over BMW's pop-ups": "إبقاء خريطة HUD فوق النوافذ المنبثقة من BMW",
+   "Map underlay calibration (parked only)": "معايرة طبقة الخريطة (أثناء الوقوف فقط)",
+   "Parked in P with parking brake applied": "متوقف في P مع فرامل الوقوف",
+   "Preview standard grid — 20 s": "معاينة الشبكة القياسية — 20 ث",
+   "Preview expanded grid — 20 s": "معاينة الشبكة الموسعة — 20 ث",
+   "Stop calibration": "إيقاف المعايرة",
+   "Calibration: renderer unavailable or update needed": "المعايرة: العارض غير متاح أو يحتاج إلى تحديث",
+   "Calibration refused: {0}": "رُفضت المعايرة: {0}",
+   "Calibration: Starting…": "المعايرة: جارٍ البدء…",
+   "Calibration: another session is active": "المعايرة: جلسة أخرى نشطة",
+   "Calibration: {0} px, {1} s remaining": "المعايرة: {0} بكسل، متبقٍ {1} ث",
+   "Calibration: Off": "المعايرة: متوقفة"
   }
  },
  {
@@ -198,7 +209,18 @@ module.exports = [
    "2.4 GHz": "2,4 GHz",
    "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "Zvuk se může přerušovat. Na iPhonu vypněte a zapněte Wi-Fi.",
    "Own settings for this driver": "Vlastní nastavení pro tohoto řidiče",
-   "Keep HUD map over BMW's pop-ups": "Ponechat mapu na HUD přes vyskakovací okna BMW"
+   "Keep HUD map over BMW's pop-ups": "Ponechat mapu na HUD přes vyskakovací okna BMW",
+   "Map underlay calibration (parked only)": "Kalibrace podkladové mapy (jen při stání)",
+   "Parked in P with parking brake applied": "Vozidlo stojí v P s parkovací brzdou",
+   "Preview standard grid — 20 s": "Náhled standardní mřížky — 20 s",
+   "Preview expanded grid — 20 s": "Náhled rozšířené mřížky — 20 s",
+   "Stop calibration": "Zastavit kalibraci",
+   "Calibration: renderer unavailable or update needed": "Kalibrace: vykreslování nedostupné nebo vyžaduje aktualizaci",
+   "Calibration refused: {0}": "Kalibrace odmítnuta: {0}",
+   "Calibration: Starting…": "Kalibrace: spouštění…",
+   "Calibration: another session is active": "Kalibrace: jiná relace je aktivní",
+   "Calibration: {0} px, {1} s remaining": "Kalibrace: {0} px, zbývá {1} s",
+   "Calibration: Off": "Kalibrace: vypnuta"
   }
  },
  {
@@ -298,7 +320,18 @@ module.exports = [
    "2.4 GHz": "2,4 GHz",
    "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "Lyden kan falde ud. Slå Wi-Fi fra og til på din iPhone.",
    "Own settings for this driver": "Egne indstillinger for denne fører",
-   "Keep HUD map over BMW's pop-ups": "Behold kort i HUD over BMW's pop-ups"
+   "Keep HUD map over BMW's pop-ups": "Behold kort i HUD over BMW's pop-ups",
+   "Map underlay calibration (parked only)": "Kalibrering af kortunderlag (kun parkeret)",
+   "Parked in P with parking brake applied": "Parkeret i P med parkeringsbremsen aktiveret",
+   "Preview standard grid — 20 s": "Vis standardgitter — 20 s",
+   "Preview expanded grid — 20 s": "Vis udvidet gitter — 20 s",
+   "Stop calibration": "Stop kalibrering",
+   "Calibration: renderer unavailable or update needed": "Kalibrering: renderer utilgængelig eller skal opdateres",
+   "Calibration refused: {0}": "Kalibrering afvist: {0}",
+   "Calibration: Starting…": "Kalibrering: starter…",
+   "Calibration: another session is active": "Kalibrering: en anden session er aktiv",
+   "Calibration: {0} px, {1} s remaining": "Kalibrering: {0} px, {1} s tilbage",
+   "Calibration: Off": "Kalibrering: fra"
   }
  },
  {
@@ -398,7 +431,18 @@ module.exports = [
    "2.4 GHz": "2,4 GHz",
    "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "Der Ton kann aussetzen. Am iPhone WLAN aus- und wieder einschalten.",
    "Own settings for this driver": "Eigene Einstellungen für diesen Fahrer",
-   "Keep HUD map over BMW's pop-ups": "Karte im HUD vor BMW-Pop-ups behalten"
+   "Keep HUD map over BMW's pop-ups": "Karte im HUD vor BMW-Pop-ups behalten",
+   "Map underlay calibration (parked only)": "Kalibrierung der Kartenebene (nur im Stand)",
+   "Parked in P with parking brake applied": "In P geparkt, Parkbremse angezogen",
+   "Preview standard grid — 20 s": "Standardraster anzeigen — 20 s",
+   "Preview expanded grid — 20 s": "Erweitertes Raster anzeigen — 20 s",
+   "Stop calibration": "Kalibrierung stoppen",
+   "Calibration: renderer unavailable or update needed": "Kalibrierung: Renderer nicht verfügbar oder Update nötig",
+   "Calibration refused: {0}": "Kalibrierung abgelehnt: {0}",
+   "Calibration: Starting…": "Kalibrierung: wird gestartet…",
+   "Calibration: another session is active": "Kalibrierung: andere Sitzung aktiv",
+   "Calibration: {0} px, {1} s remaining": "Kalibrierung: {0} px, noch {1} s",
+   "Calibration: Off": "Kalibrierung: aus"
   }
  },
  {
@@ -498,7 +542,18 @@ module.exports = [
    "2.4 GHz": "2,4 GHz",
    "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "Ο ήχος μπορεί να διακόπτεται. Στο iPhone, απενεργοποιήστε και ενεργοποιήστε ξανά το Wi-Fi.",
    "Own settings for this driver": "Δικές ρυθμίσεις για αυτόν τον οδηγό",
-   "Keep HUD map over BMW's pop-ups": "Διατήρηση χάρτη στο HUD πάνω από τα αναδυόμενα της BMW"
+   "Keep HUD map over BMW's pop-ups": "Διατήρηση χάρτη στο HUD πάνω από τα αναδυόμενα της BMW",
+   "Map underlay calibration (parked only)": "Βαθμονόμηση υποκείμενου χάρτη (μόνο σε στάση)",
+   "Parked in P with parking brake applied": "Σταθμευμένο στο P με χειρόφρενο",
+   "Preview standard grid — 20 s": "Προεπισκόπηση κανονικού πλέγματος — 20 δευτ.",
+   "Preview expanded grid — 20 s": "Προεπισκόπηση διευρυμένου πλέγματος — 20 δευτ.",
+   "Stop calibration": "Διακοπή βαθμονόμησης",
+   "Calibration: renderer unavailable or update needed": "Βαθμονόμηση: απόδοση μη διαθέσιμη ή απαιτεί ενημέρωση",
+   "Calibration refused: {0}": "Η βαθμονόμηση απορρίφθηκε: {0}",
+   "Calibration: Starting…": "Βαθμονόμηση: εκκίνηση…",
+   "Calibration: another session is active": "Βαθμονόμηση: άλλη συνεδρία είναι ενεργή",
+   "Calibration: {0} px, {1} s remaining": "Βαθμονόμηση: {0} px, απομένουν {1} δευτ.",
+   "Calibration: Off": "Βαθμονόμηση: ανενεργή"
   }
  },
  {
@@ -598,7 +653,18 @@ module.exports = [
    "2.4 GHz": "2.4 GHz",
    "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "El audio puede cortarse. En tu iPhone, desactiva y vuelve a activar el Wi-Fi.",
    "Own settings for this driver": "Configuración propia para este conductor",
-   "Keep HUD map over BMW's pop-ups": "Mantener mapa en el HUD sobre ventanas emergentes de BMW"
+   "Keep HUD map over BMW's pop-ups": "Mantener mapa en el HUD sobre ventanas emergentes de BMW",
+   "Map underlay calibration (parked only)": "Calibración de la capa del mapa (solo estacionado)",
+   "Parked in P with parking brake applied": "Estacionado en P con el freno de estacionamiento aplicado",
+   "Preview standard grid — 20 s": "Vista de cuadrícula estándar — 20 s",
+   "Preview expanded grid — 20 s": "Vista de cuadrícula ampliada — 20 s",
+   "Stop calibration": "Detener calibración",
+   "Calibration: renderer unavailable or update needed": "Calibración: renderizador no disponible o necesita actualizarse",
+   "Calibration refused: {0}": "Calibración rechazada: {0}",
+   "Calibration: Starting…": "Calibración: iniciando…",
+   "Calibration: another session is active": "Calibración: otra sesión está activa",
+   "Calibration: {0} px, {1} s remaining": "Calibración: {0} px, quedan {1} s",
+   "Calibration: Off": "Calibración: desactivada"
   }
  },
  {
@@ -698,7 +764,18 @@ module.exports = [
    "2.4 GHz": "2,4 GHz",
    "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "El audio puede cortarse. En tu iPhone, desactiva y vuelve a activar la Wi-Fi.",
    "Own settings for this driver": "Ajustes propios para este conductor",
-   "Keep HUD map over BMW's pop-ups": "Mantener mapa en el HUD sobre ventanas emergentes de BMW"
+   "Keep HUD map over BMW's pop-ups": "Mantener mapa en el HUD sobre ventanas emergentes de BMW",
+   "Map underlay calibration (parked only)": "Calibración de la capa del mapa (solo estacionado)",
+   "Parked in P with parking brake applied": "Estacionado en P con el freno de estacionamiento aplicado",
+   "Preview standard grid — 20 s": "Vista de cuadrícula estándar — 20 s",
+   "Preview expanded grid — 20 s": "Vista de cuadrícula ampliada — 20 s",
+   "Stop calibration": "Detener calibración",
+   "Calibration: renderer unavailable or update needed": "Calibración: renderizador no disponible o necesita actualizarse",
+   "Calibration refused: {0}": "Calibración rechazada: {0}",
+   "Calibration: Starting…": "Calibración: iniciando…",
+   "Calibration: another session is active": "Calibración: otra sesión está activa",
+   "Calibration: {0} px, {1} s remaining": "Calibración: {0} px, quedan {1} s",
+   "Calibration: Off": "Calibración: desactivada"
   }
  },
  {
@@ -798,7 +875,18 @@ module.exports = [
    "2.4 GHz": "2,4 GHz",
    "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "Ääni voi katkeilla. Laita iPhonen Wi-Fi pois ja takaisin päälle.",
    "Own settings for this driver": "Omat asetukset tälle kuljettajalle",
-   "Keep HUD map over BMW's pop-ups": "Pidä HUD-kartta BMW:n ponnahdusikkunoiden päällä"
+   "Keep HUD map over BMW's pop-ups": "Pidä HUD-kartta BMW:n ponnahdusikkunoiden päällä",
+   "Map underlay calibration (parked only)": "Kartan pohjatason kalibrointi (vain pysäköitynä)",
+   "Parked in P with parking brake applied": "Pysäköity P-asentoon, seisontajarru kytketty",
+   "Preview standard grid — 20 s": "Tavallisen ruudukon esikatselu — 20 s",
+   "Preview expanded grid — 20 s": "Laajennetun ruudukon esikatselu — 20 s",
+   "Stop calibration": "Lopeta kalibrointi",
+   "Calibration: renderer unavailable or update needed": "Kalibrointi: renderöinti ei käytettävissä tai päivitys tarvitaan",
+   "Calibration refused: {0}": "Kalibrointi hylätty: {0}",
+   "Calibration: Starting…": "Kalibrointi: käynnistetään…",
+   "Calibration: another session is active": "Kalibrointi: toinen istunto on aktiivinen",
+   "Calibration: {0} px, {1} s remaining": "Kalibrointi: {0} px, jäljellä {1} s",
+   "Calibration: Off": "Kalibrointi: pois"
   }
  },
  {
@@ -898,7 +986,18 @@ module.exports = [
    "2.4 GHz": "2,4 GHz",
    "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "Le son peut se couper. Sur votre iPhone, désactivez puis réactivez le Wi-Fi.",
    "Own settings for this driver": "Réglages propres à ce conducteur",
-   "Keep HUD map over BMW's pop-ups": "Garder la carte sur le HUD devant les fenêtres contextuelles BMW"
+   "Keep HUD map over BMW's pop-ups": "Garder la carte sur le HUD devant les fenêtres contextuelles BMW",
+   "Map underlay calibration (parked only)": "Calibrage du fond de carte (à l’arrêt uniquement)",
+   "Parked in P with parking brake applied": "Stationné en P, frein de stationnement serré",
+   "Preview standard grid — 20 s": "Aperçu de la grille standard — 20 s",
+   "Preview expanded grid — 20 s": "Aperçu de la grille étendue — 20 s",
+   "Stop calibration": "Arrêter le calibrage",
+   "Calibration: renderer unavailable or update needed": "Calibrage : moteur de rendu indisponible ou à mettre à jour",
+   "Calibration refused: {0}": "Calibrage refusé : {0}",
+   "Calibration: Starting…": "Calibrage : démarrage…",
+   "Calibration: another session is active": "Calibrage : une autre session est active",
+   "Calibration: {0} px, {1} s remaining": "Calibrage : {0} px, {1} s restantes",
+   "Calibration: Off": "Calibrage : désactivé"
   }
  },
  {
@@ -998,7 +1097,18 @@ module.exports = [
    "2.4 GHz": "2,4 GHz",
    "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "Le son peut se couper. Sur votre iPhone, désactivez puis réactivez le Wi-Fi.",
    "Own settings for this driver": "Réglages propres à ce conducteur",
-   "Keep HUD map over BMW's pop-ups": "Garder la carte sur le HUD devant les pop-up BMW"
+   "Keep HUD map over BMW's pop-ups": "Garder la carte sur le HUD devant les pop-up BMW",
+   "Map underlay calibration (parked only)": "Calibrage du fond de carte (à l’arrêt uniquement)",
+   "Parked in P with parking brake applied": "Stationné en P, frein de stationnement serré",
+   "Preview standard grid — 20 s": "Aperçu de la grille standard — 20 s",
+   "Preview expanded grid — 20 s": "Aperçu de la grille étendue — 20 s",
+   "Stop calibration": "Arrêter le calibrage",
+   "Calibration: renderer unavailable or update needed": "Calibrage : moteur de rendu indisponible ou à mettre à jour",
+   "Calibration refused: {0}": "Calibrage refusé : {0}",
+   "Calibration: Starting…": "Calibrage : démarrage…",
+   "Calibration: another session is active": "Calibrage : une autre session est active",
+   "Calibration: {0} px, {1} s remaining": "Calibrage : {0} px, {1} s restantes",
+   "Calibration: Off": "Calibrage : désactivé"
   }
  },
  {
@@ -1098,7 +1208,18 @@ module.exports = [
    "2.4 GHz": "2.4 GHz",
    "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "השמע עלול להיקטע. ב-iPhone, כבו את ה-Wi-Fi והפעילו אותו מחדש.",
    "Own settings for this driver": "הגדרות נפרדות לנהג זה",
-   "Keep HUD map over BMW's pop-ups": "השארת המפה ב-HUD מעל החלונות הקופצים של BMW"
+   "Keep HUD map over BMW's pop-ups": "השארת המפה ב-HUD מעל החלונות הקופצים של BMW",
+   "Map underlay calibration (parked only)": "כיול שכבת המפה התחתונה (בחניה בלבד)",
+   "Parked in P with parking brake applied": "בחניה במצב P עם בלם חניה מופעל",
+   "Preview standard grid — 20 s": "תצוגה מקדימה של רשת רגילה — 20 שניות",
+   "Preview expanded grid — 20 s": "תצוגה מקדימה של רשת מורחבת — 20 שניות",
+   "Stop calibration": "עצירת כיול",
+   "Calibration: renderer unavailable or update needed": "כיול: שירות התצוגה אינו זמין או נדרש עדכון",
+   "Calibration refused: {0}": "הכיול נדחה: {0}",
+   "Calibration: Starting…": "כיול: מתחיל…",
+   "Calibration: another session is active": "כיול: הפעלה אחרת פעילה",
+   "Calibration: {0} px, {1} s remaining": "כיול: {0} פיקסלים, נותרו {1} שניות",
+   "Calibration: Off": "כיול: כבוי"
   }
  },
  {
@@ -1198,7 +1319,18 @@ module.exports = [
    "2.4 GHz": "2,4 GHz",
    "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "A hang akadozhat. Az iPhone-on kapcsolja ki, majd be a Wi-Fi-t.",
    "Own settings for this driver": "Saját beállítások ennek a vezetőnek",
-   "Keep HUD map over BMW's pop-ups": "Térkép megtartása a HUD-on a BMW felugró ablakai felett"
+   "Keep HUD map over BMW's pop-ups": "Térkép megtartása a HUD-on a BMW felugró ablakai felett",
+   "Map underlay calibration (parked only)": "Térképalap kalibrálása (csak álló helyzetben)",
+   "Parked in P with parking brake applied": "P állásban parkol, rögzítőfék behúzva",
+   "Preview standard grid — 20 s": "Normál rács előnézete — 20 mp",
+   "Preview expanded grid — 20 s": "Bővített rács előnézete — 20 mp",
+   "Stop calibration": "Kalibrálás leállítása",
+   "Calibration: renderer unavailable or update needed": "Kalibrálás: megjelenítő nem érhető el vagy frissítendő",
+   "Calibration refused: {0}": "Kalibrálás elutasítva: {0}",
+   "Calibration: Starting…": "Kalibrálás: indítás…",
+   "Calibration: another session is active": "Kalibrálás: másik munkamenet aktív",
+   "Calibration: {0} px, {1} s remaining": "Kalibrálás: {0} px, {1} mp van hátra",
+   "Calibration: Off": "Kalibrálás: kikapcsolva"
   }
  },
  {
@@ -1298,7 +1430,18 @@ module.exports = [
    "2.4 GHz": "2,4 GHz",
    "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "Audio mungkin terputus. Di iPhone Anda, matikan lalu nyalakan Wi-Fi.",
    "Own settings for this driver": "Pengaturan sendiri untuk pengemudi ini",
-   "Keep HUD map over BMW's pop-ups": "Pertahankan peta di HUD di atas pop-up BMW"
+   "Keep HUD map over BMW's pop-ups": "Pertahankan peta di HUD di atas pop-up BMW",
+   "Map underlay calibration (parked only)": "Kalibrasi lapisan bawah peta (hanya saat parkir)",
+   "Parked in P with parking brake applied": "Parkir di P dengan rem parkir aktif",
+   "Preview standard grid — 20 s": "Pratinjau kisi standar — 20 dtk",
+   "Preview expanded grid — 20 s": "Pratinjau kisi diperluas — 20 dtk",
+   "Stop calibration": "Hentikan kalibrasi",
+   "Calibration: renderer unavailable or update needed": "Kalibrasi: perender tidak tersedia atau perlu diperbarui",
+   "Calibration refused: {0}": "Kalibrasi ditolak: {0}",
+   "Calibration: Starting…": "Kalibrasi: memulai…",
+   "Calibration: another session is active": "Kalibrasi: sesi lain sedang aktif",
+   "Calibration: {0} px, {1} s remaining": "Kalibrasi: {0} px, tersisa {1} dtk",
+   "Calibration: Off": "Kalibrasi: nonaktif"
   }
  },
  {
@@ -1398,7 +1541,18 @@ module.exports = [
    "2.4 GHz": "2,4 GHz",
    "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "L'audio potrebbe interrompersi. Sull'iPhone, disattiva e riattiva il Wi-Fi.",
    "Own settings for this driver": "Impostazioni proprie per questo conducente",
-   "Keep HUD map over BMW's pop-ups": "Mantieni la mappa sull'HUD sopra i pop-up BMW"
+   "Keep HUD map over BMW's pop-ups": "Mantieni la mappa sull'HUD sopra i pop-up BMW",
+   "Map underlay calibration (parked only)": "Calibrazione del livello mappa (solo da fermi)",
+   "Parked in P with parking brake applied": "Parcheggiato in P con freno di stazionamento inserito",
+   "Preview standard grid — 20 s": "Anteprima griglia standard — 20 s",
+   "Preview expanded grid — 20 s": "Anteprima griglia estesa — 20 s",
+   "Stop calibration": "Interrompi calibrazione",
+   "Calibration: renderer unavailable or update needed": "Calibrazione: renderer non disponibile o da aggiornare",
+   "Calibration refused: {0}": "Calibrazione rifiutata: {0}",
+   "Calibration: Starting…": "Calibrazione: avvio…",
+   "Calibration: another session is active": "Calibrazione: un’altra sessione è attiva",
+   "Calibration: {0} px, {1} s remaining": "Calibrazione: {0} px, {1} s rimanenti",
+   "Calibration: Off": "Calibrazione: disattivata"
   }
  },
  {
@@ -1498,7 +1652,18 @@ module.exports = [
    "2.4 GHz": "2.4 GHz",
    "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "音声が途切れることがあります。iPhoneでWi-Fiをオフにしてからオンにしてください。",
    "Own settings for this driver": "このドライバー専用の設定",
-   "Keep HUD map over BMW's pop-ups": "HUDの地図をBMWのポップアップより優先"
+   "Keep HUD map over BMW's pop-ups": "HUDの地図をBMWのポップアップより優先",
+   "Map underlay calibration (parked only)": "地図下層の調整（停車中のみ）",
+   "Parked in P with parking brake applied": "停車し、P レンジとパーキングブレーキを使用中",
+   "Preview standard grid — 20 s": "標準グリッドをプレビュー · 20 秒",
+   "Preview expanded grid — 20 s": "拡張グリッドをプレビュー · 20 秒",
+   "Stop calibration": "調整を停止",
+   "Calibration: renderer unavailable or update needed": "調整：描画サービスが利用不可、または更新が必要",
+   "Calibration refused: {0}": "調整を開始できません：{0}",
+   "Calibration: Starting…": "調整：開始中…",
+   "Calibration: another session is active": "調整：別のセッションが使用中",
+   "Calibration: {0} px, {1} s remaining": "調整：幅 {0} px、残り {1} 秒",
+   "Calibration: Off": "調整：オフ"
   }
  },
  {
@@ -1598,7 +1763,18 @@ module.exports = [
    "2.4 GHz": "2.4 GHz",
    "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "오디오가 끊길 수 있습니다. iPhone에서 Wi-Fi를 껐다가 다시 켜십시오.",
    "Own settings for this driver": "이 운전자 전용 설정",
-   "Keep HUD map over BMW's pop-ups": "BMW 팝업 위에 HUD 지도 유지"
+   "Keep HUD map over BMW's pop-ups": "BMW 팝업 위에 HUD 지도 유지",
+   "Map underlay calibration (parked only)": "지도 하위 레이어 보정 (주차 중에만)",
+   "Parked in P with parking brake applied": "P단에 주차하고 주차 브레이크 적용됨",
+   "Preview standard grid — 20 s": "표준 격자 미리 보기 — 20초",
+   "Preview expanded grid — 20 s": "확장 격자 미리 보기 — 20초",
+   "Stop calibration": "보정 중지",
+   "Calibration: renderer unavailable or update needed": "보정: 렌더러 사용 불가 또는 업데이트 필요",
+   "Calibration refused: {0}": "보정 거부: {0}",
+   "Calibration: Starting…": "보정: 시작 중…",
+   "Calibration: another session is active": "보정: 다른 세션이 사용 중",
+   "Calibration: {0} px, {1} s remaining": "보정: {0}px, {1}초 남음",
+   "Calibration: Off": "보정: 꺼짐"
   }
  },
  {
@@ -1698,7 +1874,18 @@ module.exports = [
    "2.4 GHz": "2,4 GHz",
    "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "Lyden kan falle ut. Slå Wi-Fi av og på igjen på iPhone.",
    "Own settings for this driver": "Egne innstillinger for denne føreren",
-   "Keep HUD map over BMW's pop-ups": "Behold kart i HUD over BMWs popup-vinduer"
+   "Keep HUD map over BMW's pop-ups": "Behold kart i HUD over BMWs popup-vinduer",
+   "Map underlay calibration (parked only)": "Kalibrering av kartunderlag (kun parkert)",
+   "Parked in P with parking brake applied": "Parkert i P med parkeringsbremsen på",
+   "Preview standard grid — 20 s": "Vis standardrutenett — 20 s",
+   "Preview expanded grid — 20 s": "Vis utvidet rutenett — 20 s",
+   "Stop calibration": "Stopp kalibrering",
+   "Calibration: renderer unavailable or update needed": "Kalibrering: renderer utilgjengelig eller må oppdateres",
+   "Calibration refused: {0}": "Kalibrering avvist: {0}",
+   "Calibration: Starting…": "Kalibrering: starter…",
+   "Calibration: another session is active": "Kalibrering: en annen økt er aktiv",
+   "Calibration: {0} px, {1} s remaining": "Kalibrering: {0} px, {1} s igjen",
+   "Calibration: Off": "Kalibrering: av"
   }
  },
  {
@@ -1800,7 +1987,18 @@ module.exports = [
    "2.4 GHz": "2,4 GHz",
    "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "Het geluid kan wegvallen. Zet Wi-Fi op je iPhone uit en weer aan.",
    "Own settings for this driver": "Eigen instellingen voor deze bestuurder",
-   "Keep HUD map over BMW's pop-ups": "Kaart in HUD boven BMW-pop-ups houden"
+   "Keep HUD map over BMW's pop-ups": "Kaart in HUD boven BMW-pop-ups houden",
+   "Map underlay calibration (parked only)": "Kalibratie van de kaartonderlaag (alleen geparkeerd)",
+   "Parked in P with parking brake applied": "Geparkeerd in P met de parkeerrem aangetrokken",
+   "Preview standard grid — 20 s": "Standaardraster bekijken — 20 s",
+   "Preview expanded grid — 20 s": "Uitgebreid raster bekijken — 20 s",
+   "Stop calibration": "Kalibratie stoppen",
+   "Calibration: renderer unavailable or update needed": "Kalibratie: renderer niet beschikbaar of update nodig",
+   "Calibration refused: {0}": "Kalibratie geweigerd: {0}",
+   "Calibration: Starting…": "Kalibratie: starten…",
+   "Calibration: another session is active": "Kalibratie: een andere sessie is actief",
+   "Calibration: {0} px, {1} s remaining": "Kalibratie: {0} px, nog {1} s",
+   "Calibration: Off": "Kalibratie: uit"
   }
  },
  {
@@ -1900,7 +2098,18 @@ module.exports = [
    "2.4 GHz": "2,4 GHz",
    "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "Dźwięk może się przerywać. Na iPhonie wyłącz i włącz Wi-Fi.",
    "Own settings for this driver": "Własne ustawienia dla tego kierowcy",
-   "Keep HUD map over BMW's pop-ups": "Zachowaj mapę na HUD nad wyskakującymi oknami BMW"
+   "Keep HUD map over BMW's pop-ups": "Zachowaj mapę na HUD nad wyskakującymi oknami BMW",
+   "Map underlay calibration (parked only)": "Kalibracja warstwy mapy (tylko na postoju)",
+   "Parked in P with parking brake applied": "Zaparkowano w P z włączonym hamulcem postojowym",
+   "Preview standard grid — 20 s": "Podgląd standardowej siatki — 20 s",
+   "Preview expanded grid — 20 s": "Podgląd rozszerzonej siatki — 20 s",
+   "Stop calibration": "Zatrzymaj kalibrację",
+   "Calibration: renderer unavailable or update needed": "Kalibracja: renderer niedostępny lub wymaga aktualizacji",
+   "Calibration refused: {0}": "Kalibracja odrzucona: {0}",
+   "Calibration: Starting…": "Kalibracja: uruchamianie…",
+   "Calibration: another session is active": "Kalibracja: inna sesja jest aktywna",
+   "Calibration: {0} px, {1} s remaining": "Kalibracja: {0} px, pozostało {1} s",
+   "Calibration: Off": "Kalibracja: wyłączona"
   }
  },
  {
@@ -2000,7 +2209,18 @@ module.exports = [
    "2.4 GHz": "2,4 GHz",
    "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "O áudio pode falhar. No iPhone, desative e ative o Wi-Fi.",
    "Own settings for this driver": "Configurações próprias para este motorista",
-   "Keep HUD map over BMW's pop-ups": "Manter mapa no HUD sobre pop-ups da BMW"
+   "Keep HUD map over BMW's pop-ups": "Manter mapa no HUD sobre pop-ups da BMW",
+   "Map underlay calibration (parked only)": "Calibração da camada do mapa (somente estacionado)",
+   "Parked in P with parking brake applied": "Estacionado em P com freio de estacionamento acionado",
+   "Preview standard grid — 20 s": "Visualizar grade padrão — 20 s",
+   "Preview expanded grid — 20 s": "Visualizar grade ampliada — 20 s",
+   "Stop calibration": "Parar calibração",
+   "Calibration: renderer unavailable or update needed": "Calibração: renderizador indisponível ou atualização necessária",
+   "Calibration refused: {0}": "Calibração recusada: {0}",
+   "Calibration: Starting…": "Calibração: iniciando…",
+   "Calibration: another session is active": "Calibração: outra sessão está ativa",
+   "Calibration: {0} px, {1} s remaining": "Calibração: {0} px, restam {1} s",
+   "Calibration: Off": "Calibração: desligada"
   }
  },
  {
@@ -2100,7 +2320,18 @@ module.exports = [
    "2.4 GHz": "2,4 GHz",
    "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "O áudio pode falhar. No iPhone, desative e volte a ativar o Wi-Fi.",
    "Own settings for this driver": "Definições próprias para este condutor",
-   "Keep HUD map over BMW's pop-ups": "Manter mapa no HUD sobre pop-ups BMW"
+   "Keep HUD map over BMW's pop-ups": "Manter mapa no HUD sobre pop-ups BMW",
+   "Map underlay calibration (parked only)": "Calibração da camada do mapa (apenas estacionado)",
+   "Parked in P with parking brake applied": "Estacionado em P com travão de estacionamento acionado",
+   "Preview standard grid — 20 s": "Pré-visualizar grelha padrão — 20 s",
+   "Preview expanded grid — 20 s": "Pré-visualizar grelha ampliada — 20 s",
+   "Stop calibration": "Parar calibração",
+   "Calibration: renderer unavailable or update needed": "Calibração: renderizador indisponível ou atualização necessária",
+   "Calibration refused: {0}": "Calibração recusada: {0}",
+   "Calibration: Starting…": "Calibração: a iniciar…",
+   "Calibration: another session is active": "Calibração: outra sessão está ativa",
+   "Calibration: {0} px, {1} s remaining": "Calibração: {0} px, faltam {1} s",
+   "Calibration: Off": "Calibração: desligada"
   }
  },
  {
@@ -2200,7 +2431,18 @@ module.exports = [
    "2.4 GHz": "2,4 GHz",
    "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "Sunetul se poate întrerupe. Pe iPhone, dezactivați și reactivați Wi-Fi.",
    "Own settings for this driver": "Setări proprii pentru acest șofer",
-   "Keep HUD map over BMW's pop-ups": "Păstrare hartă pe HUD peste ferestrele pop-up BMW"
+   "Keep HUD map over BMW's pop-ups": "Păstrare hartă pe HUD peste ferestrele pop-up BMW",
+   "Map underlay calibration (parked only)": "Calibrarea stratului hărții (doar în parcare)",
+   "Parked in P with parking brake applied": "Parcat în P cu frâna de parcare activată",
+   "Preview standard grid — 20 s": "Previzualizare grilă standard — 20 s",
+   "Preview expanded grid — 20 s": "Previzualizare grilă extinsă — 20 s",
+   "Stop calibration": "Oprește calibrarea",
+   "Calibration: renderer unavailable or update needed": "Calibrare: randare indisponibilă sau necesită actualizare",
+   "Calibration refused: {0}": "Calibrare refuzată: {0}",
+   "Calibration: Starting…": "Calibrare: pornire…",
+   "Calibration: another session is active": "Calibrare: altă sesiune este activă",
+   "Calibration: {0} px, {1} s remaining": "Calibrare: {0} px, au rămas {1} s",
+   "Calibration: Off": "Calibrare: oprită"
   }
  },
  {
@@ -2300,7 +2542,18 @@ module.exports = [
    "2.4 GHz": "2,4 ГГц",
    "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "Звук может прерываться. На iPhone выключите и снова включите Wi-Fi.",
    "Own settings for this driver": "Свои настройки для этого водителя",
-   "Keep HUD map over BMW's pop-ups": "Оставлять карту на HUD поверх всплывающих окон BMW"
+   "Keep HUD map over BMW's pop-ups": "Оставлять карту на HUD поверх всплывающих окон BMW",
+   "Map underlay calibration (parked only)": "Калибровка подложки карты (только на стоянке)",
+   "Parked in P with parking brake applied": "Автомобиль стоит в P, стояночный тормоз включён",
+   "Preview standard grid — 20 s": "Просмотр обычной сетки — 20 с",
+   "Preview expanded grid — 20 s": "Просмотр расширенной сетки — 20 с",
+   "Stop calibration": "Остановить калибровку",
+   "Calibration: renderer unavailable or update needed": "Калибровка: рендерер недоступен или требует обновления",
+   "Calibration refused: {0}": "Калибровка отклонена: {0}",
+   "Calibration: Starting…": "Калибровка: запуск…",
+   "Calibration: another session is active": "Калибровка: другой сеанс активен",
+   "Calibration: {0} px, {1} s remaining": "Калибровка: {0} пикс., осталось {1} с",
+   "Calibration: Off": "Калибровка: выключена"
   }
  },
  {
@@ -2400,7 +2653,18 @@ module.exports = [
    "2.4 GHz": "2,4 GHz",
    "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "Zvuk sa môže prerušovať. Na iPhone vypnite a zapnite Wi-Fi.",
    "Own settings for this driver": "Vlastné nastavenia pre tohto vodiča",
-   "Keep HUD map over BMW's pop-ups": "Ponechať mapu na HUD nad kontextovými oknami BMW"
+   "Keep HUD map over BMW's pop-ups": "Ponechať mapu na HUD nad kontextovými oknami BMW",
+   "Map underlay calibration (parked only)": "Kalibrácia podkladovej mapy (iba pri státí)",
+   "Parked in P with parking brake applied": "Zaparkované v P so zatiahnutou parkovacou brzdou",
+   "Preview standard grid — 20 s": "Náhľad štandardnej mriežky — 20 s",
+   "Preview expanded grid — 20 s": "Náhľad rozšírenej mriežky — 20 s",
+   "Stop calibration": "Zastaviť kalibráciu",
+   "Calibration: renderer unavailable or update needed": "Kalibrácia: vykresľovanie nedostupné alebo vyžaduje aktualizáciu",
+   "Calibration refused: {0}": "Kalibrácia odmietnutá: {0}",
+   "Calibration: Starting…": "Kalibrácia: spúšťanie…",
+   "Calibration: another session is active": "Kalibrácia: iná relácia je aktívna",
+   "Calibration: {0} px, {1} s remaining": "Kalibrácia: {0} px, zostáva {1} s",
+   "Calibration: Off": "Kalibrácia: vypnutá"
   }
  },
  {
@@ -2500,7 +2764,18 @@ module.exports = [
    "2.4 GHz": "2,4 GHz",
    "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "Zvok se lahko prekinja. Na iPhonu izklopite in vklopite Wi-Fi.",
    "Own settings for this driver": "Lastne nastavitve za tega voznika",
-   "Keep HUD map over BMW's pop-ups": "Ohrani zemljevid na HUD nad pojavnimi okni BMW"
+   "Keep HUD map over BMW's pop-ups": "Ohrani zemljevid na HUD nad pojavnimi okni BMW",
+   "Map underlay calibration (parked only)": "Umerjanje plasti zemljevida (samo med parkiranjem)",
+   "Parked in P with parking brake applied": "Parkirano v P z vključeno parkirno zavoro",
+   "Preview standard grid — 20 s": "Predogled standardne mreže — 20 s",
+   "Preview expanded grid — 20 s": "Predogled razširjene mreže — 20 s",
+   "Stop calibration": "Ustavi umerjanje",
+   "Calibration: renderer unavailable or update needed": "Umerjanje: izrisovalnik ni na voljo ali potrebuje posodobitev",
+   "Calibration refused: {0}": "Umerjanje zavrnjeno: {0}",
+   "Calibration: Starting…": "Umerjanje: zagon…",
+   "Calibration: another session is active": "Umerjanje: druga seja je aktivna",
+   "Calibration: {0} px, {1} s remaining": "Umerjanje: {0} px, še {1} s",
+   "Calibration: Off": "Umerjanje: izklopljeno"
   }
  },
  {
@@ -2600,7 +2875,18 @@ module.exports = [
    "2.4 GHz": "2,4 GHz",
    "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "Ljudet kan försvinna. Stäng av och slå på Wi-Fi på din iPhone.",
    "Own settings for this driver": "Egna inställningar för den här föraren",
-   "Keep HUD map over BMW's pop-ups": "Behåll karta i HUD över BMW:s popup-fönster"
+   "Keep HUD map over BMW's pop-ups": "Behåll karta i HUD över BMW:s popup-fönster",
+   "Map underlay calibration (parked only)": "Kalibrering av kartunderlag (endast parkerad)",
+   "Parked in P with parking brake applied": "Parkerad i P med parkeringsbromsen åtdragen",
+   "Preview standard grid — 20 s": "Visa standardrutnät — 20 s",
+   "Preview expanded grid — 20 s": "Visa utökat rutnät — 20 s",
+   "Stop calibration": "Stoppa kalibrering",
+   "Calibration: renderer unavailable or update needed": "Kalibrering: renderare saknas eller behöver uppdateras",
+   "Calibration refused: {0}": "Kalibrering nekad: {0}",
+   "Calibration: Starting…": "Kalibrering: startar…",
+   "Calibration: another session is active": "Kalibrering: en annan session är aktiv",
+   "Calibration: {0} px, {1} s remaining": "Kalibrering: {0} px, {1} s kvar",
+   "Calibration: Off": "Kalibrering: av"
   }
  },
  {
@@ -2700,7 +2986,18 @@ module.exports = [
    "2.4 GHz": "2.4 GHz",
    "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "เสียงอาจขาดหาย ให้ปิดแล้วเปิด Wi-Fi บน iPhone",
    "Own settings for this driver": "การตั้งค่าเฉพาะสำหรับผู้ขับขี่คนนี้",
-   "Keep HUD map over BMW's pop-ups": "คงแผนที่บน HUD ไว้เหนือป๊อปอัปของ BMW"
+   "Keep HUD map over BMW's pop-ups": "คงแผนที่บน HUD ไว้เหนือป๊อปอัปของ BMW",
+   "Map underlay calibration (parked only)": "ปรับเทียบชั้นแผนที่ด้านล่าง (ขณะจอดเท่านั้น)",
+   "Parked in P with parking brake applied": "จอดในเกียร์ P และใช้เบรกจอดแล้ว",
+   "Preview standard grid — 20 s": "ดูตารางมาตรฐาน — 20 วินาที",
+   "Preview expanded grid — 20 s": "ดูตารางแบบขยาย — 20 วินาที",
+   "Stop calibration": "หยุดการปรับเทียบ",
+   "Calibration: renderer unavailable or update needed": "การปรับเทียบ: ระบบแสดงผลไม่พร้อมหรือจำเป็นต้องอัปเดต",
+   "Calibration refused: {0}": "ปฏิเสธการปรับเทียบ: {0}",
+   "Calibration: Starting…": "การปรับเทียบ: กำลังเริ่ม…",
+   "Calibration: another session is active": "การปรับเทียบ: มีเซสชันอื่นทำงานอยู่",
+   "Calibration: {0} px, {1} s remaining": "การปรับเทียบ: {0} พิกเซล เหลือ {1} วินาที",
+   "Calibration: Off": "การปรับเทียบ: ปิด"
   }
  },
  {
@@ -2800,7 +3097,18 @@ module.exports = [
    "2.4 GHz": "2,4 GHz",
    "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "Ses kesilebilir. iPhone'unuzda Wi-Fi'yi kapatıp açın.",
    "Own settings for this driver": "Bu sürücüye özel ayarlar",
-   "Keep HUD map over BMW's pop-ups": "HUD haritasını BMW açılır pencerelerinin üstünde tut"
+   "Keep HUD map over BMW's pop-ups": "HUD haritasını BMW açılır pencerelerinin üstünde tut",
+   "Map underlay calibration (parked only)": "Harita alt katmanı kalibrasyonu (yalnızca park halinde)",
+   "Parked in P with parking brake applied": "P konumunda park edildi, park freni çekili",
+   "Preview standard grid — 20 s": "Standart ızgarayı önizle — 20 sn",
+   "Preview expanded grid — 20 s": "Genişletilmiş ızgarayı önizle — 20 sn",
+   "Stop calibration": "Kalibrasyonu durdur",
+   "Calibration: renderer unavailable or update needed": "Kalibrasyon: işleyici kullanılamıyor veya güncelleme gerekli",
+   "Calibration refused: {0}": "Kalibrasyon reddedildi: {0}",
+   "Calibration: Starting…": "Kalibrasyon: başlatılıyor…",
+   "Calibration: another session is active": "Kalibrasyon: başka bir oturum etkin",
+   "Calibration: {0} px, {1} s remaining": "Kalibrasyon: {0} piksel, {1} sn kaldı",
+   "Calibration: Off": "Kalibrasyon: kapalı"
   }
  },
  {
@@ -2900,7 +3208,18 @@ module.exports = [
    "2.4 GHz": "2,4 ГГц",
    "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "Звук може перериватися. На iPhone вимкніть і знову ввімкніть Wi-Fi.",
    "Own settings for this driver": "Власні налаштування для цього водія",
-   "Keep HUD map over BMW's pop-ups": "Залишати карту на HUD поверх спливних вікон BMW"
+   "Keep HUD map over BMW's pop-ups": "Залишати карту на HUD поверх спливних вікон BMW",
+   "Map underlay calibration (parked only)": "Калібрування підкладки карти (лише на стоянці)",
+   "Parked in P with parking brake applied": "Автомобіль стоїть у P, стоянкове гальмо ввімкнено",
+   "Preview standard grid — 20 s": "Перегляд звичайної сітки — 20 с",
+   "Preview expanded grid — 20 s": "Перегляд розширеної сітки — 20 с",
+   "Stop calibration": "Зупинити калібрування",
+   "Calibration: renderer unavailable or update needed": "Калібрування: рендерер недоступний або потребує оновлення",
+   "Calibration refused: {0}": "Калібрування відхилено: {0}",
+   "Calibration: Starting…": "Калібрування: запуск…",
+   "Calibration: another session is active": "Калібрування: інший сеанс активний",
+   "Calibration: {0} px, {1} s remaining": "Калібрування: {0} пікс., залишилося {1} с",
+   "Calibration: Off": "Калібрування: вимкнено"
   }
  },
  {
@@ -3000,7 +3319,18 @@ module.exports = [
    "2.4 GHz": "2,4 GHz",
    "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "Âm thanh có thể bị ngắt. Trên iPhone, hãy tắt rồi bật lại Wi-Fi.",
    "Own settings for this driver": "Cài đặt riêng cho người lái này",
-   "Keep HUD map over BMW's pop-ups": "Giữ bản đồ trên HUD phía trên cửa sổ bật lên của BMW"
+   "Keep HUD map over BMW's pop-ups": "Giữ bản đồ trên HUD phía trên cửa sổ bật lên của BMW",
+   "Map underlay calibration (parked only)": "Hiệu chuẩn lớp bản đồ dưới (chỉ khi đỗ)",
+   "Parked in P with parking brake applied": "Đã đỗ ở P và bật phanh đỗ",
+   "Preview standard grid — 20 s": "Xem lưới tiêu chuẩn — 20 giây",
+   "Preview expanded grid — 20 s": "Xem lưới mở rộng — 20 giây",
+   "Stop calibration": "Dừng hiệu chuẩn",
+   "Calibration: renderer unavailable or update needed": "Hiệu chuẩn: bộ dựng hình không khả dụng hoặc cần cập nhật",
+   "Calibration refused: {0}": "Hiệu chuẩn bị từ chối: {0}",
+   "Calibration: Starting…": "Hiệu chuẩn: đang bắt đầu…",
+   "Calibration: another session is active": "Hiệu chuẩn: phiên khác đang hoạt động",
+   "Calibration: {0} px, {1} s remaining": "Hiệu chuẩn: {0} px, còn {1} giây",
+   "Calibration: Off": "Hiệu chuẩn: tắt"
   }
  },
  {
@@ -3102,7 +3432,18 @@ module.exports = [
    "2.4 GHz": "2.4 GHz",
    "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "音频可能中断。请在 iPhone 上关闭再打开无线局域网。",
    "Own settings for this driver": "此驾驶员的专属设置",
-   "Keep HUD map over BMW's pop-ups": "HUD 地图保持在 BMW 弹窗之上"
+   "Keep HUD map over BMW's pop-ups": "HUD 地图保持在 BMW 弹窗之上",
+   "Map underlay calibration (parked only)": "地图下层校准（仅限停车）",
+   "Parked in P with parking brake applied": "已停稳、挂 P 挡并拉好驻车制动",
+   "Preview standard grid — 20 s": "预览标准网格 · 20 秒",
+   "Preview expanded grid — 20 s": "预览扩展网格 · 20 秒",
+   "Stop calibration": "停止校准",
+   "Calibration: renderer unavailable or update needed": "校准：渲染服务不可用或需更新",
+   "Calibration refused: {0}": "校准未启动：{0}",
+   "Calibration: Starting…": "校准：正在启动…",
+   "Calibration: another session is active": "校准：另一会话正在使用",
+   "Calibration: {0} px, {1} s remaining": "校准：宽 {0} 像素，剩余 {1} 秒",
+   "Calibration: Off": "校准：关闭"
   },
   "messages": {
    "Details: {0}": "原始详情：{0}",
@@ -3256,7 +3597,18 @@ module.exports = [
    "2.4 GHz": "2.4 GHz",
    "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "音訊可能中斷。請在 iPhone 上關閉再開啟 Wi-Fi。",
    "Own settings for this driver": "此駕駛的專屬設定",
-   "Keep HUD map over BMW's pop-ups": "HUD 地圖保持在 BMW 彈出視窗之上"
+   "Keep HUD map over BMW's pop-ups": "HUD 地圖保持在 BMW 彈出視窗之上",
+   "Map underlay calibration (parked only)": "地圖下層校準（僅限停車）",
+   "Parked in P with parking brake applied": "已停穩、排入 P 檔並拉好駐車煞車",
+   "Preview standard grid — 20 s": "預覽標準網格 · 20 秒",
+   "Preview expanded grid — 20 s": "預覽擴展網格 · 20 秒",
+   "Stop calibration": "停止校準",
+   "Calibration: renderer unavailable or update needed": "校準：繪圖服務無法使用或需更新",
+   "Calibration refused: {0}": "校準未啟動：{0}",
+   "Calibration: Starting…": "校準：正在啟動…",
+   "Calibration: another session is active": "校準：另一工作階段正在使用",
+   "Calibration: {0} px, {1} s remaining": "校準：寬 {0} 像素，剩餘 {1} 秒",
+   "Calibration: Off": "校準：關閉"
   }
  }
 ];

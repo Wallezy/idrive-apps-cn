@@ -94,6 +94,17 @@
     "2.4 GHz": "2,4 GHz",
     "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "Zvuk sa môže prerušovať. Na iPhone vypnite a zapnite Wi-Fi.",
     "Own settings for this driver": "Vlastné nastavenia pre tohto vodiča",
-    "Keep HUD map over BMW's pop-ups": "Ponechať mapu na HUD nad kontextovými oknami BMW"
+    "Keep HUD map over BMW's pop-ups": "Ponechať mapu na HUD nad kontextovými oknami BMW",
+    "Map underlay calibration (parked only)": "Kalibrácia podkladovej mapy (iba pri státí)",
+    "Parked in P with parking brake applied": "Zaparkované v P so zatiahnutou parkovacou brzdou",
+    "Preview standard grid — 20 s": "Náhľad štandardnej mriežky — 20 s",
+    "Preview expanded grid — 20 s": "Náhľad rozšírenej mriežky — 20 s",
+    "Stop calibration": "Zastaviť kalibráciu",
+    "Calibration: renderer unavailable or update needed": "Kalibrácia: vykresľovanie nedostupné alebo vyžaduje aktualizáciu",
+    "Calibration refused: {0}": "Kalibrácia odmietnutá: {0}",
+    "Calibration: Starting…": "Kalibrácia: spúšťanie…",
+    "Calibration: another session is active": "Kalibrácia: iná relácia je aktívna",
+    "Calibration: {0} px, {1} s remaining": "Kalibrácia: {0} px, zostáva {1} s",
+    "Calibration: Off": "Kalibrácia: vypnutá"
   }
 }

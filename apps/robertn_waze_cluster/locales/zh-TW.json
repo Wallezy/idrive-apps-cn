@@ -96,6 +96,17 @@
     "2.4 GHz": "2.4 GHz",
     "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "音訊可能中斷。請在 iPhone 上關閉再開啟 Wi-Fi。",
     "Own settings for this driver": "此駕駛的專屬設定",
-    "Keep HUD map over BMW's pop-ups": "HUD 地圖保持在 BMW 彈出視窗之上"
+    "Keep HUD map over BMW's pop-ups": "HUD 地圖保持在 BMW 彈出視窗之上",
+    "Map underlay calibration (parked only)": "地圖下層校準（僅限停車）",
+    "Parked in P with parking brake applied": "已停穩、排入 P 檔並拉好駐車煞車",
+    "Preview standard grid — 20 s": "預覽標準網格 · 20 秒",
+    "Preview expanded grid — 20 s": "預覽擴展網格 · 20 秒",
+    "Stop calibration": "停止校準",
+    "Calibration: renderer unavailable or update needed": "校準：繪圖服務無法使用或需更新",
+    "Calibration refused: {0}": "校準未啟動：{0}",
+    "Calibration: Starting…": "校準：正在啟動…",
+    "Calibration: another session is active": "校準：另一工作階段正在使用",
+    "Calibration: {0} px, {1} s remaining": "校準：寬 {0} 像素，剩餘 {1} 秒",
+    "Calibration: Off": "校準：關閉"
   }
 }

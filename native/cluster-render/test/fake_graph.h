@@ -87,6 +87,7 @@ public:
     long write_budget = -1;        /* refuse writes once this many bytes went; -1: never */
     bool fail_flush = false;
     std::string name;
+    uint32_t width = 0, height = 0;
     std::map<std::string, FakeGraph *> *registry = nullptr;
     const std::map<int, unsigned> *effect_attributes = nullptr;   /* the Gpu's */
 
@@ -468,6 +469,8 @@ public:
     {
         FakeGraph *g = new FakeGraph();
         g->name = t.name;
+        g->width = t.width;
+        g->height = t.height;
         g->registry = &live;
         g->clock_us = clock_us;
         g->flush_cost_us = &flush_cost_us;

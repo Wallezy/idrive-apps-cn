@@ -94,6 +94,17 @@
     "2.4 GHz": "2,4 GHz",
     "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "Sunetul se poate întrerupe. Pe iPhone, dezactivați și reactivați Wi-Fi.",
     "Own settings for this driver": "Setări proprii pentru acest șofer",
-    "Keep HUD map over BMW's pop-ups": "Păstrare hartă pe HUD peste ferestrele pop-up BMW"
+    "Keep HUD map over BMW's pop-ups": "Păstrare hartă pe HUD peste ferestrele pop-up BMW",
+    "Map underlay calibration (parked only)": "Calibrarea stratului hărții (doar în parcare)",
+    "Parked in P with parking brake applied": "Parcat în P cu frâna de parcare activată",
+    "Preview standard grid — 20 s": "Previzualizare grilă standard — 20 s",
+    "Preview expanded grid — 20 s": "Previzualizare grilă extinsă — 20 s",
+    "Stop calibration": "Oprește calibrarea",
+    "Calibration: renderer unavailable or update needed": "Calibrare: randare indisponibilă sau necesită actualizare",
+    "Calibration refused: {0}": "Calibrare refuzată: {0}",
+    "Calibration: Starting…": "Calibrare: pornire…",
+    "Calibration: another session is active": "Calibrare: altă sesiune este activă",
+    "Calibration: {0} px, {1} s remaining": "Calibrare: {0} px, au rămas {1} s",
+    "Calibration: Off": "Calibrare: oprită"
   }
 }

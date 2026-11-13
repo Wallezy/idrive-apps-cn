@@ -94,6 +94,17 @@
     "2.4 GHz": "2,4 GHz",
     "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "Audio mungkin terputus. Di iPhone Anda, matikan lalu nyalakan Wi-Fi.",
     "Own settings for this driver": "Pengaturan sendiri untuk pengemudi ini",
-    "Keep HUD map over BMW's pop-ups": "Pertahankan peta di HUD di atas pop-up BMW"
+    "Keep HUD map over BMW's pop-ups": "Pertahankan peta di HUD di atas pop-up BMW",
+    "Map underlay calibration (parked only)": "Kalibrasi lapisan bawah peta (hanya saat parkir)",
+    "Parked in P with parking brake applied": "Parkir di P dengan rem parkir aktif",
+    "Preview standard grid — 20 s": "Pratinjau kisi standar — 20 dtk",
+    "Preview expanded grid — 20 s": "Pratinjau kisi diperluas — 20 dtk",
+    "Stop calibration": "Hentikan kalibrasi",
+    "Calibration: renderer unavailable or update needed": "Kalibrasi: perender tidak tersedia atau perlu diperbarui",
+    "Calibration refused: {0}": "Kalibrasi ditolak: {0}",
+    "Calibration: Starting…": "Kalibrasi: memulai…",
+    "Calibration: another session is active": "Kalibrasi: sesi lain sedang aktif",
+    "Calibration: {0} px, {1} s remaining": "Kalibrasi: {0} px, tersisa {1} dtk",
+    "Calibration: Off": "Kalibrasi: nonaktif"
   }
 }

@@ -35,6 +35,9 @@
  * car's hotspot downloads the saved archives from, that address, and the
  * archives. The app holds the logs socket while the page is visible; the QR
  * code is a PNG in QR_DIR (RAM), replaced when the address changes.
+ * The Logs page also holds an optional underlay calibration connection:
+ * parking confirmation, two bounded grid previews, stop and status. Hiding
+ * that page closes this connection immediately, ending any preview.
  *
  * CarPlay's Patch button is enabled for an unpatched or unknown state and Remove
  * patch for a patch, both only with no change pending (waze_cluster_control.js
@@ -63,6 +66,7 @@ const { WazeClusterControl, ZOOM_STEP, SHOWN_ON } = require('./waze_cluster_cont
 const { LogsControl, ROWS: LOGS_ROWS } = require('./logs_control.js');
 const { qrPng } = require('./qr.js');
 const { ProfileSync, sessionReader } = require('./profile_sync.js');
+const { UnderlayControl } = require('./underlay_control.js');
 
 const logger = logging.getSDKLogger();
 
@@ -102,6 +106,7 @@ const LOGS_STATUS = 'wocLogsStatus';
 const LOGS_QR = 'wocLogsQr';
 const LOGS_URL = 'wocLogsUrl';
 const LOGS_ROW_NAMES = Array.from({ length: LOGS_ROWS }, (_, i) => `wocLogsRow${i + 1}`);
+const CAL_NAMES = ['wocCalHead', 'wocCalParked', 'wocCalStandard', 'wocCalExpanded', 'wocCalStop', 'wocCalStatus'];
 const ROW_CHARS = 90;
 const PRESS_DEDUPE_MS = 400;
 const HIDE_SETTLE_MS = 800;
@@ -140,6 +145,8 @@ class WazeClusterApp extends OnlineApp {
         this._control.on('change', () => this._render());
         this._logs = new LogsControl({ log: logger });
         this._logs.on('change', () => this._renderLogs());
+        this._underlay = new UnderlayControl();
+        this._underlay.on('change', () => this._renderLogs());
         /* the map settings per driver profile, page shown or not */
         this._profiles = new ProfileSync({ control: this._control, log: logger, readProfile: sessionReader(someipBuilders, logger) });
         this._profiles.on('change', () => this._render());
@@ -208,7 +215,7 @@ class WazeClusterApp extends OnlineApp {
             AA_ENABLE_NAME, AA_DISABLE_NAME, AA_ZOOM_NAME, AA_ZOOM_OUT_NAME, AA_ZOOM_IN_NAME, AA_CARD_NAME, RESTART_NAME, GUIDE_NAME,
             HEAD_GENERAL_NAME, HEAD_HUD_NAME, SHOW_ON_NAME, PROFILE_NAME, HUD_NAME, HUD_KEEP_NAME, HUD_SIZE_NAME, HUD_POS_NAME]
             .concat(Object.values(HUD_MOVE_NAMES), [HUD_CENTRE_NAME, CAPTURE_NAME, CAPTURE_STATUS,
-                LOGS_NAME, LOGS_SAVE, LOGS_STATUS, LOGS_QR, LOGS_URL], LOGS_ROW_NAMES);
+                LOGS_NAME, LOGS_SAVE, LOGS_STATUS, LOGS_QR, LOGS_URL], LOGS_ROW_NAMES, CAL_NAMES);
         names.forEach((name) => { this._components[name] = rhmi.getByName(name); });
         const missing = names.filter((name) => !this._components[name]);
         if (missing.length) {
@@ -268,6 +275,14 @@ class WazeClusterApp extends OnlineApp {
         this._bind(LOGS_NAME, () => Promise.resolve(rhmi.openState(LOGS_STATE))
             .catch((err) => logger.warn(`openState ${LOGS_STATE} failed: ${err && err.message}`)));
         this._bind(LOGS_SAVE, () => this._logs.save());
+        this._bind('wocCalParked', () => {
+            delete this._written['selected:wocCalParked'];
+            this._underlay.confirm();
+            this._renderLogs();
+        });
+        this._bind('wocCalStandard', () => this._underlay.start('standard'));
+        this._bind('wocCalExpanded', () => this._underlay.start('expanded'));
+        this._bind('wocCalStop', () => this._underlay.stop());
         // Presses also arrive as the application's raw 'userEvent'; both paths
         // land in _press, which keeps a press delivered twice to one.
         rhmi.on('userEvent', (ev) => {
@@ -391,6 +406,7 @@ class WazeClusterApp extends OnlineApp {
         this._shownPage = 'main';
         this._pages.logs = false;
         this._logs.close();
+        this._underlay.close();
         this._setVisible(true);
         return Promise.resolve(this.rhmiApplication.openEntryState(uuid))
             .catch((err) => logger.warn(`openEntryState failed: ${err && err.message}`));
@@ -410,8 +426,10 @@ class WazeClusterApp extends OnlineApp {
         if (page === 'logs') {
             if (visible) {
                 this._logs.open();
+                this._underlay.open();
             } else {
                 this._logs.close();
+                this._underlay.close();
             }
         }
         clearTimeout(this._hideTimer);
@@ -431,6 +449,7 @@ class WazeClusterApp extends OnlineApp {
         if (!visible) {
             this._pages = { main: false, logs: false };
             this._logs.close();
+            this._underlay.close();
         }
         if (this._shutdownPromise || this._visible === visible) {
             return;
@@ -446,6 +465,7 @@ class WazeClusterApp extends OnlineApp {
             if (this._shownPage === 'logs') {
                 this._pages.logs = true;
                 this._logs.open();
+                this._underlay.open();
             }
         } else {
             this._control.close();
@@ -597,6 +617,18 @@ class WazeClusterApp extends OnlineApp {
         const rows = this._logs.rows();
         LOGS_ROW_NAMES.forEach((name, i) => this._write(name, oneRow(rows[i])));
         this._showQr(this._logs.url());
+        const u = this._underlay;
+        this._write('wocCalHead', t('Map underlay calibration (parked only)'));
+        this._write('wocCalParked', t('Parked in P with parking brake applied'));
+        this._setSelected('wocCalParked', u.parked);
+        this._setEnabled('wocCalParked', u.supported && !u.active && !u.pending);
+        this._write('wocCalStandard', t('Preview standard grid — 20 s'));
+        this._write('wocCalExpanded', t('Preview expanded grid — 20 s'));
+        this._write('wocCalStop', t('Stop calibration'));
+        this._write('wocCalStatus', u.statusText());
+        this._setEnabled('wocCalStandard', u.canStart());
+        this._setEnabled('wocCalExpanded', u.canStart());
+        this._setEnabled('wocCalStop', u.pending || (u.active && u.owned));
     }
 
     /* Writes url's QR code (none: a blank square) as a new file and shows it,
@@ -667,6 +699,7 @@ class WazeClusterApp extends OnlineApp {
         clearTimeout(this._hideTimer);
         this._control.close();
         this._logs.close();
+        this._underlay.close();
         this._profiles.stop();
         if (this._qr.file) {
             try {

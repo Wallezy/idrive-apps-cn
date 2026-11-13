@@ -3,6 +3,37 @@
 
 # cluster-render protocol, version 1
 
+## ID7 parking calibration extension
+
+`hello` advertises `underlay: 1` only on ID7 (or the host test backend)
+with the standard map slot, scene and dimensions. Absence means unsupported.
+Ordinary targets, layers and clients keep their protocol and geometry.
+
+`{"op":"underlay","action":"standard|expanded","parked":1}` starts a
+static grid for at most 20 seconds. Parking confirmation is supplied by the
+user, not a vehicle-signal interlock. The standard map video must already
+be shown and live. The scene canvas is 1088×480 or 1632×720, on map slot
+0x100 and scene 0x010004f0 only. No caller-provided dimensions or identities
+are accepted. The regular target dimensions in `hello` stay 1088×480.
+
+`action: "keep"` renews the owning connection's two-second lease without
+extending the total limit; `"stop"` ends it; `"status"` only reads it.
+Each request replies with `ev: "underlay"`, numeric `active`, `owned`,
+`w`, `h`, `remaining_ms`, and a diagnostic `reason`. Refusals also send
+the usual `error` event. Status is global; only the owner may renew or stop.
+The status file includes the same calibration state, separately from the
+ordinary target geometry. A mapped status is not physical display proof.
+
+Disconnect, timeout, a lost/stalled source video, map alerts and display
+interruption end calibration. The ordinary canvas is restored through
+the slot manager's scene release and reacquisition, while existing client
+layers and the HUD are retained. No setting is saved. Clients must never
+replay a preview after reconnecting. See the
+[calibration notes](../../docs/CLUSTER-B-CALIBRATION.zh-CN.md) for the
+physical validation limits.
+
+## Transport
+
 A client connects to the service's stream socket
 (`/dev/shm/cluster-render/render.sock`, group `tm_oap_app`). Messages go
 both ways, each:

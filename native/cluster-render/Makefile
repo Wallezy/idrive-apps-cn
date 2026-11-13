@@ -73,7 +73,7 @@ CLIENT_SRC = client/client.cpp client/protocol.cpp
 KIT_TESTS = $(H)/map_upload_test $(H)/yuv_atlas_test $(H)/frame_clock_test $(H)/block_pack_test
 CPP_TESTS = $(H)/log_test $(H)/slots_test $(H)/governor_test $(H)/compositor_test $(H)/video_composite_test \
 	$(H)/occlusion_test \
-	$(H)/service_test \
+	$(H)/service_test $(H)/underlay_test \
 	$(H)/dcsm2_port_test $(H)/ramses_console_test $(H)/dcsm27_port_test $(H)/generation_test $(H)/holds_test \
 	$(H)/guard_test $(H)/head_unit_test $(H)/refused_test $(H)/recv_buffer_test $(H)/scene_test
 
@@ -102,9 +102,11 @@ test-cpp: $(CPP_TESTS)
 	$(H)/recv_buffer_test
 	$(H)/scene_test
 	$(H)/service_test
+	$(H)/underlay_test
 
 test-js: $(H)/host_service
 	$(NODE) js/test/client_test.js $(H)/host_service
+	$(NODE) ../../apps/robertn_waze_cluster/tools/test_underlay.js $(H)/host_service
 
 test-kit-bin: $(KIT_TESTS)
 
@@ -201,6 +203,9 @@ $(H)/scene_test: $(O)/test/scene_test.o $(CORE_OBJ)
 	$(CXX) $(CXXFLAGS) -o $@ $^ -lpthread
 
 $(H)/service_test: $(O)/test/service_test.o $(CORE_OBJ) $(O)/client/client.o
+	$(CXX) $(CXXFLAGS) -o $@ $^ -lpthread
+
+$(H)/underlay_test: $(O)/test/underlay_test.o $(CORE_OBJ)
 	$(CXX) $(CXXFLAGS) -o $@ $^ -lpthread
 
 $(H)/host_service: $(O)/test/host_service.o $(CORE_OBJ)

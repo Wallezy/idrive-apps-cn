@@ -94,6 +94,17 @@
     "2.4 GHz": "2.4 GHz",
     "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "오디오가 끊길 수 있습니다. iPhone에서 Wi-Fi를 껐다가 다시 켜십시오.",
     "Own settings for this driver": "이 운전자 전용 설정",
-    "Keep HUD map over BMW's pop-ups": "BMW 팝업 위에 HUD 지도 유지"
+    "Keep HUD map over BMW's pop-ups": "BMW 팝업 위에 HUD 지도 유지",
+    "Map underlay calibration (parked only)": "지도 하위 레이어 보정 (주차 중에만)",
+    "Parked in P with parking brake applied": "P단에 주차하고 주차 브레이크 적용됨",
+    "Preview standard grid — 20 s": "표준 격자 미리 보기 — 20초",
+    "Preview expanded grid — 20 s": "확장 격자 미리 보기 — 20초",
+    "Stop calibration": "보정 중지",
+    "Calibration: renderer unavailable or update needed": "보정: 렌더러 사용 불가 또는 업데이트 필요",
+    "Calibration refused: {0}": "보정 거부: {0}",
+    "Calibration: Starting…": "보정: 시작 중…",
+    "Calibration: another session is active": "보정: 다른 세션이 사용 중",
+    "Calibration: {0} px, {1} s remaining": "보정: {0}px, {1}초 남음",
+    "Calibration: Off": "보정: 꺼짐"
   }
 }

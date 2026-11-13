@@ -602,6 +602,7 @@ void Server::on_json(Client &c, const std::string &body, int64_t now_ms)
                                  {"proto", std::to_string(cr::kProtocolVersion)},
                                  {"backend", cr::json_quote(backend_)},
                                  {"targets", cr::json_quote(targets)},
+                                 {"underlay", (backend_ == "id7" || backend_ == "host") && comp_->underlay_supported() ? "1" : "0"},
                                  {"repeat", "1"}}));
         c.target_sent.clear();
         log_info("client %llu: %s", (unsigned long long)c.id, c.app.c_str());
@@ -609,6 +610,14 @@ void Server::on_json(Client &c, const std::string &body, int64_t now_ms)
     }
     if (op == "layer") {
         op_layer(c, j, now_ms);
+        return;
+    }
+    if (op == "underlay") {
+        std::string err;
+        if ((backend_ != "id7" && backend_ != "host") ||
+            !comp_->underlay(c.id, str(j, "action"), str(j, "parked") == "1", now_ms, &err))
+            error(c, op, 0, err.empty() ? "ID7 only" : err);
+        send(c, comp_->underlay_status(c.id, now_ms));
         return;
     }
     if (op == "status") {
@@ -1173,7 +1182,7 @@ std::string Server::status_text(int64_t now_ms) const
             if (!stats.empty())
                 s += "  " + stats + "\n";
         }
-    return s;
+    return s + "underlay: " + comp_->underlay_status(0, now_ms) + "\n";
 }
 
 }  // namespace crs

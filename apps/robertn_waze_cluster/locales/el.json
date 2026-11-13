@@ -94,6 +94,17 @@
     "2.4 GHz": "2,4 GHz",
     "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "Ο ήχος μπορεί να διακόπτεται. Στο iPhone, απενεργοποιήστε και ενεργοποιήστε ξανά το Wi-Fi.",
     "Own settings for this driver": "Δικές ρυθμίσεις για αυτόν τον οδηγό",
-    "Keep HUD map over BMW's pop-ups": "Διατήρηση χάρτη στο HUD πάνω από τα αναδυόμενα της BMW"
+    "Keep HUD map over BMW's pop-ups": "Διατήρηση χάρτη στο HUD πάνω από τα αναδυόμενα της BMW",
+    "Map underlay calibration (parked only)": "Βαθμονόμηση υποκείμενου χάρτη (μόνο σε στάση)",
+    "Parked in P with parking brake applied": "Σταθμευμένο στο P με χειρόφρενο",
+    "Preview standard grid — 20 s": "Προεπισκόπηση κανονικού πλέγματος — 20 δευτ.",
+    "Preview expanded grid — 20 s": "Προεπισκόπηση διευρυμένου πλέγματος — 20 δευτ.",
+    "Stop calibration": "Διακοπή βαθμονόμησης",
+    "Calibration: renderer unavailable or update needed": "Βαθμονόμηση: απόδοση μη διαθέσιμη ή απαιτεί ενημέρωση",
+    "Calibration refused: {0}": "Η βαθμονόμηση απορρίφθηκε: {0}",
+    "Calibration: Starting…": "Βαθμονόμηση: εκκίνηση…",
+    "Calibration: another session is active": "Βαθμονόμηση: άλλη συνεδρία είναι ενεργή",
+    "Calibration: {0} px, {1} s remaining": "Βαθμονόμηση: {0} px, απομένουν {1} δευτ.",
+    "Calibration: Off": "Βαθμονόμηση: ανενεργή"
   }
 }

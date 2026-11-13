@@ -94,6 +94,17 @@
     "2.4 GHz": "2.4 GHz",
     "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "音声が途切れることがあります。iPhoneでWi-Fiをオフにしてからオンにしてください。",
     "Own settings for this driver": "このドライバー専用の設定",
-    "Keep HUD map over BMW's pop-ups": "HUDの地図をBMWのポップアップより優先"
+    "Keep HUD map over BMW's pop-ups": "HUDの地図をBMWのポップアップより優先",
+    "Map underlay calibration (parked only)": "地図下層の調整（停車中のみ）",
+    "Parked in P with parking brake applied": "停車し、P レンジとパーキングブレーキを使用中",
+    "Preview standard grid — 20 s": "標準グリッドをプレビュー · 20 秒",
+    "Preview expanded grid — 20 s": "拡張グリッドをプレビュー · 20 秒",
+    "Stop calibration": "調整を停止",
+    "Calibration: renderer unavailable or update needed": "調整：描画サービスが利用不可、または更新が必要",
+    "Calibration refused: {0}": "調整を開始できません：{0}",
+    "Calibration: Starting…": "調整：開始中…",
+    "Calibration: another session is active": "調整：別のセッションが使用中",
+    "Calibration: {0} px, {1} s remaining": "調整：幅 {0} px、残り {1} 秒",
+    "Calibration: Off": "調整：オフ"
   }
 }

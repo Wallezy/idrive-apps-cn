@@ -94,6 +94,17 @@
     "2.4 GHz": "2.4 GHz",
     "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "השמע עלול להיקטע. ב-iPhone, כבו את ה-Wi-Fi והפעילו אותו מחדש.",
     "Own settings for this driver": "הגדרות נפרדות לנהג זה",
-    "Keep HUD map over BMW's pop-ups": "השארת המפה ב-HUD מעל החלונות הקופצים של BMW"
+    "Keep HUD map over BMW's pop-ups": "השארת המפה ב-HUD מעל החלונות הקופצים של BMW",
+    "Map underlay calibration (parked only)": "כיול שכבת המפה התחתונה (בחניה בלבד)",
+    "Parked in P with parking brake applied": "בחניה במצב P עם בלם חניה מופעל",
+    "Preview standard grid — 20 s": "תצוגה מקדימה של רשת רגילה — 20 שניות",
+    "Preview expanded grid — 20 s": "תצוגה מקדימה של רשת מורחבת — 20 שניות",
+    "Stop calibration": "עצירת כיול",
+    "Calibration: renderer unavailable or update needed": "כיול: שירות התצוגה אינו זמין או נדרש עדכון",
+    "Calibration refused: {0}": "הכיול נדחה: {0}",
+    "Calibration: Starting…": "כיול: מתחיל…",
+    "Calibration: another session is active": "כיול: הפעלה אחרת פעילה",
+    "Calibration: {0} px, {1} s remaining": "כיול: {0} פיקסלים, נותרו {1} שניות",
+    "Calibration: Off": "כיול: כבוי"
   }
 }

@@ -12,7 +12,8 @@
     "src/logs_control.js",
     "src/qr.js",
     "src/qrcodegen.js",
-    "src/profile_sync.js"
+    "src/profile_sync.js",
+    "src/underlay_control.js"
   ],
   "sdk": [
     "oap-sdk/src/core/OnlineApp.js",

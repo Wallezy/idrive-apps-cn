@@ -151,6 +151,7 @@ jobs:
       - if: needs.changes.outputs.waze-on-cluster == 'true'
         run: make -C native/waze-on-cluster test
       - run: node apps/robertn_waze_cluster/tools/test_control.js
+      - run: node apps/robertn_waze_cluster/tools/test_underlay.js
       - run: node apps/robertn_waze_cluster/tools/test_page.js
       - run: node apps/robertn_waze_cluster/tools/test_profiles.js
       - run: node apps/robertn_waze_cluster/tools/test_i18n.js

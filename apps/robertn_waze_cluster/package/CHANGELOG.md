@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Logs has a parking-only map-underlay calibration: standard and expanded
+  static grids, each limited to 20 seconds. The renderer restores the standard
+  canvas on stop, UI disconnect, timeout, stream loss or display interruption.
+  This measures the display area; full-width maps and preserved factory
+  information require physical validation on the vehicle.
+
 - The CN app defaults to Simplified Chinese while the HMI language is unavailable and follows explicit display-language selections. Chinese status rows translate known renderer and patch messages, frame counts and transfer limits; unknown diagnostics retain their original detail. Native protocol fields and logs are unchanged.
 
 ## 0.6.7

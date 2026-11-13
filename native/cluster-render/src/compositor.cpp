@@ -9,6 +9,7 @@
 #include <iterator>
 
 #include "block_pack.h"
+#include "cluster_render/protocol.h"
 #include "log.h"
 #include "yuv_atlas.h"
 
@@ -580,7 +581,155 @@ bool Compositor::stale(const TargetSpec &spec) const
 {
     const int ti = slots_->index(spec.name);
     const Target &t = targets_[ti];
-    return (t.graph || t.file) && content(ti) != (t.file ? t.file_of : 0);
+    const TargetSpec c = canvas(spec);
+    return ((t.graph || t.file) && content(ti) != (t.file ? t.file_of : 0)) ||
+           (t.graph && (t.canvas_w != c.width || t.canvas_h != c.height));
+}
+
+bool Compositor::underlay_supported() const
+{
+    const int ti = slots_->index("map");
+    if (ti < 0) return false;
+    const TargetSpec &t = slots_->targets()[ti];
+    return t.slot == 0x100 && t.scene_id == 0x010004f0 && t.content_class == 0 &&
+           t.width == 1088 && t.height == 480 && !t.scene_files;
+}
+
+TargetSpec Compositor::canvas(const TargetSpec &spec) const
+{
+    TargetSpec c = spec;
+    if (underlay_.layer && spec.name == "map") {
+        c.width = underlay_.w;
+        c.height = underlay_.h;
+    }
+    return c;
+}
+
+void Compositor::end_underlay(const std::string &reason)
+{
+    if (!underlay_.layer) return;
+    const uint64_t owner = underlay_.owner;
+    const uint32_t id = underlay_.layer;
+    underlay_ = Underlay();
+    underlay_.reason = reason;
+    remove(owner, id);
+    log_info("underlay calibration ended: %s; standard map canvas requested", reason.c_str());
+}
+
+bool Compositor::underlay(uint64_t owner, const std::string &action, bool parked, int64_t now_ms, std::string *err)
+{
+    tick_underlay(now_ms);
+    if (action == "status") return true;
+    if (action == "stop") {
+        if (underlay_.layer && underlay_.owner != owner) { *err = "calibration owned by another client"; return false; }
+        end_underlay("stopped");
+        return true;
+    }
+    if (action == "keep") {
+        if (!underlay_.layer || underlay_.owner != owner) { *err = "no calibration owned by this client"; return false; }
+        underlay_.lease = now_ms + 2000;
+        return true;
+    }
+    if (action != "standard" && action != "expanded") { *err = "unknown calibration action"; return false; }
+    if (!parked) { *err = "parking confirmation required"; return false; }
+    if (!underlay_supported()) { *err = "calibration needs the standard ID7 map target"; return false; }
+    if (underlay_.layer) { *err = "calibration already active"; return false; }
+    const int ti = slots_->index("map");
+    if (content(ti)) { *err = "map has a scene file"; return false; }
+    // The known central map must already be shown. Calibration never asks
+    // for a different slot or starts from an unavailable/parked map.
+    if (slots_->status(ti).state != TargetState::Shown) { *err = "show the standard cluster map first"; return false; }
+    uint32_t source = 0;
+    for (const auto &kv : layers_) {
+        const Layer &l = *kv.second.layer;
+        if (l.target() == ti && l.params.visible && l.ready(now_ms)) {
+            if (l.params.klass == Klass::Alert) { *err = "map alert is active"; return false; }
+            std::string why;
+            if (!std::strcmp(l.kind(), "video") && state(kv.first, &why) == LayerState::Shown)
+                source = kv.first;
+        }
+    }
+    if (!source) { *err = "show the standard cluster map first"; return false; }
+    const uint32_t w = action == "expanded" ? 1632 : 1088, h = action == "expanded" ? 720 : 480;
+    LayerParams lp;
+    lp.rect = {0, 0, w, h};
+    lp.klass = Klass::Alert;
+    lp.z = INT32_MAX;
+    lp.exclusive = true;
+    lp.contend = false;
+    lp.guide_hold = false;
+    // Static grid: 64 px spacing, cyan centre, red left edge, blue right
+    // edge, yellow top, green bottom. It carries no video or vehicle data.
+    const std::string fs =
+        "precision mediump float; varying vec2 v_uv; uniform vec2 u_size;\n"
+        "void main(){vec2 p=v_uv*u_size; vec3 c=vec3(0.0);"
+        "if(mod(p.x,64.0)<2.0||mod(p.y,64.0)<2.0)c=vec3(0.18);"
+        "if(abs(p.x-u_size.x*0.5)<2.0||abs(p.y-u_size.y*0.5)<2.0)c=vec3(0.0,0.5,0.5);"
+        "if(p.x<12.0)c=vec3(0.7,0.0,0.0);"
+        "if(p.x>u_size.x-12.0)c=vec3(0.0,0.2,0.8);"
+        "if(p.y<12.0)c=vec3(0.6,0.6,0.0);"
+        "if(p.y>u_size.y-12.0)c=vec3(0.0,0.6,0.0);"
+        "gl_FragColor=vec4(c,1.0);}";
+    const uint32_t id = add_effect(owner, ti, lp, "", fs, 0, now_ms, err);
+    if (!id) return false;
+    const float size[] = {(float)w, (float)h};
+    static_cast<EffectLayer *>(layer(owner, id))->set_uniform("u_size", size, 2);
+    underlay_.owner = owner;
+    underlay_.layer = id;
+    underlay_.source = source;
+    underlay_.target = ti;
+    underlay_.w = w;
+    underlay_.h = h;
+    underlay_.deadline = now_ms + 20000;
+    underlay_.lease = now_ms + 2000;
+    underlay_.shown = false;
+    underlay_.reason = "starting";
+    log_info("underlay calibration: %s %ux%u, 20 s limit, 2 s lease; physical result unverified", action.c_str(), w, h);
+    return true;
+}
+
+void Compositor::tick_underlay(int64_t now_ms)
+{
+    if (!underlay_.layer) return;
+    if (now_ms >= underlay_.deadline) { end_underlay("timeout"); return; }
+    if (now_ms >= underlay_.lease) { end_underlay("lease expired"); return; }
+    auto source = layers_.find(underlay_.source);
+    if (source == layers_.end() || !source->second.layer->params.visible || !source->second.layer->ready(now_ms)) {
+        end_underlay("map stream stopped");
+        return;
+    }
+    for (const auto &kv : layers_) {
+        const Layer &l = *kv.second.layer;
+        if (kv.first != underlay_.layer && l.target() == underlay_.target &&
+            l.params.klass == Klass::Alert && l.params.visible && l.ready(now_ms)) {
+            end_underlay("map alert");
+            return;
+        }
+    }
+    const TargetStatus &ts = slots_->status(underlay_.target);
+    std::string why;
+    const LayerState s = state(underlay_.layer, &why);
+    if (s == LayerState::Error || ts.state == TargetState::Unavailable || ts.state == TargetState::Parked ||
+        (underlay_.shown && ts.state != TargetState::Shown)) {
+        end_underlay("display interrupted");
+        return;
+    }
+    // Ignore the old graph while the expanded scene is waiting to replace it.
+    const Target &t = targets_[underlay_.target];
+    if (s == LayerState::Shown && t.canvas_w == underlay_.w && t.canvas_h == underlay_.h) {
+        underlay_.shown = true;
+        underlay_.reason = "mapped; physical result unverified";
+    }
+}
+
+std::string Compositor::underlay_status(uint64_t owner, int64_t now_ms) const
+{
+    return cr::json_object({{"ev", cr::json_quote("underlay")},
+        {"active", underlay_.layer ? "1" : "0"},
+        {"owned", underlay_.layer && underlay_.owner == owner ? "1" : "0"},
+        {"w", std::to_string(underlay_.w)}, {"h", std::to_string(underlay_.h)},
+        {"remaining_ms", std::to_string(underlay_.layer ? std::max<int64_t>(0, underlay_.deadline - now_ms) : 0)},
+        {"reason", cr::json_quote(underlay_.reason)}});
 }
 
 bool Compositor::outdated(const TargetSpec &spec) const
@@ -653,6 +802,7 @@ void Compositor::remove(uint64_t owner, uint32_t id)
 
 void Compositor::remove_owner(uint64_t owner)
 {
+    if (underlay_.owner == owner) end_underlay("client disconnected");
     /* Layers first: then no layer samples the assets. */
     std::vector<uint32_t> ids;
     for (const auto &kv : layers_)
@@ -674,6 +824,7 @@ void Compositor::remove_owner(uint64_t owner)
 void Compositor::arrange(int64_t now_ms)
 {
     now_ms_ = now_ms;
+    tick_underlay(now_ms);
     for (const Target &t : targets_)
         if ((t.remake_ms >= 0 && now_ms >= t.remake_ms) || (t.hold_ms >= 0 && now_ms >= t.hold_ms)) {
             reconcile();
@@ -1667,9 +1818,12 @@ bool Compositor::publish(const TargetSpec &spec, std::string *err)
                  spec.name.c_str(), s.src.file.c_str(), (unsigned long long)(t.file_bytes / 1024), s.edits.kept());
         return true;
     }
-    t.graph = gpu_->scene(spec, err);
+    const TargetSpec c = canvas(spec);
+    t.graph = gpu_->scene(c, err);
     if (!t.graph)
         return false;
+    t.canvas_w = c.width;
+    t.canvas_h = c.height;
     t.tag = 0;
     t.flush_failing = false;
     /* A new scene shows nothing until its first flush. */

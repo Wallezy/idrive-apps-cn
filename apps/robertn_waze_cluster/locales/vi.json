@@ -94,6 +94,17 @@
     "2.4 GHz": "2,4 GHz",
     "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "Âm thanh có thể bị ngắt. Trên iPhone, hãy tắt rồi bật lại Wi-Fi.",
     "Own settings for this driver": "Cài đặt riêng cho người lái này",
-    "Keep HUD map over BMW's pop-ups": "Giữ bản đồ trên HUD phía trên cửa sổ bật lên của BMW"
+    "Keep HUD map over BMW's pop-ups": "Giữ bản đồ trên HUD phía trên cửa sổ bật lên của BMW",
+    "Map underlay calibration (parked only)": "Hiệu chuẩn lớp bản đồ dưới (chỉ khi đỗ)",
+    "Parked in P with parking brake applied": "Đã đỗ ở P và bật phanh đỗ",
+    "Preview standard grid — 20 s": "Xem lưới tiêu chuẩn — 20 giây",
+    "Preview expanded grid — 20 s": "Xem lưới mở rộng — 20 giây",
+    "Stop calibration": "Dừng hiệu chuẩn",
+    "Calibration: renderer unavailable or update needed": "Hiệu chuẩn: bộ dựng hình không khả dụng hoặc cần cập nhật",
+    "Calibration refused: {0}": "Hiệu chuẩn bị từ chối: {0}",
+    "Calibration: Starting…": "Hiệu chuẩn: đang bắt đầu…",
+    "Calibration: another session is active": "Hiệu chuẩn: phiên khác đang hoạt động",
+    "Calibration: {0} px, {1} s remaining": "Hiệu chuẩn: {0} px, còn {1} giây",
+    "Calibration: Off": "Hiệu chuẩn: tắt"
   }
 }

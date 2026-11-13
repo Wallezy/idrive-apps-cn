@@ -1057,6 +1057,142 @@
               }
             }
           ]
+        },
+        "90": {
+          "type": "label",
+          "name": "wocCalHead",
+          "properties": {
+            "Visible": {
+              "value": 1,
+              "type": "UInt"
+            },
+            "Focusable": {
+              "value": 0,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "Map underlay calibration (parked only)",
+                "type": "Text"
+              }
+            }
+          ]
+        },
+        "91": {
+          "type": "checkBox",
+          "name": "wocCalParked",
+          "properties": {
+            "Visible": {
+              "value": 1,
+              "type": "UInt"
+            },
+            "Focusable": {
+              "value": 3,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "Parked in P with parking brake applied",
+                "type": "Text"
+              },
+              "eParam_RowSelected": {
+                "value": false,
+                "type": "Bool"
+              }
+            }
+          ]
+        },
+        "92": {
+          "type": "button",
+          "name": "wocCalStandard",
+          "properties": {
+            "Visible": {
+              "value": 1,
+              "type": "UInt"
+            },
+            "Focusable": {
+              "value": 3,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "Preview standard grid — 20 s",
+                "type": "Text"
+              }
+            }
+          ]
+        },
+        "93": {
+          "type": "button",
+          "name": "wocCalExpanded",
+          "properties": {
+            "Visible": {
+              "value": 1,
+              "type": "UInt"
+            },
+            "Focusable": {
+              "value": 3,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "Preview expanded grid — 20 s",
+                "type": "Text"
+              }
+            }
+          ]
+        },
+        "94": {
+          "type": "button",
+          "name": "wocCalStop",
+          "properties": {
+            "Visible": {
+              "value": 1,
+              "type": "UInt"
+            },
+            "Focusable": {
+              "value": 3,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "Stop calibration",
+                "type": "Text"
+              }
+            }
+          ]
+        },
+        "95": {
+          "type": "label",
+          "name": "wocCalStatus",
+          "properties": {
+            "Visible": {
+              "value": 1,
+              "type": "UInt"
+            },
+            "Focusable": {
+              "value": 0,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "Calibration: Off",
+                "type": "Text"
+              }
+            }
+          ]
         }
       }
     }

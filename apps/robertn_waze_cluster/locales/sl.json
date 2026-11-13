@@ -94,6 +94,17 @@
     "2.4 GHz": "2,4 GHz",
     "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "Zvok se lahko prekinja. Na iPhonu izklopite in vklopite Wi-Fi.",
     "Own settings for this driver": "Lastne nastavitve za tega voznika",
-    "Keep HUD map over BMW's pop-ups": "Ohrani zemljevid na HUD nad pojavnimi okni BMW"
+    "Keep HUD map over BMW's pop-ups": "Ohrani zemljevid na HUD nad pojavnimi okni BMW",
+    "Map underlay calibration (parked only)": "Umerjanje plasti zemljevida (samo med parkiranjem)",
+    "Parked in P with parking brake applied": "Parkirano v P z vključeno parkirno zavoro",
+    "Preview standard grid — 20 s": "Predogled standardne mreže — 20 s",
+    "Preview expanded grid — 20 s": "Predogled razširjene mreže — 20 s",
+    "Stop calibration": "Ustavi umerjanje",
+    "Calibration: renderer unavailable or update needed": "Umerjanje: izrisovalnik ni na voljo ali potrebuje posodobitev",
+    "Calibration refused: {0}": "Umerjanje zavrnjeno: {0}",
+    "Calibration: Starting…": "Umerjanje: zagon…",
+    "Calibration: another session is active": "Umerjanje: druga seja je aktivna",
+    "Calibration: {0} px, {1} s remaining": "Umerjanje: {0} px, še {1} s",
+    "Calibration: Off": "Umerjanje: izklopljeno"
   }
 }

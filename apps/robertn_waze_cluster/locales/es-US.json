@@ -94,6 +94,17 @@
     "2.4 GHz": "2.4 GHz",
     "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "El audio puede cortarse. En tu iPhone, desactiva y vuelve a activar el Wi-Fi.",
     "Own settings for this driver": "Configuración propia para este conductor",
-    "Keep HUD map over BMW's pop-ups": "Mantener mapa en el HUD sobre ventanas emergentes de BMW"
+    "Keep HUD map over BMW's pop-ups": "Mantener mapa en el HUD sobre ventanas emergentes de BMW",
+    "Map underlay calibration (parked only)": "Calibración de la capa del mapa (solo estacionado)",
+    "Parked in P with parking brake applied": "Estacionado en P con el freno de estacionamiento aplicado",
+    "Preview standard grid — 20 s": "Vista de cuadrícula estándar — 20 s",
+    "Preview expanded grid — 20 s": "Vista de cuadrícula ampliada — 20 s",
+    "Stop calibration": "Detener calibración",
+    "Calibration: renderer unavailable or update needed": "Calibración: renderizador no disponible o necesita actualizarse",
+    "Calibration refused: {0}": "Calibración rechazada: {0}",
+    "Calibration: Starting…": "Calibración: iniciando…",
+    "Calibration: another session is active": "Calibración: otra sesión está activa",
+    "Calibration: {0} px, {1} s remaining": "Calibración: {0} px, quedan {1} s",
+    "Calibration: Off": "Calibración: desactivada"
   }
 }

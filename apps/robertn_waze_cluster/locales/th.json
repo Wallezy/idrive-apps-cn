@@ -94,6 +94,17 @@
     "2.4 GHz": "2.4 GHz",
     "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "เสียงอาจขาดหาย ให้ปิดแล้วเปิด Wi-Fi บน iPhone",
     "Own settings for this driver": "การตั้งค่าเฉพาะสำหรับผู้ขับขี่คนนี้",
-    "Keep HUD map over BMW's pop-ups": "คงแผนที่บน HUD ไว้เหนือป๊อปอัปของ BMW"
+    "Keep HUD map over BMW's pop-ups": "คงแผนที่บน HUD ไว้เหนือป๊อปอัปของ BMW",
+    "Map underlay calibration (parked only)": "ปรับเทียบชั้นแผนที่ด้านล่าง (ขณะจอดเท่านั้น)",
+    "Parked in P with parking brake applied": "จอดในเกียร์ P และใช้เบรกจอดแล้ว",
+    "Preview standard grid — 20 s": "ดูตารางมาตรฐาน — 20 วินาที",
+    "Preview expanded grid — 20 s": "ดูตารางแบบขยาย — 20 วินาที",
+    "Stop calibration": "หยุดการปรับเทียบ",
+    "Calibration: renderer unavailable or update needed": "การปรับเทียบ: ระบบแสดงผลไม่พร้อมหรือจำเป็นต้องอัปเดต",
+    "Calibration refused: {0}": "ปฏิเสธการปรับเทียบ: {0}",
+    "Calibration: Starting…": "การปรับเทียบ: กำลังเริ่ม…",
+    "Calibration: another session is active": "การปรับเทียบ: มีเซสชันอื่นทำงานอยู่",
+    "Calibration: {0} px, {1} s remaining": "การปรับเทียบ: {0} พิกเซล เหลือ {1} วินาที",
+    "Calibration: Off": "การปรับเทียบ: ปิด"
   }
 }

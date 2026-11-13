@@ -94,6 +94,17 @@
     "2.4 GHz": "2,4 GHz",
     "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "A hang akadozhat. Az iPhone-on kapcsolja ki, majd be a Wi-Fi-t.",
     "Own settings for this driver": "Saját beállítások ennek a vezetőnek",
-    "Keep HUD map over BMW's pop-ups": "Térkép megtartása a HUD-on a BMW felugró ablakai felett"
+    "Keep HUD map over BMW's pop-ups": "Térkép megtartása a HUD-on a BMW felugró ablakai felett",
+    "Map underlay calibration (parked only)": "Térképalap kalibrálása (csak álló helyzetben)",
+    "Parked in P with parking brake applied": "P állásban parkol, rögzítőfék behúzva",
+    "Preview standard grid — 20 s": "Normál rács előnézete — 20 mp",
+    "Preview expanded grid — 20 s": "Bővített rács előnézete — 20 mp",
+    "Stop calibration": "Kalibrálás leállítása",
+    "Calibration: renderer unavailable or update needed": "Kalibrálás: megjelenítő nem érhető el vagy frissítendő",
+    "Calibration refused: {0}": "Kalibrálás elutasítva: {0}",
+    "Calibration: Starting…": "Kalibrálás: indítás…",
+    "Calibration: another session is active": "Kalibrálás: másik munkamenet aktív",
+    "Calibration: {0} px, {1} s remaining": "Kalibrálás: {0} px, {1} mp van hátra",
+    "Calibration: Off": "Kalibrálás: kikapcsolva"
   }
 }

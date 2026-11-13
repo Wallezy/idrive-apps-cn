@@ -1165,10 +1165,10 @@ void SlotManager::tick(int64_t now_ms)
         Target &t = t_[i];
         const TargetSpec &spec = specs_[i];
 
-        /* A scene file came or went: published again, the stale scene
+        /* Scene content or a calibration canvas changed: published again, the stale scene
          * shown until then while nothing wants the target (its linger). */
         if (t.scene && (!t.requested || t.wanted) && scenes_->stale(spec)) {
-            log_info("target %s: a scene file came or went: its scene goes and is published again", spec.name.c_str());
+            log_info("target %s: scene content or canvas changed: its scene goes and is published again", spec.name.c_str());
             if (t.requested)
                 release(i, now_ms);
             drop_scene(i);

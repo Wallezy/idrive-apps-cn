@@ -181,6 +181,14 @@ supported, HIGH F included.
 The **Logs** page (`ST_OnlineApps_WazeClusterLogs`, a child of the main
 page):
 
+Its parking calibration section offers standard and expanded map-underlay
+grids, each for at most 20 seconds after explicit parking confirmation.
+The standard map must already be showing. Stop or leave the Logs page to
+end the preview; disconnect, timeout and stream loss also end it. This is
+a display-area experiment, not a full-width map mode. Physical clipping
+and factory information visibility remain unverified. See the
+[calibration notes](../../docs/CLUSTER-B-CALIBRATION.zh-CN.md).
+
 | Row | What it does |
 |---|---|
 | Start capture / Stop capture | a bounded DLT capture (5 minutes) for diagnostics; start it, then reconnect CarPlay |

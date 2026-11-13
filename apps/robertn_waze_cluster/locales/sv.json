@@ -94,6 +94,17 @@
     "2.4 GHz": "2,4 GHz",
     "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "Ljudet kan försvinna. Stäng av och slå på Wi-Fi på din iPhone.",
     "Own settings for this driver": "Egna inställningar för den här föraren",
-    "Keep HUD map over BMW's pop-ups": "Behåll karta i HUD över BMW:s popup-fönster"
+    "Keep HUD map over BMW's pop-ups": "Behåll karta i HUD över BMW:s popup-fönster",
+    "Map underlay calibration (parked only)": "Kalibrering av kartunderlag (endast parkerad)",
+    "Parked in P with parking brake applied": "Parkerad i P med parkeringsbromsen åtdragen",
+    "Preview standard grid — 20 s": "Visa standardrutnät — 20 s",
+    "Preview expanded grid — 20 s": "Visa utökat rutnät — 20 s",
+    "Stop calibration": "Stoppa kalibrering",
+    "Calibration: renderer unavailable or update needed": "Kalibrering: renderare saknas eller behöver uppdateras",
+    "Calibration refused: {0}": "Kalibrering nekad: {0}",
+    "Calibration: Starting…": "Kalibrering: startar…",
+    "Calibration: another session is active": "Kalibrering: en annan session är aktiv",
+    "Calibration: {0} px, {1} s remaining": "Kalibrering: {0} px, {1} s kvar",
+    "Calibration: Off": "Kalibrering: av"
   }
 }

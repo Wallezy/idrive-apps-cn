@@ -94,6 +94,17 @@
     "2.4 GHz": "2,4 ГГц",
     "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "Звук може перериватися. На iPhone вимкніть і знову ввімкніть Wi-Fi.",
     "Own settings for this driver": "Власні налаштування для цього водія",
-    "Keep HUD map over BMW's pop-ups": "Залишати карту на HUD поверх спливних вікон BMW"
+    "Keep HUD map over BMW's pop-ups": "Залишати карту на HUD поверх спливних вікон BMW",
+    "Map underlay calibration (parked only)": "Калібрування підкладки карти (лише на стоянці)",
+    "Parked in P with parking brake applied": "Автомобіль стоїть у P, стоянкове гальмо ввімкнено",
+    "Preview standard grid — 20 s": "Перегляд звичайної сітки — 20 с",
+    "Preview expanded grid — 20 s": "Перегляд розширеної сітки — 20 с",
+    "Stop calibration": "Зупинити калібрування",
+    "Calibration: renderer unavailable or update needed": "Калібрування: рендерер недоступний або потребує оновлення",
+    "Calibration refused: {0}": "Калібрування відхилено: {0}",
+    "Calibration: Starting…": "Калібрування: запуск…",
+    "Calibration: another session is active": "Калібрування: інший сеанс активний",
+    "Calibration: {0} px, {1} s remaining": "Калібрування: {0} пікс., залишилося {1} с",
+    "Calibration: Off": "Калібрування: вимкнено"
   }
 }

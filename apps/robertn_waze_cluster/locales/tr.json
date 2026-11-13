@@ -94,6 +94,17 @@
     "2.4 GHz": "2,4 GHz",
     "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "Ses kesilebilir. iPhone'unuzda Wi-Fi'yi kapatıp açın.",
     "Own settings for this driver": "Bu sürücüye özel ayarlar",
-    "Keep HUD map over BMW's pop-ups": "HUD haritasını BMW açılır pencerelerinin üstünde tut"
+    "Keep HUD map over BMW's pop-ups": "HUD haritasını BMW açılır pencerelerinin üstünde tut",
+    "Map underlay calibration (parked only)": "Harita alt katmanı kalibrasyonu (yalnızca park halinde)",
+    "Parked in P with parking brake applied": "P konumunda park edildi, park freni çekili",
+    "Preview standard grid — 20 s": "Standart ızgarayı önizle — 20 sn",
+    "Preview expanded grid — 20 s": "Genişletilmiş ızgarayı önizle — 20 sn",
+    "Stop calibration": "Kalibrasyonu durdur",
+    "Calibration: renderer unavailable or update needed": "Kalibrasyon: işleyici kullanılamıyor veya güncelleme gerekli",
+    "Calibration refused: {0}": "Kalibrasyon reddedildi: {0}",
+    "Calibration: Starting…": "Kalibrasyon: başlatılıyor…",
+    "Calibration: another session is active": "Kalibrasyon: başka bir oturum etkin",
+    "Calibration: {0} px, {1} s remaining": "Kalibrasyon: {0} piksel, {1} sn kaldı",
+    "Calibration: Off": "Kalibrasyon: kapalı"
   }
 }
