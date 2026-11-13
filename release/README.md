@@ -18,6 +18,9 @@ adaptations publish identical payloads to Beta and Stable after source review,
 reproducibility and exact-commit CI. Runtime integration is explicitly pending
 when not tested, and does not block this route. A separately requested
 development trial publishes only Beta until the owner requests wider release.
+Branches under `codex/beta/` run the full Test and CN source checks workflows
+on their exact stamped commits. Passing those checks supplies source/build
+evidence for an owner trial; publication still uses the explicit CN publisher.
 
 Before an optional GitHub Release workflow run, commit the stamped versions, complete
 the CN Store integration, update-order and recovery tests, and record their
