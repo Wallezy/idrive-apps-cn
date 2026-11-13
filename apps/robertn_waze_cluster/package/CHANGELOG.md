@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.6.9
+
+- Fix the settings app failing to open when the parking calibration page is present. Keep calibration controls separate from the main page.
+
 ## 0.6.8
 
 - Logs has a parking-only map-underlay calibration: standard and expanded

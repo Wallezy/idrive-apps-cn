@@ -71,6 +71,9 @@ const UI = JSON.parse(fs.readFileSync(path.join(UI_DIR, 'uiDescription.json'), '
 const XML = fs.readFileSync(path.join(UI_DIR, 'application.xml'), 'utf8');
 const APP_JSON = JSON.parse(fs.readFileSync(path.join(PKG, 'rhmiData', 'application.json'), 'utf8'));
 
+/* A name-only fake can hide collisions rejected by the real SDK/HMI. */
+require('./check_rhmi.js').check(UI_DIR);
+
 /* short: macOS limits a socket path to 104 bytes */
 const RSOCK = `/tmp/woc-pr-${process.pid}.sock`;
 const PSOCK = `/tmp/woc-pp-${process.pid}.sock`;
@@ -335,7 +338,7 @@ async function main() {
     assert.deepStrictEqual(xmlIds('2').map(([id]) => logsPage.components[id].name), ['wocLogsTitle', 'wocCapture', 'wocCaptureStatus',
         'wocLogsSave', 'wocLogsStatus', 'wocLogsQr', 'wocLogsUrl', 'wocLogsRow1', 'wocLogsRow2', 'wocLogsRow3', 'wocLogsRow4', 'wocLogsRow5',
         'wocCalHead', 'wocCalParked', 'wocCalStandard', 'wocCalExpanded', 'wocCalStop', 'wocCalStatus']);
-    assert(/<component id="91" type="checkBox" widget="LT_CheckBox_1Row">/.test(XML), 'parking confirmation checkbox');
+    assert(/<component id="111" type="checkBox" widget="LT_CheckBox_1Row">/.test(XML), 'parking confirmation checkbox');
     assert(/<component id="83" type="label" widget="LT_Label_1Graphic_Scalable">/.test(XML), 'the QR code is a graphic');
     assert.strictEqual(APP_JSON.application.entryPoints.length, 1);
     assert.deepStrictEqual(xmlIds('2').slice(1).map(([id]) => logsPage.components[id].rows[0].Text && logsPage.components[id].rows[0].Text.value)

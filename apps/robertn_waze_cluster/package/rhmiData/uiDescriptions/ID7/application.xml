@@ -193,27 +193,27 @@
                 <property id="2" value="1"/>
                 <property id="3" value="3"/>
             </component>
-            <component id="90" type="label" widget="LT_Label_1Row">
+            <component id="110" type="label" widget="LT_Label_1Row">
                 <property id="2" value="1"/>
                 <property id="3" value="0"/>
             </component>
-            <component id="91" type="checkBox" widget="LT_CheckBox_1Row">
+            <component id="111" type="checkBox" widget="LT_CheckBox_1Row">
                 <property id="2" value="1"/>
                 <property id="3" value="3"/>
             </component>
-            <component id="92" type="button" widget="LT_Button_1Row">
+            <component id="112" type="button" widget="LT_Button_1Row">
                 <property id="2" value="1"/>
                 <property id="3" value="3"/>
             </component>
-            <component id="93" type="button" widget="LT_Button_1Row">
+            <component id="113" type="button" widget="LT_Button_1Row">
                 <property id="2" value="1"/>
                 <property id="3" value="3"/>
             </component>
-            <component id="94" type="button" widget="LT_Button_1Row">
+            <component id="114" type="button" widget="LT_Button_1Row">
                 <property id="2" value="1"/>
                 <property id="3" value="3"/>
             </component>
-            <component id="95" type="label" widget="LT_Label_1Row">
+            <component id="115" type="label" widget="LT_Label_1Row">
                 <property id="2" value="1"/>
                 <property id="3" value="0"/>
             </component>
