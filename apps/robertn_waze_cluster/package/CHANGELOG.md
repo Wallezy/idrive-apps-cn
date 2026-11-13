@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 0.6.11
+
+- 去除苹果和安卓状态中的“未验证”提示，显示实际补丁状态。
+- 明确“隐藏安卓导航转向卡片”开关名称。
+
 ## 0.6.9
 
 - Fix the settings app failing to open when the parking calibration page is present. Keep calibration controls separate from the main page.
@@ -13,8 +18,6 @@
   canvas on stop, UI disconnect, timeout, stream loss or display interruption.
   This measures the display area; full-width maps and preserved factory
   information require physical validation on the vehicle.
-- Show the actual CarPlay and Android Auto patch states without an untested-version label. Name the Chinese turn-card checkbox as Android-only.
-
 - Check page control IDs before packaging to prevent conflicting controls from breaking app startup.
 
 - The CN app defaults to Simplified Chinese while the HMI language is unavailable and follows explicit display-language selections. Chinese status rows translate known renderer and patch messages, frame counts and transfer limits; unknown diagnostics retain their original detail. Native protocol fields and logs are unchanged.
