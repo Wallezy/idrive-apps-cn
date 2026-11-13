@@ -2,7 +2,10 @@
 
 ## Unreleased
 
-- Show the actual CarPlay and Android Auto patch states without an untested-version label. Name the Chinese turn-card checkbox as Android-only.
+## 0.6.10
+
+- 去除苹果和安卓状态中的“未验证”提示，显示实际补丁状态。
+- 明确“隐藏安卓导航转向卡片”开关名称。
 
 - Check page control IDs before packaging to prevent conflicting controls from breaking app startup.
 
