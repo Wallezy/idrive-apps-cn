@@ -70,6 +70,9 @@ const UI = JSON.parse(fs.readFileSync(path.join(UI_DIR, 'uiDescription.json'), '
 const XML = fs.readFileSync(path.join(UI_DIR, 'application.xml'), 'utf8');
 const APP_JSON = JSON.parse(fs.readFileSync(path.join(PKG, 'rhmiData', 'application.json'), 'utf8'));
 
+// The vehicle SDK resolves all pages through one application-wide ID map.
+require('./check_rhmi.js').check(UI_DIR);
+
 /* short: macOS limits a socket path to 104 bytes */
 const RSOCK = `/tmp/woc-pr-${process.pid}.sock`;
 const PSOCK = `/tmp/woc-pp-${process.pid}.sock`;

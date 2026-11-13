@@ -28,6 +28,8 @@ jobs:
         run: node tools/test_i18n.js
       - name: Chinese dynamic status messages
         run: node apps/robertn_waze_cluster/tools/test_native_text.js
+      - name: Waze RHMI identity and layout consistency
+        run: node apps/robertn_waze_cluster/tools/check_rhmi.js
       - name: Localized application layouts and package integration
         run: |
           python3 localized/kit/tools/test_zh.py

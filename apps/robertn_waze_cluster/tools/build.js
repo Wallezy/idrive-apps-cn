@@ -39,8 +39,9 @@ function donorArg(argv) {
 
 function main() {
     const donor = donorArg(process.argv.slice(2));
-    require('./gen_locales.js').write();
     const m = link.readManifest(HERE);
+    require('./check_rhmi.js').check(path.join(HERE, m.tree, 'rhmiData', 'uiDescriptions', 'ID7'));
+    require('./gen_locales.js').write();
     const src = path.join(HERE, `${m.id}@${m.version}.src.tgz`);
     const out = { source: path.basename(src), sourceMembers: link.packSource(HERE, src).length };
     if (donor) {
