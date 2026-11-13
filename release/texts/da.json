@@ -54,5 +54,9 @@
   "warmup": {
     "title": "Warm-Up (简体中文)",
     "description": "Simplified Chinese edition. Oil and coolant warm-up calculator (time to ready), safe rev limit and turbo cool-down"
+  },
+  "ambient_config": {
+    "title": "Ambient config (简体中文)",
+    "description": "Simplified Chinese edition. Customize ambient light colours, brightness, animations and driving-mode presets."
   }
 }

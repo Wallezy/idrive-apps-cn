@@ -84,6 +84,15 @@ def main():
     texts['ambient_config'] = {'title': '氛围灯设置',
                               'description': '自定义氛围灯颜色、亮度和动画，按驾驶模式切换并保存收藏。简体中文界面，支持国内源在线更新。'}
     write(path, texts)
+    for path in (ROOT / 'release/texts').glob('*.json'):
+        if path.stem == 'zh-CN':
+            continue
+        texts = json.loads(path.read_text())
+        texts['ambient_config'] = {
+            'title': 'Ambient config (简体中文)',
+            'description': 'Simplified Chinese edition. Customize ambient light colours, brightness, animations and driving-mode presets.',
+        }
+        write(path, texts)
 
 
 if __name__ == '__main__':
