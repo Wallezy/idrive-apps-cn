@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.6.8
+
 - Logs has a parking-only map-underlay calibration: standard and expanded
   static grids, each limited to 20 seconds. The renderer restores the standard
   canvas on stop, UI disconnect, timeout, stream loss or display interruption.
