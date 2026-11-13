@@ -251,7 +251,6 @@ function headUnitRefused(conflict) {
 function conflictText(conflict) {
     return /^not supported|^not patchable|^no Android Auto/.test(conflict) ? t('Not supported on this car')
         : /unreadable/.test(conflict) ? t('Unavailable')
-        : /^untested/.test(conflict) ? t('Untested version')
         : t('Changed by another tool');
 }
 
@@ -641,7 +640,8 @@ class WazeClusterControl extends EventEmitter {
         if (ps.recovered && ps.state !== 'patched' && !headUnitRefused(ps.conflict)) {
             return t('Removed — head unit kept restarting');
         }
-        if (ps.conflict && (ps.state !== 'patched' || headUnitRefused(ps.conflict))) {
+        // An untested build can be patched from this page; show its actual patch state.
+        if (ps.conflict && !/^untested/.test(ps.conflict) && (ps.state !== 'patched' || headUnitRefused(ps.conflict))) {
             return withDetail(conflictText(ps.conflict), ps.conflict);
         }
         if (ps.state === 'patched') {
@@ -841,7 +841,7 @@ class WazeClusterControl extends EventEmitter {
         }
         /* A conflict patchd refuses changes for is named also while patched,
          * since it greys Zoom and the turn card. */
-        if (aa.state === 'absent' || (aa.conflict && (aa.state !== 'patched' || this._aaBlocked()))) {
+        if (aa.state === 'absent' || this._aaBlocked()) {
             return withDetail(conflictText(aa.conflict || 'no Android Auto'), aa.conflict);
         }
         return aa.state === 'patched' ? t('Patched') : aa.state === 'original' ? t('Not patched') : t('Partly patched');
