@@ -1,0 +1,10 @@
+{
+  "repository": "https://github.com/cauliflowermossgrape/idrive7-apps",
+  "commit": "4a8deb77f67b5243aff357164958bbc94586facf",
+  "component": "ambient_config",
+  "upstreamVersion": "2.4.4",
+  "cnRevision": 1,
+  "releaseVersion": "2.4.5",
+  "scope": "Ambient app and its matching runtime; existing localized applications are independent",
+  "sdk": "Not included; linked on the head unit"
+}
