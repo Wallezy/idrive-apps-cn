@@ -1,0 +1,11 @@
+{
+  "build": "node ../../tools/build_localized.js",
+  "requires": {
+    "mgu-deploy": "0.8.18",
+    "mgu-render": "0.6.19"
+  },
+  "uninstallable": true,
+  "mguHmi": [
+    "ID7"
+  ]
+}

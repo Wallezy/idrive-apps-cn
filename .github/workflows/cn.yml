@@ -34,4 +34,10 @@ jobs:
         run: |
           python3 localized/kit/tools/test_zh.py
           node tools/test_localized.js
+      - name: Ambient controls and upstream regression checks
+        run: |
+          node localized/ambient/kit/tools/test_ambient_config.js
+          node localized/ambient/kit/tools/test_ambient_rgb.js
+          node localized/ambient/kit/tools/test_ambient_strobe.js
+          node localized/ambient/kit/tools/test_ambient_others.js
 # Unit tests do not set release-check/cn-integration.

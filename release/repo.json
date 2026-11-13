@@ -1,5 +1,6 @@
 {
   "unprefixedAppIds": [
+    "ambient_config",
     "brake_test",
     "car_vitals",
     "doom",

@@ -1,0 +1,295 @@
+{
+ "id": "ambient_config",
+ "title": "\u6c1b\u56f4\u706f\u8bbe\u7f6e",
+ "version": "2.4.5",
+ "screens": [
+  {
+   "name": "MAIN",
+   "kind": "canvas",
+   "title": "\u6c1b\u56f4\u706f\u8bbe\u7f6e",
+   "buttons": [
+    [
+     "BTN_SETTINGS",
+     "\u8bbe\u7f6e"
+    ]
+   ]
+  }
+ ],
+ "settings": [
+  {
+   "key": "carKind",
+   "label": "\u8f66\u8f86\u7c7b\u578b",
+   "type": "choice",
+   "default": "ice",
+   "hidden": true,
+   "options": [
+    [
+     "ice",
+     "\u6c7d\u6cb9\u6216\u67f4\u6cb9"
+    ],
+    [
+     "hybrid",
+     "\u63d2\u7535\u6df7\u52a8"
+    ]
+   ]
+  },
+  {
+   "key": "follow",
+   "label": "\u968f\u9a7e\u9a76\u6a21\u5f0f\u5207\u6362",
+   "type": "bool",
+   "default": true,
+   "hidden": true
+  },
+  {
+   "key": "welcome",
+   "label": "\u542f\u52a8\u8fce\u5bbe\u626b\u5149",
+   "type": "bool",
+   "default": false,
+   "hidden": true
+  },
+  {
+   "key": "sportPulse",
+   "label": "\u8fd0\u52a8\u8109\u51b2",
+   "type": "bool",
+   "default": false,
+   "hidden": true
+  },
+  {
+   "key": "nightDim",
+   "label": "\u591c\u95f4\u81ea\u52a8\u8c03\u6697",
+   "type": "bool",
+   "default": true
+  },
+  {
+   "key": "keep",
+   "label": "\u542f\u52a8\u65f6\u6062\u590d\u81ea\u5b9a\u4e49\u989c\u8272",
+   "type": "bool",
+   "default": true
+  },
+  {
+   "key": "flashAlerts",
+   "label": "Redline \u6362\u6321\u95ea\u5149",
+   "type": "bool",
+   "default": true,
+   "hidden": true
+  },
+  {
+   "key": "turnGlow",
+   "label": "\u8f6c\u5411\u7eff\u5149",
+   "type": "bool",
+   "default": false,
+   "hidden": true
+  },
+  {
+   "key": "doorRed",
+   "label": "\u5f00\u95e8\u7ea2\u5149",
+   "type": "bool",
+   "default": false,
+   "hidden": true
+  },
+  {
+   "key": "strobe",
+   "label": "\u8fdc\u5149\u9891\u95ea\u4e0e\u706f\u5149\u79c0\uff08\u4ec5\u9650\u79c1\u4eba\u573a\u5730\uff09",
+   "type": "bool",
+   "default": false
+  },
+  {
+   "key": "strobeLights",
+   "label": "\u9891\u95ea\u706f\u7ec4",
+   "type": "choice",
+   "default": "all",
+   "hidden": true,
+   "options": [
+    [
+     "all",
+     "\u5168\u90e8\u706f\u5149"
+    ],
+    [
+     "high",
+     "\u8fdc\u5149\u706f"
+    ]
+   ]
+  },
+  {
+   "key": "strobeEvery",
+   "label": "\u9891\u95ea\u6b21\u6570\uff0f\u79d2",
+   "type": "choice",
+   "default": "0",
+   "hidden": true,
+   "options": [
+    [
+     "0",
+     "\u6700\u5feb"
+    ],
+    [
+     "250",
+     "4"
+    ],
+    [
+     "333",
+     "3"
+    ],
+    [
+     "500",
+     "2"
+    ],
+    [
+     "1000",
+     "1"
+    ]
+   ]
+  },
+  {
+   "key": "policeBurst",
+   "label": "\u8b66\u793a\u8fde\u95ea\u6b21\u6570",
+   "type": "choice",
+   "default": "4",
+   "hidden": true,
+   "options": [
+    [
+     "1",
+     "1"
+    ],
+    [
+     "2",
+     "2"
+    ],
+    [
+     "3",
+     "3"
+    ],
+    [
+     "4",
+     "4"
+    ]
+   ]
+  },
+  {
+   "key": "strobeFlashMs",
+   "label": "\u5355\u6b21\u95ea\u5149\u65f6\u957f",
+   "type": "choice",
+   "default": "80",
+   "hidden": true,
+   "options": [
+    [
+     "50",
+     "50 ms"
+    ],
+    [
+     "80",
+     "80 ms"
+    ],
+    [
+     "100",
+     "100 ms"
+    ],
+    [
+     "150",
+     "150 ms"
+    ]
+   ]
+  },
+  {
+   "key": "policeOrder",
+   "label": "\u8b66\u793a\u95ea\u5149\u987a\u5e8f",
+   "type": "choice",
+   "default": "lbr",
+   "hidden": true,
+   "options": [
+    [
+     "lbr",
+     "\u5de6\u3001\u4e24\u4fa7\u3001\u53f3"
+    ],
+    [
+     "lrb",
+     "\u5de6\u3001\u53f3\u3001\u4e24\u4fa7"
+    ],
+    [
+     "lr",
+     "\u5de6\u3001\u53f3"
+    ]
+   ]
+  },
+  {
+   "key": "strobePattern",
+   "label": "\u9891\u95ea\u6a21\u5f0f",
+   "type": "choice",
+   "default": "police",
+   "hidden": true,
+   "options": [
+    [
+     "police",
+     "\u8b66\u793a\u4ea4\u66ff"
+    ],
+    [
+     "both",
+     "\u9891\u95ea"
+    ],
+    [
+     "alternate",
+     "\u8f6e\u6d41\u95ea\u70c1"
+    ]
+   ]
+  },
+  {
+   "key": "strobeRate",
+   "label": "\u9891\u95ea\u901f\u5ea6",
+   "type": "choice",
+   "default": "normal",
+   "hidden": true,
+   "options": [
+    [
+     "fast",
+     "\u5feb\u901f"
+    ],
+    [
+     "normal",
+     "\u6807\u51c6"
+    ],
+    [
+     "slow",
+     "\u6162\u901f"
+    ]
+   ]
+  },
+  {
+   "key": "showRate",
+   "label": "\u706f\u5149\u79c0\u901f\u5ea6",
+   "type": "choice",
+   "default": "normal",
+   "hidden": true,
+   "options": [
+    [
+     "fast",
+     "\u5feb\u901f"
+    ],
+    [
+     "normal",
+     "\u6807\u51c6"
+    ]
+   ]
+  },
+  {
+   "key": "drive",
+   "label": "\u65b9\u5411\u76d8\u4f4d\u7f6e",
+   "type": "choice",
+   "default": "lhd",
+   "options": [
+    [
+     "lhd",
+     "\u5de6\u4fa7"
+    ],
+    [
+     "rhd",
+     "\u53f3\u4fa7"
+    ]
+   ]
+  }
+ ],
+ "config": null,
+ "startWidget": null,
+ "stateIds": {
+  "MAIN": 1,
+  "SETTINGS": 8
+ }
+}
