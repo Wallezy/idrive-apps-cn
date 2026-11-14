@@ -471,7 +471,12 @@ mgu.run({
         async function render() {
             const t = ctx.theme(), cv = ctx.canvas(W, H).clear(t.bg);
             if (page >= tabs().length) page = 0;
-            [drawColour, drawAnimations, drawModes, drawFavs, drawStrobe][page](cv, t);
+            if (cv.own) [drawColour, drawAnimations, drawModes, drawFavs, drawStrobe][page](cv, t);
+            else {
+                G.panel(cv, t, 24, 44, 1552, 468, 'Touch controls unavailable');
+                cv.text('Update the Renderer in the Store, then use Full layout in Settings.', 60, 150, 24, t.text);
+                cv.text('Controls return automatically when a compatible renderer connects.', 60, 194, 22, t.dim);
+            }
             G.frame(cv, t, tabs(), page, []);
             dirty = false;
             await ui.image('MAIN_GFX', cv);
@@ -521,6 +526,9 @@ mgu.run({
             });
         }
         ctx.onTab((i) => { page = i; if (i >= 2) editing = null; if (i === 4) strobeSeen = Date.now(); pauseCheck(); return redraw(); });
+        // Renderer readiness/layout can change without a vehicle event. Rebuild the page's
+        // click targets once the display can own input, even when the lights are static.
+        if (ctx.onLayout) ctx.onLayout(() => { dirty = true; });
         lights.on('change', () => { dirty = true; });
         ambient.on('change', () => { dirty = true; });
         others.on('change', () => { dirty = true; });

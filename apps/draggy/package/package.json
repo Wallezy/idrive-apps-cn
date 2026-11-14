@@ -1,6 +1,6 @@
 {
   "name": "draggy",
-  "version": "2.3.2",
+  "version": "2.3.3",
   "description": "0-100, 100-200 and 1/4 mile timer with best times",
   "main": "javascript/localized-entry.js",
   "private": false,

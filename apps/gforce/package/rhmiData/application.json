@@ -5,7 +5,7 @@
     "type": "OnlineApp",
     "name": "gforce",
     "vendor": "custom",
-    "version": "1.4.2",
+    "version": "1.4.3",
     "defaultLanguage": "en_GB",
     "stringBundleUuid": "f97ef80e-bc3a-5be5-81d4-f1d04bb99253",
     "resourceBundleUuid": "c1ce8540-1381-5c8d-afb4-133e36778b79",

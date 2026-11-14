@@ -5,7 +5,7 @@
     "type": "OnlineApp",
     "name": "dtc_scanner",
     "vendor": "custom",
-    "version": "2.6.4",
+    "version": "2.6.5",
     "defaultLanguage": "en_GB",
     "stringBundleUuid": "cb9e59bc-8d30-5af3-8f0b-933a86273a4f",
     "resourceBundleUuid": "cdeda47a-e178-592a-b72c-7eb7440e1cfb",

@@ -5,7 +5,7 @@
     "type": "OnlineApp",
     "name": "dyno",
     "vendor": "custom",
-    "version": "1.2.5",
+    "version": "1.2.6",
     "defaultLanguage": "en_GB",
     "stringBundleUuid": "22ca92cb-abb0-5e60-9920-81b1f08850de",
     "resourceBundleUuid": "2733c234-3094-5c0f-9c06-226cc3bf47d9",

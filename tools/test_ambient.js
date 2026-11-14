@@ -39,6 +39,7 @@ const strobe = Object.assign(new EventEmitter(), {
     kind: 'fn', kindName: 'body controller light functions', mask: true, patterns: true, running: null,
 });
 let tab, frame, name = 'colour', targets = {}, labels = [], checks = 0;
+let inputReady = false, layoutChanged, loopTick, frames = 0;
 const allLabels = [];
 function ok(value, message) { checks++; assert(value, message); }
 const drawText = Recorder.prototype.text;
@@ -61,20 +62,22 @@ const context = {
     theme: () => require(path.join(kit, 'themes')).theme('m_tricolour'),
     canvas(w, h) {
         const cv = new Recorder(w, h);
-        cv.own = true; // The declared mgu-render dependency supplies the interactive surface.
+        cv.own = inputReady;
         targets = {}; labels = [];
-        cv.target = (x, y, width, height, fn, key) => { targets[key] = fn; };
+        cv.target = (x, y, width, height, fn, key) => { if (cv.own) targets[key] = fn; };
         frame = cv;
         return cv;
     },
     ui: { image: async () => {
+        frames++;
         if (out) {
             const cv = new Canvas(frame.w, frame.h);
             play(frame.u.subarray(0, frame.n), cv);
             fs.writeFileSync(path.join(out, name + '.png'), cv.png());
         }
     } },
-    onTab(fn) { tab = fn; }, onTap() {}, loop() {},
+    onTab(fn) { tab = fn; }, onTap() {},
+    onLayout(fn) { layoutChanged = fn; }, loop(_screen, _fps, fn) { loopTick = fn; },
 };
 const realLoad = Module._load, realInterval = global.setInterval;
 let impl;
@@ -111,6 +114,15 @@ global.setInterval = (fn, ms) => { const id = realInterval(fn, ms); timers.push(
         assert.strictEqual(t('Strobe stopped: the headlights got hot (90 °C)'), '频闪已停止：前灯温度过高 (90 °C)');
         await impl.start(context);
         await Promise.resolve();
+        ok(labels.includes('交互控件暂不可用'), 'unavailable renderer has an actionable message');
+        assert.strictEqual(Object.keys(targets).length, 0, 'renderer not ready: no input targets yet');
+        const firstFrames = frames;
+        inputReady = true;
+        ok(typeof layoutChanged === 'function', 'renderer readiness/layout changes trigger a redraw');
+        layoutChanged();
+        await loopTick();
+        ok(frames > firstFrames && Object.keys(targets).length > 0,
+            'renderer ready: buttons become usable without any vehicle event');
         ok(labels.includes('颜色') && labels.includes('保存收藏'), 'main colour screen');
         name = 'animations'; await tab(1);
         ok(labels.includes('呼吸') && labels.includes('流光'), 'animation labels');

@@ -5,7 +5,7 @@
     "type": "OnlineApp",
     "name": "car_vitals",
     "vendor": "custom",
-    "version": "2.13.1",
+    "version": "2.13.2",
     "defaultLanguage": "en_GB",
     "stringBundleUuid": "1e95e4e1-815e-534e-9e61-e07fa1ca7eb8",
     "resourceBundleUuid": "adeaf552-542a-5b1b-9659-5b6165b297f6",

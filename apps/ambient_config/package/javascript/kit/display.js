@@ -176,7 +176,7 @@ class Display {
     _startGpu(file) {
         // mgu-render/1 for every app that draws no pixel images (Doom: "chrome": false)
         const native = this.screen.chrome !== false && process.env.MGU_RENDERD_PROTO !== 'upstream';
-        const gpu = this.gpu = new RenderClient(this.spec.id, this.log, Object.assign({ native }, file ? { file } : {}));
+        const gpu = this.gpu = new RenderClient(this.spec.id, this.log, Object.assign({ native, interactive: native }, file ? { file } : {}));
         gpu.on('ready', () => { if (this.gpu !== gpu) return; this._place(); this._syncVisible(); this._grab(); });
         gpu.on('tick', () => { if (this.gpu === gpu) { this.tickT = Date.now(); this.tickHandlers.forEach((fn) => fn()); } });
         gpu.on('close', () => { if (this.gpu === gpu) { clearTimeout(this.frontTimer); this.blocked = false; this._lost(); } });
@@ -454,6 +454,21 @@ class Display {
             const tab = !bar && (this.tabs || []).find(inside);
             const tgt = !bar && !tab && !this.sheet ? (this.pageTargets || []).find(inside) : null;
             const key = bar ? 'bar:' + bar.id : tab ? 'tab:' + tab.i : tgt ? 'tgt:' + tgt.key : this.sheet ? 'sheet:' + (this.sheetTargets || []).findIndex(inside) : null;
+            // A tap on the preview/empty page is still received. Show that briefly, as buttons
+            // already do: otherwise mgu-render mistakes four unchanged taps for a stuck app
+            // and takes its picture and input away for ten seconds.
+            if (phase === 1 || phase === 3) {
+                clearTimeout(this.pageTouchTimer);
+                const hadTouch = !!this.pageTouch;
+                this.pageTouch = phase === 1 && !bar && !tab && !tgt && !this.sheet ? { x, y } : null;
+                if (hadTouch || this.pageTouch) this._repaint();
+                if (this.pageTouch) {
+                    this.pageTouchTimer = setTimeout(() => {
+                        this.pageTouch = null;
+                        this._repaint();
+                    }, 350);
+                }
+            }
             if (phase === 3 && this.dragging && !this.sheet) { this.dragging = false; this.ownDown = null; return; }
             if (phase === 3 && !this.dragging && key && key === this.ownDown && (tab || tgt)) {
                 this.ownDown = null;
@@ -846,6 +861,12 @@ class Display {
         const k = pl.scale, onPage = (key) => !this.sheet && key && (this.pageTargets || []).find((q) => 'tgt:' + q.key === key);
         const pt = onPage(this.focusKey), pp = Date.now() - this.pressedT < 300 && onPage(this.pressed);
         if (pp) c.roundRect(pp.x * k + pl.ox, pp.y * k + pl.oy, pp.w * k, pp.h * k, (pp.r != null ? pp.r : pp.h / 2) * k, G.withAlpha(t.sel || t.accent, 0.35));
+        if (this.pageTouch && !this.sheet) {
+            c.clip(hx, FULL.headH, W - hx, H - FULL.headH - this.barH());
+            c.arc(this.pageTouch.x * k + pl.ox, this.pageTouch.y * k + pl.oy,
+                9 * k, 12 * k, 0, 360, G.withAlpha(t.sel || t.accent, 0.65));
+            c.noclip();
+        }
         // the controller on a page that scrolls: a frame round the page; on a list (cv.scroll = { y, bar }) its
         // scroll bar in the colour of the selection (bar: where the page drew it, so it moves with the list)
         const sb = this.focusKey === 'scroll' && !this.sheet && this.pageScroll;

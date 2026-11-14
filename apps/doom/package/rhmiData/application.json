@@ -5,7 +5,7 @@
     "type": "OnlineApp",
     "name": "doom",
     "vendor": "custom",
-    "version": "1.4.2",
+    "version": "1.4.3",
     "defaultLanguage": "en_GB",
     "stringBundleUuid": "4217be99-7dfd-5342-a9de-df74e7008ac9",
     "resourceBundleUuid": "88ef50e0-10cb-581b-88cb-748b2eb7c7eb",

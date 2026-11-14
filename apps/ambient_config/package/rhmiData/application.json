@@ -5,7 +5,7 @@
     "type": "OnlineApp",
     "name": "ambient_config",
     "vendor": "custom",
-    "version": "2.4.5",
+    "version": "2.4.6",
     "defaultLanguage": "en_GB",
     "stringBundleUuid": "ef1e08bd-7f3b-5b8d-a962-3a29bca2f2a4",
     "resourceBundleUuid": "88191162-4b4a-5ac3-8065-a80b22414974",

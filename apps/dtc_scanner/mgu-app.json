@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "id": "dtc_scanner",
-  "version": "2.6.4",
+  "version": "2.6.5",
   "tree": "package",
   "modules": [
     "src/sdk.js"
