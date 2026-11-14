@@ -1,0 +1,226 @@
+Cluster Themes	仪表主题
+All settings	全部设置
+Theme (when not by drive mode)	默认主题
+Change with SPORT / COMFORT / ECO PRO	随驾驶模式切换
+In Comfort	舒适模式主题
+In Sport	运动模式主题
+In Eco Pro	节能模式主题
+Off (BMW's own cluster)	关闭（原车仪表）
+Calibration grid	校准网格
+Map calibration	地图校准
+Show Waze map inside the theme	主题内显示 Waze 地图
+Units	单位
+Clock	时钟
+12-hour	12 小时制
+24-hour	24 小时制
+Time zone (clock)	时区
+Fuel tank size	油箱容量
+Redline (shift light)	红线转速
+Shift point before redline	提前换挡
+Cold-engine rev guard	冷机转速保护
+Shift lights	换挡提示灯
+Count in, by how fast the revs climb	按转速上升预测
+Fixed rpm band, as before	固定转速区间
+Show temperatures only when they matter	仅在温度异常时显示
+Show boost	显示增压值
+Leave BMW's bottom strip clear	保留原车底部信息栏
+Leave room for the driver camera	避让驾驶员摄像头
+Holiday editions	节日主题
+Auto, by the date	随日期自动切换
+Off	关闭
+On	开启
+Christmas	圣诞节
+Thanksgiving	感恩节
+New Year	新年
+Fourth of July	美国独立日
+Oil temperature warning	机油温度告警
+Coolant temperature warning	冷却液温度告警
+Boost warning	增压告警
+G-meter: swap left / right	G 值左右反转
+G-meter: brake on top	G 值制动朝上
+G-meter range	G 值量程
+G-meter trail	G 值轨迹
+Night colours	夜间配色
+Auto (dimmer after sunset)	日落后自动调暗
+Badge	车型标识
+None	无
+BMW lettering on the badge	标识显示 BMW 字样
+Demo data	演示数据
+Auto (until the car sends data)	收到车辆数据前自动演示
+Themes	主题
+Readouts	数据
+Map	地图
+Alerts	告警
+G-meter	G 值
+Settings	设置
+Now showing	当前主题
+Change with the drive mode	随驾驶模式切换
+Theme	主题
+BMW's own	原车仪表
+BMW's own cluster	原车仪表
+stock cluster	原车
+race dash	赛车
+M8 style	M8 风格
+Live Cockpit	运动座舱
+just the speed	极简
+round dials	圆形表盘
+tyres + temps	胎压温度
+0-60 timer	加速计时
+rev arc · G-meter	转速 · G 值
+80s digital	复古数字
+calm · trip	巡航
+safety tiles	数据卡片
+calm · holidays	节日光带
+ON THE CLUSTER	仪表已开启
+CLUSTER OFF	仪表已关闭
+DEMO	演示
+DEMO DATA	演示数据
+Play demo	播放演示
+Stop demo	停止演示
+Stop the car to play the demo	请停车后播放演示
+Pick a theme to play the demo	请先选择主题
+The cluster is not drawing yet	仪表暂未显示主题
+Reset slots	恢复默认
+readout slots	数据项
+none here	无数据项
+Engine	动力
+Temps	温度
+Chassis	底盘
+Fuel	燃油
+Tyres	轮胎
+Drive	驾驶
+Engine speed	发动机转速
+Boost	增压
+Engine torque	发动机扭矩
+Power	功率
+Torque, % of max	扭矩百分比
+Power, % of max	功率百分比
+Oil temperature	机油温度
+Coolant temperature	冷却液温度
+Intake air temperature	进气温度
+Outside temperature	车外温度
+Speed	车速
+Cornering g	横向 G 值
+Braking / accel g	纵向 G 值
+Fuel level	油量
+Range	续航
+Hybrid battery (plug-in hybrids)	混动车型电池电量
+Tyre pressure, front left	左前胎压
+Tyre pressure, front right	右前胎压
+Tyre pressure, rear left	左后胎压
+Tyre pressure, rear right	右后胎压
+Tyre temperature, front left	左前胎温
+Tyre temperature, front right	右前胎温
+Tyre temperature, rear left	左后胎温
+Tyre temperature, rear right	右后胎温
+Shift point	换挡转速
+Last shift	上次换挡
+Navigation map on the cluster	仪表导航地图
+Not available in this app	当前不可用
+This theme has no map version (GT3, Sport and M do)	当前主题不支持地图，请选 GT3、Sport 或 M
+On: GT3, Sport and M open a window in the middle and Waze on Cluster draws its map in it, above	开启后，GT3、Sport 和 M 会在中间显示 Waze 地图，
+BMW's own map view, so nothing shows twice. When the map goes away the theme fills back in.	覆盖原车地图，避免重复显示。地图关闭后，主题恢复完整布局。
+While on, Waze's map on the HUD is off (the cluster and the HUD share one picture).	使用时，HUD 上的 Waze 地图会关闭。
+Needs robertnisipeanu's Waze on Cluster. Turning this off gives Waze its usual place back.	需安装 Waze 仪表盘应用。关闭此选项后，地图恢复原来的位置。
+Waze on Cluster isn't running	Waze 仪表盘未运行
+Waze on Cluster: this car isn't supported	Waze 仪表盘暂不支持此车型
+Waze map is turned off in the Waze app	Waze 应用内的地图已关闭
+Off. Waze shows the map in BMW's own map view	已关闭，Waze 显示在原车地图区域
+Waze app is open, retrying	Waze 设置页面正在使用，稍后重试
+Moving the map into the theme	正在将地图移入主题
+Map showing in the theme	地图已显示在主题内
+Map frozen, waiting for the phone	地图暂停，等待手机连接
+Waze on Cluster reports an error	Waze 仪表盘出现错误
+Waiting for the map	等待地图
+Waze map · on	Waze 地图 · 开
+Waze map · off	Waze 地图 · 关
+Series	车系
+Model	车型
+On the cluster	仪表显示效果
+No badge	不显示车型标识
+BMW lettering	BMW 字样
+warnings off	告警已关闭
+Test the shift lights	测试换挡提示灯
+Test running	正在测试
+Stop the car first	请先停车
+Run test	开始测试
+Runs the rpm up to the shift point for about 4 seconds: the lights fill, go red and flash.	模拟转速上升约 4 秒，提示灯依次点亮、变红并闪烁。
+Only while the car stands. Set a limit to 0 (Off) to turn that warning off.	仅停车时可测试。告警阈值设为 0 即关闭该项告警。
+Rpm band	固定转速
+Count-in	预测点亮
+From a fixed rpm up to the shift point.	从固定转速开始点亮，直至换挡转速。
+Fill over the last second, flash early	在换挡前约一秒逐步点亮，
+by your reaction time.	按反应时间提前闪烁。
+Temperatures	温度
+Only when they matter	仅在异常时显示
+Oil and coolant show only while cold,	机油及冷却液仅在冷机、
+warming up or hot. Outside: blue at 37 °F.	升温或过热时显示；车外低于 37 °F 变蓝。
+warming up or hot. Outside: blue at 3 °C.	升温或过热时显示；车外低于 3 °C 变蓝。
+Trail	轨迹
+Swap left / right	左右反转
+Brake on top	制动朝上
+BEST THIS DRIVE, IN G	本次驾驶峰值（G）
+Left	左侧
+Right	右侧
+Accel	加速
+Brake	制动
+Peak	峰值
+Reset	重置
+From the car's own acceleration sensor. Parked on level ground it reads 0.00; hills add a little.	使用车辆加速度传感器。平地静止时接近 0.00，坡道上会略有偏差。
+The outline is the most g this drive in every direction; Reset clears it with the bests.	轮廓表示本次驾驶各方向的峰值；重置会清除轨迹和峰值。
+Live	实时
+no g reading	暂无 G 值
+At the redline	红线转速时
+Cancel	取消
+Turn HUD off	关闭 HUD
+A cluster theme and the HUD can't show at the same time.	当前渲染服务无法同时显示仪表主题和 HUD。
+Not set (UTC)	未设置（UTC）
+US Eastern	美国东部
+US Central	美国中部
+US Mountain	美国山区
+US Pacific	美国太平洋
+Arizona	亚利桑那
+Alaska	阿拉斯加
+Hawaii	夏威夷
+Canada Atlantic	加拿大大西洋
+Mexico	墨西哥
+UK, Ireland, Portugal	英国 / 爱尔兰 / 葡萄牙
+Central Europe	中欧
+Eastern Europe	东欧
+Previous	上一页
+Next	下一页
+Drawn as text in the theme's own font.	使用主题原有字体显示车型名称。
+GT3: top left. Sport and M: bottom centre.	GT3 位于左上角，Sport 与 M 位于底部中央。
+Warnings · the readout flashes red over its limit	超过告警阈值时，数据会闪烁红色
+HUD Widgets is on	HUD Widgets 正在显示
+bottom row, left	底行 · 左侧
+bottom row, middle	底行 · 中部
+bottom row, right	底行 · 右侧
+centre, left	中央 · 左侧
+centre, right	中央 · 右侧
+left box, middle	左侧 卡片 · 中部
+left box, top	左侧 卡片 · 顶部
+left, bottom	左侧 · 底部
+left, middle	左侧 · 中部
+left, second	左侧 · 第 2 项
+left, third	左侧 · 第 3 项
+left, top	左侧 · 顶部
+right box, bottom	右侧 卡片 · 底部
+right box, middle	右侧 卡片 · 中部
+right box, top	右侧 卡片 · 顶部
+right, bottom	右侧 · 底部
+right, bottom (tall)	右侧 · 底部 (纵向)
+right, middle	右侧 · 中部
+right, row 1	右侧 · 第 1 行
+right, row 2	右侧 · 第 2 行
+right, row 3	右侧 · 第 3 行
+right, top	右侧 · 顶部
+right, top (tall)	右侧 · 顶部 (纵向)
+second row, left	第 2 行 · 左侧
+second row, middle	第 2 行 · 中部
+second row, right	第 2 行 · 右侧
+third row, left	第 3 行 · 左侧
+third row, middle	第 3 行 · 中部
+top row, left	顶行 · 左侧
+top row, middle	顶行 · 中部
+top row, right	顶行 · 右侧

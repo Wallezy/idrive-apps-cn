@@ -58,5 +58,9 @@
   "ambient_config": {
     "title": "Ambient config (简体中文)",
     "description": "Simplified Chinese edition. Customize ambient light colours, brightness, animations and driving-mode presets."
+  },
+  "cluster_themes": {
+    "title": "Cluster Themes (简体中文)",
+    "description": "12 instrument cluster themes with Chinese centre-screen controls. Original theme names and instrument styling preserved."
   }
 }

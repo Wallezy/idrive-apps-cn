@@ -1,0 +1,123 @@
+{
+  "rhmiLoadingEnabled": true,
+  "entryPointLoadingEnabled": true,
+  "settings": {
+    "cluster_themes": {
+      "target": "panel",
+      "statusName": "Cluster",
+      "socketPath": "/dev/shm/cluster-render/render.sock",
+      "utcOffsetMinutes": null,
+      "waze": {
+        "comment": "Show Waze map inside the theme (shared/waze.js): waze-on-cluster's status file (read every second) and its control socket (one short 'start' command, then closed). Paths from waze-on-cluster 0.9.3.",
+        "status": "/run/waze-on-cluster/status.json",
+        "control": "/dev/shm/waze-on-cluster/ctl.sock"
+      },
+      "_comment": "target panel: the whole 1920x720 instrument cluster, drawn over BMW's gauges. socketPath: cluster-render's documented default. utcOffsetMinutes: as in HUD Widgets (the clock box). tankLitres: the fuel gauge's full mark (the car sends litres, not the tank size; a G01 X3 holds 65). engine: the peak crank torque (Nm) and power (kW) the {{torquePct}} and {{powerPct}} tokens count from (an M40i: 500 Nm, 285 kW / 382 hp).",
+      "dme": {
+        "comment": "Boost from the engine unit (DME, ecu 18) over read-only UDS 0x22, only while the sport display sends no boost and a boost readout is shown. Absolute kPa, the outside air pressure (baro) is subtracted. Candidates tried in order, the first plausible one wins. From cauliflowermossgrape's car_vitals (MIT). Intake air temperature the same way (config.dme.intake, every 2 s, only while an intake readout shows); candidates from cruzen991/Cluster's signal table (MIT), unverified on this car.",
+        "ecu": 18,
+        "boost": [
+          {
+            "did": "F470",
+            "bytes": 2,
+            "at": 3,
+            "factor": 0.03125,
+            "offset": 0,
+            "min": 20,
+            "max": 600,
+            "note": "OBD PID 0x70 boost pressure control: actual boost pressure sensor A (absolute), 1/32 kPa"
+          },
+          {
+            "did": "F487",
+            "bytes": 2,
+            "at": 1,
+            "factor": 0.03125,
+            "offset": 0,
+            "min": 20,
+            "max": 600,
+            "note": "OBD PID 0x87 intake manifold absolute pressure sensor A, 1/32 kPa"
+          },
+          {
+            "did": "F40B",
+            "bytes": 1,
+            "at": 0,
+            "factor": 1,
+            "offset": 0,
+            "min": 20,
+            "max": 255,
+            "note": "OBD PID 0x0B intake manifold absolute pressure, kPa (max 255 = 1.5 bar boost)"
+          },
+          {
+            "obd": "0B",
+            "bytes": 1,
+            "at": 0,
+            "factor": 1,
+            "offset": 0,
+            "min": 20,
+            "max": 255,
+            "note": "OBD service 01 PID 0x0B (same as F40B)"
+          }
+        ],
+        "baro": [
+          {
+            "did": "F433",
+            "bytes": 1,
+            "at": 0,
+            "factor": 1,
+            "offset": 0,
+            "min": 50,
+            "max": 115,
+            "note": "OBD PID 0x33 barometric pressure, kPa (101.3 when not available)"
+          },
+          {
+            "obd": "33",
+            "bytes": 1,
+            "at": 0,
+            "factor": 1,
+            "offset": 0,
+            "min": 50,
+            "max": 115,
+            "note": "OBD service 01 PID 0x33 (same as F433)"
+          }
+        ],
+        "intake": [
+          {
+            "did": "F40F",
+            "bytes": 1,
+            "at": 0,
+            "factor": 1,
+            "offset": -40,
+            "min": -35,
+            "max": 150,
+            "note": "OBD PID 0x0F intake air temperature, C + 40"
+          },
+          {
+            "did": "F477",
+            "bytes": 1,
+            "at": 1,
+            "factor": 1,
+            "offset": -40,
+            "min": -35,
+            "max": 150,
+            "note": "OBD PID 0x77 charge air cooler temperature, bank 1 sensor 1 (byte after the support byte), C + 40"
+          },
+          {
+            "obd": "0F",
+            "bytes": 1,
+            "at": 0,
+            "factor": 1,
+            "offset": -40,
+            "min": -35,
+            "max": 150,
+            "note": "OBD service 01 PID 0x0F (same as F40F)"
+          }
+        ]
+      },
+      "tankLitres": 65,
+      "engine": {
+        "torqueNm": 500,
+        "powerKw": 285
+      }
+    }
+  }
+}

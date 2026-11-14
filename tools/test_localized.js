@@ -32,7 +32,8 @@ try {
         assert(first.equals(fs.readFileSync(path.join(tmp, id + '.tgz'))), 'deterministic source package');
         assert(zlib.gunzipSync(first).length > 0);
         const kit = path.join(tree, 'javascript/kit');
-        const suite = id === 'ambient_config' ? 'tools/test_ambient.js' : 'localized/kit/tools/test_zh.js';
+        const suite = id === 'ambient_config' ? 'tools/test_ambient.js' :
+            id === 'cluster_themes' ? 'tools/test_cluster_themes.js' : 'localized/kit/tools/test_zh.js';
         const result = cp.spawnSync(process.execPath, [path.join(root, suite), kit],
             { encoding: 'utf8', timeout: 30000 });
         assert.strictEqual(result.status, 0, id + ': ' + result.stdout + result.stderr);

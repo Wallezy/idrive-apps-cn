@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "1.3.0",
+  "application": {
+    "uuid": "fdb1b95c-ae8c-51b7-823e-295e81f7f79e",
+    "type": "OnlineApp",
+    "name": "cluster_themes",
+    "vendor": "custom",
+    "version": "0.17.3",
+    "defaultLanguage": "en_GB",
+    "stringBundleUuid": "6d257bb9-3140-58e2-b55d-c9018ec0e530",
+    "resourceBundleUuid": "2ce5d2d3-194e-50c6-83b2-a98a035403da",
+    "entryPoints": [
+      {
+        "name": "CLUSTER_THEMES_ENTRY",
+        "uuid": "9df3c61d-c536-5cc4-9e98-1bee28d522cd",
+        "textId": "SID_CLUSTER_THEMES_TITLE",
+        "icon": "cluster_themes_icon.png",
+        "insertionStateId": 20974,
+        "insertionFocusId": 2,
+        "insertionMode": "INSERT_BELOW",
+        "insertionOrder": 0,
+        "insertionPriority": 0,
+        "previewType": "NONE",
+        "bookmarkable": true,
+        "private": false,
+        "appearance": "DEFAULT",
+        "isGroupHeader": false,
+        "insertionGroup": 0
+      }
+    ],
+    "uiDescriptions": [
+      {
+        "applicationFilePath": "./uiDescriptions/ID7/application.xml",
+        "uiDescriptionFilePath": "./uiDescriptions/ID7/uiDescription.json",
+        "hmi": [
+          "ID7"
+        ]
+      }
+    ],
+    "variantGroups": [
+      {
+        "stringsPath": "./variantGroups/Common/texts",
+        "resourcesPath": "./variantGroups/Common/images",
+        "hmi": [
+          "ID7"
+        ],
+        "brands": [
+          "BMW"
+        ]
+      }
+    ]
+  }
+}
