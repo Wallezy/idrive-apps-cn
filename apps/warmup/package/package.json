@@ -1,6 +1,6 @@
 {
   "name": "warmup",
-  "version": "1.4.5",
+  "version": "1.4.6",
   "description": "Oil and coolant warm-up calculator (time to ready), safe rev limit and turbo cool-down",
   "main": "javascript/localized-entry.js",
   "private": false,

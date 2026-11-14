@@ -1,0 +1,10 @@
+[
+  {
+    "version": "2.13.2",
+    "upstreamVersion": "2.13.0",
+    "cnRevision": 2,
+    "changes": [
+      "移除界面角落水印，让仪表和数据显示更清爽。"
+    ]
+  }
+]

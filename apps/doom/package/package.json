@@ -1,6 +1,6 @@
 {
   "name": "doom",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "Doom (Freedoom: Phase 1) on the iDrive. Main menu with all settings; the game drawn in full resolution across the whole screen, on the controller; BACK returns to the menu and saves",
   "main": "javascript/localized-entry.js",
   "private": false,

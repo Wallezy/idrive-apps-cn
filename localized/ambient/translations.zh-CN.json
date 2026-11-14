@@ -163,5 +163,8 @@
   "headlights": "前灯",
   "body controller light functions": "车身灯光控制",
   "not set up": "未配置",
-  "status": "状态"
+  "status": "状态",
+  "Touch controls unavailable": "交互控件暂不可用",
+  "Update the Renderer in the Store, then use Full layout in Settings.": "请在商店更新渲染服务，并在设置中使用全屏布局。",
+  "Controls return automatically when a compatible renderer connects.": "连接恢复后，控件会自动恢复。"
 }

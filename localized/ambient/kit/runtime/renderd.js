@@ -24,8 +24,9 @@ const rec = require('./record');
 
 // the Store's renderer (mgu-render) first, then the community socket (an older renderer, or mgu-render's
 // link): an older renderer still installed beside mgu-render never gets the apps
-const SOCKETS = process.env.MGU_RENDERD_SOCKET ? [process.env.MGU_RENDERD_SOCKET] : ['/run/mgu-renderd/renderd.sock', '/run/mgu-render/render.sock'];
+const SOCKETS = process.env.MGU_RENDERD_SOCKET ? [process.env.MGU_RENDERD_SOCKET] : ['/run/mgu-render/render.sock', '/run/mgu-renderd/renderd.sock'];
 const SOCKET = SOCKETS[0];
+const CONNECT_MS = 2000, RETRY_MS = 3000;
 const isSocket = (p) => { try { return fs.statSync(p).isSocket(); } catch (e) { return false; } };
 const M = { HELLO: 1, PLACE: 2, SHOW: 3, ATLAS: 4, RAMP: 5, LAYER: 6, FRAME: 7, DROP_LAYER: 8, IMAGE: 9, GRAB: 10 };
 const E = { READY: 101, TICK: 102, ERROR: 103, STATS: 104, CCU: 105 };
@@ -69,12 +70,41 @@ class RenderClient extends EventEmitter {
         this.info = null;            // X_READY: { touch, controller, frontGate }
         this.area = null;            // X_READY: the app area { x, y, w, h } (screen px), null: not told
         this.onScreen = null;        // X_STATE: the renderer shows us (null: not told)
+        this.failed = new Set();     // candidates already tried in this retry round
+        this.failures = new Map();   // avoid repeating the same error every retry
     }
 
     /** Socket exists (the renderer is installed and running)? */
     static available(path) { return path ? isSocket(path) : SOCKETS.some(isSocket); }
 
+    _paths() {
+        const paths = this.opts.socket ? [this.opts.socket] : this.opts.sockets || SOCKETS;
+        const seen = new Set();
+        // A shared symlink to the Store socket is one service, not a second fallback.
+        return paths.filter((p) => {
+            let key = p;
+            try { key = fs.realpathSync(p); } catch (e) { /* a service can appear on the next retry */ }
+            if (seen.has(key)) return false;
+            seen.add(key); return true;
+        });
+    }
+
+    _fail(reason) {
+        if (!this.sock || this.failed.has(this.path)) return;
+        // An established peer can reset the stream during a restart (Node 8 reports
+        // ECONNRESET where newer Node versions may only close). Retry that proven
+        // service first; only failed handshakes reject a candidate for this round.
+        if (!this.ready) this.failed.add(this.path);
+        if (this.failures.get(this.path) !== reason) {
+            this.failures.set(this.path, reason);
+            this.log.warn('renderd: ' + this.path + ': ' + reason);
+        }
+        this.sock.destroy();
+    }
+
     connect() {
+        if (this.closed || this.sock || this.fd !== null) return this;
+        if (this.retry) { clearTimeout(this.retry); this.retry = null; }
         if (this.opts.file) {
             this.fd = fs.openSync(this.opts.file, 'w');
             this.connected = this.ready = true;
@@ -88,14 +118,23 @@ class RenderClient extends EventEmitter {
             setImmediate(() => this.emit('ready', this.screen));
             return this;
         }
-        // the first socket there; one nobody listens on (a stopped renderer's) passes to the next
-        const list = this.opts.socket ? [this.opts.socket] : SOCKETS.filter(isSocket);
-        if (!list.length) list.push(SOCKET);
-        const path = list[(this.at || 0) % list.length];
+        // Keep a service that proved usable across reconnects. Failed, silent or incompatible
+        // candidates are tried once per round; an exhausted round waits before trying again.
+        const list = this._paths().filter((p) => !this.failed.has(p));
+        const path = list.indexOf(this.preferred) >= 0 ? this.preferred : list[0];
+        if (!path) {
+            this.emit('unavailable');
+            this.retry = setTimeout(() => { this.retry = null; this.failed.clear(); this.connect(); }, RETRY_MS);
+            return this;
+        }
         if (path !== this.path) { this.path = path; this.log.info('renderd: socket ' + path); }
         const s = net.createConnection(path);
         this.sock = s;
+        this.connectTimer = setTimeout(() => {
+            if (this.sock === s && !this.ready) this._fail('renderer handshake timed out');
+        }, CONNECT_MS);
         s.on('connect', () => {
+            if (this.sock !== s || this.closed) return;
             this.connected = true;
             this._reset();
             this.inbuf = Buffer.alloc(0);   // (a message cut off with the last connection)
@@ -104,20 +143,23 @@ class RenderClient extends EventEmitter {
             this.claimed = null;
             this._write(msg(M.HELLO, this._hello()));
             // upstream renderers take these before READY; they are sent again once READY came
-            if (this.placement) this._sendPlace();
-            if (this.visible) this._write(this._u32msg(M.SHOW, [1]));
+            if (this.placement && !this.opts.interactive) this._sendPlace();
+            if (this.visible && !this.opts.interactive) this._write(this._u32msg(M.SHOW, [1]));
             if (this.grabbing && !this.opts.native) this._write(this._u32msg(M.GRAB, [1]));
         });
-        s.on('data', (d) => this._data(d));
+        s.on('data', (d) => { if (this.sock === s && !this.failed.has(path)) this._data(d); });
         s.on('error', (e) => {
-            if (!this.connected) this.at = (this.at || 0) + 1;      // the next socket at the next try
-            if (!this.errLogged) { this.errLogged = true; this.log.warn('renderd: ' + e.message); }
+            if (this.sock === s) this._fail(e.code || e.message);
         });
         s.on('close', () => {
+            if (this.sock !== s) return;
+            clearTimeout(this.connectTimer); this.connectTimer = null;
             const was = this.ready;
-            this.connected = this.ready = this.native = false; this.sock = null; this.waiting = false; this.onScreen = null;
+            if (!was) this.failed.add(path); // EOF before READY also advances to the next candidate.
+            this.connected = this.ready = this.native = this.touch = false;
+            this.sock = null; this.waiting = false; this.onScreen = null; this.info = null; this.area = null;
             if (was) { this.log.warn('renderd: connection closed'); this.emit('close'); }
-            if (!this.closed) this.retry = setTimeout(() => { this.retry = null; this.connect(); }, this.soon ? 0 : 3000);
+            if (!this.closed) this.retry = setTimeout(() => { this.retry = null; this.connect(); }, !was || this.failed.has(path) || this.soon ? 0 : RETRY_MS);
             this.soon = false;
         });
         return this;
@@ -144,6 +186,7 @@ class RenderClient extends EventEmitter {
         if (this.connected) this._sendGrab(on ? 1 : 0);
     }
     _sendGrab(on) {
+        if (this.opts.interactive && !this.ready) return;
         if (this.native) this._write(this._u32msg(X.GRAB, [on]));
         // mgu-render/1 asked for: wait for READY, which tells the dialect (upstream GRAB is IMAGE there)
         else if (!this.opts.native || this.ready) this._write(this._u32msg(M.GRAB, [on]));
@@ -174,6 +217,7 @@ class RenderClient extends EventEmitter {
         this.grab(false);
         this.closed = true;
         if (this.retry) clearTimeout(this.retry);
+        if (this.connectTimer) clearTimeout(this.connectTimer);
         if (this.sock) this.sock.destroy();
         if (this.fd !== null) { fs.closeSync(this.fd); this.fd = null; }
     }
@@ -209,14 +253,22 @@ class RenderClient extends EventEmitter {
             this.inbuf = this.inbuf.slice(8 + len);
             if (type === X.READY && p.length >= 12) {
                 const caps = p.readUInt32LE(8);
-                this.native = true;
+                this.native = p.readUInt32LE(0) === 1;
+                this.layer = !!(p.readUInt32LE(4) & 1);
                 this.info = { touch: !!(caps & 1), controller: !!(caps & 2), frontGate: !!(caps & 4) };
                 // the app area (where the HMI leaves room for apps, in screen px): after the embed box
                 this.area = p.length >= 44 ? { x: p.readInt32LE(28), y: p.readInt32LE(32), w: p.readInt32LE(36), h: p.readInt32LE(40) } : null;
             } else if (type === E.READY) {
+                if (p.length < 12) { this._fail('invalid READY'); return; }
+                this.touch = p.length >= 16 && p.readUInt32LE(12) !== 0;
+                if (this.opts.interactive && (!this.native || !this.layer || !this.touch || !this.info || !this.info.touch)) {
+                    this._fail('interactive controls need mgu-render/1, layer mode and touch');
+                    return;
+                }
+                clearTimeout(this.connectTimer); this.connectTimer = null;
+                this.preferred = this.path; this.failed.clear(); this.failures.delete(this.path);
                 this.ready = true; this.errLogged = false;
                 this.screen = { w: p.readUInt32LE(4), h: p.readUInt32LE(8) };
-                this.touch = p.length >= 16 && p.readUInt32LE(12) !== 0;
                 this.log.info('renderd: connected, screen ' + this.screen.w + 'x' + this.screen.h +
                     (this.native ? ', mgu-render/1 ' + JSON.stringify(this.info) : this.opts.native ? ', upstream dialect (no mgu-render/1)' : ''));
                 if (this.native) this._write(this._u32msg(X.MODE, [X_MODE_LAYER]));

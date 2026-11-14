@@ -1,5 +1,15 @@
 [
   {
+    "version": "2.4.6",
+    "upstreamVersion": "2.4.4",
+    "cnRevision": 2,
+    "changes": [
+      "修复部分车机按钮无响应及连续点击预览后页面消失的问题。",
+      "自动选择兼容的渲染服务，连接恢复后自动恢复操作。",
+      "移除界面角落水印。"
+    ]
+  },
+  {
     "version": "2.4.5",
     "upstreamVersion": "2.4.4",
     "cnRevision": 1,

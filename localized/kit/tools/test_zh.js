@@ -52,7 +52,8 @@ async function main(){
  assert.strictEqual(cv.textWidth('Oil',32,opts),r.textWidth('Oil',32,opts));
  const credit=new Canvas(600,40);drawCredit(credit,580,25);let alpha=0;
  for(let i=3;i<credit.d.length;i+=4)alpha=Math.max(alpha,credit.d[i]);
- assert(chinese?alpha>0&&alpha<=64:alpha===0,'credit visibility follows the installed language');
+ assert.strictEqual(CREDIT,'','corner watermark is disabled');
+ assert.strictEqual(alpha,0,'corner attribution must not draw over application content');
  let height=0;for(const name of fs.readdirSync(path.join(kit,'fonts')).filter(x=>x.endsWith('.json'))){
   const file=JSON.parse(fs.readFileSync(path.join(kit,'fonts',name),'utf8'));for(const s of file.sizes){assert(s.atlasW<=1024&&s.atlasH<=4096);height+=s.atlasH+1}
  }assert(height<8192,'GPU atlas budget');

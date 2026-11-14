@@ -1,6 +1,6 @@
 {
   "name": "ambient_config",
-  "version": "2.4.5",
+  "version": "2.4.6",
   "description": "自定义氛围灯颜色、亮度和动画，按驾驶模式切换并保存收藏。",
   "main": "javascript/localized-entry.js",
   "private": false,

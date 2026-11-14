@@ -1,6 +1,6 @@
 {
   "name": "redline",
-  "version": "1.8.2",
+  "version": "1.8.3",
   "description": "Full-screen rev tach with shift lights, gear, shift scoring and cold-engine rev guard",
   "main": "javascript/localized-entry.js",
   "private": false,

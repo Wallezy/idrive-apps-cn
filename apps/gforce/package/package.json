@@ -1,6 +1,6 @@
 {
   "name": "gforce",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "Friction circle with grip envelope, peak g per direction and session records",
   "main": "javascript/localized-entry.js",
   "private": false,

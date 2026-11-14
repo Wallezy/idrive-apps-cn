@@ -1,6 +1,6 @@
 {
   "name": "car_vitals",
-  "version": "2.13.1",
+  "version": "2.13.2",
   "description": "Live engine, thermal, intake / fuel / ignition, tyre and chassis gauges",
   "main": "javascript/localized-entry.js",
   "private": false,

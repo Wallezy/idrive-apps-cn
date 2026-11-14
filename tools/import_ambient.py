@@ -65,7 +65,7 @@ def main():
               'tree': 'package', 'modules': ['src/sdk.js'],
               'sdk': ['oap-sdk/src/core/OnlineApp.js', 'oap-sdk/src/logging/logging']})
         write(app / 'release.json', {'build': 'node ../../tools/build_localized.js',
-              'requires': {'mgu-deploy': '0.8.18', 'mgu-render': '0.6.19'}, 'uninstallable': True, 'mguHmi': ['ID7']})
+              'requires': {'mgu-deploy': '0.8.18', 'mgu-render': '0.6.23'}, 'uninstallable': True, 'mguHmi': ['ID7']})
         write(app / 'release-notes.json', [{
             'version': version, 'upstreamVersion': provenance['upstreamVersion'],
             'cnRevision': provenance['cnRevision'],
