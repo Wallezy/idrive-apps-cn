@@ -20,9 +20,9 @@ ZF 8HP 先读取 EGS 标识 `F150`，按 `0F25D0` 与混动车型 `0F21E0` 的�
 
 源码包入口是 `javascript/localized-entry.js`，先加载安装阶段生成的 `javascript/app.js`，再从 `global.__mguLocalizedSdk` 使用 `OnlineApp` 与 `logging`。源码包没有 BMW SDK、`node_modules`、运行日志、车辆快照或设备身份；安装时由本车 donor 生成 SDK 桥。
 
-现有 `car_vitals` 开发树版本继续保持 `2.13.2`，遵循 CONTRIBUTING 的发行阶段统一编号规则。导入的增强基础版本为 `2.27.3`，CN Beta 最终编号需要至少 `2.27.4`，才能升级用户导出的较新版本。新加入仓库的 `zf8hp` 以 `1.5.7` 为初始 CN 版本，覆盖导出版本 `1.5.6`。
+本次 `car_vitals` 发行号为 `2.27.4`，高于增强基础版本 `2.27.3`。`zf8hp` 为 `1.5.7`，高于导出版本 `1.5.6`。
 
-两应用依赖 `mgu-deploy >= 0.8.18` 和 `mgu-render >= 0.6.21`，发布范围为 ID7。应用自己的完整源码包保存在 `apps/<id>/package/`；旧的 `localized/apps` 导入流程不能覆盖这些增强包。全局发布目录仍需统一登记 `zf8hp` 和中文商店文案。
+两应用依赖 `mgu-deploy >= 0.8.18` 和 `mgu-render >= 0.6.21`，发布范围为 ID7。应用自己的完整源码包保存在 `apps/<id>/package/`；旧的 `localized/apps` 导入流程不能覆盖这些增强包。全局发布目录已登记 `zf8hp` 和中文商店文案。
 
 ## 来源与许可
 

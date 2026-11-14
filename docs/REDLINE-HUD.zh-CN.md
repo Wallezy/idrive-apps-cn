@@ -58,4 +58,4 @@ python3 apps/redline/tools/localize_hud.py --font /path/to/NotoSansSC.ttf
 
 固定字体 SHA-256：`a3041811a78c361b1de50f953c805e0244951c21c5bd412f7232ef0d899af0da`。构建保持 `javascript/localized-entry.js` 为入口，先加载链接器生成的 `app.js`；运行时通过 `global.__mguLocalizedSdk` 使用用户自己的 SDK。源码包没有 BMW SDK、`node_modules`、车机状态或日志。
 
-应用源码版本暂按贡献规则保留，最终发布版本必须高于已安装来源版本 `2.0.41`，避免 CN Beta 的更新号低于车机现有版本。
+本次 CN Beta 发行号为 `2.0.42`，高于已安装来源版本 `2.0.41`。

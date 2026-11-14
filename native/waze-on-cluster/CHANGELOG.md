@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.9.16
+
 - Add `panel_gauges` as a logical cluster target, using the full physical
   ID7 panel and the renderer's gauge alpha mask.
 - Report mask support to the settings application. Reject unsupported

@@ -1,5 +1,13 @@
 [
   {
+    "version": "2.27.4",
+    "upstreamVersion": "2.27.3",
+    "cnRevision": 1,
+    "changes": [
+      "四页车辆监测，增加目标/实际增压、充气量与历史；明确缺失数据。"
+    ]
+  },
+  {
     "version": "2.13.2",
     "upstreamVersion": "2.13.0",
     "cnRevision": 2,

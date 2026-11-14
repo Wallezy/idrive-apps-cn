@@ -1,8 +1,8 @@
 {
   "build": "node tools/build.js",
   "requires": {
-    "waze-on-cluster": "next",
-    "cluster-render": "next"
+    "waze-on-cluster": "0.9.16",
+    "cluster-render": "0.5.13"
   },
   "uninstallable": true,
   "mguHmi": [

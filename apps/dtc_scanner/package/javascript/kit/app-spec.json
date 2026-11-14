@@ -1,7 +1,7 @@
 {
   "id": "dtc_scanner",
   "title": "故障检测",
-  "version": "2.6.5",
+  "version": "2.9.8",
   "screens": [
     {
       "name": "MAIN",

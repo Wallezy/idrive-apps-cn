@@ -1,5 +1,14 @@
 [
   {
+    "version": "2.9.3",
+    "upstreamVersion": "2.9.2",
+    "cnRevision": 1,
+    "changes": [
+      "补齐插混、48V、12V 电池页面和主页卡片；估算功率明确标识。",
+      "停车闲置停止诊断轮询，无信号时不会自动显示模拟读数。"
+    ]
+  },
+  {
     "version": "2.0.3",
     "upstreamVersion": "2.0.1",
     "cnRevision": 2,

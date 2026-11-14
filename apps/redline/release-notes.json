@@ -1,5 +1,14 @@
 [
   {
+    "version": "2.0.42",
+    "upstreamVersion": "2.0.41",
+    "cnRevision": 1,
+    "changes": [
+      "十种 HUD 布局、驾驶模式独立设置、导航和胎压小窗。",
+      "固定中文，修复上传重试和停止后的资源清理；自动演示默认关闭。"
+    ]
+  },
+  {
     "version": "1.8.3",
     "upstreamVersion": "1.8.1",
     "cnRevision": 2,

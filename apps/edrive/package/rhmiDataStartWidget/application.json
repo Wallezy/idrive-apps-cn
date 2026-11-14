@@ -5,7 +5,7 @@
     "type": "StartWidget",
     "name": "edrive_widget",
     "vendor": "custom",
-    "version": "2.0.3",
+    "version": "2.9.3",
     "defaultLanguage": "zh_CN",
     "stringBundleUuid": "a0e7e99d-e4e8-59e5-b6cd-341b352fdec1",
     "resourceBundleUuid": "88cfb712-1d60-5459-a7be-c84645e2709a",

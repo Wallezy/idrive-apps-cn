@@ -1,0 +1,40 @@
+{
+  "cluster-render": [
+    {
+      "version": "0.5.13",
+      "upstreamVersion": "0.5.9",
+      "cnRevision": 2,
+      "changes": [
+        "新增 ID7 全幅视频透明遮罩，保留原厂表盘区域。",
+        "后台握手未确认支持时禁止发送扩展图层；绘图失败不回退为不透明视频。"
+      ]
+    },
+    {
+      "version": "0.5.12",
+      "upstreamVersion": "0.5.9",
+      "cnRevision": 1,
+      "changes": [
+        "支持压缩图像资源，减少仪表和 HUD 图像占用。",
+        "保留停车校准功能。"
+      ]
+    }
+  ],
+  "waze-on-cluster": [
+    {
+      "version": "0.9.16",
+      "upstreamVersion": "0.9.14",
+      "cnRevision": 2,
+      "changes": [
+        "支持保留原厂表盘的扩展地图目标，并向应用报告配套能力。"
+      ]
+    },
+    {
+      "version": "0.9.15",
+      "upstreamVersion": "0.9.14",
+      "cnRevision": 1,
+      "changes": [
+        "简化应用说明，方便了解安装与使用方式。"
+      ]
+    }
+  ]
+}
