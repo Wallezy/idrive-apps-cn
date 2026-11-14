@@ -5,11 +5,11 @@
   },
   "waze-on-cluster": {
     "title": "Waze 地图投屏服务",
-    "description": "接收并显示 CarPlay 或 Android Auto 提供的地图画面，通过仪表盘与 HUD 渲染器输出。包含按车机兼容情况启用的可还原补丁；HUD 显示为实验性功能，需要配套控制应用设置。"
+    "description": "在后台接收并显示手机地图，随“Waze 仪表盘显示”应用自动安装，在应用中设置。"
   },
   "robertn_waze_cluster": {
     "title": "Waze 仪表盘显示",
-    "description": "管理 CarPlay 和 Android Auto 地图投屏：应用或移除补丁，查看运行状态与日志，选择仪表盘、HUD 或同时显示，并调整 HUD 画面大小和位置。HUD 为实验性功能；可用画面取决于手机地图应用和车机支持情况。"
+    "description": "将 CarPlay 或 Android Auto 地图显示在仪表盘，也可选择显示在 HUD。在支持的车辆上，安装并重启主机后自动开启。"
   },
   "brake_test": {
     "title": "制动测试",

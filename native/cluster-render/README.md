@@ -1,5 +1,16 @@
 # cluster-render
 
+Cluster renderer draws apps' content, such as the
+[Waze on cluster](../../apps/robertn_waze_cluster) map, on the instrument
+cluster and the head-up display of a BMW with iDrive 7 or iDrive 8.
+
+You don't install or use it on its own. The Store installs it with the apps
+that need it, and there is nothing to set up. If something an app draws doesn't
+show, follow that app's instructions; for Waze on cluster, see
+[If the map doesn't show](../../apps/robertn_waze_cluster/README.md#if-the-map-doesnt-show).
+
+## For developers
+
 The one renderer every app on a BMW iDrive 7 or iDrive 8 head unit (MGU)
 draws through on the instrument cluster and the HUD: maps and video,
 widgets, overlays, 2D and 3D, and whole-cluster content. Apps and native
@@ -13,7 +24,7 @@ Labels: **VERIFIED** (seen in the unit's binaries or configuration, or
 observed running), **INFERRED** (reasoned from verified facts),
 **CAR-ONLY** (needs the vehicle).
 
-## Why a service
+### Why a service
 
 The display path has three things only one process can hold:
 
@@ -63,7 +74,7 @@ What it gives:
                                                          RAMSES 19 graph ──scene──>
 ```
 
-## Arbitration
+### Arbitration
 
 A **target** is one slot with one scene: `map` (0x100, the central map
 area under the gauges, 1088x480), `panel` (0x203, the whole cluster over
@@ -120,7 +131,7 @@ cluster is offered, and what differs is in "iDrive 8".
   timeout, and is `parked` (behind the holder the table names) until the
   KOMBI shows it. A parked target stages and flushes nothing. Nobody
   wanting it, it is released at once, with no linger.
-- **Giving way** (contributed by [eroobeeroo](https://github.com/eroobeeroo)).
+- **Giving way.**
   A target with `<target>_yield_slots` gives way while the stock HMI shows
   content there: asking for the target again while a pop-up showed pushed
   the pop-up from the HUD to the cluster. It is asked for again
@@ -146,8 +157,7 @@ cluster is offered, and what differs is in "iDrive 8".
   (0x330-0x332 on a G05; 0x300 on an X3, which the KOMBI disables while the
   HUD map holds 0x323). A layer with `yield` 0 (PROTOCOL.md) keeps its
   target from giving way while it wants it.
-- **The HUD** (iDrive 7, `hud`): slot 0x323 only, the slot the HUD map of
-  [eroobeeroo](https://github.com/eroobeeroo) was shown in on a G80 and a
+- **The HUD** (iDrive 7, `hud`): slot 0x323 only, the slot a HUD map was shown in on a G80 and a
   G05 (VERIFIED there), scene 0x01000400, class 0.
   - Another `hud_slot` or `hud_scene_id`, or `hud_take_over_stock` 1,
     leaves the HUD out: the
@@ -468,7 +478,7 @@ cluster is offered, and what differs is in "iDrive 8".
   newest frame, written whole and exact as soon as the budget allows, its
   bytes charged to the budget as debt.
 
-## Upload budget
+### Upload budget
 
 Every layer of every client writes within one budget (`src/governor.h`,
 `kit/upload_pacer.h`). Its ceiling, `upload_kb_per_s`, is 5500 KB/s: on the
@@ -539,7 +549,7 @@ layers wrote 1800 frames (18 ms from offer to flush on average), 52000 KB, 0
 failed, 12 budget holds; rendered:
 renderer 00000000-0000-0000-0000-000000000001 subscribed for 412 s`.
 
-## Layers
+### Layers
 
 | Kind | What the client sends | What the service does |
 |---|---|---|
@@ -554,7 +564,21 @@ Beside the layers:
   glyph atlas or sprites. Not drawn, so they never make a target wanted;
   kept on the CPU, written whole into each new scene and in place as they
   change, before the layers, within the budget. A layer sampling one is
-  drawn only while its buffer holds it whole.
+  drawn only while its buffer holds it whole. An `etc2rgba` asset is ETC2
+  RGBA with EAC alpha, 1 byte a pixel; an `etc2rgb` asset opaque ETC2 RGB,
+  half a byte a pixel. Each is sent whole once, an immutable texture made
+  from it in each scene, charged once (no rectangle scratch), so a
+  2048x1024 atlas takes 2 MiB of the pixel memory as `etc2rgba` and 1 MiB
+  as `etc2rgb` (as RGBA8 it would not fit one frame message). On iDrive 7
+  the KOMBI draws `etc2rgba` (car test, [TEST-ETC2.md](TEST-ETC2.md));
+  `etc2rgb` goes the same way, its GL format checked in the KOMBI's
+  renderer, not tried on a car. iDrive 8's RAMSES 27 path is built the
+  same way, not tried on a car. A texture the renderer refuses puts the
+  layers sampling it in `error`, and their target is released.
+  `tools/etc2_test/etc2_encode.py` encodes both. Which format to use:
+  PROTOCOL.md "Choosing a pixel format". Artwork sent once as
+  assets animates with no more pixels sent (PROTOCOL.md "Animating
+  preloaded assets").
 - **Several videos** (`src/video_composite.h`): the display holds the
   buffers of at most two videos, its memory unmeasured. While it holds
   them all, each video draws itself as above. Past that, the videos on a
@@ -646,7 +670,7 @@ a render pass with its own camera, so the quads between two mesh layers
 share a 2D pass, and the passes' render order follows the stack exactly
 (`plan_passes` in `src/graph.h`). Without mesh layers a scene is one pass.
 
-## Lifecycle
+### Lifecycle
 
 - `cluster-render.socket` listens from boot; the first client starts the
   service. Clients reconnect by themselves (0.25, 0.5, 1, then every 2 s).
@@ -663,7 +687,7 @@ share a 2D pass, and the passes' render order follows the stack exactly
   handle and unmaps every mapping of it (`dcsm/DCSM.md` "Heartbeat"), and
   the guide hold is a mapping of the same client as the map.
 
-## Supported head units
+### Supported head units
 
 Every head-unit variant runs, HIGH F included (0.3.9 refused it). On a
 head unit whose variant cannot be read, a kernel command line with no
@@ -677,7 +701,7 @@ socket nor `Restart=on-failure` starts it again: a status request gets
 event with that reason, and the status file says the same. A SIGTERM ends
 it with 0.
 
-## Identity and packaging
+### Identity and packaging
 
 `hmi_5000` (the one uid allowed Dcsm2 and the RAMSES offers), participant
 801, vsomeip application `cluster-demo` and clientID `"\0cluster"`: the
@@ -691,7 +715,7 @@ place.
 (`mguHmi: ["ID7", "ID8"]`), with the Node client shipped beside it for apps
 (`/var/opt/cluster-render/current/cluster_render_client.js`).
 
-## Install
+### Install
 
 From the Store ([robertnisipeanu/mgu-store](https://github.com/robertnisipeanu/mgu-store))
 on the head unit: add the GitHub source `robertnisipeanu/idrive-apps`
@@ -711,7 +735,7 @@ node release/tool_artifact.js native/cluster-render --out /tmp/kit   # runs make
 <mgu-store>/deploy/hu install --artifact /tmp/kit/cluster-render@<version>.tgz
 ```
 
-## Configure
+### Configure
 
 [`cluster-render.conf`](cluster-render.conf) lists every setting with its
 built-in default: the generation (`auto`, `7` or `8`), the identity, the
@@ -737,7 +761,7 @@ answer, notifications that did not decode (their start in hex, at most every
 10 s per event id), and, for a request that got no answer, what arrived
 since it and the last slot table.
 
-## iDrive 8
+### iDrive 8
 
 iDrive 8 draws its cluster and HUD with RAMSES 27 (`.so.27.0`). That
 library has DCSM built in over SOME/IP RemoteContentManager (0xB0A3),
@@ -921,7 +945,7 @@ CAR-ONLY on iDrive 8:
   waits for the generation and for RAMSES instead of exiting; a
   configuration fault or a refused communication user still exits 1.
 
-## Clients
+### Clients
 
 - **Native producers** link `libcluster_render_client.a` and include
   `include/cluster_render/client.h`.
@@ -942,7 +966,7 @@ has: no participant, no Dcsm2 client and no `hmi_5000`.
   mesh layer the renderer turns, plasma in an effect, labels in effects
   over a glyph-atlas asset, a needle, an alert and a video.
 
-## Building and testing
+### Building and testing
 
 In `native/cluster-render`:
 
@@ -1155,7 +1179,7 @@ The host tests:
 - `js/test/client_test.js`: the Node client against `host_service`,
   assets, a mesh layer and a scene file included.
 
-## Verified, and open
+### Verified, and open
 
 Verified off the car:
 - **The kit.** waze-on-cluster built from the kit gives a binary whose
@@ -1320,7 +1344,7 @@ and renderer on the unit's libramses, for one category: no KOMBI):
 
 Not verified, needs the car (iDrive 8): the CAR-ONLY list of "iDrive 8".
 
-## Releases
+### Releases
 
 A version is `component.json` `version` (`x.y.z`), published once; the
 release sets it ([`CONTRIBUTING.md`](../../CONTRIBUTING.md)). The
@@ -1357,7 +1381,7 @@ mgu-deploy checks the kit's `mguHmi` from 0.3.0 and, from 0.4.0, applies
 an update's changed socket unit: at once while the service is stopped,
 else with the next boot.
 
-## License
+### License
 
 The service is GPL-3.0-or-later ([LICENSE](LICENSE)). What apps compile in
 or copy, `include/`, `client/`, `kit/`, `js/cluster_render_client.js` and
