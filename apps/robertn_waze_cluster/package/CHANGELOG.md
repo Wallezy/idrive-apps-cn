@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.6.12
+
+- 简化地图投屏的安装、设置和排障说明。
+
 ## 0.6.10
 
 - 去除苹果和安卓状态中的“未验证”提示，显示实际补丁状态。
@@ -10,6 +14,10 @@
 - Check page control IDs before packaging to prevent conflicting controls from breaking app startup.
 
 - The CN app defaults to Simplified Chinese while the HMI language is unavailable and follows explicit display-language selections. Chinese status rows translate known renderer and patch messages, frame counts and transfer limits; unknown diagnostics retain their original detail. Native protocol fields and logs are unchanged.
+## 0.6.8
+
+A plainer description in the Store: on supported cars the map turns on by
+itself after you install the app and restart the head unit.
 
 ## 0.6.7
 
