@@ -104,6 +104,7 @@
     "Calibration: Starting…": "Βαθμονόμηση: εκκίνηση…",
     "Calibration: another session is active": "Βαθμονόμηση: άλλη συνεδρία είναι ενεργή",
     "Calibration: {0} px, {1} s remaining": "Βαθμονόμηση: {0} px, απομένουν {1} δευτ.",
-    "Calibration: Off": "Βαθμονόμηση: ανενεργή"
+    "Calibration: Off": "Βαθμονόμηση: ανενεργή",
+    "Expanded map, retain gauges (Beta)": "Εκτεταμένος χάρτης, διατήρηση οργάνων (Beta)"
   }
 }

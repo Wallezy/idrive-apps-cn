@@ -104,6 +104,7 @@
     "Calibration: Starting…": "การปรับเทียบ: กำลังเริ่ม…",
     "Calibration: another session is active": "การปรับเทียบ: มีเซสชันอื่นทำงานอยู่",
     "Calibration: {0} px, {1} s remaining": "การปรับเทียบ: {0} พิกเซล เหลือ {1} วินาที",
-    "Calibration: Off": "การปรับเทียบ: ปิด"
+    "Calibration: Off": "การปรับเทียบ: ปิด",
+    "Expanded map, retain gauges (Beta)": "ขยายแผนที่โดยคงมาตรวัดไว้ (เบต้า)"
   }
 }

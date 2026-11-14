@@ -1,0 +1,12 @@
+# Changelog
+
+## Unreleased
+
+- Add the `video_gauge_mask_v1` capability for the ID7 1920×720 panel.
+  Atlas and packed video paths share an alpha contour around the OEM
+  gauges and speed readout. Masked video never enters opaque compositing
+  or claims opaque coverage of underlying layers.
+- Hold masked video layers, controls and frames until the current
+  connection explicitly confirms support, including after reconnect.
+  Shader-template and shader-compilation failures stop that layer.
+

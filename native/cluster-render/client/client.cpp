@@ -63,31 +63,18 @@ void Client::connect_now(int64_t now_ms)
     }
     fcntl(fd_, F_SETFD, FD_CLOEXEC);
     fcntl(fd_, F_SETFL, fcntl(fd_, F_GETFL) | O_NONBLOCK);
+    for (const auto &kv : layers_)
+        if (kv.second.kind == "video" && kv.second.vo.gauge_mask)
+            deferred_masked_.insert(kv.first);
     queue(json_object({{"op", json_quote("hello")}, {"app", json_quote(app_)}, {"proto", num(kProtocolVersion)}}));
     /* Assets first, so binds find them; binds and animations once every
      * layer and part is made. */
     for (int pass = 0; pass < 2; pass++)
         for (auto &kv : layers_) {
             Layer &l = kv.second;
-            if ((l.kind == "asset") != (pass == 0))
+            if ((l.kind == "asset") != (pass == 0) || deferred_masked_.count(kv.first))
                 continue;
-            queue(layer_json(kv.first, l));
-            if (!l.edits.empty())
-                queue(edits_json(kv.first, l));
-            for (const auto &p : l.parts) {
-                queue(p.second.json);
-                if (!p.second.geometry.empty())
-                    queue_message(p.second.geometry);
-                if (!p.second.transform.empty())
-                    queue(p.second.transform);
-            }
-            for (const auto &u : l.uniforms)
-                queue(u.second);
-            if ((l.kind == "image" || l.kind == "asset") && l.have) {
-                l.whole = true;   /* sent once the service says hello */
-                l.dirty.clear();
-                l.dirty_bytes = 0;
-            }
+            replay_layer(kv.first, l);
         }
     for (const auto &kv : layers_)
         for (const auto &b : kv.second.binds)
@@ -98,12 +85,59 @@ void Client::connect_now(int64_t now_ms)
     write_out();
 }
 
+bool Client::gauge_mask_supported() const
+{
+    return ready_ && ("," + features + ",").find(",video_gauge_mask_v1,") != std::string::npos;
+}
+
+void Client::replay_layer(uint32_t ref, Layer &l)
+{
+    queue(layer_json(ref, l));
+    if (!l.edits.empty())
+        queue(edits_json(ref, l));
+    for (const auto &p : l.parts) {
+        queue(p.second.json);
+        if (!p.second.geometry.empty())
+            queue_message(p.second.geometry);
+        if (!p.second.transform.empty())
+            queue(p.second.transform);
+    }
+    for (const auto &u : l.uniforms)
+        queue(u.second);
+    if ((l.kind == "image" || l.kind == "asset") && l.have) {
+        l.whole = true;   /* sent once the service says hello */
+        l.dirty.clear();
+        l.dirty_bytes = 0;
+    }
+}
+
+void Client::replay_masked()
+{
+    if (!gauge_mask_supported())
+        return;
+    /* on_ready may drop or replace a layer after inspecting the new
+     * capabilities; replay only the surviving, current state. */
+    const std::set<uint32_t> refs = deferred_masked_;
+    for (uint32_t ref : refs) {
+        auto it = layers_.find(ref);
+        deferred_masked_.erase(ref);
+        if (it == layers_.end())
+            continue;
+        replay_layer(ref, it->second);
+        for (const auto &b : it->second.binds)
+            queue(b.second.second);
+        for (const auto &a : it->second.animations)
+            queue(a.second);
+    }
+}
+
 void Client::disconnect(int64_t now_ms)
 {
     if (fd_ >= 0)
         close(fd_);
     fd_ = -1;
     ready_ = false;
+    features.clear();
     in_.clear();
     /* The newest frame each video layer was given stays its last: the one
      * on its way, then any still waiting. */
@@ -185,11 +219,13 @@ void Client::read_events()
         if (ev == "hello") {
             backend = j["backend"];
             targets = j["targets"];
+            features = j["features"];
             repeats_ = j["repeat"] == "1";
             ready_ = true;
             backoff_ = 0;
             if (on_ready)
                 on_ready();
+            replay_masked();
         } else if (ev == "layer" && on_layer) {
             on_layer((uint32_t)std::strtoul(j["ref"].c_str(), nullptr, 10), j["state"], j["reason"]);
         } else if (ev == "target") {
@@ -278,6 +314,11 @@ void Client::queue(const std::string &json)
 {
     if (fd_ < 0)
         return;
+    if (!deferred_masked_.empty()) {
+        Json j;
+        if (parse_json(json, &j) && deferred_masked_.count((uint32_t)std::strtoul(j["ref"].c_str(), nullptr, 10)))
+            return;   /* remembered in Layer, sent only after capability acceptance */
+    }
     ctl_.push_back(encode(kJson, json));
 }
 
@@ -382,6 +423,7 @@ std::string Client::layer_json(uint32_t ref, const Layer &l) const
         kv.push_back({"dirty_threshold", num(l.vo.dirty_threshold)});
         kv.push_back({"settle_ms", num(l.vo.settle_ms)});
         kv.push_back({"pan_blocks", flag(l.vo.pan_blocks)});
+        kv.push_back({"gauge_mask", flag(l.vo.gauge_mask)});
         kv.push_back({"stall_ms", num(l.vo.stall_ms)});
     } else if (l.kind == "image") {
         kv.push_back({"iw", num(l.io.w)});
@@ -416,6 +458,8 @@ uint32_t Client::add(const Layer &l)
 {
     const uint32_t ref = next_ref_++;
     layers_[ref] = l;
+    if (l.kind == "video" && l.vo.gauge_mask && !gauge_mask_supported())
+        deferred_masked_.insert(ref);
     queue(layer_json(ref, l));
     if (fd_ >= 0)
         write_out();
@@ -729,11 +773,15 @@ void Client::drop(uint32_t ref)
             sampled = sampled || b.second.first == ref;
     if (it->second.kind == "video")
         spare_.clear();   /* buffers of its size may be needed no more */
-    if (!sampled)
+    const bool deferred = deferred_masked_.count(ref);
+    if (!sampled) {
         layers_.erase(it);
+        deferred_masked_.erase(ref);
+    }
     frames_.erase(ref);
     repeats_due_.erase(ref);
-    queue(json_object({{"op", json_quote("drop")}, {"ref", num(ref)}}));
+    if (!deferred)
+        queue(json_object({{"op", json_quote("drop")}, {"ref", num(ref)}}));
     send_now();
 }
 
@@ -752,7 +800,8 @@ size_t Client::frame_bytes(uint32_t ref) const
 bool Client::video_frame_ok(uint32_t ref, size_t n) const
 {
     auto it = layers_.find(ref);
-    return ready_ && it != layers_.end() && it->second.kind == "video" && n == frame_bytes(ref);
+    return ready_ && !deferred_masked_.count(ref) && it != layers_.end() &&
+           it->second.kind == "video" && n == frame_bytes(ref);
 }
 
 void Client::take_spare(std::vector<uint8_t> *v, size_t n)

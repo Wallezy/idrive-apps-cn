@@ -106,6 +106,7 @@
     "Calibration: Starting…": "Kalibratie: starten…",
     "Calibration: another session is active": "Kalibratie: een andere sessie is actief",
     "Calibration: {0} px, {1} s remaining": "Kalibratie: {0} px, nog {1} s",
-    "Calibration: Off": "Kalibratie: uit"
+    "Calibration: Off": "Kalibratie: uit",
+    "Expanded map, retain gauges (Beta)": "Uitgebreide kaart, meters behouden (bèta)"
   }
 }

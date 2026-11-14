@@ -104,6 +104,7 @@
     "Calibration: Starting…": "Kalibrointi: käynnistetään…",
     "Calibration: another session is active": "Kalibrointi: toinen istunto on aktiivinen",
     "Calibration: {0} px, {1} s remaining": "Kalibrointi: {0} px, jäljellä {1} s",
-    "Calibration: Off": "Kalibrointi: pois"
+    "Calibration: Off": "Kalibrointi: pois",
+    "Expanded map, retain gauges (Beta)": "Laajennettu kartta, säilytä mittarit (Beta)"
   }
 }

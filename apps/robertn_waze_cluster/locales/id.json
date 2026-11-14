@@ -104,6 +104,7 @@
     "Calibration: Starting…": "Kalibrasi: memulai…",
     "Calibration: another session is active": "Kalibrasi: sesi lain sedang aktif",
     "Calibration: {0} px, {1} s remaining": "Kalibrasi: {0} px, tersisa {1} dtk",
-    "Calibration: Off": "Kalibrasi: nonaktif"
+    "Calibration: Off": "Kalibrasi: nonaktif",
+    "Expanded map, retain gauges (Beta)": "Peta diperluas, pertahankan instrumen (Beta)"
   }
 }

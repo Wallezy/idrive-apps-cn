@@ -104,6 +104,7 @@
     "Calibration: Starting…": "כיול: מתחיל…",
     "Calibration: another session is active": "כיול: הפעלה אחרת פעילה",
     "Calibration: {0} px, {1} s remaining": "כיול: {0} פיקסלים, נותרו {1} שניות",
-    "Calibration: Off": "כיול: כבוי"
+    "Calibration: Off": "כיול: כבוי",
+    "Expanded map, retain gauges (Beta)": "מפה מורחבת, שמירת המחוונים (בטא)"
   }
 }

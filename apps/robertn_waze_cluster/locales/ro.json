@@ -104,6 +104,7 @@
     "Calibration: Starting…": "Calibrare: pornire…",
     "Calibration: another session is active": "Calibrare: altă sesiune este activă",
     "Calibration: {0} px, {1} s remaining": "Calibrare: {0} px, au rămas {1} s",
-    "Calibration: Off": "Calibrare: oprită"
+    "Calibration: Off": "Calibrare: oprită",
+    "Expanded map, retain gauges (Beta)": "Hartă extinsă, păstrează instrumentele (Beta)"
   }
 }

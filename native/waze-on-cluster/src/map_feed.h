@@ -97,6 +97,7 @@ struct FeedStatus {
     bool guide_hold = true;
     bool guide_disabled = false;   /* cluster-render's guard keeps the turn box's hold off */
     bool disabled = false;         /* cluster-render's guard keeps the target's mapping off */
+    bool gauge_supported = false;  /* matching renderer and ID7 panel available */
     bool cluster = true;           /* the cluster setting (MapFeeds) */
     bool hud = false;              /* the HUD setting (MapFeeds) */
     std::string hud_state = "off";   /* off, disabled, or the HUD feed's state */
@@ -139,6 +140,8 @@ public:
     /* The layer's guide_hold from now on. */
     void set_guide_hold(bool hold);
     const std::string &target() const { return cfg_.target; }
+    bool gauge_supported() const;
+    std::string physical_target() const { return cfg_.target == "panel_gauges" ? "panel" : cfg_.target; }
     /* The HUD map's size (FeedConfig::hud_width_pct), applied at once to a
      * map on the HUD. */
     void set_hud_width(unsigned pct);

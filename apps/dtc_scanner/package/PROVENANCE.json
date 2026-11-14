@@ -1,0 +1,31 @@
+{
+  "sourceArchive": "dtc_scanner@2.9.7.tgz",
+  "sourceVersion": "2.9.7",
+  "sourceSha256": "728c6765cf4ac324cd361d187ddb36d5a0c62fc19312880f61ab3fa4e1485646",
+  "sourceLicense": "MIT",
+  "adaptations": [
+    "SDK-free source package with donor bridge",
+    "fixed zh-CN UI",
+    "ID7 application and widget resources",
+    "no user data, BMW SDK or node_modules",
+    "reuse repository renderer client: preferred CN socket, handshake timeout, retry and malformed READY checks",
+    "Build diagnostic_i18n.pack from public source catalog() and pack_data.pack; include dedicated diagnostic CJK atlas",
+    "Demo defaults off; offline tests explicitly enable synthetic data",
+    "Cancel pending five-second fault-clear confirmation on leaving MAIN; keep explicit double confirmation"
+  ],
+  "baselineVersion": "2.6.5",
+  "exportPackageLicense": "UNLICENSED",
+  "publicSource": {
+    "repository": "https://github.com/cauliflowermossgrape/idrive7-apps",
+    "commit": "8d860de5818a2da11d3a3750aab36866cecf6bde",
+    "licenseSha256": "7c813412dcaf1b9d18c28ca6b6199c4349e15e35beca44ab6cab8e4413fe0aa6",
+    "comparison": "All application JavaScript files and 26 kit runtime JavaScript files match the unmodified vehicle export byte for byte; DTC database also matches."
+  },
+  "diagnosticCatalog": {
+    "sourceTexts": 86735,
+    "license": "MIT",
+    "review": "Machine-assisted upstream translations; not individually human reviewed. Unknown descriptions retain complete original text.",
+    "lookupEntries": 87210,
+    "packSha256": "2089d7f2278675b7ba1e506e64fbdf3e889db1be880631144955c0f03b8a7272"
+  }
+}

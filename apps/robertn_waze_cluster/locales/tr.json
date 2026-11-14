@@ -104,6 +104,7 @@
     "Calibration: Starting…": "Kalibrasyon: başlatılıyor…",
     "Calibration: another session is active": "Kalibrasyon: başka bir oturum etkin",
     "Calibration: {0} px, {1} s remaining": "Kalibrasyon: {0} piksel, {1} sn kaldı",
-    "Calibration: Off": "Kalibrasyon: kapalı"
+    "Calibration: Off": "Kalibrasyon: kapalı",
+    "Expanded map, retain gauges (Beta)": "Genişletilmiş harita, göstergeleri koru (Beta)"
   }
 }

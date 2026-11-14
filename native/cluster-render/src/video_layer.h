@@ -64,6 +64,7 @@ struct VideoParams {
     int dirty_settle_ms = 1000;      /* 0: never */
     uint32_t fps = 30;               /* updates a second at most; 0: no clock */
     bool pan_blocks = true;          /* packed fast motion; needs h a multiple of 4 */
+    bool gauge_mask = false;         /* transparent ID7 panel contour */
     int stall_ms = 6000;             /* no frame for this long: not ready */
 };
 

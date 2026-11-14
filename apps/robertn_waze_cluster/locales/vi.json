@@ -104,6 +104,7 @@
     "Calibration: Starting…": "Hiệu chuẩn: đang bắt đầu…",
     "Calibration: another session is active": "Hiệu chuẩn: phiên khác đang hoạt động",
     "Calibration: {0} px, {1} s remaining": "Hiệu chuẩn: {0} px, còn {1} giây",
-    "Calibration: Off": "Hiệu chuẩn: tắt"
+    "Calibration: Off": "Hiệu chuẩn: tắt",
+    "Expanded map, retain gauges (Beta)": "Bản đồ mở rộng, giữ đồng hồ (Beta)"
   }
 }

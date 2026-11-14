@@ -35,6 +35,13 @@
         "hmi": [
           "ID7"
         ]
+      },
+      {
+        "applicationFilePath": "./uiDescriptions/ID8/application.xml",
+        "uiDescriptionFilePath": "./uiDescriptions/ID8/uiDescription.json",
+        "hmi": [
+          "ID8"
+        ]
       }
     ],
     "variantGroups": [
@@ -42,7 +49,8 @@
         "stringsPath": "./variantGroups/Common/texts",
         "resourcesPath": "./variantGroups/Common/images",
         "hmi": [
-          "ID7"
+          "ID7",
+          "ID8"
         ],
         "brands": [
           "BMW"

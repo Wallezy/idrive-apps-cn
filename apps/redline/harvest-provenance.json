@@ -1,0 +1,309 @@
+{
+  "source": "Owner-supplied vehicle export P3/02-older-versions-and-install-history.tar.gz",
+  "member": "var/opt/mgu-deploy/kept/redline/redline@2.0.41.tgz",
+  "sha256": "5fd7f07def18aa6ec9ea33edd8369aa50bbeef74e4306c7ea645b7dd999107e8",
+  "exportedVersion": "2.0.41",
+  "licenseDeclaredByExport": "UNLICENSED",
+  "note": "All exported JavaScript modules byte-compared with the pinned public source before localization and compatibility fixes. The generated export package UNLICENSED marker does not override the public source MIT license. No SDK, node_modules, vehicle data or runtime-generated application manifest imported.",
+  "publicSource": {
+    "repository": "https://github.com/cauliflowermossgrape/idrive7-apps",
+    "commit": "8d860de5818a2da11d3a3750aab36866cecf6bde",
+    "license": "MIT",
+    "comparison": [
+      {
+        "file": "app.js",
+        "upstream": "apps/redline/main.js",
+        "result": "exact",
+        "sha256": "d605b64bfbcfc077565d891cec2464ade40cddb9098a15422e393f7344e03053"
+      },
+      {
+        "file": "cluster_render_client.js",
+        "upstream": "apps/redline/cluster_render_client.js",
+        "result": "exact",
+        "sha256": "ae2fa272377ac4b3647a40339b2a1f48576ab7e1648cbde855a13bcc0d9ada1c"
+      },
+      {
+        "file": "electrical.js",
+        "upstream": "apps/redline/electrical.js",
+        "result": "exact",
+        "sha256": "be3369b382734df2598f552972e41130d2a25d7dbf21190564e61532f3e075a1"
+      },
+      {
+        "file": "files.js",
+        "upstream": "apps/redline/files.js",
+        "result": "exact",
+        "sha256": "5fe90fa3fdd383c1241211715556b5cd7165a6825855f398562057ad74e25a43"
+      },
+      {
+        "file": "fuel.js",
+        "upstream": "apps/redline/fuel.js",
+        "result": "exact",
+        "sha256": "13465022f9b49645e5bd4bf5e7b4629a1c26e5771f656b75f17d690d06854b66"
+      },
+      {
+        "file": "gearbox.js",
+        "upstream": "apps/redline/gearbox.js",
+        "result": "exact",
+        "sha256": "2f5ca9237b30518f807194e64ab65159ed5859a3d4b4812178fcb1c868564590"
+      },
+      {
+        "file": "hud-draw.js",
+        "upstream": "apps/redline/hud-draw.js",
+        "result": "exact",
+        "sha256": "5065ce15bf7c75d2c0c78404ce710f441a88bb868ce71ad2d9f0131e75afcc29"
+      },
+      {
+        "file": "hud-m.js",
+        "upstream": "apps/redline/hud-m.js",
+        "result": "exact",
+        "sha256": "fbacf84f855861c44b6fc18799ebbdef433a372eb65178c48f8b353d265ceabd"
+      },
+      {
+        "file": "hud-nav.js",
+        "upstream": "apps/redline/hud-nav.js",
+        "result": "exact",
+        "sha256": "45d86752b6cdbd9ec76b899a058b9dec19c0de604998794342bc7d667993e620"
+      },
+      {
+        "file": "hud-theme.js",
+        "upstream": "apps/redline/hud-theme.js",
+        "result": "exact",
+        "sha256": "081c6fe604c90c6515b3985e9367fea5bc9152149008aa6f3bfbfcadde40383f"
+      },
+      {
+        "file": "hud-tyres.js",
+        "upstream": "apps/redline/hud-tyres.js",
+        "result": "exact",
+        "sha256": "a06f1e732286c15686b3f69d2e81c997665b14897b4c9ab38a680a583b64544f"
+      },
+      {
+        "file": "hud.js",
+        "upstream": "apps/redline/hud.js",
+        "result": "exact",
+        "sha256": "02ce9d1e4c4ea24b23c2f55634e9d6cf3708fd2599ca3db5c2d609d12f03d412"
+      },
+      {
+        "file": "kit/canvas.js",
+        "upstream": "kit/runtime/canvas.js",
+        "result": "exact",
+        "sha256": "2d1d9e950700fb465af9fa7f10103a2fd22b516b3c853cf5625012cf31fe5ab3"
+      },
+      {
+        "file": "kit/car.js",
+        "upstream": "kit/runtime/car.js",
+        "result": "exact",
+        "sha256": "b87770e43018cb56368812ff9e820351d907639dc807ee1429747d34c1aca731"
+      },
+      {
+        "file": "kit/credits.js",
+        "upstream": "kit/runtime/credits.js",
+        "result": "exact",
+        "sha256": "6074066bc6ae85794db9b844322264ad8aa73b89c850f6b03a3ee57c57d95084"
+      },
+      {
+        "file": "kit/diag.js",
+        "upstream": "kit/runtime/diag.js",
+        "result": "exact",
+        "sha256": "337bec1fed75f5216de2a3ef1fbe5cbb1e183b152a8071142a1009441bcd7cba"
+      },
+      {
+        "file": "kit/dids.js",
+        "upstream": "kit/runtime/dids.js",
+        "result": "exact",
+        "sha256": "cf6ae106099e64863a7806ad1db36cdd24f161c03a4d97fba1aa2d5b630c73f4"
+      },
+      {
+        "file": "kit/display.js",
+        "upstream": "kit/runtime/display.js",
+        "result": "exact",
+        "sha256": "4ae710fb0fdac75b871c4415ed99a5c926528d823c0dce056c0e5da3837cc158"
+      },
+      {
+        "file": "kit/ecus.js",
+        "upstream": "kit/runtime/ecus.js",
+        "result": "exact",
+        "sha256": "f5ec3dbdece067f7eaa0080479dfde0d25b8a882f657df8b6f58f46f8622e149"
+      },
+      {
+        "file": "kit/engine.js",
+        "upstream": "kit/runtime/engine.js",
+        "result": "exact",
+        "sha256": "de6c7a05d041ec44743f46df1d442eaa43404d8f266a0e4e8a8ea3a8dc5fb88a"
+      },
+      {
+        "file": "kit/fonts.js",
+        "upstream": "kit/runtime/fonts.js",
+        "result": "exact",
+        "sha256": "d402329020befccbc81a2b50b663a7a358e6e70e9520735f61283296e690d303"
+      },
+      {
+        "file": "kit/gauges.js",
+        "upstream": "kit/runtime/gauges.js",
+        "result": "exact",
+        "sha256": "3b0d56a3f2b57fc7e7698cb6a93a705a4ef0017205f2d0d8848cda20ec87ef06"
+      },
+      {
+        "file": "kit/hmi-text.js",
+        "upstream": "kit/runtime/hmi-text.js",
+        "result": "exact",
+        "sha256": "74d96fd26ec53f4dc55fd36e079901ed03994794c8b31ae37e93e095092814e0"
+      },
+      {
+        "file": "kit/hud_claim.js",
+        "upstream": "kit/runtime/hud_claim.js",
+        "result": "exact",
+        "sha256": "02eb68db41e97662c972af90b30fe6d02d8e1d23e29e96250a093c3dcb7b33df"
+      },
+      {
+        "file": "kit/i18n.js",
+        "upstream": "kit/runtime/i18n.js",
+        "result": "exact",
+        "sha256": "0600bbd7946fc5cda8155702c63d0a2c9c4422541daca4d353b52fe95a0b7768"
+      },
+      {
+        "file": "kit/mgu.js",
+        "upstream": "kit/runtime/mgu.js",
+        "result": "exact",
+        "sha256": "7b1f62e0e551dd237055c5c19b4b54f7d2c6f2ba57c047e867e1b9d4acf87449"
+      },
+      {
+        "file": "kit/pack.js",
+        "upstream": "kit/runtime/pack.js",
+        "result": "exact",
+        "sha256": "25e8270eb6b67045d8d9bbc225f6877dc54f9078036742e5adca687e1cf040c2"
+      },
+      {
+        "file": "kit/parked.js",
+        "upstream": "kit/runtime/parked.js",
+        "result": "exact",
+        "sha256": "43f5517ad9badb0d23a11bb59a9c4501482891a23443861e3f5bdd10d1dcab57"
+      },
+      {
+        "file": "kit/readonly-diag.js",
+        "upstream": "kit/runtime/readonly-diag.js",
+        "result": "exact",
+        "sha256": "8882a628ee5ab8040fda02b759beafc134eaa7a973ddd3d6ae5e6b5a8d640059"
+      },
+      {
+        "file": "kit/record.js",
+        "upstream": "kit/runtime/record.js",
+        "result": "exact",
+        "sha256": "0fda0a3094c726dc52b7fe9812b586d500806337ca5213c34bfece5606a7e74c"
+      },
+      {
+        "file": "kit/renderd.js",
+        "upstream": "kit/runtime/renderd.js",
+        "result": "exact",
+        "sha256": "dc26de3883b43ecdd917de66cac470737104b43242c9746cfdc888c5b2f4c183"
+      },
+      {
+        "file": "kit/run_timer.js",
+        "upstream": "kit/runtime/run_timer.js",
+        "result": "exact",
+        "sha256": "c168a0999cfdff407896649673e68bc14757749bcdf09da90386f0471183658e"
+      },
+      {
+        "file": "kit/sgbd.js",
+        "upstream": "kit/runtime/sgbd.js",
+        "result": "exact",
+        "sha256": "799b35e09d558be20fa4fd6bacab0b6fd102fe49aaf34ae81dbadd7fcabfa37e"
+      },
+      {
+        "file": "kit/sheet.js",
+        "upstream": "kit/runtime/sheet.js",
+        "result": "exact",
+        "sha256": "a37334797edad406d716b50766254c2466b5c855aaa6230c3f516cc739931422"
+      },
+      {
+        "file": "kit/signals.js",
+        "upstream": "kit/runtime/signals.js",
+        "result": "exact",
+        "sha256": "92e3e397aef9cd44fcef989c3802af7980b7f3340028dba3fd4a1741bc940e23"
+      },
+      {
+        "file": "kit/sim.js",
+        "upstream": "kit/runtime/sim.js",
+        "result": "exact",
+        "sha256": "b7d1ee492c017223e1f0726a69af0d8cff1aa44ae10557e2effae1e3249fa2d9"
+      },
+      {
+        "file": "kit/text-layout.js",
+        "upstream": "kit/runtime/text-layout.js",
+        "result": "exact",
+        "sha256": "0a36ff6e5b4d882a28d0689e0c110f007a53babc1fe9198be822823423d534d6"
+      },
+      {
+        "file": "kit/themes.js",
+        "upstream": "kit/runtime/themes.js",
+        "result": "exact",
+        "sha256": "c24c641a0e82c4b9bc1ba91ebc2916044de9e160e40d0cf888943fc12d80fa58"
+      },
+      {
+        "file": "knock.js",
+        "upstream": "apps/redline/knock.js",
+        "result": "exact",
+        "sha256": "3f9dc55d371673b9d1a3c0edfa7236266ff0e47e71189ade6caa50d709a8e80a"
+      },
+      {
+        "file": "launch.js",
+        "upstream": "apps/redline/launch.js",
+        "result": "exact",
+        "sha256": "fc91cb3aed3bc586054d68a0f346bf0c871fba1c7c78922418fc9c2f22a25a1a"
+      },
+      {
+        "file": "limiter.js",
+        "upstream": "apps/redline/limiter.js",
+        "result": "exact",
+        "sha256": "0ee58c81c54f52f748b6dfa560af39ec25b83f257b0fed821593e316e76a82c7"
+      },
+      {
+        "file": "logview.js",
+        "upstream": "apps/redline/logview.js",
+        "result": "exact",
+        "sha256": "6130e38d82f4b969dab5836c7ed9ef9e8a3be58d9e8207bd857a2a38b183a77f"
+      },
+      {
+        "file": "nav.js",
+        "upstream": "apps/redline/nav.js",
+        "result": "exact",
+        "sha256": "2d26bb40d6656342a3866c984216513b0e98bc585cf7f4ff5107da36cf7325ed"
+      },
+      {
+        "file": "navlog.js",
+        "upstream": "apps/redline/navlog.js",
+        "result": "exact",
+        "sha256": "337fc544ed2da1bcc5f3c38b2a84cf25016a75cc8e0b7b2b7b08117935d9665f"
+      },
+      {
+        "file": "powerlog.js",
+        "upstream": "apps/redline/powerlog.js",
+        "result": "exact",
+        "sha256": "466ba80a222918409389fa02fe0a15241e029c19507af9d704dc49fc47f032b6"
+      },
+      {
+        "file": "quietlog.js",
+        "upstream": "apps/redline/quietlog.js",
+        "result": "exact",
+        "sha256": "81bde0d090c1bb5e97dfe3ba03082709a9dc31bf7729fd7182babac5c3934ed1"
+      },
+      {
+        "file": "shareshift.js",
+        "upstream": "apps/redline/shareshift.js",
+        "result": "exact",
+        "sha256": "cfd740c75ed5a4909f4b6ba6b5a290651aaa34c17f9b7cf930d9138eda541b34"
+      },
+      {
+        "file": "shiftmap.js",
+        "upstream": "apps/redline/shiftmap.js",
+        "result": "exact",
+        "sha256": "aaac445cb2e087c7fb8e84d7d5058d445a3e3276e948bd66e970e85ed6067642"
+      },
+      {
+        "file": "tyres.js",
+        "upstream": "apps/redline/tyres.js",
+        "result": "exact",
+        "sha256": "0299338555afc0c3da63e37fe28af47c8a5da6ad1ff4cfef862bc9d32050e5ba"
+      }
+    ]
+  }
+}

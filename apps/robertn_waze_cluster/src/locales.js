@@ -108,7 +108,8 @@ module.exports = [
    "Calibration: Starting…": "المعايرة: جارٍ البدء…",
    "Calibration: another session is active": "المعايرة: جلسة أخرى نشطة",
    "Calibration: {0} px, {1} s remaining": "المعايرة: {0} بكسل، متبقٍ {1} ث",
-   "Calibration: Off": "المعايرة: متوقفة"
+   "Calibration: Off": "المعايرة: متوقفة",
+   "Expanded map, retain gauges (Beta)": "خريطة موسعة مع الاحتفاظ بالعدادات (تجريبي)"
   }
  },
  {
@@ -218,7 +219,8 @@ module.exports = [
    "Calibration: Starting…": "Kalibrace: spouštění…",
    "Calibration: another session is active": "Kalibrace: jiná relace je aktivní",
    "Calibration: {0} px, {1} s remaining": "Kalibrace: {0} px, zbývá {1} s",
-   "Calibration: Off": "Kalibrace: vypnuta"
+   "Calibration: Off": "Kalibrace: vypnuta",
+   "Expanded map, retain gauges (Beta)": "Rozšířená mapa se zachováním přístrojů (Beta)"
   }
  },
  {
@@ -328,7 +330,8 @@ module.exports = [
    "Calibration: Starting…": "Kalibrering: starter…",
    "Calibration: another session is active": "Kalibrering: en anden session er aktiv",
    "Calibration: {0} px, {1} s remaining": "Kalibrering: {0} px, {1} s tilbage",
-   "Calibration: Off": "Kalibrering: fra"
+   "Calibration: Off": "Kalibrering: fra",
+   "Expanded map, retain gauges (Beta)": "Udvidet kort, behold instrumenter (Beta)"
   }
  },
  {
@@ -438,7 +441,8 @@ module.exports = [
    "Calibration: Starting…": "Kalibrierung: wird gestartet…",
    "Calibration: another session is active": "Kalibrierung: andere Sitzung aktiv",
    "Calibration: {0} px, {1} s remaining": "Kalibrierung: {0} px, noch {1} s",
-   "Calibration: Off": "Kalibrierung: aus"
+   "Calibration: Off": "Kalibrierung: aus",
+   "Expanded map, retain gauges (Beta)": "Erweiterte Karte, Instrumente beibehalten (Beta)"
   }
  },
  {
@@ -548,7 +552,8 @@ module.exports = [
    "Calibration: Starting…": "Βαθμονόμηση: εκκίνηση…",
    "Calibration: another session is active": "Βαθμονόμηση: άλλη συνεδρία είναι ενεργή",
    "Calibration: {0} px, {1} s remaining": "Βαθμονόμηση: {0} px, απομένουν {1} δευτ.",
-   "Calibration: Off": "Βαθμονόμηση: ανενεργή"
+   "Calibration: Off": "Βαθμονόμηση: ανενεργή",
+   "Expanded map, retain gauges (Beta)": "Εκτεταμένος χάρτης, διατήρηση οργάνων (Beta)"
   }
  },
  {
@@ -658,7 +663,8 @@ module.exports = [
    "Calibration: Starting…": "Calibración: iniciando…",
    "Calibration: another session is active": "Calibración: otra sesión está activa",
    "Calibration: {0} px, {1} s remaining": "Calibración: {0} px, quedan {1} s",
-   "Calibration: Off": "Calibración: desactivada"
+   "Calibration: Off": "Calibración: desactivada",
+   "Expanded map, retain gauges (Beta)": "Mapa ampliado, conservar indicadores (Beta)"
   }
  },
  {
@@ -768,7 +774,8 @@ module.exports = [
    "Calibration: Starting…": "Calibración: iniciando…",
    "Calibration: another session is active": "Calibración: otra sesión está activa",
    "Calibration: {0} px, {1} s remaining": "Calibración: {0} px, quedan {1} s",
-   "Calibration: Off": "Calibración: desactivada"
+   "Calibration: Off": "Calibración: desactivada",
+   "Expanded map, retain gauges (Beta)": "Mapa ampliado, conservar indicadores (Beta)"
   }
  },
  {
@@ -878,7 +885,8 @@ module.exports = [
    "Calibration: Starting…": "Kalibrointi: käynnistetään…",
    "Calibration: another session is active": "Kalibrointi: toinen istunto on aktiivinen",
    "Calibration: {0} px, {1} s remaining": "Kalibrointi: {0} px, jäljellä {1} s",
-   "Calibration: Off": "Kalibrointi: pois"
+   "Calibration: Off": "Kalibrointi: pois",
+   "Expanded map, retain gauges (Beta)": "Laajennettu kartta, säilytä mittarit (Beta)"
   }
  },
  {
@@ -988,7 +996,8 @@ module.exports = [
    "Calibration: Starting…": "Calibrage : démarrage…",
    "Calibration: another session is active": "Calibrage : une autre session est active",
    "Calibration: {0} px, {1} s remaining": "Calibrage : {0} px, {1} s restantes",
-   "Calibration: Off": "Calibrage : désactivé"
+   "Calibration: Off": "Calibrage : désactivé",
+   "Expanded map, retain gauges (Beta)": "Carte élargie, conserver les cadrans (bêta)"
   }
  },
  {
@@ -1098,7 +1107,8 @@ module.exports = [
    "Calibration: Starting…": "Calibrage : démarrage…",
    "Calibration: another session is active": "Calibrage : une autre session est active",
    "Calibration: {0} px, {1} s remaining": "Calibrage : {0} px, {1} s restantes",
-   "Calibration: Off": "Calibrage : désactivé"
+   "Calibration: Off": "Calibrage : désactivé",
+   "Expanded map, retain gauges (Beta)": "Carte élargie, conserver les cadrans (bêta)"
   }
  },
  {
@@ -1208,7 +1218,8 @@ module.exports = [
    "Calibration: Starting…": "כיול: מתחיל…",
    "Calibration: another session is active": "כיול: הפעלה אחרת פעילה",
    "Calibration: {0} px, {1} s remaining": "כיול: {0} פיקסלים, נותרו {1} שניות",
-   "Calibration: Off": "כיול: כבוי"
+   "Calibration: Off": "כיול: כבוי",
+   "Expanded map, retain gauges (Beta)": "מפה מורחבת, שמירת המחוונים (בטא)"
   }
  },
  {
@@ -1318,7 +1329,8 @@ module.exports = [
    "Calibration: Starting…": "Kalibrálás: indítás…",
    "Calibration: another session is active": "Kalibrálás: másik munkamenet aktív",
    "Calibration: {0} px, {1} s remaining": "Kalibrálás: {0} px, {1} mp van hátra",
-   "Calibration: Off": "Kalibrálás: kikapcsolva"
+   "Calibration: Off": "Kalibrálás: kikapcsolva",
+   "Expanded map, retain gauges (Beta)": "Kiterjesztett térkép, műszerek megtartása (Béta)"
   }
  },
  {
@@ -1428,7 +1440,8 @@ module.exports = [
    "Calibration: Starting…": "Kalibrasi: memulai…",
    "Calibration: another session is active": "Kalibrasi: sesi lain sedang aktif",
    "Calibration: {0} px, {1} s remaining": "Kalibrasi: {0} px, tersisa {1} dtk",
-   "Calibration: Off": "Kalibrasi: nonaktif"
+   "Calibration: Off": "Kalibrasi: nonaktif",
+   "Expanded map, retain gauges (Beta)": "Peta diperluas, pertahankan instrumen (Beta)"
   }
  },
  {
@@ -1538,7 +1551,8 @@ module.exports = [
    "Calibration: Starting…": "Calibrazione: avvio…",
    "Calibration: another session is active": "Calibrazione: un’altra sessione è attiva",
    "Calibration: {0} px, {1} s remaining": "Calibrazione: {0} px, {1} s rimanenti",
-   "Calibration: Off": "Calibrazione: disattivata"
+   "Calibration: Off": "Calibrazione: disattivata",
+   "Expanded map, retain gauges (Beta)": "Mappa estesa, mantieni gli strumenti (Beta)"
   }
  },
  {
@@ -1648,7 +1662,8 @@ module.exports = [
    "Calibration: Starting…": "調整：開始中…",
    "Calibration: another session is active": "調整：別のセッションが使用中",
    "Calibration: {0} px, {1} s remaining": "調整：幅 {0} px、残り {1} 秒",
-   "Calibration: Off": "調整：オフ"
+   "Calibration: Off": "調整：オフ",
+   "Expanded map, retain gauges (Beta)": "計器を保持して地図を拡張（ベータ）"
   }
  },
  {
@@ -1758,7 +1773,8 @@ module.exports = [
    "Calibration: Starting…": "보정: 시작 중…",
    "Calibration: another session is active": "보정: 다른 세션이 사용 중",
    "Calibration: {0} px, {1} s remaining": "보정: {0}px, {1}초 남음",
-   "Calibration: Off": "보정: 꺼짐"
+   "Calibration: Off": "보정: 꺼짐",
+   "Expanded map, retain gauges (Beta)": "계기판을 유지하며 지도 확장 (베타)"
   }
  },
  {
@@ -1868,7 +1884,8 @@ module.exports = [
    "Calibration: Starting…": "Kalibrering: starter…",
    "Calibration: another session is active": "Kalibrering: en annen økt er aktiv",
    "Calibration: {0} px, {1} s remaining": "Kalibrering: {0} px, {1} s igjen",
-   "Calibration: Off": "Kalibrering: av"
+   "Calibration: Off": "Kalibrering: av",
+   "Expanded map, retain gauges (Beta)": "Utvidet kart, behold instrumenter (Beta)"
   }
  },
  {
@@ -1980,7 +1997,8 @@ module.exports = [
    "Calibration: Starting…": "Kalibratie: starten…",
    "Calibration: another session is active": "Kalibratie: een andere sessie is actief",
    "Calibration: {0} px, {1} s remaining": "Kalibratie: {0} px, nog {1} s",
-   "Calibration: Off": "Kalibratie: uit"
+   "Calibration: Off": "Kalibratie: uit",
+   "Expanded map, retain gauges (Beta)": "Uitgebreide kaart, meters behouden (bèta)"
   }
  },
  {
@@ -2090,7 +2108,8 @@ module.exports = [
    "Calibration: Starting…": "Kalibracja: uruchamianie…",
    "Calibration: another session is active": "Kalibracja: inna sesja jest aktywna",
    "Calibration: {0} px, {1} s remaining": "Kalibracja: {0} px, pozostało {1} s",
-   "Calibration: Off": "Kalibracja: wyłączona"
+   "Calibration: Off": "Kalibracja: wyłączona",
+   "Expanded map, retain gauges (Beta)": "Rozszerzona mapa, zachowaj wskaźniki (Beta)"
   }
  },
  {
@@ -2200,7 +2219,8 @@ module.exports = [
    "Calibration: Starting…": "Calibração: iniciando…",
    "Calibration: another session is active": "Calibração: outra sessão está ativa",
    "Calibration: {0} px, {1} s remaining": "Calibração: {0} px, restam {1} s",
-   "Calibration: Off": "Calibração: desligada"
+   "Calibration: Off": "Calibração: desligada",
+   "Expanded map, retain gauges (Beta)": "Mapa ampliado, manter os instrumentos (Beta)"
   }
  },
  {
@@ -2310,7 +2330,8 @@ module.exports = [
    "Calibration: Starting…": "Calibração: a iniciar…",
    "Calibration: another session is active": "Calibração: outra sessão está ativa",
    "Calibration: {0} px, {1} s remaining": "Calibração: {0} px, faltam {1} s",
-   "Calibration: Off": "Calibração: desligada"
+   "Calibration: Off": "Calibração: desligada",
+   "Expanded map, retain gauges (Beta)": "Mapa ampliado, manter os instrumentos (Beta)"
   }
  },
  {
@@ -2420,7 +2441,8 @@ module.exports = [
    "Calibration: Starting…": "Calibrare: pornire…",
    "Calibration: another session is active": "Calibrare: altă sesiune este activă",
    "Calibration: {0} px, {1} s remaining": "Calibrare: {0} px, au rămas {1} s",
-   "Calibration: Off": "Calibrare: oprită"
+   "Calibration: Off": "Calibrare: oprită",
+   "Expanded map, retain gauges (Beta)": "Hartă extinsă, păstrează instrumentele (Beta)"
   }
  },
  {
@@ -2530,7 +2552,8 @@ module.exports = [
    "Calibration: Starting…": "Калибровка: запуск…",
    "Calibration: another session is active": "Калибровка: другой сеанс активен",
    "Calibration: {0} px, {1} s remaining": "Калибровка: {0} пикс., осталось {1} с",
-   "Calibration: Off": "Калибровка: выключена"
+   "Calibration: Off": "Калибровка: выключена",
+   "Expanded map, retain gauges (Beta)": "Расширенная карта с сохранением приборов (бета)"
   }
  },
  {
@@ -2640,7 +2663,8 @@ module.exports = [
    "Calibration: Starting…": "Kalibrácia: spúšťanie…",
    "Calibration: another session is active": "Kalibrácia: iná relácia je aktívna",
    "Calibration: {0} px, {1} s remaining": "Kalibrácia: {0} px, zostáva {1} s",
-   "Calibration: Off": "Kalibrácia: vypnutá"
+   "Calibration: Off": "Kalibrácia: vypnutá",
+   "Expanded map, retain gauges (Beta)": "Rozšírená mapa so zachovaním prístrojov (Beta)"
   }
  },
  {
@@ -2750,7 +2774,8 @@ module.exports = [
    "Calibration: Starting…": "Umerjanje: zagon…",
    "Calibration: another session is active": "Umerjanje: druga seja je aktivna",
    "Calibration: {0} px, {1} s remaining": "Umerjanje: {0} px, še {1} s",
-   "Calibration: Off": "Umerjanje: izklopljeno"
+   "Calibration: Off": "Umerjanje: izklopljeno",
+   "Expanded map, retain gauges (Beta)": "Razširjen zemljevid, ohrani merilnike (Beta)"
   }
  },
  {
@@ -2860,7 +2885,8 @@ module.exports = [
    "Calibration: Starting…": "Kalibrering: startar…",
    "Calibration: another session is active": "Kalibrering: en annan session är aktiv",
    "Calibration: {0} px, {1} s remaining": "Kalibrering: {0} px, {1} s kvar",
-   "Calibration: Off": "Kalibrering: av"
+   "Calibration: Off": "Kalibrering: av",
+   "Expanded map, retain gauges (Beta)": "Utökad karta, behåll instrument (Beta)"
   }
  },
  {
@@ -2970,7 +2996,8 @@ module.exports = [
    "Calibration: Starting…": "การปรับเทียบ: กำลังเริ่ม…",
    "Calibration: another session is active": "การปรับเทียบ: มีเซสชันอื่นทำงานอยู่",
    "Calibration: {0} px, {1} s remaining": "การปรับเทียบ: {0} พิกเซล เหลือ {1} วินาที",
-   "Calibration: Off": "การปรับเทียบ: ปิด"
+   "Calibration: Off": "การปรับเทียบ: ปิด",
+   "Expanded map, retain gauges (Beta)": "ขยายแผนที่โดยคงมาตรวัดไว้ (เบต้า)"
   }
  },
  {
@@ -3080,7 +3107,8 @@ module.exports = [
    "Calibration: Starting…": "Kalibrasyon: başlatılıyor…",
    "Calibration: another session is active": "Kalibrasyon: başka bir oturum etkin",
    "Calibration: {0} px, {1} s remaining": "Kalibrasyon: {0} piksel, {1} sn kaldı",
-   "Calibration: Off": "Kalibrasyon: kapalı"
+   "Calibration: Off": "Kalibrasyon: kapalı",
+   "Expanded map, retain gauges (Beta)": "Genişletilmiş harita, göstergeleri koru (Beta)"
   }
  },
  {
@@ -3190,7 +3218,8 @@ module.exports = [
    "Calibration: Starting…": "Калібрування: запуск…",
    "Calibration: another session is active": "Калібрування: інший сеанс активний",
    "Calibration: {0} px, {1} s remaining": "Калібрування: {0} пікс., залишилося {1} с",
-   "Calibration: Off": "Калібрування: вимкнено"
+   "Calibration: Off": "Калібрування: вимкнено",
+   "Expanded map, retain gauges (Beta)": "Розширена карта зі збереженням приладів (бета)"
   }
  },
  {
@@ -3300,7 +3329,8 @@ module.exports = [
    "Calibration: Starting…": "Hiệu chuẩn: đang bắt đầu…",
    "Calibration: another session is active": "Hiệu chuẩn: phiên khác đang hoạt động",
    "Calibration: {0} px, {1} s remaining": "Hiệu chuẩn: {0} px, còn {1} giây",
-   "Calibration: Off": "Hiệu chuẩn: tắt"
+   "Calibration: Off": "Hiệu chuẩn: tắt",
+   "Expanded map, retain gauges (Beta)": "Bản đồ mở rộng, giữ đồng hồ (Beta)"
   }
  },
  {
@@ -3412,7 +3442,8 @@ module.exports = [
    "Calibration: Starting…": "校准：正在启动…",
    "Calibration: another session is active": "校准：另一会话正在使用",
    "Calibration: {0} px, {1} s remaining": "校准：宽 {0} 像素，剩余 {1} 秒",
-   "Calibration: Off": "校准：关闭"
+   "Calibration: Off": "校准：关闭",
+   "Expanded map, retain gauges (Beta)": "扩展地图，保留原厂表盘（测试）"
   },
   "messages": {
    "Details: {0}": "原始详情：{0}",
@@ -3464,7 +3495,11 @@ module.exports = [
    "waiting for CarPlay ({0})": "等待 CarPlay（{0}）",
    "receiving, not decoding ({0}) — {1}": "已接收但尚未解码（{0}）— {1}",
    "{0} decode err, last: {1}": "{0} 次解码错误，最近一次：{1}",
-   "{0}: {1}": "{0}：{1}"
+   "{0}: {1}": "{0}：{1}",
+   "gauge fullscreen requires the matching ID7 renderer": "扩展地图需要配套的 ID7 仪表渲染器",
+   "gauge_mask requires ID7": "扩展地图仅支持 ID7",
+   "gauge_mask requires the ID7 1920x720 panel": "扩展地图需要 ID7 的 1920×720 仪表画布",
+   "gauge mask shader template mismatch": "扩展地图着色器不兼容，已停止输出"
   }
  },
  {
@@ -3576,7 +3611,8 @@ module.exports = [
    "Calibration: Starting…": "校準：正在啟動…",
    "Calibration: another session is active": "校準：另一工作階段正在使用",
    "Calibration: {0} px, {1} s remaining": "校準：寬 {0} 像素，剩餘 {1} 秒",
-   "Calibration: Off": "校準：關閉"
+   "Calibration: Off": "校準：關閉",
+   "Expanded map, retain gauges (Beta)": "擴展地圖，保留原廠錶盤（測試）"
   }
  }
 ];

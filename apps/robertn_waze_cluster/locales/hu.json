@@ -104,6 +104,7 @@
     "Calibration: Starting…": "Kalibrálás: indítás…",
     "Calibration: another session is active": "Kalibrálás: másik munkamenet aktív",
     "Calibration: {0} px, {1} s remaining": "Kalibrálás: {0} px, {1} mp van hátra",
-    "Calibration: Off": "Kalibrálás: kikapcsolva"
+    "Calibration: Off": "Kalibrálás: kikapcsolva",
+    "Expanded map, retain gauges (Beta)": "Kiterjesztett térkép, műszerek megtartása (Béta)"
   }
 }

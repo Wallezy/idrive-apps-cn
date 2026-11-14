@@ -104,6 +104,7 @@
     "Calibration: Starting…": "Kalibrering: startar…",
     "Calibration: another session is active": "Kalibrering: en annan session är aktiv",
     "Calibration: {0} px, {1} s remaining": "Kalibrering: {0} px, {1} s kvar",
-    "Calibration: Off": "Kalibrering: av"
+    "Calibration: Off": "Kalibrering: av",
+    "Expanded map, retain gauges (Beta)": "Utökad karta, behåll instrument (Beta)"
   }
 }

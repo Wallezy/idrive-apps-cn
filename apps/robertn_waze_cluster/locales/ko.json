@@ -104,6 +104,7 @@
     "Calibration: Starting…": "보정: 시작 중…",
     "Calibration: another session is active": "보정: 다른 세션이 사용 중",
     "Calibration: {0} px, {1} s remaining": "보정: {0}px, {1}초 남음",
-    "Calibration: Off": "보정: 꺼짐"
+    "Calibration: Off": "보정: 꺼짐",
+    "Expanded map, retain gauges (Beta)": "계기판을 유지하며 지도 확장 (베타)"
   }
 }

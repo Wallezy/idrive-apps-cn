@@ -104,6 +104,7 @@
     "Calibration: Starting…": "المعايرة: جارٍ البدء…",
     "Calibration: another session is active": "المعايرة: جلسة أخرى نشطة",
     "Calibration: {0} px, {1} s remaining": "المعايرة: {0} بكسل، متبقٍ {1} ث",
-    "Calibration: Off": "المعايرة: متوقفة"
+    "Calibration: Off": "المعايرة: متوقفة",
+    "Expanded map, retain gauges (Beta)": "خريطة موسعة مع الاحتفاظ بالعدادات (تجريبي)"
   }
 }

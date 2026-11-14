@@ -88,6 +88,22 @@
       ]
     },
     "de.bmw.infotainment.telematic.oapcontroller.OAPController": "*",
+    "de.bmw.infotainment.hmi.entrypoint2.EntryPoint2": "*",
+    "de.bmw.infotainment.hmi.entrypoint2.EntryPointManager2": "*",
+    "de.bmw.infotainment.hmi.remote2.RemoteHmi2": "*",
+    "de.bmw.infotainment.hmi.remote2.RemoteHmiApplication2": "*",
+    "de.bmw.infotainment.hmi.resourcemanagement2.ResourceManager2": "*",
+    "de.bmw.infotainment.hmi.resourcemanagement2.ResourceBundle2": "*",
+    "de.bmw.infotainment.hmi.resourcemanagement2.StringBundle2": "*",
+    "de.bmw.infotainment.hmi.usecasemanagement.UseCaseContext": "*",
+    "de.bmw.infotainment.telematic.oap.PrivateEntryPoint2": {
+      "instances": [
+        "${userId}"
+      ],
+      "methods": [
+        "genericMethod"
+      ]
+    },
     "de.bmw.infotainment.telematic.provisioning.Provisioning": {
       "broadcasts": [
         "provisioningDataJSON"
@@ -141,7 +157,14 @@
     "de.bmw.infotainment.vehicle.CDS": {
       "instances": "1",
       "attributes": {
-        "statusEngineSpeed2": "rs"
+        "statusEngineSpeed2": "rs",
+        "statusBattery2": "rs"
+      }
+    },
+    "de.bmw.infrastructure.VehicleCondition": {
+      "instances": "1",
+      "attributes": {
+        "VehicleCondition": "s"
       }
     },
     "de.bmw.infotainment.climate.climatemaster.ClimateMaster": {
@@ -183,7 +206,8 @@
     "de.bmw.infotainment.drivingexcitement.Efficiencytainment2": {
       "instances": "1",
       "attributes": {
-        "statusBatteryTemperature": "rs"
+        "statusBatteryTemperature": "rs",
+        "statusPowerRelativHybrid": "rs"
       }
     },
     "de.bmw.infotainment.lsc.LSCDataSink": {
@@ -191,7 +215,8 @@
       "attributes": {
         "statusHighVoltageStorage": "s"
       }
-    }
+    },
+    "de.bmw.infotainment.certification.Certification": "*"
   },
   "services": {
     "de.bmw.infotainment.telematic.oap.AppStatus": {

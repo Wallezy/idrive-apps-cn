@@ -104,6 +104,7 @@
     "Calibration: Starting…": "Kalibrácia: spúšťanie…",
     "Calibration: another session is active": "Kalibrácia: iná relácia je aktívna",
     "Calibration: {0} px, {1} s remaining": "Kalibrácia: {0} px, zostáva {1} s",
-    "Calibration: Off": "Kalibrácia: vypnutá"
+    "Calibration: Off": "Kalibrácia: vypnutá",
+    "Expanded map, retain gauges (Beta)": "Rozšírená mapa so zachovaním prístrojov (Beta)"
   }
 }

@@ -143,6 +143,32 @@
             }
           ]
         },
+        "64": {
+          "type": "checkBox",
+          "name": "wocGaugeMode",
+          "properties": {
+            "Visible": {
+              "value": 1,
+              "type": "UInt"
+            },
+            "Focusable": {
+              "value": 3,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "Expanded map, retain gauges (Beta)",
+                "type": "Text"
+              },
+              "eParam_RowSelected": {
+                "value": false,
+                "type": "Bool"
+              }
+            }
+          ]
+        },
         "35": {
           "type": "checkBox",
           "name": "wocGuide",

@@ -104,6 +104,7 @@
     "Calibration: Starting…": "Calibrage : démarrage…",
     "Calibration: another session is active": "Calibrage : une autre session est active",
     "Calibration: {0} px, {1} s remaining": "Calibrage : {0} px, {1} s restantes",
-    "Calibration: Off": "Calibrage : désactivé"
+    "Calibration: Off": "Calibrage : désactivé",
+    "Expanded map, retain gauges (Beta)": "Carte élargie, conserver les cadrans (bêta)"
   }
 }

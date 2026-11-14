@@ -104,6 +104,7 @@
     "Calibration: Starting…": "Калібрування: запуск…",
     "Calibration: another session is active": "Калібрування: інший сеанс активний",
     "Calibration: {0} px, {1} s remaining": "Калібрування: {0} пікс., залишилося {1} с",
-    "Calibration: Off": "Калібрування: вимкнено"
+    "Calibration: Off": "Калібрування: вимкнено",
+    "Expanded map, retain gauges (Beta)": "Розширена карта зі збереженням приладів (бета)"
   }
 }

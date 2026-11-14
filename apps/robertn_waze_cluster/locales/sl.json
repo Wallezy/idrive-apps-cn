@@ -104,6 +104,7 @@
     "Calibration: Starting…": "Umerjanje: zagon…",
     "Calibration: another session is active": "Umerjanje: druga seja je aktivna",
     "Calibration: {0} px, {1} s remaining": "Umerjanje: {0} px, še {1} s",
-    "Calibration: Off": "Umerjanje: izklopljeno"
+    "Calibration: Off": "Umerjanje: izklopljeno",
+    "Expanded map, retain gauges (Beta)": "Razširjen zemljevid, ohrani merilnike (Beta)"
   }
 }

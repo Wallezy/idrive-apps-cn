@@ -104,6 +104,7 @@
     "Calibration: Starting…": "調整：開始中…",
     "Calibration: another session is active": "調整：別のセッションが使用中",
     "Calibration: {0} px, {1} s remaining": "調整：幅 {0} px、残り {1} 秒",
-    "Calibration: Off": "調整：オフ"
+    "Calibration: Off": "調整：オフ",
+    "Expanded map, retain gauges (Beta)": "計器を保持して地図を拡張（ベータ）"
   }
 }

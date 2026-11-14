@@ -106,6 +106,7 @@
     "Calibration: Starting…": "校准：正在启动…",
     "Calibration: another session is active": "校准：另一会话正在使用",
     "Calibration: {0} px, {1} s remaining": "校准：宽 {0} 像素，剩余 {1} 秒",
-    "Calibration: Off": "校准：关闭"
+    "Calibration: Off": "校准：关闭",
+    "Expanded map, retain gauges (Beta)": "扩展地图，保留原厂表盘（测试）"
   }
 }

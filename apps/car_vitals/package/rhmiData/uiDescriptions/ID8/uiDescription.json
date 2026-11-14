@@ -1,0 +1,1802 @@
+{
+ "schemaVersion": "1.3.0",
+ "containers": {
+  "1": {
+   "type": "state",
+   "name": "MAIN",
+   "components": {
+    "2": {
+     "type": "label",
+     "name": "MAIN_GFX",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 0,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {}
+     ]
+    },
+    "3": {
+     "type": "button",
+     "name": "BTN_PAGE",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CAR_VITALS_BTN_PAGE",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "4": {
+     "type": "button",
+     "name": "BTN_PREV",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CAR_VITALS_BTN_PREV",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "5": {
+     "type": "button",
+     "name": "BTN_SETTINGS",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CAR_VITALS_BTN_SETTINGS",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "990": {
+     "type": "label",
+     "name": "KIT_HMI_ID8",
+     "properties": {
+      "Visible": {
+       "value": 0,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 0,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text": {
+        "value": "",
+        "type": "Text"
+       }
+      }
+     ]
+    },
+    "7": {
+     "type": "title",
+     "name": "MAIN_TITLE",
+     "rows": [
+      {
+       "Text": {
+        "value": "SID_CAR_VITALS_MAIN_TITLE",
+        "type": "StringId"
+       }
+      }
+     ]
+    }
+   }
+  },
+  "10": {
+   "type": "state",
+   "name": "SETTINGS",
+   "components": {
+    "11": {
+     "type": "button",
+     "name": "SET_PAGE",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CN_STATIC8_0000",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "12": {
+     "type": "button",
+     "name": "SET_TEMPUNIT",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CN_STATIC8_0001",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "13": {
+     "type": "button",
+     "name": "SET_PRESSUNIT",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CN_STATIC8_0002",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "14": {
+     "type": "button",
+     "name": "SET_BOOSTMAX",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CN_STATIC8_0003",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "15": {
+     "type": "button",
+     "name": "SET_SPEEDUNIT",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CN_STATIC8_0004",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "16": {
+     "type": "button",
+     "name": "SET_ENGINE",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CN_STATIC8_0005",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "17": {
+     "type": "button",
+     "name": "SET_REDLINE",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CN_STATIC8_0006",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "18": {
+     "type": "button",
+     "name": "SET_RPMSCALE",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CN_STATIC8_0007",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "19": {
+     "type": "button",
+     "name": "SET_MAXPOWER",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CN_STATIC8_0008",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "20": {
+     "type": "button",
+     "name": "SET_MAXTORQUEKGM",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CN_STATIC8_0009",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "21": {
+     "type": "button",
+     "name": "SET_POWERUNIT",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CN_STATIC8_0010",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "22": {
+     "type": "button",
+     "name": "SET_TORQUEUNIT",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CN_STATIC8_0011",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "23": {
+     "type": "button",
+     "name": "SET_POWERSOURCE",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CN_STATIC8_0012",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "24": {
+     "type": "button",
+     "name": "SET_OILWARN",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CN_STATIC8_0013",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "25": {
+     "type": "button",
+     "name": "SET_FLIPLONG",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CAR_VITALS_SET_FLIPLONG",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "26": {
+     "type": "button",
+     "name": "SET_PEAKS",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CAR_VITALS_SET_PEAKS",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "27": {
+     "type": "button",
+     "name": "SET_PEAKHOLD",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CN_STATIC8_0014",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "28": {
+     "type": "button",
+     "name": "SET_XDRIVE",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CN_STATIC8_0015",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "29": {
+     "type": "button",
+     "name": "SET_SHOWBOOST",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CN_STATIC8_0016",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "30": {
+     "type": "button",
+     "name": "SET_BOOSTSOURCE",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CN_STATIC8_0017",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "31": {
+     "type": "button",
+     "name": "SET_SHOWGEARBOX",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CN_STATIC8_0018",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "32": {
+     "type": "button",
+     "name": "SET_SHOWEGS",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CN_STATIC8_0019",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "33": {
+     "type": "button",
+     "name": "SET_SHOWIAT",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CN_STATIC8_0020",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "34": {
+     "type": "button",
+     "name": "SET_SHOWHPFP",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CN_STATIC8_0021",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "35": {
+     "type": "button",
+     "name": "SET_SHOWLPFP",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CN_STATIC8_0022",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "36": {
+     "type": "button",
+     "name": "SET_SHOWTIMING",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CN_STATIC8_0023",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "37": {
+     "type": "button",
+     "name": "SET_SHOWBOOSTCTL",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CN_STATIC8_0024",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "38": {
+     "type": "button",
+     "name": "SET_SHOWLOAD",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CN_STATIC8_0025",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "39": {
+     "type": "button",
+     "name": "SET_SHOWMISFIRE",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CN_STATIC8_0026",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "40": {
+     "type": "button",
+     "name": "SET_SHOWTYRES",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CN_STATIC8_0027",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "41": {
+     "type": "button",
+     "name": "SET_SHOWTYRETEMP",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CN_STATIC8_0028",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "42": {
+     "type": "button",
+     "name": "SET_ADVANCED",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CAR_VITALS_SET_ADVANCED",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "43": {
+     "type": "button",
+     "name": "SET_THEME",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CN_STATIC8_0029",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "44": {
+     "type": "button",
+     "name": "SET_SPEEDRATE",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CN_STATIC8_0030",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "45": {
+     "type": "button",
+     "name": "SET_LAYOUT",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CN_STATIC8_0031",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "46": {
+     "type": "button",
+     "name": "SET_RENDERER",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CN_STATIC8_0032",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "47": {
+     "type": "button",
+     "name": "SET_DEMO",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CN_STATIC8_0033",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "",
+        "type": "Text"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "48": {
+     "type": "button",
+     "name": "REPO_CREDITS",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "PrimaryText": {
+        "value": "SID_CAR_VITALS_REPO_CREDITS_TITLE",
+        "type": "StringId"
+       },
+       "FrequencyText": {
+        "value": "SID_CAR_VITALS_REPO_CREDITS_LINK",
+        "type": "StringId"
+       },
+       "FrequencyVisible": {
+        "value": true,
+        "type": "Bool"
+       },
+       "IconVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "ProgressVisible": {
+        "value": false,
+        "type": "Bool"
+       },
+       "IsPlaying": {
+        "value": false,
+        "type": "Bool"
+       }
+      }
+     ]
+    },
+    "49": {
+     "type": "title",
+     "name": "SETTINGS_TITLE",
+     "rows": [
+      {
+       "Text": {
+        "value": "SID_CAR_VITALS_SETTINGS_TITLE",
+        "type": "StringId"
+       }
+      }
+     ]
+    }
+   }
+  }
+ }
+}

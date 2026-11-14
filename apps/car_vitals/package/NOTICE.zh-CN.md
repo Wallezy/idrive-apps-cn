@@ -1,15 +1,7 @@
-# 汉化署名与来源
+# 来源与发行说明
 
-本仓库的简体中文汉化由 **抖音 小白科技杂物社 / BiliBili 小白151 / GitHub JackieZ123430** 维护。
+本应用基于 cauliflowermossgrape/idrive7-apps 的 MIT 许可源码及用户提供的同源车机应用导出适配。已将导出的应用主程序与公开仓库固定提交 `8d860de5818a2da11d3a3750aab36866cecf6bde` 逐字节比对，结果一致；运行库、生成资源及中文适配的具体比对记录见 PROVENANCE.json。导出 package.json 中的 UNLICENSED 是生成包的元数据标记，许可依据为已核验公开源码根目录 LICENSE；本包保留该文件及原版权声明。
 
-- 汉化仓库：https://github.com/JackieZ123430/idrive7-apps-cn
-- 上游项目：https://github.com/cauliflowermossgrape/idrive7-apps
-- 汉化部分 Copyright (c) 2026 小白151 (GitHub: JackieZ123430)，按仓库 MIT 许可证提供。
+上游 Copyright (c) 2026 cauliflowermossgrape。中文翻译 Copyright (c) 2026 小白151 (GitHub: JackieZ123430)。翻译署名：抖音 小白科技杂物社 / BiliBili 小白151 / GitHub JackieZ123430。第三方字体按 javascript/kit/fonts/ 下的 SIL Open Font License 1.1 保留许可。
 
-请在转载、分发或修改版本时保留上游许可证、版权声明及汉化署名，并清楚标明修改来源。
-本仓库没有设置付费激活、联网授权或收费下载。若有人收费提供安装服务，该收费并非本仓库的下载费或授权费，请自行核对服务内容。
-
-这份来源说明不更改上游开源许可证，也不额外限制其已授予的权利。Doom/Freedoom 相关组件继续适用各自原有许可证。
-
-中文绘制字形来自 Noto Sans SC，使用 SIL Open Font License 1.1；许可证随字库存放在
-`kit/runtime/fonts/OFL-NotoSansSC.txt`。BMW 的原厂 oap-sdk 必须从使用者自己的车机提取，不公开分发。
+本次新增工作包括商店 donor SDK 链接、简体中文固定资源、遥测读取边界、渲染服务连接兼容和离线验证。源码包不包含 BMW oap-sdk、node_modules、车辆状态、日志或设备身份数据。安装时 SDK 由本车 donor 提供；归档哈希、源版本与公开源码固定提交均记录于 PROVENANCE.json。

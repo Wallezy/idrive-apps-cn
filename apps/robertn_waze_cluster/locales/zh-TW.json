@@ -106,6 +106,7 @@
     "Calibration: Starting…": "校準：正在啟動…",
     "Calibration: another session is active": "校準：另一工作階段正在使用",
     "Calibration: {0} px, {1} s remaining": "校準：寬 {0} 像素，剩餘 {1} 秒",
-    "Calibration: Off": "校準：關閉"
+    "Calibration: Off": "校準：關閉",
+    "Expanded map, retain gauges (Beta)": "擴展地圖，保留原廠錶盤（測試）"
   }
 }
