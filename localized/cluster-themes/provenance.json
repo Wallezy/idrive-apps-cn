@@ -1,0 +1,10 @@
+{
+  "repository": "https://github.com/bimmer-lab/apps",
+  "commit": "985bffe860430064c6a2436255c463d085bcdd42",
+  "component": "cluster_themes",
+  "upstreamVersion": "0.17.2",
+  "cnRevision": 1,
+  "releaseVersion": "0.17.3",
+  "scope": "Chinese centre-screen controls, settings, help and catalog; original instrument themes, units, signals and defaults preserved",
+  "sdk": "Not included; linked on the head unit"
+}

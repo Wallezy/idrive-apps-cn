@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "cluster_themes",
+  "version": "0.17.3",
+  "tree": "package",
+  "modules": [
+    "src/sdk.js"
+  ],
+  "sdk": [
+    "oap-sdk/src/core/OnlineApp.js",
+    "oap-sdk/src/logging/logging"
+  ]
+}
