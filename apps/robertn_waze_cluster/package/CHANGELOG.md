@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+Add an optional Cluster fullscreen mode on supported iDrive 7 panels, expanding the map with a fixed transparent contour around the original gauges.
+
 ## 0.6.8
 
 A plainer description in the Store: on supported cars the map turns on by

@@ -71,6 +71,7 @@ struct VideoOptions {
     unsigned fps = 30;
     unsigned level_bits = 2, dirty_threshold = 8, settle_ms = 1000;
     bool pan_blocks = true;
+    bool gauge_mask = false;        /* ID7 panel contour; requires video_gauge_mask_v1 */
     unsigned stall_ms = 6000;
 };
 
@@ -288,7 +289,7 @@ public:
     std::map<std::string, Host> hosts;
     void request_status();
     /* The service's hello: its backend ("id7", "id8") and targets ("map:1088x480,..."). */
-    std::string backend, targets;
+    std::string backend, targets, features;
 
 private:
     struct Part {
@@ -332,6 +333,9 @@ private:
     void queue(const std::string &json);
     void queue_message(const std::string &msg);
     void send_now();
+    bool gauge_mask_supported() const;
+    void replay_layer(uint32_t ref, Layer &l);
+    void replay_masked();
     std::vector<std::pair<std::string, std::string>> fields(const char *op, uint32_t ref,
                                                             const LayerOptions &lo) const;
     void turn_fields(std::vector<std::pair<std::string, std::string>> *kv, const LayerOptions &lo) const;
@@ -349,6 +353,9 @@ private:
     int64_t retry_ms_ = 0;
     int backoff_ = 0;
     std::map<uint32_t, Layer> layers_;
+    /* Masked videos stay local until this connection's hello opts in.
+     * Their controls, frames and saved state are held with the layer. */
+    std::set<uint32_t> deferred_masked_;
     uint32_t next_ref_ = 1;
     uint64_t edits_ = 0;   /* edit lines taken */
     std::string in_;

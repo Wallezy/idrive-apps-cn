@@ -203,6 +203,165 @@ struct Raw {
     }
 };
 
+/* A deliberately old peer: it only sends the hello chosen by the test,
+ * and records every message without rejecting fields it does not know. */
+struct HelloPeer {
+    std::string path = "/tmp/crs-old-peer-" + std::to_string(getpid()) + "-" + std::to_string(next_rig()) + ".sock";
+    int listener = -1, peer = -1;
+    std::string pending;
+    HelloPeer()
+    {
+        listener = socket(AF_UNIX, SOCK_STREAM, 0);
+        sockaddr_un addr{};
+        addr.sun_family = AF_UNIX;
+        std::snprintf(addr.sun_path, sizeof addr.sun_path, "%s", path.c_str());
+        if (bind(listener, (sockaddr *)&addr, sizeof addr) || listen(listener, 1)) {
+            std::perror("old peer listen");
+            std::exit(2);
+        }
+    }
+    ~HelloPeer()
+    {
+        if (peer >= 0) close(peer);
+        close(listener);
+        unlink(path.c_str());
+    }
+    void accept_client()
+    {
+        pollfd p{listener, POLLIN, 0};
+        if (::poll(&p, 1, 1000) != 1 || (peer = accept(listener, nullptr, nullptr)) < 0) {
+            std::fprintf(stderr, "old peer accept failed\n");
+            std::exit(2);
+        }
+        fcntl(peer, F_SETFL, fcntl(peer, F_GETFL) | O_NONBLOCK);
+        pending.clear();
+    }
+    void hello(const std::string &feature_fields = "")
+    {
+        const std::string m = cr::encode(cr::kJson, "{\"ev\":\"hello\",\"proto\":1,\"backend\":\"id7\","
+            "\"targets\":\"map:1088x480,panel:1920x720\",\"repeat\":1" + feature_fields + "}");
+        if (write(peer, m.data(), m.size()) != (ssize_t)m.size())
+            std::exit(2);
+    }
+    std::vector<cr::Json> received()
+    {
+        char buf[4096];
+        ssize_t n;
+        while ((n = read(peer, buf, sizeof buf)) > 0)
+            pending.append(buf, (size_t)n);
+        std::vector<cr::Json> result;
+        size_t off = 0;
+        for (;;) {
+            size_t used = 0, count = 0;
+            uint8_t type = 0;
+            const char *body = nullptr;
+            bool bad = false;
+            if (!cr::next_message(pending.data() + off, pending.size() - off, &used, &type, &body, &count, &bad))
+                break;
+            cr::Json j;
+            if (type == cr::kJson) cr::parse_json(std::string(body, count), &j);
+            else j["binary"] = "1";
+            result.push_back(j);
+            off += used;
+        }
+        pending.erase(0, off);
+        return result;
+    }
+    void disconnect()
+    {
+        close(peer);
+        peer = -1;
+    }
+};
+
+static void masked_replay_capabilities()
+{
+    HelloPeer peer;
+    cr::Client c("mask-replay", peer.path);
+    cr::LayerOptions normal;
+    normal.target = "map"; normal.w = 1088; normal.h = 480;
+    cr::VideoOptions video;
+    video.w = 8; video.h = 4;
+    const uint32_t plain = c.video(normal, video);
+    cr::LayerOptions panel = normal;
+    panel.target = "panel"; panel.w = 1920; panel.h = 720;
+    video.gauge_mask = true;
+    const uint32_t masked = c.video(panel, video);
+    const uint32_t removed = c.video(panel, video);
+    cr::AssetOptions ao;
+    ao.w = 2; ao.h = 2;
+    const uint32_t asset = c.asset(ao);
+    c.uniform(masked, "u_test", {0.1f});
+    c.bind(masked, "u_test_texture", asset);
+    cr::AnimationOptions animation;
+    animation.property = "opacity"; animation.keys = "0:0 100:1";
+    c.animate(masked, animation);
+    const auto has_ref = [](const std::vector<cr::Json> &messages, uint32_t ref) {
+        return std::any_of(messages.begin(), messages.end(), [&](const cr::Json &j) {
+            auto it = j.find("ref");
+            return it != j.end() && it->second == std::to_string(ref);
+        });
+    };
+    c.poll(1000);
+    peer.accept_client();
+    const auto before = peer.received();
+    ok("masked replay: ordinary layer keeps pre-hello compatibility",
+       has_ref(before, plain));
+    ok("masked replay: no panel layer or its saved controls before hello",
+       !has_ref(before, masked) && !has_ref(before, removed));
+    peer.hello();   /* The old ID7 service has no feature field at all. */
+    c.poll(1001);
+    std::vector<uint8_t> frame(48, 128);
+    panel.x = 7;
+    c.set(masked, panel);
+    c.uniform(masked, "u_test", {0.7f});
+    const uint32_t later = c.video(panel, video);
+    ok("masked replay: old hello cannot admit new/remembered video frames or repeats",
+       c.connected() && !c.frame(masked, frame.data(), frame.size(), 1) && !c.repeat(masked, 2) &&
+       !c.frame(later, frame.data(), frame.size(), 1));
+    ok("masked replay: legacy peer receives neither panel layers nor controls", peer.received().empty());
+    c.drop(later);
+    ok("masked replay: dropping an unannounced layer sends nothing", peer.received().empty());
+    peer.disconnect();
+    c.poll(1002);
+    c.poll(2000);
+    peer.accept_client();
+    ok("masked replay: upgrade reconnect still waits for its own hello", !has_ref(peer.received(), masked));
+    c.on_ready = [&] {
+        c.drop(removed);
+        c.uniform(masked, "u_test", {0.9f});
+    };
+    peer.hello(",\"features\":\"other,video_gauge_mask_v1\"");
+    c.poll(2001);
+    const auto upgraded = peer.received();
+    unsigned layers = 0, uniforms = 0, binds = 0, animations = 0;
+    bool ordered = true;
+    for (const auto &j : upgraded) {
+        if (!has_ref({j}, masked)) continue;
+        const std::string op = j.at("op");
+        if (op == "layer") layers += j.at("gauge_mask") == "1" && j.at("x") == "7";
+        else {
+            ordered = ordered && layers == 1;
+            uniforms += op == "uniform" && j.at("v") == "0.9";
+            binds += op == "bind";
+            animations += op == "animate";
+        }
+    }
+    ok("masked replay: accepted upgrade replays latest layer then uniform, bind and animation once",
+       layers == 1 && uniforms == 1 && binds == 1 && animations == 1 && ordered && !has_ref(upgraded, removed));
+    ok("masked replay: accepted layer can send video", c.frame(masked, frame.data(), frame.size(), 3));
+    peer.received();
+    peer.disconnect();
+    c.poll(2002);
+    c.poll(3000);
+    peer.accept_client();
+    ok("masked replay: downgrade receives no panel before hello", !has_ref(peer.received(), masked));
+    c.on_ready = [&] { c.drop(masked); };
+    peer.hello();
+    c.poll(3001);
+    ok("masked replay: downgrade on_ready can remove layer before any replay", peer.received().empty());
+}
+
 /* A mesh message body: header and then raw bytes as given. */
 static std::string mesh_body(uint32_t ref, uint32_t part, uint32_t vertices, uint32_t indices, uint8_t mask,
                              const std::string &rest)
@@ -1899,6 +2058,7 @@ int main()
     repeats();
     framing();
     scene_files();
+    masked_replay_capabilities();
     layers_and_hosting();
     std::printf(failures ? "%d FAILED\n" : "all ok\n", failures);
     return failures ? 1 : 0;

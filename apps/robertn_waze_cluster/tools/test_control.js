@@ -117,6 +117,30 @@ test('connected, original: not patched', async (render, patch) => {
     c.close();
 });
 
+test('expanded map requires advertised support and follows confirmed renderer status', async (render) => {
+    const c = control();
+    c.open();
+    await until('connected status', () => c.connectedRender() && c.clusterOn() === true);
+    assert.strictEqual(c.canChooseGaugeMode(), false);
+    c.toggleGaugeMode();
+    assert.strictEqual(render.count('start'), 0);
+    render._broadcast(Object.assign(render._status(), { target: 'map', gauge_supported: 1 }));
+    await until('mask available', () => c.canChooseGaugeMode());
+    c.toggleGaugeMode();
+    await until('expanded start', () => render.count('start') === 1);
+    assert.deepStrictEqual(render.received.filter((m) => m.cmd === 'start')[0], { cmd: 'start', target: 'panel_gauges' });
+    render._broadcast(Object.assign(render._status(), { target: 'panel_gauges', gauge_supported: 1 }));
+    await until('confirmed expanded mode', () => c.gaugeMode());
+    c.toggleGaugeMode();
+    await until('standard start', () => render.count('start') === 2);
+    assert.deepStrictEqual(render.received.filter((m) => m.cmd === 'start')[1], { cmd: 'start', target: 'map' });
+    render._broadcast(Object.assign(render._status(), { target: 'map', cluster: 0, gauge_supported: 1 }));
+    await until('cluster disabled', () => !c.canChooseGaugeMode());
+    c.toggleGaugeMode();
+    assert.strictEqual(render.count('start'), 2);
+    c.close();
+});
+
 test('CarPlay\'s Patch button applies the patch; patched line once done', async (render, patch) => {
     const c = control();
     c.open();

@@ -145,7 +145,7 @@ void VideoLayer::occluded(const Coverage &cov, const Shown &s)
 void VideoLayer::occlude(Coverage *cov, const Shown &s)
 {
     /* Drawn at u_opacity, 0 until its first frame is written. */
-    if (g_ && s.drawn && opaque_ && s.opacity * s.fade >= 1.0f && !s.turned)
+    if (g_ && s.drawn && opaque_ && !p_.gauge_mask && s.opacity * s.fade >= 1.0f && !s.turned)
         cov->add(box_of(s.rect));
 }
 
@@ -251,19 +251,21 @@ bool VideoLayer::attach(Graph *g, int64_t now_ms, std::string *err)
 
 bool VideoLayer::make_atlas_quads(Graph *g)
 {
-    const float size[2] = {(float)p_.w, (float)p_.h}, zero = 0.0f;
+    const float size[2] = {(float)p_.w, (float)p_.h}, zero = 0.0f, mask = p_.gauge_mask ? 1.0f : 0.0f;
     atlas_quad_ = g->quad(atlas_effect_, drawn_params().rect);
     return atlas_quad_ && g->turn(atlas_quad_, drawn_params().turn()) && g->texture(atlas_quad_, "u_image", atlas_buf_) &&
            g->uniform(atlas_quad_, "u_size", size, 2) && g->uniform(atlas_quad_, "u_opacity", &zero, 1) &&
+           (!p_.gauge_mask || g->uniform(atlas_quad_, "u_gauge_mask", &mask, 1)) &&
            g->show(atlas_quad_, false) && g->order(atlas_quad_, order_);
 }
 
 bool VideoLayer::make_block_quads(Graph *g)
 {
-    const float size[2] = {(float)p_.w, (float)p_.h}, zero = 0.0f;
+    const float size[2] = {(float)p_.w, (float)p_.h}, zero = 0.0f, mask = p_.gauge_mask ? 1.0f : 0.0f;
     block_quad_ = g->quad(block_effect_, drawn_params().rect);
     return block_quad_ && g->turn(block_quad_, drawn_params().turn()) && g->texture(block_quad_, "u_image", block_buf_[0]) &&
            g->uniform(block_quad_, "u_size", size, 2) && g->uniform(block_quad_, "u_opacity", &zero, 1) &&
+           (!p_.gauge_mask || g->uniform(block_quad_, "u_gauge_mask", &mask, 1)) &&
            g->show(block_quad_, false) && g->order(block_quad_, order_ + 1);
 }
 

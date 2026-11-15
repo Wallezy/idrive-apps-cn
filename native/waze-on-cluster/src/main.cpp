@@ -84,6 +84,7 @@ std::string status_line(const FeedStatus &s)
            ",\"upload_reason\":" + json_escape(s.upload_reason) +
            ",\"hide_bmw_guidance\":" + (s.guide_hold ? "1" : "0") +
            ",\"guide_disabled\":" + (s.guide_disabled ? "1" : "0") +
+           ",\"gauge_supported\":" + (s.gauge_supported ? "1" : "0") +
            ",\"cluster\":" + (s.cluster ? "1" : "0") +
            ",\"hud\":" + (s.hud ? "1" : "0") + ",\"hud_state\":" + json_escape(s.hud_state) +
            ",\"hud_width_pct\":" + std::to_string(s.hud_width_pct) +

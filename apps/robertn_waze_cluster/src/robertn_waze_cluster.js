@@ -83,6 +83,7 @@ const AA_ZOOM_OUT_NAME = 'wocAaZoomOut';
 const AA_ZOOM_IN_NAME = 'wocAaZoomIn';
 const AA_CARD_NAME = 'wocAaCard';
 const GUIDE_NAME = 'wocGuide';
+const GAUGE_NAME = 'wocGaugeMode';
 const HEAD_GENERAL_NAME = 'wocHeadGeneral';
 const HEAD_HUD_NAME = 'wocHeadHud';
 const HUD_NAME = 'wocHud';
@@ -206,7 +207,7 @@ class WazeClusterApp extends OnlineApp {
         }
         const names = [STATUS_NAME, MAP_NAME, RESTART_STATUS_NAME, ENABLE_NAME, DISABLE_NAME, WIFI_NAME, WIFI_HINT_NAME, AA_STATUS_NAME,
             AA_ENABLE_NAME, AA_DISABLE_NAME, AA_ZOOM_NAME, AA_ZOOM_OUT_NAME, AA_ZOOM_IN_NAME, AA_CARD_NAME, RESTART_NAME, GUIDE_NAME,
-            HEAD_GENERAL_NAME, HEAD_HUD_NAME, SHOW_ON_NAME, PROFILE_NAME, HUD_NAME, HUD_KEEP_NAME, HUD_SIZE_NAME, HUD_POS_NAME]
+            HEAD_GENERAL_NAME, HEAD_HUD_NAME, SHOW_ON_NAME, PROFILE_NAME, GAUGE_NAME, HUD_NAME, HUD_KEEP_NAME, HUD_SIZE_NAME, HUD_POS_NAME]
             .concat(Object.values(HUD_MOVE_NAMES), [HUD_CENTRE_NAME, CAPTURE_NAME, CAPTURE_STATUS,
                 LOGS_NAME, LOGS_SAVE, LOGS_STATUS, LOGS_QR, LOGS_URL], LOGS_ROW_NAMES);
         names.forEach((name) => { this._components[name] = rhmi.getByName(name); });
@@ -226,6 +227,11 @@ class WazeClusterApp extends OnlineApp {
             this._control.toggleCard();
         });
         this._bind(RESTART_NAME, () => this._control.requestRestart());
+        this._bind(GAUGE_NAME, () => {
+            delete this._written[`selected:${GAUGE_NAME}`];
+            this._control.toggleGaugeMode();
+            this._render();
+        });
         this._bind(GUIDE_NAME, () => {
             /* the HMI ticks or unticks the box itself; the render's answer
              * decides what it shows */
@@ -565,6 +571,9 @@ class WazeClusterApp extends OnlineApp {
         this._write(PROFILE_NAME, t('Own settings for this driver'));
         this._setSelected(PROFILE_NAME, profiles.ownShown());
         this._setEnabled(PROFILE_NAME, profiles.canChooseOwn());
+        this._write(GAUGE_NAME, t('Cluster fullscreen'));
+        this._setSelected(GAUGE_NAME, c.gaugeMode());
+        this._setEnabled(GAUGE_NAME, c.canChooseGaugeMode());
         /* the turn box's hold follows the map on the cluster */
         this._setEnabled(GUIDE_NAME, hide !== null && !unavailable && c.clusterOn() !== false);
         this._write(GUIDE_NAME, t("Hide BMW's turn box"));

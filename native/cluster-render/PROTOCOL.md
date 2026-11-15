@@ -469,3 +469,17 @@ that `reason`.
 
 A client that does not read its events (over 1 MiB waiting) is
 disconnected.
+
+### Optional ID7 gauge contour
+
+A service that supports the fixed transparent ID7 panel contour advertises
+`video_gauge_mask_v1` in the comma-separated `features` field of `hello`.
+A video layer may then set `gauge_mask:1`, only on the 1920×720 `panel`
+target. Both atlas and block paths use the same alpha contour. A masked
+video does not count as an opaque rectangle for occlusion. The default is
+`gauge_mask:0`, preserving existing behavior.
+
+Clients must not send a masked layer or its frames before this connection's
+capability confirmation. Old services may ignore unknown fields, so merely
+sending `gauge_mask:1` to an old service is not safe. The C++ client defers
+masked layers across connect/reconnect and replays them only after acceptance.

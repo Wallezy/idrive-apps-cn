@@ -43,6 +43,13 @@ MapFeed::MapFeed(const FeedConfig &cfg)
         refused_.clear();
         status_asked_ = false;
         log_info("render: connected to the cluster renderer (%s; %s)", client_.backend.c_str(), client_.targets.c_str());
+        /* Client holds masked layers until this hello confirms support.
+         * Discard a remembered layer if the renderer was downgraded:
+         * an unmasked whole-panel video must never replace this mode. */
+        if (cfg_.target == "panel_gauges" && !gauge_supported() && layer_) {
+            client_.drop(layer_);
+            layer_ = 0;
+        }
         if (!layer_)
             make_layer();
     };
@@ -85,7 +92,12 @@ MapFeed::MapFeed(const FeedConfig &cfg)
 void MapFeed::make_layer()
 {
     uint32_t tw = 0, th = 0;
-    if (!target_size(client_.targets, cfg_.target, &tw, &th)) {
+    const bool gauges = cfg_.target == "panel_gauges";
+    if (gauges && !gauge_supported()) {
+        refused_ = "gauge fullscreen requires the matching ID7 renderer";
+        return;
+    }
+    if (!target_size(client_.targets, physical_target(), &tw, &th)) {
         refused_ = "the cluster renderer has no target " + cfg_.target;
         log_error("render: %s", refused_.c_str());
         return;
@@ -101,10 +113,10 @@ void MapFeed::make_layer()
         return;
     /* The map area: all of the map slot's scene, the centred 1088x480 of a
      * whole-panel one, a fitted centre on the HUD. */
-    crk::QuadRect q = quad(tw, th);
-    if (cfg_.rect.set() && cfg_.rect.fits(tw, th))
+    crk::QuadRect q = gauges ? crk::QuadRect{0, 0, tw, th} : quad(tw, th);
+    if (!gauges && cfg_.rect.set() && cfg_.rect.fits(tw, th))
         q = crk::QuadRect{cfg_.rect.x, cfg_.rect.y, cfg_.rect.w, cfg_.rect.h};
-    else if (cfg_.rect.set())
+    else if (!gauges && cfg_.rect.set())
         log_warn("render: map_rect %u,%u,%u,%u is outside %s (%ux%u); the map area instead", cfg_.rect.x,
                  cfg_.rect.y, cfg_.rect.w, cfg_.rect.h, cfg_.target.c_str(), tw, th);
     /* The HUD, shown smaller than the decoded frame: the frame is scaled to
@@ -112,6 +124,7 @@ void MapFeed::make_layer()
      * renderer and packed motion need), drawn 1:1 centred where the quad
      * was. On the cluster the KOMBI scales a map_rect itself. */
     cr::VideoOptions vo = cfg_.video;
+    vo.gauge_mask = gauges;
     scaling_ = false;
     const uint32_t sw = q.w & ~3u, sh = q.h & ~3u;
     if (hosted()) {
@@ -284,8 +297,10 @@ void MapFeed::set_hud_width(unsigned pct)
 bool MapFeed::set_target(const std::string &name)
 {
     const std::string t = name == "sail" ? "map" : name;
+    if (t == "panel_gauges" && !gauge_supported())
+        return false;   /* retain the current map when an old renderer is installed */
     uint32_t w, h;
-    if (client_.connected() && !target_size(client_.targets, t, &w, &h))
+    if (client_.connected() && !target_size(client_.targets, t == "panel_gauges" ? "panel" : t, &w, &h))
         return false;
     if (t == cfg_.target && layer_)
         return true;
@@ -300,6 +315,17 @@ bool MapFeed::set_target(const std::string &name)
     if (client_.connected())
         make_layer();
     return true;
+}
+
+bool MapFeed::gauge_supported() const
+{
+    uint32_t w = 0, h = 0;
+    std::stringstream features(client_.features);
+    std::string feature;
+    bool mask = false;
+    while (std::getline(features, feature, ','))
+        mask = mask || feature == "video_gauge_mask_v1";
+    return client_.connected() && mask && target_size(client_.targets, "panel", &w, &h) && w == 1920 && h == 720;
 }
 
 void MapFeed::set_guide_hold(bool hold)
@@ -434,7 +460,7 @@ bool MapFeed::latest(std::vector<uint8_t> *out) const
 
 bool MapFeed::disabled() const
 {
-    auto d = client_.disabled.find(cfg_.target);
+    auto d = client_.disabled.find(physical_target());
     return client_.connected() && d != client_.disabled.end() && d->second;
 }
 
@@ -524,8 +550,9 @@ bool StatusLog::due(const FeedStatus &s, int64_t now_ms)
 FeedStatus MapFeed::status(const std::string &decode, const std::string &stream) const
 {
     FeedStatus s;
-    s.target = drawn_target();
+    s.target = hosted() ? drawn_target() : cfg_.target;
     s.hosted = hosted();
+    s.gauge_supported = gauge_supported();
     s.hud_width_pct = cfg_.hud_width_pct;
     s.hud_offset_x = placed_x_;
     s.hud_keep_shown = cfg_.hud_keep_shown;
@@ -533,7 +560,7 @@ FeedStatus MapFeed::status(const std::string &decode, const std::string &stream)
     s.upload_cap_kb = cap_kb_;
     s.upload_reason = budget_reason_;
     s.guide_hold = cfg_.guide_hold;
-    auto g = client_.guide_disabled.find(cfg_.target);
+    auto g = client_.guide_disabled.find(physical_target());
     s.guide_disabled = client_.connected() && g != client_.guide_disabled.end() && g->second;
     s.disabled = disabled();
     char cap[96] = "";

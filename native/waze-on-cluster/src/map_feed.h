@@ -110,6 +110,7 @@ struct FeedStatus {
     bool guide_hold = true;
     bool guide_disabled = false;   /* cluster-render reports the turn box's hold disabled */
     bool disabled = false;         /* cluster-render reports the target disabled */
+    bool gauge_supported = false;  /* matching renderer and ID7 panel available */
     bool cluster = true;           /* the cluster setting (MapFeeds) */
     bool hud = false;              /* the HUD setting (MapFeeds) */
     std::string hud_state = "off";   /* off, disabled, or the HUD feed's state */
@@ -154,6 +155,8 @@ public:
     /* The layer's guide_hold from now on. */
     void set_guide_hold(bool hold);
     const std::string &target() const { return cfg_.target; }
+    bool gauge_supported() const;
+    std::string physical_target() const { return cfg_.target == "panel_gauges" ? "panel" : cfg_.target; }
     /* The HUD map's size (FeedConfig::hud_width_pct), applied at once to a
      * map on the HUD. */
     void set_hud_width(unsigned pct);
@@ -223,7 +226,7 @@ private:
     void set_host(const cr::Host &h);
     bool hosted() const { return !host_.into.empty(); }
     /* The target the layer is on: the host's, or the feed's own. */
-    const std::string &drawn_target() const { return hosted() ? host_.into : cfg_.target; }
+    std::string drawn_target() const { return hosted() ? host_.into : physical_target(); }
     /* A layer that scales: the scaled frame to the renderer, and the newest
      * frame to the worker once the frame rate allows (offer and poll). */
     void send_pending(int64_t now_ms);

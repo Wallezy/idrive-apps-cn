@@ -954,3 +954,9 @@ dlt-receive from `ROOTFS`, an extracted root file system of the unit.
 GPL-3.0-or-later (`LICENSE`). `abi/include/mfx/` is a subset of the Intel
 Media SDK headers under the MIT license (`abi/include/mfx/LICENSE`).
 Third-party files keep their own licenses.
+
+The optional `panel_gauges` target expands the map on supported iDrive 7
+panels while keeping a fixed contour around the original gauges transparent.
+It requires the renderer's `video_gauge_mask_v1` capability; the service
+reports `gauge_supported` to the app. See [Cluster fullscreen](../../docs/CLUSTER-FULLSCREEN.md)
+for the tested layout and limitations. The default `map` target is unchanged.

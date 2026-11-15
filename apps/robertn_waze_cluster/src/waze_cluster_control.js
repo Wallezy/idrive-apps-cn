@@ -395,6 +395,25 @@ class WazeClusterControl extends EventEmitter {
         return this.render.connected() && this.connectedPatch() && this.clusterOn() !== null && this.hudOn() !== null;
     }
 
+    /* The renderer confirms the mode. An old backend must never be asked to
+     * put an unmasked video over the OEM gauges. */
+    gaugeMode() {
+        return !!(this.renderStatus && this.renderStatus.target === 'panel_gauges');
+    }
+
+    canChooseGaugeMode() {
+        return this.render.connected() && this.clusterOn() === true &&
+            !!(this.renderStatus && (this.renderStatus.gauge_supported === 1 || this.gaugeMode()));
+    }
+
+    toggleGaugeMode() {
+        if (!this.canChooseGaugeMode()) {
+            return;
+        }
+        this.render.send({ cmd: 'start', target: this.gaugeMode() ? 'map' : 'panel_gauges' });
+        this.emit('change');
+    }
+
     /* Shows the map on the cluster, the HUD, both or neither ('off': BMW's
      * own content on both): the render at once, patchd saves it. A display
      * turned on goes first, so a switch from one display to the other never

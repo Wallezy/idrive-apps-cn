@@ -654,6 +654,7 @@ private:
     int64_t second_ms_ = 0;
     int64_t (*clock_us_)() = nullptr;
     int atlas_fx_ = 0, block_fx_ = 0, image_fx_ = 0;
+    int gauge_atlas_fx_ = 0, gauge_block_fx_ = 0;
     int atlas_view_fx_ = 0, block_view_fx_ = 0;   /* the composite's, made with the first one */
     std::string plan_error_;   /* why the last reconcile changed nothing; logged once */
     std::map<uint32_t, Entry> layers_;
