@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.6.1
+
+- Beta：支持主题场景内嵌实时地图；保留仪表全屏遮罩和映射失败保护。
+
 ## 0.5.14
 
 - Remove the experimental map-underlay calibration protocol, grid layers and viewport overrides. Keep the full-panel map gauge mask and normal rendering behavior.

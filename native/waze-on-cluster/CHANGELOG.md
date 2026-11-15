@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.10.1
+
+- Beta：适配主题内嵌地图的裁切、隐藏与重连，保留仪表盘全屏切换。
+
 ## 0.9.16
 
 - Add `panel_gauges` as a logical cluster target, using the full physical

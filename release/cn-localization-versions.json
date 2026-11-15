@@ -1,10 +1,10 @@
 {
   "schema": 1,
-  "purpose": "CN Beta and Stable: owner-accepted cluster fullscreen and enhanced vehicle applications",
-  "sourceCommit": "8d860de5818a2da11d3a3750aab36866cecf6bde",
+  "purpose": "Beta scene hosting with existing CN fullscreen and persistent mapping guard",
+  "sourceCommit": "1fc3812993847096311e629fe4cb2a73439c241e",
   "components": {
-    "cluster-render": "0.5.14",
-    "waze-on-cluster": "0.9.16",
+    "cluster-render": "0.6.1",
+    "waze-on-cluster": "0.10.1",
     "robertn_waze_cluster": "0.6.15",
     "brake_test": "1.3.3",
     "car_vitals": "2.27.4",
