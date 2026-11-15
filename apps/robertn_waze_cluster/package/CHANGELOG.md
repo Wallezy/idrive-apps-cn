@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Explain known native map and capture statuses in Simplified Chinese while preserving raw diagnostic details and protocol values.
+
 ## 0.6.8
 
 A plainer description in the Store: on supported cars the map turns on by

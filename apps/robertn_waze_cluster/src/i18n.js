@@ -42,4 +42,10 @@ function t(key, ...args) {
     return text.replace(/\{(\d+)\}/g, (match, i) => (Number(i) < args.length ? String(args[i]) : match));
 }
 
-module.exports = { codes, setHmiLanguage, language, t };
+function message(key, ...args) {
+    const words = current && current.messages;
+    const text = words && Object.prototype.hasOwnProperty.call(words, key) ? words[key] : key;
+    return text.replace(/\{(\d+)\}/g, (match, i) => (Number(i) < args.length ? String(args[i]) : match));
+}
+
+module.exports = { codes, setHmiLanguage, language, t, message };

@@ -84,7 +84,12 @@ all.forEach((l) => {
     const n = `${l.code}.json`;
     ok(Array.isArray(l.hmiLanguages) && l.hmiLanguages.length && l.hmiLanguages.every((h) => SDK_TEXTS[h]), `${n}: hmiLanguages`);
     eq(l.rhmiTexts, l.hmiLanguages.map((h) => SDK_TEXTS[h]), `${n}: rhmiTexts, the oap-sdk's file of each of its HMI languages`);
-    eq(Object.keys(l).sort(), ['code', 'hmiLanguages', 'rhmiTexts', 'words'], `${n}: hmiLanguages, rhmiTexts, words`);
+    eq(Object.keys(l).sort(), (l.messages ? ['code', 'hmiLanguages', 'messages', 'rhmiTexts', 'words'] :
+        ['code', 'hmiLanguages', 'rhmiTexts', 'words']), `${n}: locale and optional native messages`);
+    Object.keys(l.messages || {}).forEach((k) => {
+        ok(typeof l.messages[k] === 'string' && l.messages[k].trim() !== '', `${n}: native message translated`);
+        eq(placeholders(l.messages[k]), placeholders(k), `${n}: native message preserves placeholders`);
+    });
     Object.keys(l.words).forEach((k) => {
         ok(typeof l.words[k] === 'string' && l.words[k].trim() !== '', `${n}: "${k}" is translated`);
         eq(placeholders(l.words[k]), placeholders(k), `${n}: "${k}" has the placeholders of its English`);
