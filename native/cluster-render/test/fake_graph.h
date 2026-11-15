@@ -13,6 +13,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
+#include <functional>
 #include <map>
 #include <sstream>
 #include <string>
@@ -91,6 +92,11 @@ public:
     uint32_t width = 0, height = 0;
     std::map<std::string, FakeGraph *> *registry = nullptr;
     const std::map<int, unsigned> *effect_attributes = nullptr;   /* the Gpu's */
+    /* Over a file scene (FileScene::layers): its passes' first render
+     * order, and the file's flush, which a flush of this graph is too. */
+    bool over_file = false;
+    int32_t over_order = 0;
+    std::function<void(uint64_t)> also_flush;
 
     ~FakeGraph() override
     {
@@ -287,6 +293,8 @@ public:
         flushes++;
         last_tag = tag;
         written = 0;
+        if (also_flush)
+            also_flush(tag);
         return true;
     }
 
@@ -430,6 +438,12 @@ public:
         flushes++;
         return true;
     }
+    /* FakeGpu's layers over this file (FakeGpu::load). */
+    std::function<std::unique_ptr<Graph>(const int32_t *, std::string *)> make_layers;
+    std::unique_ptr<Graph> layers(const int32_t *order, std::string *err) override
+    {
+        return make_layers ? make_layers(order, err) : FileScene::layers(order, err);
+    }
 };
 
 class FakeGpu : public Gpu {
@@ -443,6 +457,8 @@ public:
     std::map<std::string, FakeGraph *> live;   /* published scenes by target name */
     int scenes = 0;
     bool refuse_textures = false;         /* each new scene's immutable_texture() refused */
+    bool refuse_layers = false;           /* no layers over a file scene, as a backend without them */
+    bool fail_loads = false;              /* every scene file fails to load */
     int64_t *clock_us = nullptr;
     int64_t flush_cost_us = 0;
 
@@ -501,7 +517,7 @@ public:
     {
         std::ifstream in(file);
         std::string word, id;
-        if (!(in >> word >> id) || word != "scene") {
+        if (fail_loads || !(in >> word >> id) || word != "scene") {
             *err = "the scene file did not load";
             return nullptr;
         }
@@ -546,6 +562,22 @@ public:
         s->registry = &files;
         files[t.name] = s.get();
         loads++;
+        /* Layers over it: a graph like scene()'s, its passes from order
+         * up (past the file's passes, one order each, without one), its
+         * flush the file's too. */
+        FakeFileScene *fs = s.get();
+        s->make_layers = [this, t, fs](const int32_t *order, std::string *why) -> std::unique_ptr<Graph> {
+            if (refuse_layers) {
+                *why = "this display draws no layers over scene files";
+                return nullptr;
+            }
+            std::unique_ptr<Graph> g = scene(t, why);
+            FakeGraph *fg = static_cast<FakeGraph *>(g.get());
+            fg->over_file = true;
+            fg->over_order = order ? *order : (int32_t)fs->names[FileScene::Pass].size();
+            fg->also_flush = [fs](uint64_t tag) { fs->flush(tag); };
+            return g;
+        };
         return std::unique_ptr<FileScene>(s.release());
     }
     FakeFileScene *file(const std::string &target)
