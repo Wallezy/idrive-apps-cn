@@ -62,5 +62,9 @@
   "cluster_themes": {
     "title": "Cluster Themes (简体中文)",
     "description": "12 instrument cluster themes with Chinese centre-screen controls. Original theme names and instrument styling preserved."
+  },
+  "zf8hp": {
+    "title": "ZF 8HP (简体中文)",
+    "description": "Simplified Chinese edition. Read-only ZF 8HP monitor: live data, clutch adaptations, shift maps and temperature history."
   }
 }

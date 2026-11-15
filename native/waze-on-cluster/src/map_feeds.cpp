@@ -12,7 +12,7 @@ namespace {
  * "panel"; empty for anything else (the HUD is its own setting). */
 std::string cluster_target(const std::string &name)
 {
-    return name == "map" || name == "sail" ? "map" : name == "panel" ? name : std::string();
+    return name == "map" || name == "sail" ? "map" : name == "panel" || name == "panel_gauges" ? name : std::string();
 }
 
 }  // namespace
@@ -22,7 +22,7 @@ MapFeeds::MapFeeds(const FeedConfig &base, bool cluster, bool hud, unsigned hud_
 {
     base_.target = cluster_target(base.target);
     if (base_.target.empty()) {
-        log_error("target %s is not the cluster's (map, panel); using map", base.target.c_str());
+        log_error("target %s is not the cluster's (map, panel, panel_gauges); using map", base.target.c_str());
         base_.target = "map";
     }
     if (base_.hud_width_pct > kHudMaxPct)

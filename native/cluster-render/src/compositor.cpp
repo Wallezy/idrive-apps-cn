@@ -9,6 +9,8 @@
 #include <iterator>
 
 #include "block_pack.h"
+#include "gauge_mask.h"
+#include "cluster_render/protocol.h"
 #include "log.h"
 #include "yuv_atlas.h"
 
@@ -72,7 +74,7 @@ namespace {
  * its planes line up with the canvas's. */
 bool composable(const LayerParams &p, const VideoParams &vp)
 {
-    return p.rotate == 0 && p.sx == 1 && p.sy == 1 && p.rect.w == vp.w && p.rect.h == vp.h && !(p.rect.x & 1) &&
+    return !vp.gauge_mask && p.rotate == 0 && p.sx == 1 && p.sy == 1 && p.rect.w == vp.w && p.rect.h == vp.h && !(p.rect.x & 1) &&
            !(p.rect.y & 1);
 }
 
@@ -111,6 +113,8 @@ Compositor::~Compositor()
     if (block_view_fx_) gpu_->drop_effect(block_view_fx_);
     if (atlas_fx_) gpu_->drop_effect(atlas_fx_);
     if (block_fx_) gpu_->drop_effect(block_fx_);
+    if (gauge_atlas_fx_) gpu_->drop_effect(gauge_atlas_fx_);
+    if (gauge_block_fx_) gpu_->drop_effect(gauge_block_fx_);
     if (image_fx_) gpu_->drop_effect(image_fx_);
 }
 
@@ -245,6 +249,25 @@ uint32_t Compositor::add_video(uint64_t owner, int target, const LayerParams &lp
         *err = "unknown target";
         return 0;
     }
+    if (vp.gauge_mask) {
+        const TargetSpec &spec = slots_->targets()[target];
+        if (spec.name != "panel" || spec.width != 1920 || spec.height != 720) {
+            *err = "gauge_mask requires the ID7 1920x720 panel";
+            return 0;
+        }
+        const std::string atlas = crk::gauge_video_shader(crk::kAtlasFragmentShader);
+        const std::string block = crk::gauge_video_shader(crk::kBlockFragmentShader);
+        if (atlas.empty() || block.empty()) {
+            *err = "gauge mask shader template mismatch";
+            return 0;
+        }
+        if (!gauge_atlas_fx_)
+            gauge_atlas_fx_ = gpu_->effect(kQuadVertexShader, atlas.c_str(), err);
+        if (!gauge_block_fx_)
+            gauge_block_fx_ = gpu_->effect(kQuadVertexShader, block.c_str(), err);
+        if (!gauge_atlas_fx_ || !gauge_block_fx_)
+            return 0;
+    }
     uint32_t videos = 0;
     for (const auto &kv : layers_)
         videos += std::string(kv.second.layer->kind()) == "video";
@@ -272,7 +295,9 @@ uint32_t Compositor::add_video(uint64_t owner, int target, const LayerParams &lp
     if (!id)
         return 0;
     Entry &e = layers_[id];
-    e.layer.reset(new VideoLayer(id, target, ++seq_, pacer_for(target), atlas_fx_, block_fx_, vp, now_ms));
+    e.layer.reset(new VideoLayer(id, target, ++seq_, pacer_for(target),
+                                vp.gauge_mask ? gauge_atlas_fx_ : atlas_fx_,
+                                vp.gauge_mask ? gauge_block_fx_ : block_fx_, vp, now_ms));
     e.layer->params = lp;
     e.owner = owner;
     e.pixel_bytes = bytes;
@@ -592,7 +617,9 @@ bool Compositor::stale(const TargetSpec &spec) const
 {
     const int ti = slots_->index(spec.name);
     const Target &t = targets_[ti];
-    return (t.graph || t.file) && content(ti) != (t.file ? t.file_of : 0);
+    const TargetSpec &c = spec;
+    return ((t.graph || t.file) && content(ti) != (t.file ? t.file_of : 0)) ||
+           (t.graph && (t.canvas_w != c.width || t.canvas_h != c.height));
 }
 
 bool Compositor::outdated(const TargetSpec &spec) const
@@ -1691,9 +1718,12 @@ bool Compositor::publish(const TargetSpec &spec, std::string *err)
                  spec.name.c_str(), s.src.file.c_str(), (unsigned long long)(t.file_bytes / 1024), s.edits.kept());
         return true;
     }
-    t.graph = gpu_->scene(spec, err);
+    const TargetSpec &c = spec;
+    t.graph = gpu_->scene(c, err);
     if (!t.graph)
         return false;
+    t.canvas_w = c.width;
+    t.canvas_h = c.height;
     t.tag = 0;
     t.flush_failing = false;
     /* A new scene shows nothing until its first flush. */

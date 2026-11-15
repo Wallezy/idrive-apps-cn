@@ -1,0 +1,10 @@
+[
+  {
+    "version": "1.5.7",
+    "upstreamVersion": "1.5.6",
+    "cnRevision": 1,
+    "changes": [
+      "新增七页只读 ZF 8HP 监测，按控制器型号校验数据，区分缓存与实时读数。"
+    ]
+  }
+]

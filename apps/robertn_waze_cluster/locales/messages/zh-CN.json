@@ -48,5 +48,9 @@
   "waiting for CarPlay ({0})": "等待 CarPlay（{0}）",
   "receiving, not decoding ({0}) — {1}": "已接收但尚未解码（{0}）— {1}",
   "{0} decode err, last: {1}": "{0} 次解码错误，最近一次：{1}",
-  "{0}: {1}": "{0}：{1}"
+  "{0}: {1}": "{0}：{1}",
+  "gauge fullscreen requires the matching ID7 renderer": "扩展地图需要配套的 ID7 仪表渲染器",
+  "gauge_mask requires ID7": "扩展地图仅支持 ID7",
+  "gauge_mask requires the ID7 1920x720 panel": "扩展地图需要 ID7 的 1920×720 仪表画布",
+  "gauge mask shader template mismatch": "扩展地图着色器不兼容，已停止输出"
 }

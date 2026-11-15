@@ -530,6 +530,16 @@ void Server::op_layer(Client &c, const cr::Json &j, int64_t now_ms)
         vp.dirty_settle_ms = (int)k[5].cur;
         vp.pan_blocks = k[6].cur != 0;
         vp.stall_ms = (int)k[7].cur;
+        double mask = 0;
+        if (!num(j, "gauge_mask", 0, 1, &mask, &err) || (mask != 0 && mask != 1)) {
+            error(c, "layer", ref, err.empty() ? "gauge_mask must be 0 or 1" : err);
+            return;
+        }
+        vp.gauge_mask = mask == 1;
+        if (vp.gauge_mask && backend_ != "id7" && backend_ != "host" && backend_ != "fake") {
+            error(c, "layer", ref, "gauge_mask requires ID7");
+            return;
+        }
         id = comp_->add_video(c.id, target, lp, vp, now_ms, &err);
     } else if (kind == "image") {
         double iw = lp.rect.w, ih = lp.rect.h, fps = 30;
@@ -602,6 +612,8 @@ void Server::on_json(Client &c, const std::string &body, int64_t now_ms)
                                  {"proto", std::to_string(cr::kProtocolVersion)},
                                  {"backend", cr::json_quote(backend_)},
                                  {"targets", cr::json_quote(targets)},
+                                 {"features", cr::json_quote(backend_ == "id7" || backend_ == "host" || backend_ == "fake"
+                                                                ? "video_gauge_mask_v1" : "")},
                                  {"repeat", "1"}}));
         c.target_sent.clear();
         log_info("client %llu: %s", (unsigned long long)c.id, c.app.c_str());

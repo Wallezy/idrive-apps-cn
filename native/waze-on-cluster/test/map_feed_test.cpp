@@ -76,6 +76,8 @@
 #include "test/fake_port.h"
 #include "../src/map_feed.h"
 #include "src/log.h"
+#include "src/occlusion.h"
+#include "gauge_mask.h"
 #include "../src/map_feeds.h"
 #include "../src/atlas_scale.h"
 
@@ -459,10 +461,70 @@ static void only_what_is_needed()
     ok("another target: repeats alone bring the picture", r.st().state == "showing" && r.st().target == "panel" && drawn);
 }
 
+static void expanded_gauges()
+{
+    ok("expanded map: incompatible shader templates fail closed",
+       crk::gauge_video_shader("void other() {}").empty() &&
+       crk::gauge_video_shader("void main() { gl_FragColor = vec4(1.0); }").empty());
+    const auto frame = atlas(19);
+    Rig r;
+    r.pump(100);
+    ok("expanded map: renderer advertises mask support", r.st().gauge_supported);
+    ok("expanded map: opt in on the existing feed", r.feed->set_target("panel_gauges"));
+    r.pump(1500, &frame);
+    const crs::Layer *layer = r.map_layer();
+    ok("expanded map: full 1920x720 panel with logical mode retained",
+       layer && layer->target() == 1 && layer->params.rect.x == 0 && layer->params.rect.y == 0 &&
+       layer->params.rect.w == 1920 && layer->params.rect.h == 720 &&
+       r.st().target == "panel_gauges" && r.st().state == "showing");
+    int shaders = 0;
+    for (const auto &kv : r.gpu.effects)
+        if (kv.second.find("u_opacity * gauge_alpha(v_uv)") != std::string::npos)
+            ++shaders;
+    bool masked = false;
+    if (auto *g = r.gpu.graph("panel"))
+        for (const auto &kv : g->shown.quads) {
+            auto uniform = kv.second.uniforms.find("u_gauge_mask");
+            masked = masked || (kv.second.visible && uniform != kv.second.uniforms.end() &&
+                                 uniform->second == std::vector<float>{1.0f});
+        }
+    ok("expanded map: both video shaders compiled, visible quad enables their alpha mask", shaders == 2 && masked);
+    crs::Coverage coverage;
+    crs::Shown shown;
+    shown.drawn = true;
+    shown.opacity = shown.fade = 1.0f;
+    if (layer) {
+        shown.rect = layer->params.rect;
+        const_cast<crs::Layer *>(layer)->occlude(&coverage, shown);
+    }
+    ok("expanded map: transparent panel never hides underlying content as opaque", coverage.empty());
+    r.svc.reset();
+    r.pump(100);
+    r.sc.backend = "id8"; // An unsupported renderer after an upgrade or rollback.
+    r.start();
+    r.pump(3000, &frame);
+    ok("expanded map: reconnect without mask support cannot replay an opaque panel",
+       !r.st().gauge_supported && !r.map_layer() && r.st().state == "error");
+    ok("expanded map: standard map can still be restored", r.feed->set_target("map"));
+    r.pump(1500, &frame);
+    ok("expanded map: standard map works on a renderer without the feature", r.st().state == "showing");
+    ok("expanded map: unsupported opt-in is refused without changing the standard map",
+       !r.feed->set_target("panel_gauges") && r.st().target == "map");
+
+    Rig failed;
+    failed.pump(100);
+    failed.gpu.reject = "gauge_alpha";
+    failed.feed->set_target("panel_gauges");
+    failed.pump(1500, &frame);
+    ok("expanded map: shader failure reports an error and creates no unmasked fallback",
+       !failed.map_layer() && failed.st().state == "error");
+}
+
 int main()
 {
     signal(SIGPIPE, SIG_IGN);
     setvbuf(stdout, nullptr, _IONBF, 0);
+    expanded_gauges();
     Rig r;
     r.pump(100);
     const crs::Layer *l = r.map_layer();

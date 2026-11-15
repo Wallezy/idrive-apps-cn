@@ -182,9 +182,14 @@ test('the Waze chain: app -> waze-on-cluster -> cluster-render and a hook-runnin
     const renderer = byId('cluster-render');
     assert.ok(app && tool && renderer, 'all three are releasable');
     assert.deepStrictEqual(app.mguHmi, ['ID7']);
-    assert.deepStrictEqual(Object.keys(app.requires), ['waze-on-cluster']);
+    assert.deepStrictEqual(Object.keys(app.requires), ['waze-on-cluster', 'cluster-render']);
     assert.ok(catalog.compareVersions(tool.version, app.requires['waze-on-cluster']) >= 0,
         'the tool meets the app\'s requirement');
+    const calibrationNeeds = app.requires['cluster-render'];
+    assert.ok(calibrationNeeds === 'next' || (catalog.SEMVER.test(calibrationNeeds) &&
+        catalog.compareVersions(calibrationNeeds, '0.5.10') >= 0 &&
+        catalog.compareVersions(renderer.version, calibrationNeeds) >= 0),
+    'the calibration app requires a supported renderer with parking calibration');
     assert.deepStrictEqual(Object.keys(tool.requires), ['mgu-deploy', 'cluster-render'], 'the deploy tool installs first');
     assert.strictEqual(tool.requires['mgu-deploy'], '0.8.19', 'CN recovery deactivation and safe-mode unit support');
     const needs = tool.requires['cluster-render'];

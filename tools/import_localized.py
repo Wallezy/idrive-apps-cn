@@ -24,6 +24,15 @@ def main():
     with tempfile.TemporaryDirectory(prefix='mgu-cn-apps-') as temp:
         build.DIST = temp
         for identity in selected:
+            app = ROOT / 'apps' / identity
+            # Enhanced apps use their own reviewed kit and import provenance.
+            # The legacy localized snapshot must not replace those packages.
+            if ((app / 'package/PROVENANCE.json').is_file() or
+                    (app / 'harvest-provenance.json').is_file()):
+                if sys.argv[1:]:
+                    raise SystemExit(f'{identity}: enhanced source package; use its documented update workflow')
+                print(f'{identity}: keeping enhanced source package')
+                continue
             spec = json.loads((LOCAL / 'apps' / identity / 'app.json').read_text())
             localized = localize_spec(spec, 'zh-CN')
             parts = list(map(int, spec['version'].split('.')))

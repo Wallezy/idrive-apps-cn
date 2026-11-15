@@ -29,7 +29,7 @@
     </container>
     <container id="11" type="state" widget="LT_State_Wide">
         <property id="9" value="1"/>
-        <layoutGroup id="28" name="List">
+        <layoutGroup id="33" name="List">
             <property id="3" value="1"/>
             <component id="12" type="dropDownMenu"/>
             <component id="13" type="dropDownMenu"/>
@@ -38,23 +38,28 @@
             <component id="16" type="dropDownMenu"/>
             <component id="17" type="dropDownMenu"/>
             <component id="18" type="dropDownMenu"/>
-            <component id="19" type="dropDownMenu"/>
-            <component id="20" type="dropDownMenu"/>
-            <component id="21" type="checkBox" widget="LT_CheckBox_1Row">
+            <component id="19" type="checkBox" widget="LT_CheckBox_1Row">
                 <property id="2" value="1"/>
                 <property id="3" value="2"/>
             </component>
+            <component id="20" type="dropDownMenu"/>
+            <component id="21" type="dropDownMenu"/>
             <component id="22" type="dropDownMenu"/>
             <component id="23" type="dropDownMenu"/>
             <component id="24" type="dropDownMenu"/>
             <component id="25" type="dropDownMenu"/>
-            <component id="26" type="button" widget="LT_Button_2Row_2Text">
+            <component id="26" type="dropDownMenu"/>
+            <component id="27" type="dropDownMenu"/>
+            <component id="28" type="dropDownMenu"/>
+            <component id="29" type="dropDownMenu"/>
+            <component id="30" type="dropDownMenu"/>
+            <component id="31" type="button" widget="LT_Button_2Row_2Text">
                 <property id="2" value="1"/>
                 <property id="3" value="2"/>
             </component>
         </layoutGroup>
-        <layoutGroup id="29" name="Titlebar">
-            <component id="27" type="title"/>
+        <layoutGroup id="34" name="Titlebar">
+            <component id="32" type="title"/>
         </layoutGroup>
     </container>
 </application>

@@ -1,0 +1,24 @@
+{
+  "sourceArchive": "edrive@2.9.2.tgz",
+  "sourceVersion": "2.9.2",
+  "sourceSha256": "3fd913740d97402b3132faed4bbdac33206e18442085e730c4c073c11710c15d",
+  "sourceLicense": "MIT",
+  "adaptations": [
+    "SDK-free source package with donor bridge",
+    "fixed zh-CN UI",
+    "ID7 application and widget resources",
+    "no user data, BMW SDK or node_modules",
+    "reuse repository renderer client: preferred CN socket, handshake timeout, retry and malformed READY checks",
+    "Demo defaults off; offline tests explicitly enable synthetic data",
+    "Fast fitted power displays ~ and ESTIMATED marker",
+    "Gate slow diagnostics for every powertrain while parked; resume after page visibility or explicit interaction"
+  ],
+  "baselineVersion": "2.0.3",
+  "exportPackageLicense": "UNLICENSED",
+  "publicSource": {
+    "repository": "https://github.com/cauliflowermossgrape/idrive7-apps",
+    "commit": "8d860de5818a2da11d3a3750aab36866cecf6bde",
+    "licenseSha256": "7c813412dcaf1b9d18c28ca6b6199c4349e15e35beca44ab6cab8e4413fe0aa6",
+    "comparison": "All application JavaScript files and 26 kit runtime JavaScript files match the unmodified vehicle export byte for byte; DTC database also matches."
+  }
+}

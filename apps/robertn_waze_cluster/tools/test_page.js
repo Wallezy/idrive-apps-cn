@@ -70,7 +70,7 @@ const UI = JSON.parse(fs.readFileSync(path.join(UI_DIR, 'uiDescription.json'), '
 const XML = fs.readFileSync(path.join(UI_DIR, 'application.xml'), 'utf8');
 const APP_JSON = JSON.parse(fs.readFileSync(path.join(PKG, 'rhmiData', 'application.json'), 'utf8'));
 
-// The vehicle SDK resolves all pages through one application-wide ID map.
+/* A name-only fake can hide collisions rejected by the real SDK/HMI. */
 require('./check_rhmi.js').check(UI_DIR);
 
 /* short: macOS limits a socket path to 104 bytes */
@@ -287,7 +287,7 @@ async function main() {
     const main = xmlIds('1').map(([id]) => [id, components[id].type, components[id].name, shipped(components[id])]);
     assert.deepStrictEqual(main.map(([id, type, name, text]) => (type === 'title' ? name : `${name} ${text}`)), [
         'wocTitle',
-        'wocHeadGeneral General', 'wocShowOn Show on: Cluster', 'wocProfile Own settings for this driver', 'wocMap Cluster map: Off', "wocGuide Hide BMW's turn box", 'wocLogs Logs',
+        'wocHeadGeneral General', 'wocShowOn Show on: Cluster', 'wocProfile Own settings for this driver', 'wocMap Cluster map: Off', 'wocGaugeMode Cluster fullscreen', "wocGuide Hide BMW's turn box", 'wocLogs Logs',
         'wocHeadHud HUD', 'wocHud HUD map: \u2014', "wocHudKeep Keep HUD map over BMW's pop-ups", 'wocHudSize Size: \u2014', 'wocHudPos Position: \u2014', 'wocHudLeft Move left',
         'wocHudRight Move right', 'wocHudUp Move up', 'wocHudDown Move down', 'wocHudCentre Centre',
         'wocHeadCarPlay CarPlay', 'wocStatus Status: Connecting…', 'wocEnable Patch', 'wocDisable Remove patch', 'wocWifi ', 'wocWifiHint ',
@@ -309,7 +309,7 @@ async function main() {
         .find((id) => components[id].name === n)].properties.Focusable.value]), Array(4).fill(['0', 0]), 'the section headers take no focus');
     assert.strictEqual(main.find(([, , name]) => focus[name] === '3')[2], 'wocShowOn', 'the first row the controller stops on: Show on');
     assert(!main.some(([, , name]) => /^wocRow|^wocSetup|^wocCapture/.test(name)), 'no log rows, setup line or capture on the main page');
-    assert.deepStrictEqual(['wocAaCard', 'wocGuide', 'wocProfile', 'wocHudKeep'].map((n) => widgets[n]), Array(4).fill('LT_CheckBox_1Row'),
+    assert.deepStrictEqual(['wocAaCard', 'wocGaugeMode', 'wocGuide', 'wocProfile', 'wocHudKeep'].map((n) => widgets[n]), Array(5).fill('LT_CheckBox_1Row'),
         'the on/off settings are checkboxes');
     assert.deepStrictEqual([widgets.wocShowOn, widgets.wocHudSize], ['LT_DropDownMenu_1Row_2Col3070', 'LT_Slider_LeftJustified_Fill_Steps'],
         'where the map shows: a drop-down of four; the HUD\'s size: a slider');
@@ -360,8 +360,8 @@ async function main() {
         assert(!logs.some((l) => /^error/.test(l)), logs.filter((l) => /^error/.test(l)).join('\n'));
         const bound = logs.filter((l) => l.startsWith('info: BIND OK: ')).map((l) => l.split(' ')[3]).sort();
         assert.deepStrictEqual(bound, ['wocAaCard', 'wocAaDisable', 'wocAaEnable', 'wocAaZoomIn', 'wocAaZoomOut', 'wocCapture', 'wocDisable', 'wocEnable',
-            'wocGuide', 'wocHudCentre', 'wocHudDown', 'wocHudKeep', 'wocHudLeft', 'wocHudRight', 'wocHudUp', 'wocLogs', 'wocLogsSave', 'wocProfile',
-            'wocRestart'],
+            'wocGaugeMode', 'wocGuide', 'wocHudCentre', 'wocHudDown', 'wocHudKeep', 'wocHudLeft', 'wocHudRight', 'wocHudUp', 'wocLogs', 'wocLogsSave', 'wocProfile',
+            'wocRestart'].sort(),
             'bound buttons and checkbox');
         assert.strictEqual(byName.wocRestart.visible, false, 'restart button hidden while the map shows');
         console.log('ok   a page opened while the map is up shows it');
@@ -672,6 +672,23 @@ async function main() {
         await until('unknown', () => wifi.visible === false && hint.visible === false);
         console.log('ok   CarPlay Wi-Fi: 5 GHz alone, 2.4 GHz with the line under it; neither while the band is unknown');
 
+        const gauge = byName.wocGaugeMode;
+        assert.strictEqual(gauge.enabled, false, 'older renderer leaves expanded map disabled');
+        render._broadcast(Object.assign(render._status(), { cluster: 1, target: 'map', gauge_supported: 1 }));
+        await until('expanded map available', () => gauge.enabled && !gauge.selected);
+        const starts = render.count('start');
+        gauge.press();
+        await until('expanded map command', () => render.count('start') === starts + 1);
+        assert.strictEqual(gauge.selected, false, 'checkbox waits for renderer confirmation');
+        render._broadcast(Object.assign(render._status(), { cluster: 1, target: 'panel_gauges', gauge_supported: 1 }));
+        await until('expanded map confirmed', () => gauge.selected);
+        await sleep(450);
+        gauge.press();
+        await until('standard map command', () => render.count('start') === starts + 2);
+        render._broadcast(Object.assign(render._status(), { cluster: 1, target: 'map', gauge_supported: 0 }));
+        await until('standard mode confirmed', () => !gauge.selected && !gauge.enabled);
+        console.log('ok   expanded map: capability gating, renderer-confirmed checkbox and restore to standard map');
+
         /* Through every state above, no row came or went but CarPlay Wi-Fi,
          * its line and the restart's, and each button was greyed and enabled
          * in place. */
@@ -679,7 +696,7 @@ async function main() {
             'only CarPlay Wi-Fi, its line and the restart\'s rows are shown and hidden');
         Object.values(components).filter((d) => !/^(wocRestart|wocWifi)/.test(d.name) && d.type !== 'title')
             .forEach((d) => assert.strictEqual(byName[d.name].visible, true, `${d.name} stays on the page`));
-        ['wocEnable', 'wocDisable', 'wocAaEnable', 'wocAaDisable', 'wocAaZoomOut', 'wocAaZoomIn', 'wocAaCard', 'wocGuide', 'wocShowOn', 'wocProfile', 'wocHudSize',
+        ['wocEnable', 'wocDisable', 'wocAaEnable', 'wocAaDisable', 'wocAaZoomOut', 'wocAaZoomIn', 'wocAaCard', 'wocGaugeMode', 'wocGuide', 'wocShowOn', 'wocProfile', 'wocHudSize',
             'wocHudLeft', 'wocHudCentre', 'wocHudKeep']
             .forEach((n) => assert.deepStrictEqual([...byName[n].enabledSeen].sort(), [false, true], `${n} greyed and enabled in place`));
         const valueRow = /^[A-Z][A-Za-z ]+: [A-Z0-9\u2014]/;
@@ -713,6 +730,8 @@ async function main() {
         assert.deepStrictEqual(fs.readFileSync(qr1).slice(0, 8), Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
         assert.strictEqual(fs.statSync(qr1).mode & 0o777, 0o644, 'the HMI reads it');
         console.log('ok   Logs opens the Logs page; the app stays shown; the page shows the address and its QR code');
+
+        assert(!Object.keys(byName).some((name) => name.startsWith('wocCal')), 'Logs has no calibration controls');
 
         byName.wocLogsSave.emit('action');
         ['wocCaptureStatus', 'wocLogsStatus', 'wocLogsUrl'].forEach((n) => assert(/^[A-Z][a-z ]+: [A-Z0-9h]/.test(byName[n].text), byName[n].text));

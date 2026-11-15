@@ -2,15 +2,38 @@
 
 ## Unreleased
 
-## 0.6.12
+## 0.6.15
+
+- 仪表全屏地图开关名称统一为“仪表盘全屏”。
+- 移除日志页中的地图下层校准、停车确认和网格预览入口。
+
+## 0.6.14
+
+- 增加“扩展地图，保留原厂表盘（测试）”：使用整幅仪表画布与透明轮廓显示手机地图，继续保留原厂仪表。
+- 通过后台能力检测启用开关；旧渲染器、着色器失败或失联时不会退化成不透明整屏视频。
+- 开关以后台确认状态为准，可切回标准地图；此测试模式在地图服务重启后恢复标准模式。
+
+## 0.6.13
 
 - 简化地图投屏的安装、设置和排障说明。
+- 保留停车校准功能。
 
-## 0.6.10
+## 0.6.11
 
 - 去除苹果和安卓状态中的“未验证”提示，显示实际补丁状态。
 - 明确“隐藏安卓导航转向卡片”开关名称。
 
+## 0.6.9
+
+- Fix the settings app failing to open when the parking calibration page is present. Keep calibration controls separate from the main page.
+
+## 0.6.8
+
+- Logs has a parking-only map-underlay calibration: standard and expanded
+  static grids, each limited to 20 seconds. The renderer restores the standard
+  canvas on stop, UI disconnect, timeout, stream loss or display interruption.
+  This measures the display area; full-width maps and preserved factory
+  information require physical validation on the vehicle.
 - Check page control IDs before packaging to prevent conflicting controls from breaking app startup.
 
 - The CN app defaults to Simplified Chinese while the HMI language is unavailable and follows explicit display-language selections. Chinese status rows translate known renderer and patch messages, frame counts and transfer limits; unknown diagnostics retain their original detail. Native protocol fields and logs are unchanged.

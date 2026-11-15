@@ -319,7 +319,7 @@ public:
     /* Charges the budget the scene's buffer bytes, layers' and assets', or
      * a file scene's files. */
     void resent(const TargetSpec &t, int64_t now_ms) override;
-    /* A scene content came or went since the target's scene was published. */
+    /* Scene content or target dimensions differ from the published scene. */
     bool stale(const TargetSpec &t) const override;
     /* The published file scene's content has another file since. */
     bool outdated(const TargetSpec &t) const override;
@@ -372,6 +372,7 @@ private:
     };
     struct Target {
         std::unique_ptr<Graph> graph;
+        uint32_t canvas_w = 0, canvas_h = 0;
         /* Or the scene of a scene content's file: which content's, its
          * serial, and its files' bytes. */
         std::unique_ptr<FileScene> file;
@@ -599,6 +600,7 @@ private:
     int64_t second_ms_ = 0;
     int64_t (*clock_us_)() = nullptr;
     int atlas_fx_ = 0, block_fx_ = 0, image_fx_ = 0;
+    int gauge_atlas_fx_ = 0, gauge_block_fx_ = 0;
     int atlas_view_fx_ = 0, block_view_fx_ = 0;   /* the composite's, made with the first one */
     std::string plan_error_;   /* why the last reconcile changed nothing; logged once */
     std::map<uint32_t, Entry> layers_;

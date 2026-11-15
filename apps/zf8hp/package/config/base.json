@@ -1,0 +1,11 @@
+{
+  "rhmiLoadingEnabled": true,
+  "entryPointLoadingEnabled": true,
+  "settings": {
+    "zf8hp": {
+      "egsAddress": 24,
+      "expectedSgbdIndex": "0F25D0",
+      "readOnly": true
+    }
+  }
+}

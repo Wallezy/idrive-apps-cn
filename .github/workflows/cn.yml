@@ -2,7 +2,7 @@ name: CN source checks
 
 on:
   push:
-    branches: [main]
+    branches: [main, 'codex/beta/**']
   pull_request:
   workflow_dispatch:
 
@@ -42,4 +42,9 @@ jobs:
           node localized/ambient/kit/tools/test_ambient_rgb.js
           node localized/ambient/kit/tools/test_ambient_strobe.js
           node localized/ambient/kit/tools/test_ambient_others.js
+      - name: Enhanced vehicle applications
+        run: |
+          node tools/test_redline_enhanced.js
+          node tools/test_vitals_zf8hp.js
+          node tools/test_edrive_dtc_enhanced.js
 # Unit tests do not set release-check/cn-integration.

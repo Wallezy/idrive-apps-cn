@@ -301,6 +301,7 @@ class ClusterRender extends EventEmitter {
                 if (o[k] !== undefined) m[k] = o[k];
             });
             if (o.pan_blocks !== undefined) m.pan_blocks = flag(o.pan_blocks);
+            if (o.gauge_mask !== undefined) m.gauge_mask = flag(o.gauge_mask);
         } else if (l.kind === 'image') {
             m.iw = o.iw;
             m.ih = o.ih;

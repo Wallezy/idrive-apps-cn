@@ -1,256 +1,1914 @@
 {
- "id": "redline",
- "title": "\u6362\u6321\u8f6c\u901f",
- "version": "1.8.2",
- "screens": [
-  {
-   "name": "MAIN",
-   "kind": "canvas",
-   "title": "\u6362\u6321\u8f6c\u901f",
-   "buttons": [
-    [
-     "BTN_RESET",
-     "\u91cd\u7f6e\u5cf0\u503c"
-    ],
-    [
-     "BTN_PAGE",
-     "\u4e0b\u4e00\u9875"
-    ],
-    [
-     "BTN_PREV",
-     "\u4e0a\u4e00\u9875"
-    ],
-    [
-     "BTN_SETTINGS",
-     "\u8bbe\u7f6e"
-    ]
-   ]
+  "id": "redline",
+  "title": "换挡转速",
+  "version": "2.0.42",
+  "screens": [
+    {
+      "name": "MAIN",
+      "kind": "canvas",
+      "title": "换挡转速",
+      "buttons": [
+        [
+          "BTN_RESET",
+          "重置峰值"
+        ],
+        [
+          "BTN_RESET_LEARNED",
+          "重置学习"
+        ],
+        [
+          "BTN_PAGE",
+          "下一页"
+        ],
+        [
+          "BTN_PREV",
+          "上一页"
+        ],
+        [
+          "BTN_SETTINGS",
+          "设置"
+        ]
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "key": "hud",
+      "label": "显示到 HUD（测试功能）",
+      "type": "choice",
+      "default": "off",
+      "options": [
+        [
+          "off",
+          "关闭"
+        ],
+        [
+          "on",
+          "开启"
+        ],
+        [
+          "test",
+          "定位图"
+        ]
+      ]
+    },
+    {
+      "key": "hudStyle",
+      "label": "HUD 布局",
+      "type": "choice",
+      "default": "standard",
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ]
+      },
+      "options": [
+        [
+          "standard",
+          "标准"
+        ],
+        [
+          "minimal",
+          "简洁（换挡灯与挡位）"
+        ],
+        [
+          "wings",
+          "分翼"
+        ],
+        [
+          "digital",
+          "复古数字仪表"
+        ],
+        [
+          "vfd",
+          "VFD 荧光（青色）"
+        ],
+        [
+          "vector",
+          "矢量轮廓"
+        ],
+        [
+          "arc",
+          "弧形（F80／F82 风格）"
+        ],
+        [
+          "ramp",
+          "阶梯（G80／G82 风格）"
+        ],
+        [
+          "dial",
+          "圆盘（E60 M5 风格）"
+        ],
+        [
+          "pill",
+          "胶囊（赛车数据风格）"
+        ]
+      ]
+    },
+    {
+      "key": "hudComfortMode",
+      "label": "舒适／节能模式",
+      "type": "choice",
+      "default": "hide",
+      "reset": 1,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ]
+      },
+      "options": [
+        [
+          "same",
+          "与运动模式相同"
+        ],
+        [
+          "own",
+          "独立 HUD 配置"
+        ],
+        [
+          "hide",
+          "隐藏（显示原厂 HUD）"
+        ]
+      ]
+    },
+    {
+      "key": "hudComfortSetup",
+      "label": "舒适模式 HUD 配置",
+      "type": "object",
+      "default": {},
+      "hidden": true
+    },
+    {
+      "key": "hudHybridMode",
+      "label": "混动／纯电模式",
+      "type": "choice",
+      "default": "same",
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudHybridSeen": [
+          true
+        ]
+      },
+      "options": [
+        [
+          "same",
+          "与运动模式相同"
+        ],
+        [
+          "own",
+          "独立 HUD 配置"
+        ],
+        [
+          "hide",
+          "隐藏（显示原厂 HUD）"
+        ]
+      ]
+    },
+    {
+      "key": "hudHybridSetup",
+      "label": "混动模式 HUD 配置",
+      "type": "object",
+      "default": {},
+      "hidden": true
+    },
+    {
+      "key": "hudNav",
+      "label": "HUD 导航提示（测试功能）",
+      "type": "choice",
+      "default": "route",
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ]
+      },
+      "options": [
+        [
+          "route",
+          "导航期间"
+        ],
+        [
+          "near",
+          "临近转弯（1 公里内及车道提示）"
+        ],
+        [
+          "off",
+          "关闭"
+        ]
+      ]
+    },
+    {
+      "key": "hudNavX",
+      "label": "导航左右位置",
+      "type": "number",
+      "unit": "px",
+      "default": 0,
+      "labels": {
+        "0": "右下角"
+      },
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudNav": [
+          "route",
+          "near"
+        ],
+        "advanced": [
+          true
+        ]
+      },
+      "steps": [
+        -240,
+        -200,
+        -160,
+        -120,
+        -80,
+        -40,
+        -20,
+        0,
+        20
+      ],
+      "group": "高级"
+    },
+    {
+      "key": "hudNavY",
+      "label": "导航上下位置",
+      "type": "number",
+      "unit": "px",
+      "default": 0,
+      "labels": {
+        "0": "右下角"
+      },
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudNav": [
+          "route",
+          "near"
+        ],
+        "advanced": [
+          true
+        ]
+      },
+      "steps": [
+        -120,
+        -80,
+        -40,
+        -20,
+        -10,
+        0,
+        10,
+        20
+      ],
+      "group": "高级"
+    },
+    {
+      "key": "hudAll",
+      "label": "在设置中显示全部 HUD 选项",
+      "type": "bool",
+      "default": false,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ]
+      }
+    },
+    {
+      "key": "shiftMode",
+      "label": "换挡提示转速",
+      "type": "choice",
+      "default": "learned",
+      "options": [
+        [
+          "learned",
+          "按挡位学习（测试功能）"
+        ],
+        [
+          "fixed",
+          "红线减去下方设定值"
+        ]
+      ],
+      "group": "换挡提示转速"
+    },
+    {
+      "key": "minShift",
+      "label": "最低换挡提示转速",
+      "type": "number",
+      "unit": "rpm",
+      "default": 0,
+      "labels": {
+        "0": "无"
+      },
+      "steps": [
+        0,
+        4000,
+        4500,
+        5000,
+        5500,
+        5800,
+        6000,
+        6200,
+        6500
+      ],
+      "group": "换挡提示转速"
+    },
+    {
+      "key": "shiftBefore",
+      "label": "换挡提示点（红线前）",
+      "type": "number",
+      "unit": "rpm",
+      "default": 300,
+      "steps": [
+        0,
+        100,
+        200,
+        300,
+        500,
+        800,
+        1000
+      ],
+      "group": "换挡提示转速"
+    },
+    {
+      "key": "hudLead",
+      "label": "换挡灯提前量（反应时间）",
+      "type": "number",
+      "unit": "ms",
+      "default": -1,
+      "reset": 1,
+      "labels": {
+        "-1": "自动（根据换挡学习）"
+      },
+      "steps": [
+        -1,
+        0,
+        100,
+        150,
+        200,
+        250,
+        300,
+        400
+      ],
+      "group": "换挡提示转速"
+    },
+    {
+      "key": "lights",
+      "label": "灯光配色",
+      "type": "choice",
+      "default": "m",
+      "options": [
+        [
+          "m",
+          "M 样式（绿黄红）"
+        ],
+        [
+          "f1",
+          "竞速样式（绿红蓝）"
+        ],
+        [
+          "mono",
+          "主题颜色"
+        ]
+      ],
+      "group": "换挡提示转速"
+    },
+    {
+      "key": "lightMode",
+      "label": "换挡灯",
+      "type": "choice",
+      "default": "shift",
+      "options": [
+        [
+          "shift",
+          "换挡提示转速"
+        ],
+        [
+          "rev",
+          "转速条"
+        ]
+      ],
+      "group": "换挡提示转速"
+    },
+    {
+      "key": "lightStart",
+      "label": "起始",
+      "type": "number",
+      "unit": "rpm",
+      "default": 4000,
+      "steps": [
+        2000,
+        2500,
+        3000,
+        3500,
+        4000,
+        4500,
+        5000,
+        5500,
+        6000
+      ],
+      "when": {
+        "lightMode": [
+          "rev"
+        ]
+      },
+      "group": "换挡提示转速"
+    },
+    {
+      "key": "flash",
+      "label": "换挡点闪烁提示",
+      "type": "bool",
+      "default": false,
+      "reset": 1,
+      "group": "换挡提示转速"
+    },
+    {
+      "key": "downCue",
+      "label": "降挡箭头（测试功能）",
+      "type": "choice",
+      "default": "slowing",
+      "options": [
+        [
+          "slowing",
+          "减速时"
+        ],
+        [
+          "always",
+          "始终"
+        ],
+        [
+          "off",
+          "关闭"
+        ]
+      ],
+      "group": "换挡提示转速"
+    },
+    {
+      "key": "downTarget",
+      "label": "箭头显示",
+      "type": "choice",
+      "default": "all",
+      "when": {
+        "downCue": [
+          "slowing",
+          "always"
+        ]
+      },
+      "options": [
+        [
+          "all",
+          "全部可降挡位"
+        ],
+        [
+          "best",
+          "最佳挡位（进入动力区间）"
+        ]
+      ],
+      "group": "换挡提示转速"
+    },
+    {
+      "key": "engine",
+      "label": "发动机",
+      "type": "choice",
+      "default": "auto",
+      "options": [
+        [
+          "auto",
+          "自动（读取车辆）"
+        ],
+        [
+          "diesel",
+          "柴油"
+        ],
+        [
+          "petrol",
+          "汽油"
+        ]
+      ],
+      "group": "发动机"
+    },
+    {
+      "key": "redline",
+      "label": "换挡转速",
+      "type": "number",
+      "unit": "rpm",
+      "default": 0,
+      "labels": {
+        "0": "自动"
+      },
+      "reset": 1,
+      "steps": [
+        0,
+        4000,
+        4500,
+        5000,
+        5500,
+        5800,
+        6000,
+        6200,
+        6500,
+        6800,
+        7000,
+        7200,
+        7500,
+        7800,
+        8000,
+        8500,
+        9000
+      ],
+      "group": "发动机"
+    },
+    {
+      "key": "rpmScale",
+      "label": "转速刻度上限",
+      "type": "number",
+      "unit": "rpm",
+      "default": 0,
+      "labels": {
+        "0": "自动"
+      },
+      "steps": [
+        0,
+        5000,
+        6000,
+        7000,
+        8000,
+        9000,
+        10000
+      ],
+      "group": "发动机"
+    },
+    {
+      "key": "coldGuard",
+      "label": "冷机转速保护",
+      "type": "bool",
+      "default": true,
+      "group": "发动机"
+    },
+    {
+      "key": "coldLimit",
+      "label": "冷机转速上限",
+      "type": "number",
+      "unit": "rpm",
+      "default": 0,
+      "labels": {
+        "0": "自动"
+      },
+      "reset": 1,
+      "steps": [
+        0,
+        2000,
+        2500,
+        3000,
+        3500,
+        4000,
+        4500,
+        5000,
+        5500
+      ],
+      "group": "发动机"
+    },
+    {
+      "key": "warmOil",
+      "label": "机油暖机温度",
+      "type": "number",
+      "unit": "°C",
+      "default": 80,
+      "labels": {
+        "60": "60 °C (140 °F)",
+        "70": "70 °C (158 °F)",
+        "80": "80 °C (176 °F)",
+        "90": "90 °C (194 °F)"
+      },
+      "steps": [
+        60,
+        70,
+        80,
+        90
+      ],
+      "group": "发动机"
+    },
+    {
+      "key": "peakHold",
+      "label": "峰值保持（0 表示手动重置）",
+      "type": "number",
+      "unit": "s",
+      "default": 15,
+      "steps": [
+        0,
+        5,
+        10,
+        15,
+        30,
+        60
+      ],
+      "group": "发动机"
+    },
+    {
+      "key": "learn",
+      "label": "行驶学习（转速、换挡点、反应时间）",
+      "type": "bool",
+      "default": true,
+      "group": "学习（测试功能）"
+    },
+    {
+      "key": "learnRedline",
+      "label": "根据限转状态学习红线",
+      "type": "bool",
+      "default": true,
+      "when": {
+        "learn": true
+      },
+      "group": "学习（测试功能）"
+    },
+    {
+      "key": "speedUnit",
+      "label": "速度单位",
+      "type": "choice",
+      "default": "kmh",
+      "options": [
+        [
+          "kmh",
+          "km/h"
+        ],
+        [
+          "mph",
+          "mph"
+        ]
+      ],
+      "group": "单位"
+    },
+    {
+      "key": "hudTempUnit",
+      "label": "温度单位",
+      "type": "choice",
+      "default": "c",
+      "options": [
+        [
+          "c",
+          "°C"
+        ],
+        [
+          "f",
+          "°F"
+        ]
+      ],
+      "group": "单位"
+    },
+    {
+      "key": "hudTorqueUnit",
+      "label": "扭矩单位",
+      "type": "choice",
+      "default": "nm",
+      "options": [
+        [
+          "nm",
+          "Nm"
+        ],
+        [
+          "lbft",
+          "lb-ft"
+        ],
+        [
+          "kgm",
+          "kgm"
+        ]
+      ],
+      "group": "单位"
+    },
+    {
+      "key": "hudPowerUnit",
+      "label": "功率单位",
+      "type": "choice",
+      "default": "hp",
+      "options": [
+        [
+          "hp",
+          "hp"
+        ],
+        [
+          "ps",
+          "PS"
+        ],
+        [
+          "kw",
+          "kW"
+        ]
+      ],
+      "group": "单位"
+    },
+    {
+      "key": "hudBoostUnit",
+      "label": "增压单位",
+      "type": "choice",
+      "default": "bar",
+      "options": [
+        [
+          "bar",
+          "bar"
+        ],
+        [
+          "psi",
+          "psi"
+        ],
+        [
+          "kpa",
+          "kPa"
+        ]
+      ],
+      "group": "单位"
+    },
+    {
+      "key": "hudFuelUnit",
+      "label": "油耗单位",
+      "type": "choice",
+      "default": "l100",
+      "options": [
+        [
+          "l100",
+          "l/100 km"
+        ],
+        [
+          "mpguk",
+          "mpg (UK)"
+        ],
+        [
+          "mpgus",
+          "mpg (US)"
+        ],
+        [
+          "kml",
+          "km/l"
+        ]
+      ],
+      "group": "单位"
+    },
+    {
+      "key": "hudTyreUnit",
+      "label": "胎压单位",
+      "type": "choice",
+      "default": "bar",
+      "options": [
+        [
+          "bar",
+          "bar"
+        ],
+        [
+          "psi",
+          "psi"
+        ],
+        [
+          "kpa",
+          "kPa"
+        ]
+      ],
+      "when": {
+        "hudTyresSeen": [
+          true
+        ]
+      },
+      "group": "单位"
+    },
+    {
+      "key": "hudPalette",
+      "label": "HUD 配色",
+      "type": "choice",
+      "default": "colour",
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudStyle": [
+          "standard",
+          "minimal",
+          "wings",
+          "digital",
+          "vector",
+          "pill"
+        ],
+        "hudAll": [
+          true
+        ]
+      },
+      "options": [
+        [
+          "colour",
+          "彩色"
+        ],
+        [
+          "amber",
+          "夜间琥珀"
+        ],
+        [
+          "ice",
+          "冰晶白"
+        ]
+      ],
+      "group": "HUD：外观"
+    },
+    {
+      "key": "hudGearFont",
+      "label": "挡位字体",
+      "type": "choice",
+      "default": "auto",
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudStyle": [
+          "standard",
+          "minimal",
+          "wings",
+          "arc",
+          "ramp",
+          "dial",
+          "pill"
+        ],
+        "hudAll": [
+          true
+        ]
+      },
+      "options": [
+        [
+          "auto",
+          "自动（弧形／圆盘使用 Barlow）"
+        ],
+        [
+          "ubuntu",
+          "Ubuntu"
+        ],
+        [
+          "barlow",
+          "Barlow"
+        ]
+      ],
+      "group": "HUD：外观"
+    },
+    {
+      "key": "hudLabels",
+      "label": "数据标签",
+      "type": "choice",
+      "default": "normal",
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ]
+      },
+      "options": [
+        [
+          "normal",
+          "正常"
+        ],
+        [
+          "clear",
+          "醒目（放大并提高亮度）"
+        ]
+      ],
+      "group": "HUD：外观"
+    },
+    {
+      "key": "hudRpmFormat",
+      "label": "转速显示格式",
+      "type": "choice",
+      "default": "10",
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ]
+      },
+      "options": [
+        [
+          "10",
+          "精细（每 10 rpm）"
+        ],
+        [
+          "50",
+          "平稳（每 50 rpm）"
+        ],
+        [
+          "k",
+          "千转格式（4.5）"
+        ]
+      ],
+      "group": "HUD：外观"
+    },
+    {
+      "key": "hudUnlit",
+      "label": "未点亮的灯段",
+      "type": "choice",
+      "default": "dim",
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudStyle": [
+          "standard",
+          "minimal",
+          "wings",
+          "digital",
+          "vector",
+          "arc",
+          "ramp",
+          "dial",
+          "pill"
+        ],
+        "hudAll": [
+          true
+        ]
+      },
+      "options": [
+        [
+          "dim",
+          "微亮"
+        ],
+        [
+          "hidden",
+          "隐藏"
+        ]
+      ],
+      "group": "HUD：外观"
+    },
+    {
+      "key": "hudLightStyle",
+      "label": "灯光填充",
+      "type": "choice",
+      "default": "gt3",
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ]
+      },
+      "options": [
+        [
+          "gt3",
+          "GT3（由外向内闪烁）"
+        ],
+        [
+          "bar",
+          "从左到右"
+        ],
+        [
+          "off",
+          "关闭"
+        ]
+      ],
+      "group": "HUD：仪表"
+    },
+    {
+      "key": "hudShowBar",
+      "label": "转速条",
+      "type": "bool",
+      "default": true,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ]
+      },
+      "group": "HUD：仪表"
+    },
+    {
+      "key": "hudShowGear",
+      "label": "挡位",
+      "type": "bool",
+      "default": true,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ]
+      },
+      "group": "HUD：仪表"
+    },
+    {
+      "key": "hudShowMode",
+      "label": "变速箱模式（D／S／M）",
+      "type": "bool",
+      "default": true,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ]
+      },
+      "group": "HUD：仪表"
+    },
+    {
+      "key": "hudShowSpeed",
+      "label": "车速（阶梯布局位于挡位下方）",
+      "type": "bool",
+      "default": false,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ]
+      },
+      "group": "HUD：数据"
+    },
+    {
+      "key": "hudShowRpm",
+      "label": "转速",
+      "type": "bool",
+      "default": true,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ]
+      },
+      "group": "HUD：数据"
+    },
+    {
+      "key": "hudBoost",
+      "label": "增压压力",
+      "type": "bool",
+      "default": true,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ]
+      },
+      "group": "HUD：数据"
+    },
+    {
+      "key": "hudShowTorque",
+      "label": "扭矩",
+      "type": "bool",
+      "default": false,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ]
+      },
+      "group": "HUD：数据"
+    },
+    {
+      "key": "hudShowPower",
+      "label": "功率（由扭矩与转速计算）",
+      "type": "bool",
+      "default": false,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ]
+      },
+      "group": "HUD：数据"
+    },
+    {
+      "key": "hudShowG",
+      "label": "G 值（横向与纵向合成）",
+      "type": "bool",
+      "default": false,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ]
+      },
+      "group": "HUD：数据"
+    },
+    {
+      "key": "hudShowKnock",
+      "label": "爆震退角（度）",
+      "type": "bool",
+      "default": false,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ]
+      },
+      "group": "HUD：数据"
+    },
+    {
+      "key": "hudShowFuel",
+      "label": "油耗（发动机读数，测试功能）",
+      "type": "bool",
+      "default": false,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ]
+      },
+      "group": "HUD：数据"
+    },
+    {
+      "key": "hudShowOil",
+      "label": "机油",
+      "type": "bool",
+      "default": true,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ]
+      },
+      "group": "HUD：数据"
+    },
+    {
+      "key": "hudShowWater",
+      "label": "水温",
+      "type": "bool",
+      "default": true,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ]
+      },
+      "group": "HUD：数据"
+    },
+    {
+      "key": "hudShowGearbox",
+      "label": "变速箱",
+      "type": "bool",
+      "default": true,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ]
+      },
+      "group": "HUD：数据"
+    },
+    {
+      "key": "hudShowOutside",
+      "label": "室外温度（3°C 以下蓝色）",
+      "type": "bool",
+      "default": false,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ]
+      },
+      "group": "HUD：数据"
+    },
+    {
+      "key": "hudShowTyres",
+      "label": "四轮胎压（按目标值显示颜色）",
+      "type": "bool",
+      "default": false,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ],
+        "hudTyresSeen": [
+          true
+        ]
+      },
+      "group": "HUD：数据"
+    },
+    {
+      "key": "hudShowLimit",
+      "label": "冷机换挡上限",
+      "type": "bool",
+      "default": true,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ]
+      },
+      "group": "HUD：数据"
+    },
+    {
+      "key": "hudTempsMode",
+      "label": "温度显示",
+      "type": "choice",
+      "default": "smart",
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ]
+      },
+      "options": [
+        [
+          "smart",
+          "仅低温或高温时"
+        ],
+        [
+          "always",
+          "始终"
+        ]
+      ],
+      "group": "HUD：数据"
+    },
+    {
+      "key": "hudShowBattSoc",
+      "label": "12V 电池电量（%）",
+      "type": "bool",
+      "default": false,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ]
+      },
+      "group": "HUD：数据"
+    },
+    {
+      "key": "hudShowBattVolt",
+      "label": "12V 电池电压",
+      "type": "bool",
+      "default": false,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ]
+      },
+      "group": "HUD：数据"
+    },
+    {
+      "key": "hudShowHvSoc",
+      "label": "混动电池电量（%）",
+      "type": "bool",
+      "default": false,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ],
+        "hudHybridSeen": [
+          true
+        ]
+      },
+      "group": "HUD：数据"
+    },
+    {
+      "key": "hudShowHvPower",
+      "label": "混动电池功率（正值驱动，负值回收）",
+      "type": "bool",
+      "default": false,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ],
+        "hudHybridSeen": [
+          true
+        ]
+      },
+      "group": "HUD：数据"
+    },
+    {
+      "key": "hudShowHvBar",
+      "label": "回收／功率条（左回收、右驱动）",
+      "type": "bool",
+      "default": false,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ],
+        "hudHybridSeen": [
+          true
+        ]
+      },
+      "group": "HUD：数据"
+    },
+    {
+      "key": "hudShowHvTemp",
+      "label": "混动电池温度",
+      "type": "bool",
+      "default": false,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ],
+        "hudHybridSeen": [
+          true
+        ]
+      },
+      "group": "HUD：数据"
+    },
+    {
+      "key": "hudShowHvVolt",
+      "label": "混动电池电压",
+      "type": "bool",
+      "default": false,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ],
+        "hudHybridSeen": [
+          true
+        ]
+      },
+      "group": "HUD：数据"
+    },
+    {
+      "key": "hudHybridSeen",
+      "label": "已检测到混动电池",
+      "type": "bool",
+      "default": false,
+      "reset": 1,
+      "hidden": true
+    },
+    {
+      "key": "hudChip",
+      "label": "升挡后显示换挡评价",
+      "type": "choice",
+      "default": "burst",
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ]
+      },
+      "aliases": {
+        "true": "burst",
+        "false": "off"
+      },
+      "options": [
+        [
+          "burst",
+          "弹出与圆环"
+        ],
+        [
+          "simple",
+          "简洁"
+        ],
+        [
+          "off",
+          "关闭"
+        ]
+      ],
+      "group": "HUD：提示"
+    },
+    {
+      "key": "hudKnockWarn",
+      "label": "爆震退角提示（测试功能）",
+      "type": "bool",
+      "default": true,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ]
+      },
+      "group": "HUD：提示"
+    },
+    {
+      "key": "hudLaunch",
+      "label": "起步加速成绩与最佳成绩对比",
+      "type": "bool",
+      "default": true,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ]
+      },
+      "group": "HUD：提示"
+    },
+    {
+      "key": "hudPeak",
+      "label": "峰值标记",
+      "type": "bool",
+      "default": true,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ]
+      },
+      "group": "HUD：提示"
+    },
+    {
+      "key": "hudShake",
+      "label": "限转时抖动效果",
+      "type": "bool",
+      "default": false,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ]
+      },
+      "group": "HUD：提示"
+    },
+    {
+      "key": "hudTyreWidget",
+      "label": "轮胎小窗（导航提示优先）",
+      "type": "choice",
+      "default": "low",
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ],
+        "hudTyresSeen": [
+          true
+        ]
+      },
+      "options": [
+        [
+          "low",
+          "胎压偏低时"
+        ],
+        [
+          "warm",
+          "胎压偏低或尚未升温"
+        ],
+        [
+          "always",
+          "始终"
+        ],
+        [
+          "off",
+          "关闭"
+        ]
+      ],
+      "group": "HUD：轮胎"
+    },
+    {
+      "key": "hudTyreCar",
+      "label": "轮胎小窗：车辆轮廓",
+      "type": "bool",
+      "default": true,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ],
+        "hudTyresSeen": [
+          true
+        ]
+      },
+      "group": "HUD：轮胎"
+    },
+    {
+      "key": "hudTyreTarget",
+      "label": "轮胎小窗：目标胎压",
+      "type": "bool",
+      "default": false,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ],
+        "hudTyresSeen": [
+          true
+        ]
+      },
+      "group": "HUD：轮胎"
+    },
+    {
+      "key": "hudTyreTemp",
+      "label": "轮胎小窗：轮胎温度",
+      "type": "bool",
+      "default": true,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ],
+        "hudTyresSeen": [
+          true
+        ]
+      },
+      "group": "HUD：轮胎"
+    },
+    {
+      "key": "hudTyresSeen",
+      "label": "已检测到胎压信号",
+      "type": "bool",
+      "default": false,
+      "hidden": true
+    },
+    {
+      "key": "hudSize",
+      "label": "大小",
+      "type": "number",
+      "unit": "%",
+      "default": 100,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ]
+      },
+      "steps": [
+        40,
+        50,
+        60,
+        70,
+        80,
+        90,
+        100,
+        110,
+        120,
+        130
+      ],
+      "group": "HUD：位置"
+    },
+    {
+      "key": "hudX",
+      "label": "左右位置",
+      "type": "number",
+      "unit": "px",
+      "default": 0,
+      "labels": {
+        "0": "居中"
+      },
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ]
+      },
+      "steps": [
+        -120,
+        -100,
+        -80,
+        -60,
+        -40,
+        -20,
+        0,
+        20,
+        40,
+        60,
+        80,
+        100,
+        120,
+        140,
+        160,
+        180,
+        200,
+        220,
+        240,
+        260,
+        280
+      ],
+      "group": "HUD：位置"
+    },
+    {
+      "key": "hudY",
+      "label": "上下位置",
+      "type": "number",
+      "unit": "px",
+      "default": 0,
+      "labels": {
+        "0": "默认"
+      },
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "hudAll": [
+          true
+        ]
+      },
+      "steps": [
+        -120,
+        -100,
+        -80,
+        -60,
+        -50,
+        -40,
+        -30,
+        -20,
+        -10,
+        0,
+        10,
+        20,
+        30,
+        40,
+        50,
+        60,
+        80,
+        100,
+        120,
+        140,
+        160,
+        180,
+        200,
+        220
+      ],
+      "group": "HUD：位置"
+    },
+    {
+      "key": "theme",
+      "label": "配色主题",
+      "type": "choice",
+      "default": "m_tricolour",
+      "options": [
+        [
+          "m_red",
+          "M 红色"
+        ],
+        [
+          "m_tricolour",
+          "M 三色"
+        ],
+        [
+          "ice",
+          "冰晶白"
+        ],
+        [
+          "amber",
+          "夜间琥珀"
+        ]
+      ],
+      "group": "屏幕"
+    },
+    {
+      "key": "layout",
+      "label": "屏幕布局",
+      "type": "choice",
+      "default": "full",
+      "options": [
+        [
+          "full",
+          "全屏"
+        ],
+        [
+          "standard",
+          "标准"
+        ]
+      ],
+      "group": "屏幕"
+    },
+    {
+      "key": "demo",
+      "label": "演示数据",
+      "type": "choice",
+      "default": "off",
+      "options": [
+        [
+          "auto",
+          "自动"
+        ],
+        [
+          "on",
+          "始终"
+        ],
+        [
+          "off",
+          "从不"
+        ]
+      ],
+      "group": "屏幕"
+    },
+    {
+      "key": "advanced",
+      "label": "高级设置",
+      "type": "bool",
+      "default": false
+    },
+    {
+      "key": "renderer",
+      "label": "渲染器",
+      "type": "choice",
+      "default": "auto",
+      "options": [
+        [
+          "auto",
+          "GPU 60 帧（默认）"
+        ],
+        [
+          "software",
+          "软件渲染"
+        ]
+      ],
+      "group": "高级",
+      "when": {
+        "advanced": [
+          true
+        ]
+      }
+    },
+    {
+      "key": "speedRate",
+      "label": "速度刷新率",
+      "type": "number",
+      "unit": "fps",
+      "default": 10,
+      "reset": 1,
+      "markDefault": true,
+      "steps": [
+        5,
+        10,
+        15,
+        30,
+        60
+      ],
+      "when": {
+        "advanced": [
+          true
+        ]
+      },
+      "group": "高级"
+    },
+    {
+      "key": "hudFps",
+      "label": "HUD 刷新率",
+      "type": "number",
+      "unit": "fps",
+      "default": 20,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "advanced": [
+          true
+        ]
+      },
+      "steps": [
+        10,
+        20,
+        30
+      ],
+      "group": "高级"
+    },
+    {
+      "key": "hudReadoutRate",
+      "label": "HUD 数据刷新率",
+      "type": "number",
+      "unit": "/s",
+      "default": 4,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "advanced": [
+          true
+        ]
+      },
+      "steps": [
+        4,
+        10,
+        20
+      ],
+      "group": "高级"
+    },
+    {
+      "key": "hudHandBack",
+      "label": "熄火后把 HUD 交还给 Cluster functions",
+      "type": "bool",
+      "default": true,
+      "when": {
+        "hud": [
+          "on",
+          "test"
+        ],
+        "advanced": [
+          true
+        ]
+      },
+      "group": "高级"
+    }
+  ],
+  "config": null,
+  "startWidget": null,
+  "stateIds": {
+    "MAIN": 1,
+    "SETTINGS": 12
   }
- ],
- "settings": [
-  {
-   "key": "redline",
-   "label": "\u6362\u6321\u8f6c\u901f",
-   "type": "number",
-   "unit": "rpm",
-   "default": 7000,
-   "steps": [
-    5000,
-    5500,
-    6000,
-    6500,
-    7000,
-    7200,
-    7500,
-    7800,
-    8000,
-    8500,
-    9000
-   ]
-  },
-  {
-   "key": "shiftBefore",
-   "label": "\u6362\u6321\u63d0\u793a\u8ddd\u7ea2\u7ebf\u8f6c\u901f",
-   "type": "number",
-   "unit": "rpm",
-   "default": 300,
-   "steps": [
-    0,
-    100,
-    200,
-    300,
-    500,
-    800,
-    1000
-   ]
-  },
-  {
-   "key": "lights",
-   "label": "\u6362\u6321\u706f\u6837\u5f0f",
-   "type": "choice",
-   "default": "m",
-   "options": [
-    [
-     "m",
-     "M \u6837\u5f0f\uff08\u7eff\u9ec4\u7ea2\uff09"
-    ],
-    [
-     "f1",
-     "\u7ade\u901f\u6837\u5f0f\uff08\u7eff\u7ea2\u84dd\uff09"
-    ],
-    [
-     "mono",
-     "\u4e3b\u9898\u989c\u8272"
-    ]
-   ]
-  },
-  {
-   "key": "flash",
-   "label": "\u6362\u6321\u70b9\u95ea\u70c1\u63d0\u793a",
-   "type": "bool",
-   "default": false,
-   "reset": 1
-  },
-  {
-   "key": "coldGuard",
-   "label": "\u51b7\u673a\u8f6c\u901f\u4fdd\u62a4",
-   "type": "bool",
-   "default": true
-  },
-  {
-   "key": "coldLimit",
-   "label": "\u51b7\u673a\u8f6c\u901f\u4e0a\u9650",
-   "type": "number",
-   "unit": "rpm",
-   "default": 4500,
-   "steps": [
-    3500,
-    4000,
-    4500,
-    5000,
-    5500
-   ]
-  },
-  {
-   "key": "warmOil",
-   "label": "\u673a\u6cb9\u6696\u673a\u6e29\u5ea6",
-   "type": "number",
-   "unit": "\u00b0C",
-   "default": 80,
-   "steps": [
-    60,
-    70,
-    80,
-    90
-   ]
-  },
-  {
-   "key": "speedUnit",
-   "label": "\u5355\u4f4d",
-   "type": "choice",
-   "default": "kmh",
-   "options": [
-    [
-     "kmh",
-     "km/h"
-    ],
-    [
-     "mph",
-     "mph"
-    ]
-   ]
-  },
-  {
-   "key": "peakHold",
-   "label": "\u5cf0\u503c\u4fdd\u6301\uff080 \u8868\u793a\u624b\u52a8\u91cd\u7f6e\uff09",
-   "type": "number",
-   "unit": "s",
-   "default": 15,
-   "steps": [
-    0,
-    5,
-    10,
-    15,
-    30,
-    60
-   ]
-  },
-  {
-   "key": "theme",
-   "label": "\u914d\u8272\u4e3b\u9898",
-   "type": "choice",
-   "default": "m_tricolour",
-   "options": [
-    [
-     "m_red",
-     "M \u7ea2\u8272"
-    ],
-    [
-     "m_tricolour",
-     "M \u4e09\u8272"
-    ],
-    [
-     "ice",
-     "\u51b0\u6676\u767d"
-    ],
-    [
-     "amber",
-     "\u591c\u95f4\u7425\u73c0"
-    ]
-   ]
-  },
-  {
-   "key": "speedRate",
-   "label": "\u901f\u5ea6\u5237\u65b0\u7387",
-   "type": "number",
-   "unit": "fps",
-   "default": 10,
-   "reset": 1,
-   "markDefault": true,
-   "steps": [
-    5,
-    10,
-    15,
-    30,
-    60
-   ]
-  },
-  {
-   "key": "layout",
-   "label": "\u5c4f\u5e55\u5e03\u5c40",
-   "type": "choice",
-   "default": "full",
-   "options": [
-    [
-     "full",
-     "\u5168\u5c4f"
-    ],
-    [
-     "standard",
-     "\u6807\u51c6"
-    ]
-   ]
-  },
-  {
-   "key": "renderer",
-   "label": "\u6e32\u67d3\u5668",
-   "type": "choice",
-   "default": "auto",
-   "options": [
-    [
-     "auto",
-     "GPU 60 \u5e27\uff08\u9ed8\u8ba4\uff09"
-    ],
-    [
-     "software",
-     "\u8f6f\u4ef6\u6e32\u67d3"
-    ]
-   ]
-  },
-  {
-   "key": "demo",
-   "label": "\u6f14\u793a\u6570\u636e",
-   "type": "choice",
-   "default": "auto",
-   "options": [
-    [
-     "auto",
-     "\u81ea\u52a8"
-    ],
-    [
-     "on",
-     "\u59cb\u7ec8"
-    ],
-    [
-     "off",
-     "\u4ece\u4e0d"
-    ]
-   ]
-  }
- ],
- "config": null,
- "stateIds": {
-  "MAIN": 1,
-  "SETTINGS": 11
- }
 }

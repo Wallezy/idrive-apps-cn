@@ -1,0 +1,61 @@
+{
+  "schemaVersion": "1.3.0",
+  "application": {
+    "uuid": "f82641ab-a2f4-5c1b-8f1f-81743bc3b0b9",
+    "type": "OnlineApp",
+    "name": "zf8hp",
+    "vendor": "custom",
+    "version": "1.5.7",
+    "defaultLanguage": "en_GB",
+    "stringBundleUuid": "027e7ff8-ad24-5068-9d21-fc4dddb17f46",
+    "resourceBundleUuid": "51403d33-02fd-5ffb-bfb3-42ea23a40815",
+    "entryPoints": [
+      {
+        "name": "ZF8HP_ENTRY",
+        "uuid": "cc8fedef-af4d-51f1-92ed-a7d524c5e789",
+        "textId": "SID_ZF8HP_TITLE",
+        "icon": "zf8hp_icon.png",
+        "insertionStateId": 20974,
+        "insertionFocusId": 2,
+        "insertionMode": "INSERT_BELOW",
+        "insertionOrder": 0,
+        "insertionPriority": 0,
+        "previewType": "NONE",
+        "bookmarkable": true,
+        "private": false,
+        "appearance": "DEFAULT",
+        "isGroupHeader": false,
+        "insertionGroup": 0
+      }
+    ],
+    "uiDescriptions": [
+      {
+        "applicationFilePath": "./uiDescriptions/ID7/application.xml",
+        "uiDescriptionFilePath": "./uiDescriptions/ID7/uiDescription.json",
+        "hmi": [
+          "ID7"
+        ]
+      },
+      {
+        "applicationFilePath": "./uiDescriptions/ID8/application.xml",
+        "uiDescriptionFilePath": "./uiDescriptions/ID8/uiDescription.json",
+        "hmi": [
+          "ID8"
+        ]
+      }
+    ],
+    "variantGroups": [
+      {
+        "stringsPath": "./variantGroups/Common/texts",
+        "resourcesPath": "./variantGroups/Common/images",
+        "hmi": [
+          "ID7",
+          "ID8"
+        ],
+        "brands": [
+          "BMW"
+        ]
+      }
+    ]
+  }
+}
