@@ -1,6 +1,15 @@
 {
   "cluster-render": [
     {
+      "version": "0.5.14",
+      "upstreamVersion": "0.5.9",
+      "cnRevision": 3,
+      "changes": [
+        "移除地图下层校准协议、测试网格及临时画布覆盖。",
+        "保留仪表全屏地图的原厂表盘透明遮罩与兼容性检查。"
+      ]
+    },
+    {
       "version": "0.5.13",
       "upstreamVersion": "0.5.9",
       "cnRevision": 2,

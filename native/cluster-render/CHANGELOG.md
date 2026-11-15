@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.5.14
+
 - Remove the experimental map-underlay calibration protocol, grid layers and viewport overrides. Keep the full-panel map gauge mask and normal rendering behavior.
 
 ## 0.5.13
