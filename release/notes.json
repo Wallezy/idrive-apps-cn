@@ -1,6 +1,14 @@
 {
   "cluster-render": [
     {
+      "version": "next",
+      "changes": [
+        "修复主题切换时短暂花屏。"
+      ],
+      "upstreamVersion": "0.6.0",
+      "cnRevision": 2
+    },
+    {
       "version": "0.6.1",
       "upstreamVersion": "0.6.0",
       "cnRevision": 1,
