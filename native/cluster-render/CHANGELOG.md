@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Remove the experimental map-underlay calibration protocol, grid layers and viewport overrides. Keep the full-panel map gauge mask and normal rendering behavior.
+
 ## 0.5.13
 
 - Add the `video_gauge_mask_v1` capability for the ID7 1920×720 panel.

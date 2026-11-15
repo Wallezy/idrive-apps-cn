@@ -314,19 +314,12 @@ public:
     std::vector<const Asset *> assets() const;
     uint64_t owner_of(uint32_t id) const;
 
-    /* A bounded, socket-owned ID7 map calibration. Only the scene viewport
-     * changes; target identities and the ordinary clients' geometry stay
-     * fixed. No settings are written. The UI renews a two-second lease. */
-    bool underlay_supported() const;
-    bool underlay(uint64_t owner, const std::string &action, bool parked, int64_t now_ms, std::string *err);
-    std::string underlay_status(uint64_t owner, int64_t now_ms) const;
-
     bool publish(const TargetSpec &t, std::string *err) override;
     void unpublish(const TargetSpec &t) override;
     /* Charges the budget the scene's buffer bytes, layers' and assets', or
      * a file scene's files. */
     void resent(const TargetSpec &t, int64_t now_ms) override;
-    /* Scene content or the calibration canvas differs from the published scene. */
+    /* Scene content or target dimensions differ from the published scene. */
     bool stale(const TargetSpec &t) const override;
     /* The published file scene's content has another file since. */
     bool outdated(const TargetSpec &t) const override;
@@ -446,17 +439,6 @@ private:
          * order: kept to save allocating it each tick. */
         std::vector<std::pair<int32_t, uint32_t>> walk;
     };
-    struct Underlay {
-        uint64_t owner = 0;
-        uint32_t layer = 0, source = 0, w = 0, h = 0;
-        int target = -1;
-        int64_t deadline = 0, lease = 0;
-        bool shown = false;
-        std::string reason = "idle";
-    } underlay_;
-    TargetSpec canvas(const TargetSpec &spec) const;
-    void end_underlay(const std::string &reason);
-    void tick_underlay(int64_t now_ms);
     struct VideoSpec {
         uint32_t id = 0;
         int target = 0;

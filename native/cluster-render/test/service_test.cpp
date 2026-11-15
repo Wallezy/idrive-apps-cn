@@ -660,6 +660,24 @@ static void guide_hold_choice()
 
 /* The KOMBI restarting: our mappings dropped and the display service gone,
  * then back. */
+static void retired_calibration()
+{
+    Rig r;
+    r.sc.backend = "id7";
+    r.svc.reset();
+    r.start();
+    Raw old(r.path);
+    old.send("{\"op\":\"hello\",\"app\":\"old-calibration\"}");
+    r.pump(50);
+    const std::string hello = old.events();
+    ok("ID7 advertises full-panel gauge masking without calibration",
+       has(hello, "video_gauge_mask_v1") && !has(hello, "\"underlay\""));
+    old.send("{\"op\":\"underlay\",\"action\":\"expanded\",\"parked\":1}");
+    r.pump(50);
+    ok("retired calibration requests cannot create a grid or acquire a display",
+       has(old.events(), "unknown op") && r.svc->compositor().layers().empty() && r.port.requests == 0);
+}
+
 static void kombi_restart(Rig &r)
 {
     r.port.watchdog();
@@ -1842,6 +1860,7 @@ int main()
     take_over_and_fall_back();
     guide_hold();
     guide_hold_choice();
+    retired_calibration();
     hud_yield_choice();
     mapping_guard();
     repeats();
