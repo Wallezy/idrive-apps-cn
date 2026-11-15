@@ -201,7 +201,7 @@ public:
     /* A copy of the newest picture into *out; false when this feed has none
      * at hand. */
     bool latest(std::vector<uint8_t> *out) const;
-    /* cluster-render reports the target disabled. */
+    /* cluster-render's mapping guard keeps the target's mapping off. */
     bool disabled() const;
     /* Frames scaled for this feed. */
     uint64_t scaled_frames() const { return worker_.frames(); }

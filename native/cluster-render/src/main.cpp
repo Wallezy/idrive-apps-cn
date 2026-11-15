@@ -39,7 +39,7 @@ namespace {
  * status once the service starts (service_config). */
 std::vector<std::string> drop_in_report;
 
-/* The mapping guard's strikes, as cluster-render 0.5.11 and older keep
+/* The mapping guard's strikes, as cluster-render 0.5.10 and older keep
  * them: nothing reads them, and the service removes the file at start. */
 const char kOldStateFile[] = "/var/opt/cluster-render/state/guard.txt";
 
@@ -53,8 +53,6 @@ bool crs::service_config(const cld::Config &cfg, int generation, ServiceConfig *
     for (const std::string &line : drop_in_report)
         cld::log(line.compare(0, 8, "skipped ") ? 'I' : 'W', "drop-in %s", line.c_str());
     sc.drop_ins = drop_in_report;
-    if (cfg.has("guard_path"))
-        cld::log('W', "setting guard_path is not used; ignored");
     if (unlink(kOldStateFile) == 0)
         cld::log('I', "%s removed: its strikes are not used", kOldStateFile);
     else if (errno != ENOENT)
