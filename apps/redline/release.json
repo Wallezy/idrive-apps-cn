@@ -2,8 +2,10 @@
   "build": "node ../../tools/build_localized.js",
   "requires": {
     "mgu-deploy": "0.8.18",
-    "cluster-render": "0.5.13",
-    "mgu-render": "0.6.21"
+    "mgu-render": "0.6.24",
+    "mgu-inputgate": "1.1.1",
+    "robertn_store": "0.9.45",
+    "cluster-render": "0.6.2"
   },
   "uninstallable": true,
   "mguHmi": [

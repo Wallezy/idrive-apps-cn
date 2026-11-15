@@ -1,10 +1,10 @@
 {
   "name": "dtc_scanner",
-  "version": "2.9.8",
+  "version": "2.9.9",
   "description": "Read and clear fault memory of every control unit, plus active Check Control messages",
   "main": "javascript/localized-entry.js",
   "private": false,
-  "author": "cauliflowermossgrape; Chinese translation: JackieZ123430",
+  "author": "custom",
   "license": "MIT",
   "engines": {
     "node": ">=8.7.0"
@@ -32,6 +32,7 @@
     "rhmiData",
     "LICENSE",
     "NOTICE.zh-CN.md",
-    "PROVENANCE.json"
+    "PROVENANCE.json",
+    "CHANGELOG.md"
   ]
 }

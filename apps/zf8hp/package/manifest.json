@@ -146,8 +146,7 @@
       "broadcasts": [
         "sendTasuResponse"
       ]
-    },
-    "de.bmw.infotainment.certification.Certification": "*"
+    }
   },
   "services": {
     "de.bmw.infotainment.telematic.oap.AppStatus": {

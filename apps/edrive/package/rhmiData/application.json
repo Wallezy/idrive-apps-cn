@@ -5,8 +5,8 @@
     "type": "OnlineApp",
     "name": "edrive",
     "vendor": "custom",
-    "version": "2.9.3",
-    "defaultLanguage": "zh_CN",
+    "version": "2.9.4",
+    "defaultLanguage": "en_GB",
     "stringBundleUuid": "a454a670-0d1c-57a8-b912-b202345d70a1",
     "resourceBundleUuid": "7789a63f-9550-5be1-b93e-dac315e0b593",
     "entryPoints": [
@@ -42,7 +42,8 @@
         "stringsPath": "./variantGroups/Common/texts",
         "resourcesPath": "./variantGroups/Common/images",
         "hmi": [
-          "ID7"
+          "ID7",
+          "ID8"
         ],
         "brands": [
           "BMW"

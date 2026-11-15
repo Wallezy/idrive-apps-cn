@@ -5,7 +5,7 @@
     "type": "OnlineApp",
     "name": "warmup",
     "vendor": "custom",
-    "version": "1.4.6",
+    "version": "1.8.2",
     "defaultLanguage": "en_GB",
     "stringBundleUuid": "097f0ba0-09c3-5a42-b9a3-54c56e0342f9",
     "resourceBundleUuid": "82ce46d1-9d9b-5d27-af47-7a4139900ec3",
@@ -42,7 +42,8 @@
         "stringsPath": "./variantGroups/Common/texts",
         "resourcesPath": "./variantGroups/Common/images",
         "hmi": [
-          "ID7"
+          "ID7",
+          "ID8"
         ],
         "brands": [
           "BMW"

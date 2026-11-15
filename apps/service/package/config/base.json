@@ -1,4 +1,6 @@
 {
+  "rhmiLoadingEnabled": true,
+  "entryPointLoadingEnabled": true,
   "settings": {
     "service": {}
   }

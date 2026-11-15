@@ -13,51 +13,51 @@
   },
   "brake_test": {
     "title": "制动测试",
-    "description": "记录制动距离、时间与减速度，提供简体中文菜单和设置。"
+    "description": "记录制动距离与时间，查看历史成绩。 简体中文界面，支持在线更新。"
   },
   "car_vitals": {
     "title": "M 车辆仪表",
-    "description": "显示车辆温度、转速、功率等实时信息，提供简体中文菜单和设置。"
+    "description": "查看发动机、温度、燃油、点火及底盘实时数据。 简体中文界面，支持在线更新。"
   },
   "doom": {
     "title": "毁灭战士",
-    "description": "Doom / Freedoom：简体中文启动菜单和设置，游戏内贴图保持原文。"
+    "description": "驻车时游玩 Freedoom，支持全屏画面和旋钮操作。 简体中文界面，支持在线更新。"
   },
   "draggy": {
     "title": "弹射模式",
-    "description": "记录起步、加速分段和成绩，提供简体中文菜单和设置。"
+    "description": "测量加速时间，查看历史与最佳成绩。 简体中文界面，支持在线更新。"
   },
   "dtc_scanner": {
     "title": "故障检测",
-    "description": "读取故障码与车辆诊断信息；内置常见说明汉化，未收录说明保留原文。"
+    "description": "读取与清除故障码，查看控制单元和中文故障说明。 简体中文界面，支持在线更新。"
   },
   "dyno": {
     "title": "虚拟马力机",
-    "description": "根据车辆数据估算功率和扭矩，提供简体中文菜单和设置。"
+    "description": "记录车辆加速过程，估算功率与扭矩并保存结果。 简体中文界面，支持在线更新。"
   },
   "edrive": {
-    "title": "EDrive助手",
-    "description": "显示混动车辆电驱与电池信息，提供简体中文菜单和设置。"
+    "title": "EDrive 助手",
+    "description": "查看续航、电池状态、充电记录与实时能耗。 简体中文界面，支持在线更新。"
   },
   "gforce": {
     "title": "G 值仪表",
-    "description": "显示加速度和 G 值信息，提供简体中文菜单和设置。"
+    "description": "显示纵横向加速度，查看记录与峰值。 简体中文界面，支持在线更新。"
   },
   "redline": {
     "title": "换挡转速",
-    "description": "显示转速与换挡提示，提供简体中文菜单和设置。"
+    "description": "显示转速、挡位与换挡提示，支持 HUD 样式设置。 简体中文界面，支持在线更新。"
   },
   "service": {
     "title": "保养信息",
-    "description": "显示保养项目与车辆信息，提供简体中文菜单和设置。"
+    "description": "查看车辆保养项目、剩余里程与到期信息。 简体中文界面，支持在线更新。"
   },
   "warmup": {
     "title": "暖机助手",
-    "description": "显示油温、水温及暖机状态，提供简体中文菜单和设置。"
+    "description": "查看机油与车辆温度，辅助判断暖机状态。 简体中文界面，支持在线更新。"
   },
   "ambient_config": {
     "title": "氛围灯设置",
-    "description": "自定义氛围灯颜色、亮度和动画，按驾驶模式切换并保存收藏。简体中文界面，支持国内源在线更新。"
+    "description": "自定义氛围灯颜色、亮度与动画，按驾驶模式切换。 简体中文界面，支持在线更新。"
   },
   "cluster_themes": {
     "title": "仪表主题 (Cluster Themes)",
@@ -65,6 +65,18 @@
   },
   "zf8hp": {
     "title": "ZF 8HP 变速箱监测",
-    "description": "只读查看 ZF 8HP 实时数据、离合器适配、换挡曲线与油温历史；简体中文界面。"
+    "description": "只读查看变速箱实时数据、离合器适配、换挡曲线及油温历史。 简体中文界面，支持在线更新。"
+  },
+  "live_adjustments": {
+    "title": "发动机设置",
+    "description": "控制排气阀门；兼容车辆可使用 BM3、MHD 设置及实验性 xDrive 功能。 简体中文界面，支持在线更新。"
+  },
+  "live_data": {
+    "title": "实时数据",
+    "description": "自定义车辆数据页面，查看行程、信号与控制单元信息。 简体中文界面，支持在线更新。"
+  },
+  "mgu-inputgate": {
+    "title": "旋钮输入支持",
+    "description": "供应用使用 iDrive 旋钮；保留返回和菜单键，下次车机正常启动后生效。"
   }
 }

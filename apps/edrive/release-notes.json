@@ -1,5 +1,14 @@
 [
   {
+    "version": "2.9.4",
+    "upstreamVersion": "2.9.2",
+    "cnRevision": 2,
+    "changes": [
+      "保留驻车休眠与缺失读数处理。",
+      "完善简体中文显示，保留无水印界面。"
+    ]
+  },
+  {
     "version": "2.9.3",
     "upstreamVersion": "2.9.2",
     "cnRevision": 1,

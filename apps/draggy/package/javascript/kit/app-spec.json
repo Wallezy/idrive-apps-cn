@@ -1,12 +1,12 @@
 {
  "id": "draggy",
- "title": "\u5f39\u5c04\u6a21\u5f0f",
- "version": "2.3.2",
+ "title": "\u52a0\u901f\u8ba1\u65f6",
+ "version": "2.5.21",
  "screens": [
   {
    "name": "MAIN",
    "kind": "canvas",
-   "title": "\u5f39\u5c04\u6a21\u5f0f",
+   "title": "\u52a0\u901f\u8ba1\u65f6",
    "buttons": [
     [
      "BTN_ACTION",
@@ -30,7 +30,7 @@
  "settings": [
   {
    "key": "speedUnit",
-   "label": "\u5355\u4f4d",
+   "label": "\u901f\u5ea6\u5355\u4f4d",
    "type": "choice",
    "default": "kmh",
    "options": [
@@ -67,6 +67,12 @@
   {
    "key": "rollout",
    "label": "\u4e00\u82f1\u5c3a\u8d77\u6b65\u8c41\u514d",
+   "type": "bool",
+   "default": false
+  },
+  {
+   "key": "advanced",
+   "label": "\u9ad8\u7ea7\u8bbe\u7f6e",
    "type": "bool",
    "default": false
   },
@@ -108,7 +114,10 @@
     15,
     30,
     60
-   ]
+   ],
+   "when": {
+    "advanced": true
+   }
   },
   {
    "key": "layout",
@@ -146,7 +155,7 @@
    "key": "demo",
    "label": "\u6f14\u793a\u6570\u636e",
    "type": "choice",
-   "default": "auto",
+   "default": "off",
    "options": [
     [
      "auto",
@@ -183,6 +192,7 @@
    }
   }
  },
+ "startWidget": null,
  "stateIds": {
   "MAIN": 1,
   "SETTINGS": 11

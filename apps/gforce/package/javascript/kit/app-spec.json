@@ -1,7 +1,7 @@
 {
  "id": "gforce",
  "title": "G \u503c\u4eea\u8868",
- "version": "1.4.2",
+ "version": "1.6.22",
  "screens": [
   {
    "name": "MAIN",
@@ -60,8 +60,14 @@
    "default": false
   },
   {
+   "key": "flipLong",
+   "label": "\u4ea4\u6362\u52a0\u901f\u548c\u5236\u52a8\uff08\u5236\u52a8\u5728\u4e0a\uff09",
+   "type": "bool",
+   "default": false
+  },
+  {
    "key": "speedUnit",
-   "label": "\u5355\u4f4d",
+   "label": "\u901f\u5ea6\u5355\u4f4d",
    "type": "choice",
    "default": "kmh",
    "options": [
@@ -74,6 +80,12 @@
      "mph"
     ]
    ]
+  },
+  {
+   "key": "advanced",
+   "label": "\u9ad8\u7ea7\u8bbe\u7f6e",
+   "type": "bool",
+   "default": false
   },
   {
    "key": "theme",
@@ -112,7 +124,10 @@
     15,
     30,
     60
-   ]
+   ],
+   "when": {
+    "advanced": true
+   }
   },
   {
    "key": "layout",
@@ -150,7 +165,7 @@
    "key": "demo",
    "label": "\u6f14\u793a\u6570\u636e",
    "type": "choice",
-   "default": "auto",
+   "default": "off",
    "options": [
     [
      "auto",
@@ -168,6 +183,7 @@
   }
  ],
  "config": null,
+ "startWidget": null,
  "stateIds": {
   "MAIN": 1,
   "SETTINGS": 11

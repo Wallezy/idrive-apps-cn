@@ -115,12 +115,31 @@ function zoneColor(t, g, v, base) {
 const col = (t, c, dflt) => (c ? t[c] || c : dflt);
 
 /* ---------------- panel ---------------- */
-/** Widget chrome in the OEM (G20 / MGU7) style; cached as a layer. */
-function panel(cv, t, x, y, w, h, title) {
+/** Widget chrome in the OEM (G20 / MGU7) style; cached as a layer. Returns the rect drawn: { x, y, w, h }. */
+function panel(cv, t, x, y, w, h, title) { return box(cv, t, x, y, w, stretch(cv, y, h), title); }
+/**
+ * Height of a panel at y: one down to the page's bottom goes on down to the screen's where there is room
+ * (cv.extra: display.js). (read only then: a page whose panels all end higher up is centred in the room instead)
+ */
+function stretch(cv, y, h) { return y + h >= 500 && cv.extra ? h + cv.extra : h; }
+function box(cv, t, x, y, w, h, title) {
     x = Math.round(x); y = Math.round(y); w = Math.round(w); h = Math.round(h);
     const L = layer(['panel', w, h, title || '', t.name].join('|'), w, h, (c) => drawPanel(c, t, 0, 0, w, h, title), cv.textScale);
     cv.blit(L, x, y);
+    return { x, y, w, h };
 }
+/**
+ * The page's content bottom: BOTTOM, plus the room the screen has below the page (cv.extra: where the kit
+ * runs the screen with no bar under the page, else 0). Reading it places the page as one that reaches down.
+ */
+function pageBottom(cv) { return BOTTOM + (cv.extra || 0); }
+/** px between a panel's bottom and its last line (the lowest drawn pixel): the same in every panel. */
+const MARGIN = 22;
+/**
+ * How far down to move a panel's bottom part, laid out m px over the bottom of the unstretched panel (y + h),
+ * so it ends MARGIN over the panel's real bottom, room px lower (G.panel's stretch: cv.extra, else 0).
+ */
+function toMargin(room, m) { return room + m - MARGIN; }
 function drawPanel(cv, t, x, y, w, h, title) {
     // flat light grey overlay; top: a short bold bar in the theme's stripe colours (M tricolour:
     // light blue, dark blue, red; the last part with an angled end), then a thin white line;
@@ -273,48 +292,76 @@ function rampSlab(cv, x0, x1, y, h, sl, stops, spanX, spanW) {
  * scale line under it with numbers, and the peak ("hang") along the top edge.
  * g.niceMax: extend the scale to the next round number; g.ramp = 'hot': tach colours along
  * the scale; g.color: fill colour (theme key or #hex).
+ * g.origin: the fill runs from this value to the value, both ways (regen / use), with a white mark
+ * on it; below it in g.negColor. g.head: false leaves out the label / value row (the bar at y).
+ * g.track: the empty track's colour. g.ticks: the values marked on the scale line; g.labels:
+ * [{ value, text, color, align }] in place of its numbers. g.text / g.valueColor: the value row's text and colour
+ * in place of the formatted value. g.peakText: the peak as a number too ("PEAK 312"), small, after the label
+ * (left out where the label and the value leave no room for it).
  */
 function bar(cv, t, x, y, w, h, g) {
     const min = g.min || 0, v = g.value;
     let max = g.max == null ? 100 : g.max;
     const step = g.step || niceStep(max - min, 4);
     if (g.niceMax) max = min + Math.ceil((max - min) / step - 1e-9) * step;
-    const sv = sm(g, 'bar|' + x + '|' + y, v);
-    const f = isNum(sv) ? clamp((sv - min) / (max - min), 0, 1) : 0;
-    cv.text(upperText(g.label || ''), x, y + 26, 22, t.dim, { font: 'bold', spacing: 2 });
-    const uw = g.unit ? cv.textWidth(' ' + g.unit, 26) : 0;
-    cv.text(fmt(v, g.decimals), x + w - uw, y + 30, 44, isNum(v) ? t.text : t.dim, { align: 'right', font: 'num' });
-    if (g.unit) cv.text(' ' + g.unit, x + w, y + 30, 26, t.dim, { align: 'right' });
-    const bh = 22, by = y + 44, SL = 18, bw = w - SL;
+    const sv = sm(g, 'bar|' + x + '|' + y, v), head = g.head !== false;
+    if (head) {
+        const label = upperText(g.label || '');
+        cv.text(label, x, y + 26, 22, t.dim, { font: 'bold', spacing: 2 });
+        const uw = g.unit ? cv.textWidth(' ' + g.unit, 26) : 0, vs = g.text != null ? g.text : fmt(v, g.decimals);
+        cv.text(vs, x + w - uw, y + 30, 44, g.valueColor ? t[g.valueColor] || g.valueColor : isNum(v) ? t.text : t.dim, { align: 'right', font: 'num' });
+        if (g.unit) cv.text(' ' + g.unit, x + w, y + 30, 26, t.dim, { align: 'right' });
+        if (g.peakText && isNum(g.peak)) {
+            const ps = localizeLabel('PEAK') + ' ' + fmt(g.peak, g.decimals), po = { font: 'label', spacing: 1, literal: true };
+            const px = x + cv.textWidth(label, 22, { font: 'bold', spacing: 2 }) + 22;
+            if (px + cv.textWidth(ps, 20, po) <= x + w - uw - cv.textWidth(vs, 44, { font: 'num' }) - 18) cv.text(ps, px, y + 26, 20, t.hang || t.accent2 || t.dim, po);
+        }
+    }
+    const bh = 22, by = y + (head ? 44 : 0), SL = 18, bw = w - SL;
     const X = (val) => x + clamp((val - min) / (max - min), 0, 1) * bw;
-    slab(cv, x, x + bw, by, bh, SL, withAlpha('#d4d8de', 0.34));
+    slab(cv, x, x + bw, by, bh, SL, g.track ? t[g.track] || g.track : withAlpha('#d4d8de', 0.34));
     const base = g.color ? t[g.color] || g.color : t.bar || t.accent, c = zoneColor(t, g, sv, base);
     const stops = g.ramp === 'hot' && c === base ? t.hotRamp || t.ramp : null;
-    if (f > 0) {
-        const xe = X(sv), cap = 7, top = Math.round(bh * 0.42), oT = SL * (bh - top) / bh;
+    const o = g.origin == null ? min : clamp(g.origin, min, max), xo = X(o);
+    const cap = 7, top = Math.round(bh * 0.42), oT = SL * (bh - top) / bh;
+    if (isNum(sv) && sv > o && X(sv) > xo) {
+        const xe = X(sv), span = x + bw + SL - xo;
         if (stops) {
             // colour of its position on the scale; the upper part lighter
             const lite = stops.map((s) => mix(s, '#ffffff', 0.28));
-            rampSlab(cv, x, xe, by + top, bh - top, oT, stops, x, bw + SL);
-            rampSlab(cv, x + oT, xe + oT, by, top, SL - oT, lite, x, bw + SL);
+            rampSlab(cv, xo, xe, by + top, bh - top, oT, stops, xo, span);
+            rampSlab(cv, xo + oT, xe + oT, by, top, SL - oT, lite, xo, span);
         } else {
-            slab(cv, x, xe, by, bh, SL, c);
-            cv.quad([[x + SL, by], [xe + SL, by], [xe + oT, by + top], [x + oT, by + top]], mix(c, '#ffffff', 0.28));
+            slab(cv, xo, xe, by, bh, SL, c);
+            cv.quad([[xo + SL, by], [xe + SL, by], [xe + oT, by + top], [xo + oT, by + top]], mix(c, '#ffffff', 0.28));
         }
-        if (xe - x > cap + 4) { slab(cv, xe - cap - 3, xe - cap, by, bh, SL, t.bg); slab(cv, xe - cap, xe, by, bh, SL, '#ffffff'); }
+        if (xe - xo > cap + 4) { slab(cv, xe - cap - 3, xe - cap, by, bh, SL, t.bg); slab(cv, xe - cap, xe, by, bh, SL, '#ffffff'); }
+    } else if (isNum(sv) && sv < o && X(sv) < xo) {
+        // below the origin: the fill runs left, its white stripe at the left end
+        const xe = X(sv), nc = g.negColor ? t[g.negColor] || g.negColor : c;
+        slab(cv, xe, xo, by, bh, SL, nc);
+        cv.quad([[xe + SL, by], [xo + SL, by], [xo + oT, by + top], [xe + oT, by + top]], mix(nc, '#ffffff', 0.28));
+        if (xo - xe > cap + 4) { slab(cv, xe + cap, xe + cap + 3, by, bh, SL, t.bg); slab(cv, xe, xe + cap, by, bh, SL, '#ffffff'); }
     }
+    if (g.origin != null) cv.line(xo + SL + 5, by - 6, xo - 5, by + bh + 6, 3, t.text);
     if (isNum(g.peak) && (g.peak - min) / (max - min) > 0.02) {
         const px = X(g.peak), hc = t.hang || (stops ? ramp(stops, (px - x) / bw) : c);
         cv.fillRect(x + SL, by - 2, px - x, 5, hc);
         if (!isNum(sv) || g.peak > sv) cv.line(px + SL, by, px, by + bh, 4, hc);
     }
     const dec = g.scaleDecimals != null ? g.scaleDecimals : step % 1 ? 1 : 0;
-    const marks = [];
-    for (let a = min; a <= max + 1e-9; a += step) marks.push(a);
-    if (max - marks[marks.length - 1] > step * 0.45) marks.push(max);
+    let marks = g.ticks;
+    if (!marks) {
+        marks = [];
+        for (let a = min; a <= max + 1e-9; a += step) marks.push(a);
+        if (max - marks[marks.length - 1] > step * 0.45) marks.push(max);
+    }
     cv.fillRect(x, by + bh + 2, bw, 2, withAlpha('#ffffff', 0.85));
-    marks.slice(1).forEach((a) => { if (a < max - 1e-9) cv.fillRect(X(a) - 2, by + bh + 2, 4, 2, t.bg); });
-    if (h >= 80) marks.forEach((a) => cv.text(fmt(a, dec), X(a), by + bh + 26, 20, withAlpha(t.text, 0.85), { align: 'center', font: 'bold' }));
+    marks.forEach((a) => { if (a > min + 1e-9 && a < max - 1e-9) cv.fillRect(X(a) - 2, by + bh + 2, 4, 2, t.bg); });
+    if (h >= (head ? 80 : 50)) {
+        (g.labels || marks.map((a) => ({ value: a, text: fmt(a, dec) }))).forEach((l) =>
+            cv.text(l.text, X(l.value), by + bh + 26, 20, l.color ? t[l.color] || l.color : withAlpha(t.text, 0.85), { align: l.align || 'center', font: 'bold' }));
+    }
 }
 
 /**
@@ -325,7 +372,7 @@ function bar(cv, t, x, y, w, h, g) {
  * g.panel = false: no panel / title (just the bar in x, y, w, h).
  */
 function segBar(cv, t, x, y, w, h, g) {
-    if (g.panel !== false) panel(cv, t, x, y, w, h, g.label);
+    if (g.panel !== false) { h = stretch(cv, y, h); box(cv, t, x, y, w, h, g.label); }   // (the bar grows with its panel)
     const min = g.min || 0, max = g.max, v = g.value, sv = sm(g, 'seg|' + x + '|' + y, v), step = g.step || (max - min) / 16, SL = 18;
     const hot = g.ramp === 'hot', lim = g.limit == null ? max : g.limit, over = hot && isNum(v) && v >= lim;
     const base = g.color ? t[g.color] || g.color : t.accent;
@@ -336,7 +383,8 @@ function segBar(cv, t, x, y, w, h, g) {
         if (g.unit) cv.text(' ' + g.unit, x + w - 24, y + 60, 26, t.dim, { align: 'right' });
     }
     const bx = x + (g.panel !== false ? 24 : 0), bw = w - (g.panel !== false ? 48 : 0) - SL;
-    const y0 = g.panel !== false ? y + 80 : y, y1 = g.panel !== false ? y + Math.max(130, h - 82) : y + h;
+    // (in a panel: the scale's labels end ~20 px over its bottom, as other panels' last lines do)
+    const y0 = g.panel !== false ? y + 80 : y, y1 = g.panel !== false ? y + Math.max(130, h - 64) : y + h;
     const X = (val) => bx + clamp((val - min) / (max - min), 0, 1) * bw;
     const band = (a, b, c, pad) => {
         pad = pad || 0; const xa = X(a), xb = X(b);
@@ -372,24 +420,26 @@ function segBar(cv, t, x, y, w, h, g) {
 /* ---------------- tiles / readouts ---------------- */
 /** Stat tile: label, big value + unit, optional history trace. */
 function stat(cv, t, x, y, w, h, g) {
-    panel(cv, t, x, y, w, h, g.label);
+    // the trace and the sub line follow a stretched panel's bottom (hb); sizes keep to the tile's own h
+    const hb = stretch(cv, y, h);
+    box(cv, t, x, y, w, hb, g.label);
     const v = g.value, c = zoneColor(t, g, v, g.color ? t[g.color] || g.color : t.accent);
     const vcol = zoneColor(t, g, v, g.valueColor ? t[g.valueColor] || g.valueColor : t.text);
-    const hist = (g.history || []).filter(isNum);
+    const hist = (g.history || []).filter(isNum), size = g.size || Math.min(96, h * 0.42), vy = y + 52 + size * 0.78;
     if (hist.length > 2 && h > 150) {
-        const hx = x + 18, hw = w - 36, hy = y + h - (g.sub ? 44 : 18), hh = Math.min(60, h * 0.25);
+        // (the trace stays under the value: at most up to 8 px under its baseline)
+        const hx = x + 18, hw = w - 36, hy = y + hb - (g.sub ? MARGIN + 28 : MARGIN), hh = Math.min(60, h * 0.25, hy - vy - 8);
         let lo = Math.min.apply(null, hist), hi = Math.max.apply(null, hist);
         if (hi - lo < 1e-6) { lo -= 1; hi += 1; }
         const pts = g.history.map((p, i) => [hx + (i / Math.max(1, g.history.length - 1)) * hw, isNum(p) ? hy - ((p - lo) / (hi - lo)) * hh : hy]);
         cv.fillUnder(pts, hy, withAlpha(c, 0.16));
         cv.polyline(pts, 2.5, withAlpha(c, 0.85));
     }
-    const size = g.size || Math.min(96, h * 0.42);
     const vs = fmt(v, g.decimals);
     const vw = cv.textWidth(vs, size, { font: 'num' });
-    cv.text(vs, x + 18, y + 52 + size * 0.78, size, isNum(v) ? vcol : t.dim, { font: 'num' });
-    if (g.unit) cv.text(g.unit, x + 26 + vw, y + 52 + size * 0.78, 28, t.dim);
-    if (g.sub) cv.text(g.sub, x + 18, y + h - 16, 22, t.dim, { spacing: 0.5 });
+    cv.text(vs, x + 18, vy, size, isNum(v) ? vcol : t.dim, { font: 'num' });
+    if (g.unit) cv.text(g.unit, x + 26 + vw, vy, 28, t.dim);
+    if (g.sub) cv.text(g.sub, x + 18, y + hb - MARGIN, 22, t.dim, { spacing: 0.5 });
 }
 
 /**
@@ -495,7 +545,9 @@ function chart(cv, t, x, y, w, h, g) {
 
 /**
  * Table: cols = [{ label, w, align, color, font, size }], rows = [[cell, ...], ...] where a cell
- * is text or { text, color }. g = { rowH (40), headerSize (16), size (24), empty, stripe }.
+ * is text or { text, color }. g = { rowH (40), headerSize (16), size (24), empty, stripe, middle }.
+ * A row's text sits at 0.68 of its height (level with the kit's 40 px rows); with middle, in its
+ * middle, for taller rows.
  */
 function table(cv, t, x, y, w, cols, rows, g) {
     g = g || {};
@@ -516,7 +568,7 @@ function table(cv, t, x, y, w, cols, rows, g) {
             if (cell == null) return;
             const txt = typeof cell === 'object' ? cell.text : cell, cc = typeof cell === 'object' && cell.color ? col(t, cell.color, t.text) : col(t, c.color, t.text);
             const al = c.align || 'left', tx = al === 'right' ? xs[i] + c.w - 8 : al === 'center' ? xs[i] + c.w / 2 : xs[i];
-            cv.text(String(txt), tx, ry + rh * 0.68, c.size || sz, cc, { align: al, font: (typeof cell === 'object' && cell.font) || c.font || 'label' });
+            cv.text(String(txt), tx, ry + (g.middle ? rh / 2 + (c.size || sz) * 0.36 : rh * 0.68), c.size || sz, cc, { align: al, font: (typeof cell === 'object' && cell.font) || c.font || 'label' });
         });
     });
 }
@@ -572,7 +624,8 @@ function tyres(cv, t, x, y, w, h, g) {
  */
 function gmeter(cv, t, cx, cy, r, g) {
     const max = g.max || 1.5;
-    const key = ['gmeter', r, max, t.name].join('|'), S = Math.ceil(r + 4);
+    const flip = !!g.flipLong;                  // brake on top, accel at the bottom (issue #72)
+    const key = ['gmeter', r, max, t.name, flip].join('|'), S = Math.ceil(r + 4);
     cv.blit(layer(key, 2 * S + 80, 2 * S, (c) => {
         const x = S, y = S;
         for (let ring_ = 0.5; ring_ <= max + 1e-6; ring_ += 0.5) {
@@ -582,10 +635,10 @@ function gmeter(cv, t, cx, cy, r, g) {
         }
         c.line(x - r, y, x + r, y, 2, withAlpha(t.tick, 0.6));
         c.line(x, y - r, x, y + r, 2, withAlpha(t.tick, 0.6));
-        c.text('BRAKE', x, y + r - 14, 22, t.dim, { align: 'center', font: 'bold', spacing: 1.5 });
-        c.text('ACCEL', x, y - r + 32, 22, t.dim, { align: 'center', font: 'bold', spacing: 1.5 });
+        c.text(flip ? 'ACCEL' : 'BRAKE', x, y + r - 14, 22, t.dim, { align: 'center', font: 'bold', spacing: 1.5 });
+        c.text(flip ? 'BRAKE' : 'ACCEL', x, y - r + 32, 22, t.dim, { align: 'center', font: 'bold', spacing: 1.5 });
     }, cv.textScale), Math.round(cx) - S, Math.round(cy) - S);
-    const P = (lat, lon) => [cx + clamp(lat / max, -1.1, 1.1) * r, cy - clamp(lon / max, -1.1, 1.1) * r];
+    const P = (lat, lon) => [cx + clamp(lat / max, -1.1, 1.1) * r, cy + (flip ? 1 : -1) * clamp(lon / max, -1.1, 1.1) * r];
     const tr = g.trail || [];
     tr.forEach((p, i) => {
         if (!isNum(p[0]) || !isNum(p[1])) return;
@@ -611,8 +664,20 @@ function gmeter(cv, t, cx, cy, r, g) {
  * On the full-screen layout (GPU renderer) the frame surface carries a `chrome` object: the
  * tabs go there and the display draws them in the header up in the HMI's title strip, so the
  * page content gets the whole screen below it. Otherwise a slim tab bar (BAR_H) along the top.
+ * Each drawn tab is left in cv.tabRects ({ i, x, y, w, h }), so a touch on it can open that page.
  */
 const BAR_H = 36, TOP = 44, BOTTOM = 512;
+/**
+ * Tab widths: each name's width plus `pad`, at least `min`; when that doesn't fit in `room` the
+ * padding shrinks (down to `pad0`) and the minimum goes, so many tabs still show side by side.
+ */
+function tabWidths(cv, names, size, opt, min, pad, room, pad0) {
+    const tw = names.map((n) => cv.textWidth(n, size, opt));
+    const wide = tw.map((w) => Math.max(min, w + pad));
+    if (wide.reduce((a, b) => a + b, 0) <= room) return wide;
+    const p = Math.max(pad0, Math.min(pad, (room - tw.reduce((a, b) => a + b, 0)) / Math.max(1, names.length)));
+    return tw.map((w) => w + p);
+}
 function frame(cv, t, tabs, sel, badges) {
     if (cv.chrome) { cv.chrome.tabs = { tabs: tabs || [], sel, badges: (badges || []).filter(Boolean) }; return; }
     const W = cv.w, S = t.sel || t.accent;
@@ -620,9 +685,15 @@ function frame(cv, t, tabs, sel, badges) {
     cv.fillRect(0, 0, W, BAR_H, withAlpha('#ffffff', 0.07));
     cv.fillRect(0, BAR_H - 1, W, 1, withAlpha('#ffffff', 0.18));
     const opt = { align: 'center', font: 'bold', spacing: 1.5 };
+    const live = (badges || []).filter(Boolean);
+    const labels = (tabs || []).map((n) => upperText(n));
+    const badgesW = live.reduce((a, b) => a + Math.max(24 * 3.5, cv.textWidth(b.text, 18, opt) + 24) + 24 * 0.4, 0);
+    const widths = tabWidths(cv, labels, 20, opt, 150, 48, W - 32 - badgesW, 20);
     let x = 16;
-    (tabs || []).forEach((name, i) => {
-        const label = upperText(name), tw = Math.max(150, cv.textWidth(label, 20, opt) + 48), on = i === sel;
+    cv.tabRects = [];
+    labels.forEach((label, i) => {
+        const tw = widths[i], on = i === sel;
+        cv.tabRects.push({ i, x, y: 0, w: tw, h: BAR_H });
         if (on) {
             cv.gradientRect(x, 0, tw, BAR_H, [[0, withAlpha(S, 0)], [1, withAlpha(S, 0.22)]]);
             cv.fillRect(x, BAR_H - 4, tw, 4, S);
@@ -664,7 +735,7 @@ function header(cv, t, x, y, w, h, title, tabs, sel, badges, flat, compact) {
     cv.fillRect(x, y + h - 2, w, 2, withAlpha('#ffffff', 0.22));
     const right = badgeRow(cv, t, x + w - 16, y + (h - 30) / 2, 30, 18, badges || []);
     const names = (tabs || []).map((n) => upperText(n));
-    const tw = names.map((n) => Math.max(170, cv.textWidth(n, 20, opt) + 64));
+    const tw = tabWidths(cv, names, 20, opt, 170, 64, right - x - 20, 24);
     const tabsW = tw.reduce((a, b) => a + b, 0);
     let tx = x + 20;
     const tsize = 38, titleW = title ? cv.textWidth(title, tsize) : 0;
@@ -672,9 +743,11 @@ function header(cv, t, x, y, w, h, title, tabs, sel, badges, flat, compact) {
         cv.text(title, tx, y + h / 2 + tsize * 0.36, tsize, t.text);
         tx += titleW + 40;
     }
+    cv.tabRects = [];
     names.forEach((n, i) => {
         const on = i === sel, bw = tw[i];
         if (tx + bw > right) return;
+        cv.tabRects.push({ i, x: tx, y, w: bw, h });
         if (on) {
             cv.gradientRect(tx, y, bw, h, [[0, withAlpha(S, 0)], [1, withAlpha(S, 0.25)]]);
             cv.fillRect(tx, y + h - 5, bw, 5, S);
@@ -689,14 +762,15 @@ function headerCompact(cv, t, x, y, w, h, title, tabs, sel, badges) {
     const S = t.sel || t.accent, opt = { align: 'center', font: 'bold', spacing: 1.6 };
     const bopt = { align: 'center', font: 'bold', spacing: 1.5 };
     const names = (tabs || []).map((n) => upperText(n));
-    const tw = names.map((n) => Math.max(132, cv.textWidth(n, 18, opt) + 44));
-    const tabsW = tw.reduce((a, b) => a + b, 0);
     const bh = 30, bsize = 17;
     const bws = (badges || []).map((b) => Math.max(bh * 3.5, cv.textWidth(b.text, bsize, bopt) + bh));
     const badgesW = bws.reduce((a, b) => a + b + bh * 0.4, 0);
     const tsize = 32, titleW = title ? cv.textWidth(title, tsize) : 0;
     const room = w - 20 - (badgesW ? badgesW + 12 : 0);
-    const showTitle = title && titleW + 32 + tabsW <= room;
+    const tw = tabWidths(cv, names, 18, opt, 132, 44, room - 20, 20);
+    const tabsW = tw.reduce((a, b) => a + b, 0);
+    // the tabs start 20 px in: the name shows only where every tab still fits after it (else the last tab, Settings, drops)
+    const showTitle = title && 20 + titleW + 32 + tabsW <= room;
     // only as wide as the content: the rest of the strip stays the HMI's
     let end = x + 20 + (showTitle ? titleW + 32 : 0);
     names.forEach((n, i) => { if (end + tw[i] <= x + room) end += tw[i]; });
@@ -708,9 +782,11 @@ function headerCompact(cv, t, x, y, w, h, title, tabs, sel, badges) {
         cv.text(title, tx, y + h / 2 + tsize * 0.36, tsize, t.text);
         tx += titleW + 32;
     }
+    cv.tabRects = [];
     names.forEach((n, i) => {
         const on = i === sel, bw = tw[i];
         if (tx + bw > x + room) return;
+        cv.tabRects.push({ i, x: tx, y, w: bw, h });
         if (on) {
             cv.gradientRect(tx, y, bw, h, [[0, withAlpha(S, 0)], [1, withAlpha(S, 0.25)]]);
             cv.fillRect(tx, y + h - 4, bw, 4, S);
@@ -748,6 +824,40 @@ function menuBar(cv, t, x, y, w, h, buttons, focus, variant, flash) {
     });
 }
 
+/**
+ * A button on the page: a pill with its label, pressed by a tap or the controller (cv.target). Drawn
+ * only where the kit runs the screen (display.js: the app's bar button then leaves the bar, hideButton).
+ * opts: { key (default: the label), color (a warning colour, for resets), primary (filled), busy (drawn
+ * dimmed, nothing to press), confirm (a reset: the first press asks, Confirm pressed within 5 s runs it) }.
+ * Returns the button's width.
+ */
+const armed = new Map();                // confirm buttons pressed once: key -> when
+let onArmed = null;
+/** fn() when a confirm button is armed or runs out (display.js: the app draws its next frame). */
+function onConfirm(fn) { onArmed = fn; }
+function button(cv, t, x, y, w, h, label, run, opts) {
+    let o = opts || {};
+    if (!cv.own) return 0;              // elsewhere the HMI's bar has the button
+    if (o.confirm && run) {
+        const key = o.key || label, act = run, live = () => armed.has(key) && Date.now() - armed.get(key) < 5000;
+        if (live()) { label = 'Confirm'; o = Object.assign({}, o, { color: t.crit, primary: true }); }
+        run = () => {
+            if (live()) { armed.delete(key); if (onArmed) onArmed(); return act(); }
+            armed.set(key, Date.now());
+            if (onArmed) { onArmed(); setTimeout(onArmed, 5050); }
+            return null;
+        };
+    }
+    const S = t.sel || t.accent, c = o.color || S;
+    if (!w) w = Math.max(h * 3, cv.textWidth(String(label).toUpperCase(), h * 0.4, { font: 'bold', spacing: 1.5 }) + h * 1.2);
+    cv.roundRect(x, y, w, h, h / 2, o.primary ? withAlpha(c, o.busy ? 0.35 : 0.85) : withAlpha('#ffffff', 0.07));
+    if (!o.primary) cv.strokeRoundRect(x, y, w, h, h / 2, 1.5, withAlpha(o.color || '#ffffff', o.busy ? 0.25 : o.color ? 0.75 : 0.3));
+    cv.text(String(label).toUpperCase(), x + w / 2, y + h / 2 + h * 0.15, h * 0.4, o.primary ? '#ffffff' : o.busy ? t.dim : o.color || t.text,
+        { align: 'center', font: 'bold', spacing: 1.5 });
+    if (!o.busy && run) cv.target(x, y, w, h, run, o.key || label);
+    return w;
+}
+
 /** Accent stripes (M-style) under a header. */
 function stripes(cv, t, x, y, w) {
     const s = t.stripes || [t.accent];
@@ -756,7 +866,7 @@ function stripes(cv, t, x, y, w) {
 }
 
 module.exports = {
-    BAR_H, TOP, BOTTOM, frame, header, layer, onLayerDrop, panel, segBar, radial, needle, ring, bar, stat, readout,
-    shiftLights, gear, chart, table, pill, tyres, gmeter, menuBar, stripes, smooth, hold, niceStep,
+    BAR_H, TOP, BOTTOM, pageBottom, MARGIN, toMargin, frame, header, layer, onLayerDrop, panel, segBar, radial, needle, ring, bar, stat, readout,
+    shiftLights, gear, chart, table, pill, tyres, gmeter, menuBar, stripes, button, onConfirm, smooth, hold, niceStep,
     fmt, isNum, clamp, mix, zoneColor, withAlpha, ramp,
 };

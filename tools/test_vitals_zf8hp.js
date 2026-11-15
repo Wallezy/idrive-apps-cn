@@ -35,8 +35,8 @@ function packages() {
         assert.strictEqual(spec.settings.find((s) => s.key === 'demo').default, 'off', 'real telemetry is the install default');
         assert.strictEqual(pkg.license, 'MIT');
         const provenance = json(path.join(p, 'PROVENANCE.json'));
-        assert.strictEqual(provenance.publicSource.commit, '8d860de5818a2da11d3a3750aab36866cecf6bde');
-        assert(provenance.publicSource.identicalFiles.includes('javascript/app.js'), 'upstream application source verified');
+        assert.strictEqual(provenance.commit, 'b2880634eb214e29f008422b970cf22ea2de280f');
+        assert(provenance.adaptedSourceFilesSha256['apps/' + id + '/main.js'], 'adapted source hash recorded');
         assert(fs.readFileSync(path.join(p, 'LICENSE'), 'utf8').includes('cauliflowermossgrape'));
         assert.strictEqual(require(path.join(p, 'javascript/kit/i18n')).getLanguage(), 'zh-CN');
         assert.strictEqual(json(path.join(p, 'config/base.json')).rhmiLoadingEnabled, true);

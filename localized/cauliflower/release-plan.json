@@ -1,0 +1,182 @@
+{
+  "ambient_config": {
+    "upstreamVersion": "2.5.0",
+    "releaseVersion": "2.5.1",
+    "cnRevision": 1,
+    "title": "氛围灯设置",
+    "description": "自定义氛围灯颜色、亮度与动画，按驾驶模式切换。 简体中文界面，支持在线更新。",
+    "englishDescription": "Ambient config with Chinese menus and status text.",
+    "changes": [
+      "同步新版灯光控制与模式设置。",
+      "完善简体中文显示，保留无水印界面。"
+    ]
+  },
+  "brake_test": {
+    "upstreamVersion": "1.5.20",
+    "releaseVersion": "1.5.21",
+    "cnRevision": 1,
+    "title": "制动测试",
+    "description": "记录制动距离与时间，查看历史成绩。 简体中文界面，支持在线更新。",
+    "englishDescription": "Brake Test with Chinese menus and status text.",
+    "changes": [
+      "更新制动测试与历史记录页面。",
+      "完善简体中文显示，保留无水印界面。"
+    ]
+  },
+  "car_vitals": {
+    "upstreamVersion": "2.27.3",
+    "releaseVersion": "2.27.5",
+    "cnRevision": 2,
+    "title": "M 车辆仪表",
+    "description": "查看发动机、温度、燃油、点火及底盘实时数据。 简体中文界面，支持在线更新。",
+    "englishDescription": "M Vitals with Chinese menus and status text.",
+    "changes": [
+      "保留目标与实际读数修复，更新共享运行库。",
+      "完善简体中文显示，保留无水印界面。"
+    ]
+  },
+  "doom": {
+    "upstreamVersion": "1.7.21",
+    "releaseVersion": "1.7.22",
+    "cnRevision": 1,
+    "title": "毁灭战士",
+    "description": "驻车时游玩 Freedoom，支持全屏画面和旋钮操作。 简体中文界面，支持在线更新。",
+    "englishDescription": "Doom with Chinese menus and status text.",
+    "changes": [
+      "更新全屏游戏画面、主菜单与旋钮操作。",
+      "完善简体中文显示，保留无水印界面。"
+    ]
+  },
+  "draggy": {
+    "upstreamVersion": "2.5.20",
+    "releaseVersion": "2.5.21",
+    "cnRevision": 1,
+    "title": "弹射模式",
+    "description": "测量加速时间，查看历史与最佳成绩。 简体中文界面，支持在线更新。",
+    "englishDescription": "Drag Timer with Chinese menus and status text.",
+    "changes": [
+      "更新加速计时与成绩页面。",
+      "完善简体中文显示，保留无水印界面。"
+    ]
+  },
+  "dtc_scanner": {
+    "upstreamVersion": "2.9.7",
+    "releaseVersion": "2.9.9",
+    "cnRevision": 2,
+    "title": "故障检测",
+    "description": "读取与清除故障码，查看控制单元和中文故障说明。 简体中文界面，支持在线更新。",
+    "englishDescription": "Fault Scanner with Chinese menus and status text.",
+    "changes": [
+      "保留清除确认处理，更新中文诊断资源。",
+      "完善简体中文显示，保留无水印界面。"
+    ]
+  },
+  "dyno": {
+    "upstreamVersion": "1.6.2",
+    "releaseVersion": "1.6.3",
+    "cnRevision": 1,
+    "title": "虚拟马力机",
+    "description": "记录车辆加速过程，估算功率与扭矩并保存结果。 简体中文界面，支持在线更新。",
+    "englishDescription": "Virtual Dyno with Chinese menus and status text.",
+    "changes": [
+      "更新功率估算与结果展示。",
+      "完善简体中文显示，保留无水印界面。"
+    ]
+  },
+  "edrive": {
+    "upstreamVersion": "2.9.2",
+    "releaseVersion": "2.9.4",
+    "cnRevision": 2,
+    "title": "EDrive 助手",
+    "description": "查看续航、电池状态、充电记录与实时能耗。 简体中文界面，支持在线更新。",
+    "englishDescription": "eDrive with Chinese menus and status text.",
+    "changes": [
+      "保留驻车休眠与缺失读数处理。",
+      "完善简体中文显示，保留无水印界面。"
+    ]
+  },
+  "gforce": {
+    "upstreamVersion": "1.6.21",
+    "releaseVersion": "1.6.22",
+    "cnRevision": 1,
+    "title": "G 值仪表",
+    "description": "显示纵横向加速度，查看记录与峰值。 简体中文界面，支持在线更新。",
+    "englishDescription": "G-Force with Chinese menus and status text.",
+    "changes": [
+      "更新加速度显示和记录页面。",
+      "完善简体中文显示，保留无水印界面。"
+    ]
+  },
+  "live_adjustments": {
+    "upstreamVersion": "0.9.6",
+    "releaseVersion": "0.9.7",
+    "cnRevision": 1,
+    "title": "发动机设置",
+    "description": "控制排气阀门；兼容车辆可使用 BM3、MHD 设置及实验性 xDrive 功能。 简体中文界面，支持在线更新。",
+    "englishDescription": "Engine Config with Chinese menus and status text.",
+    "changes": [
+      "新增发动机设置应用，保留操作确认与车辆限制。",
+      "完善简体中文显示，保留无水印界面。"
+    ]
+  },
+  "live_data": {
+    "upstreamVersion": "1.0.13",
+    "releaseVersion": "1.0.14",
+    "cnRevision": 1,
+    "title": "实时数据",
+    "description": "自定义车辆数据页面，查看行程、信号与控制单元信息。 简体中文界面，支持在线更新。",
+    "englishDescription": "Live Data with Chinese menus and status text.",
+    "changes": [
+      "新增可自定义的实时车辆数据页面。",
+      "完善简体中文显示，保留无水印界面。"
+    ]
+  },
+  "redline": {
+    "upstreamVersion": "2.0.42",
+    "releaseVersion": "2.0.43",
+    "cnRevision": 1,
+    "title": "换挡转速",
+    "description": "显示转速、挡位与换挡提示，支持 HUD 样式设置。 简体中文界面，支持在线更新。",
+    "englishDescription": "Redline with Chinese menus and status text.",
+    "changes": [
+      "同步来电时 HUD 避让等新版改进。",
+      "完善简体中文显示，保留无水印界面。"
+    ]
+  },
+  "service": {
+    "upstreamVersion": "1.6.1",
+    "releaseVersion": "1.6.2",
+    "cnRevision": 1,
+    "title": "保养信息",
+    "description": "查看车辆保养项目、剩余里程与到期信息。 简体中文界面，支持在线更新。",
+    "englishDescription": "Service with Chinese menus and status text.",
+    "changes": [
+      "更新保养项目与详情展示。",
+      "完善简体中文显示，保留无水印界面。"
+    ]
+  },
+  "warmup": {
+    "upstreamVersion": "1.8.1",
+    "releaseVersion": "1.8.2",
+    "cnRevision": 1,
+    "title": "暖机助手",
+    "description": "查看机油与车辆温度，辅助判断暖机状态。 简体中文界面，支持在线更新。",
+    "englishDescription": "Warm-Up with Chinese menus and status text.",
+    "changes": [
+      "更新温度与暖机状态展示。",
+      "完善简体中文显示，保留无水印界面。"
+    ]
+  },
+  "zf8hp": {
+    "upstreamVersion": "1.5.6",
+    "releaseVersion": "1.5.8",
+    "cnRevision": 2,
+    "title": "ZF 8HP 变速箱监测",
+    "description": "只读查看变速箱实时数据、离合器适配、换挡曲线及油温历史。 简体中文界面，支持在线更新。",
+    "englishDescription": "Transmission Config with Chinese menus and status text.",
+    "changes": [
+      "保留只读监测与车型识别，更新共享运行库。",
+      "完善简体中文显示，保留无水印界面。"
+    ]
+  }
+}

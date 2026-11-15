@@ -3,6 +3,7 @@
 const locale = require('./locale.json');
 const dict = locale.strings || {};
 const language = locale.language || 'en';
+const ambientPatterns = language === 'zh-CN' ? require('./ambient-patterns.json').map((p) => [new RegExp(p[0], 'i'), p[1]]) : [];
 const localizedValues = new Set(Object.values(dict));
 const cache = new Map();
 function getLanguage() { return language; }
@@ -35,8 +36,9 @@ const escape = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const phrases = Object.keys(dict).filter((s) => s.length >= 4 && s.indexOf('|') < 0).sort((a, b) => b.length - a.length);
 const pattern = new RegExp('(^|[^A-Za-z0-9_./])(' + phrases.map(escape).join('|') + ')(?=$|[^A-Za-z0-9_./])', 'gi');
 function t(value) {
-    const s = String(value == null ? '' : value);
+    let s = String(value == null ? '' : value);
     if (language === 'en') return s;
+    ambientPatterns.forEach((p) => { s = s.replace(p[0], p[1]); });
     if (!/[A-Za-z]/.test(s)) return s; // numeric telemetry / already translated labels: hot path
     if (s.trim() === 'rpm') return s; // preserve the physical unit; uppercase RPM headings may translate
     if (cache.has(s)) return cache.get(s);

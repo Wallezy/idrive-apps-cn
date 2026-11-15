@@ -38,13 +38,17 @@ jobs:
         run: |
           node tools/test_ambient_input.js
           node tools/test_ambient_renderer.js
-          node localized/ambient/kit/tools/test_ambient_config.js
-          node localized/ambient/kit/tools/test_ambient_rgb.js
-          node localized/ambient/kit/tools/test_ambient_strobe.js
-          node localized/ambient/kit/tools/test_ambient_others.js
+          node localized/cauliflower/kit/tools/test_ambient_config.js
+          node localized/cauliflower/kit/tools/test_ambient_rgb.js
+          node localized/cauliflower/kit/tools/test_ambient_strobe.js
+          node localized/cauliflower/kit/tools/test_ambient_others.js
       - name: Enhanced vehicle applications
         run: |
           node tools/test_redline_enhanced.js
           node tools/test_vitals_zf8hp.js
           node tools/test_edrive_dtc_enhanced.js
 # Unit tests do not set release-check/cn-integration.
+      - name: Ported upstream applications and runtime
+        run: |
+          node tools/test_cauliflower.js
+          make -C native/mgu-inputgate test

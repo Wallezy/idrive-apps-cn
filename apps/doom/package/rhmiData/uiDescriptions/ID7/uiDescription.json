@@ -72,6 +72,28 @@
      ]
     },
     "5": {
+     "type": "checkBox",
+     "name": "SET_PARKEDONLY",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 2,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text": {
+        "value": "SID_DOOM_SET_PARKEDONLY",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
+    "6": {
      "type": "dropDownMenu",
      "name": "SET_SKILL",
      "rows": [
@@ -117,7 +139,7 @@
       }
      }
     },
-    "6": {
+    "7": {
      "type": "dropDownMenu",
      "name": "SET_EPISODE",
      "rows": [
@@ -157,7 +179,7 @@
       }
      }
     },
-    "7": {
+    "8": {
      "type": "dropDownMenu",
      "name": "SET_RUN",
      "rows": [
@@ -191,7 +213,7 @@
       }
      }
     },
-    "8": {
+    "9": {
      "type": "dropDownMenu",
      "name": "SET_AIM",
      "rows": [
@@ -225,7 +247,7 @@
       }
      }
     },
-    "9": {
+    "10": {
      "type": "dropDownMenu",
      "name": "SET_AIMDIR",
      "rows": [
@@ -253,7 +275,7 @@
       }
      }
     },
-    "10": {
+    "11": {
      "type": "dropDownMenu",
      "name": "SET_DETAIL",
      "rows": [
@@ -287,7 +309,7 @@
       }
      }
     },
-    "11": {
+    "12": {
      "type": "button",
      "name": "CN_CREDITS",
      "properties": {
@@ -313,7 +335,33 @@
       }
      ]
     },
-    "12": {
+    "13": {
+     "type": "button",
+     "name": "REPO_CREDITS",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 2,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text1stRow": {
+        "value": "SID_DOOM_REPO_CREDITS_TITLE",
+        "type": "StringId"
+       },
+       "Text2ndRow": {
+        "value": "SID_DOOM_REPO_CREDITS_LINK",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
+    "14": {
      "type": "title",
      "name": "MAIN_TITLE",
      "rows": [
@@ -327,11 +375,11 @@
     }
    }
   },
-  "15": {
+  "17": {
    "type": "state",
    "name": "GAME",
    "components": {
-    "16": {
+    "18": {
      "type": "label",
      "name": "GAME_GFX",
      "properties": {
@@ -353,7 +401,7 @@
       }
      ]
     },
-    "17": {
+    "19": {
      "type": "button",
      "name": "BTN_BACK",
      "properties": {
@@ -371,7 +419,7 @@
       }
      ]
     },
-    "18": {
+    "20": {
      "type": "button",
      "name": "BTN_TL",
      "properties": {
@@ -389,7 +437,7 @@
       }
      ]
     },
-    "19": {
+    "21": {
      "type": "button",
      "name": "BTN_WL",
      "properties": {
@@ -407,7 +455,7 @@
       }
      ]
     },
-    "20": {
+    "22": {
      "type": "button",
      "name": "BTN_STAND",
      "properties": {
@@ -425,7 +473,7 @@
       }
      ]
     },
-    "21": {
+    "23": {
      "type": "button",
      "name": "BTN_WALK",
      "properties": {
@@ -443,7 +491,7 @@
       }
      ]
     },
-    "22": {
+    "24": {
      "type": "button",
      "name": "BTN_WR",
      "properties": {
@@ -461,7 +509,7 @@
       }
      ]
     },
-    "23": {
+    "25": {
      "type": "button",
      "name": "BTN_TR",
      "properties": {
@@ -479,7 +527,7 @@
       }
      ]
     },
-    "24": {
+    "26": {
      "type": "button",
      "name": "BTN_WEAPON",
      "properties": {
@@ -497,7 +545,7 @@
       }
      ]
     },
-    "25": {
+    "27": {
      "type": "title",
      "name": "GAME_TITLE",
      "rows": [

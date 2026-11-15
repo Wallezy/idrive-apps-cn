@@ -1,6 +1,8 @@
 require('./app.js');
 // Translation by: 抖音 小白科技杂物社 / BiliBili 小白151 / GitHub JackieZ123430
 // https://github.com/JackieZ123430/idrive7-apps-cn
+// Translation by: 抖音 小白科技杂物社 / BiliBili 小白151 / GitHub JackieZ123430
+// https://github.com/JackieZ123430/idrive7-apps-cn
 'use strict';
 /**
  * Ambient config - any colour on the car's ambient light, animations, and a look for each driving mode.
@@ -9,8 +11,8 @@ require('./app.js');
  *   Colour         the colour ring (and white) for the whole car, the upper lights or the lower ones, the
  *                  brightness, and the car from above lit as the car is; Original colour gives the light back
  *   Animations     Solid, Breathing, Rainbow, Smooth fade, Colour wave, how fast, shown moving on the car picture;
- *                  Turn signal glow (that side's door lines blink green with it) and Open door red (its line blinking), each off until
- *                  switched on
+ *                  Turn signal glow (that side's door lines blink green with it), Open door red (its line blinking) and
+ *                  Hazard red (every light pulses red while the hazards are on), each off until switched on
  *   Driving modes  for each driving mode the car has: Choose colour (the Colour and Animations tabs change that mode's
  *                  look until Done), the animation button stepping through them, or Original colour (BMW's); with
  *                  nothing chosen, the Colour tab's colour; welcome sweep, Sport pulse, Redline's shift flash
@@ -30,7 +32,8 @@ const { Ambient, SLOTS } = require('./ambient');
 const { Lights } = require('./lights');
 const { Control } = require('./control');
 const { Others } = require('./others');
-const { Strobe } = require('./strobe');
+const { Strobe, gateChecks, gateWhy } = require('./strobe');
+const Parked = require('./kit/parked');
 const { t: translate } = require('./kit/i18n');
 const { drawCabin } = require('./cabin');
 const { sample } = require('./lin');
@@ -112,16 +115,15 @@ async function background(bg) {
     settings.onChange((key) => {
         if (key === 'nightDim') control.night(control._night);
         if (key === 'follow') control.apply();
-        if (key === 'turnGlow' || key === 'doorRed' || key === 'drive') control.signals();
+        if (key === 'turnGlow' || key === 'doorRed' || key === 'hazardRed' || key === 'drive') control.signals();
     });
     const others = new Others({ log }).start();
     // the high beam strobe and the light show (strobe.js): only for use on private property, behind its setting,
-    // with someone in the car; why not, or null
-    const checks = () => [
-        ['Switched on in the settings', settings.get('strobe') === true],
-        ['Someone in the car', !control._away],
-    ];
-    const gate = () => { const c = checks().find((x) => !x[1]); return c ? (c[2] || c[0].toLowerCase() + ': no') : null; };
+    // with someone in the car; the light show also with the car standing still (kit/parked.js, checked again on every
+    // step: it stops when the car moves off); why not, or null
+    const parked = Parked.watch(bg, log);
+    const checks = () => gateChecks({ setting: settings.get('strobe') === true, away: control._away, moving: parked.moving() });
+    const gate = (what) => gateWhy(checks(), what);
     // the high beam's channels learned on a headlight unit, kept in the data folder
     const fs = require('fs'), path = require('path');
     const chFile = bg.dataDir ? path.join(bg.dataDir, 'strobe_channels.json') : null;
@@ -305,11 +307,13 @@ mgu.run({
             if (editing) return editBar(cv, t, x);
             G.button(cv, t, x, 240, 0, 48, 'Original colour', () => { control.carColour(); return redraw(); }, { primary: !control.on(), key: 'car2' });
             status(cv, t, x, 330);
-            // over every look, off until switched on: the turn signal's green glow, an open door's red. Under the other
-            // ambient app's warning (4 lines, to y 440) they go side by side, a little lower
-            const togs = others.comfort ? [[x, 460, 200, 40], [x + 212, 460, 190, 40]] : [[x, 400, 400, 48], [x, 456, 400, 48]];
-            [['turnGlow', 'Turn signal glow'], ['doorRed', 'Open door red']].forEach(([k, n], i) => {
-                const [bx, by, bw, bh] = togs[i];
+            // over every look, off until switched on: the turn signal's green glow, an open door's red, the hazards' red
+            // pulse. Under the other ambient app's warning (4 lines, to y 440) all three side by side, a little lower
+            const togs = others.comfort ? [[x, 460, 128, 40, 'Turn glow'], [x + 136, 460, 128, 40, 'Door red'], [x + 272, 460, 128, 40, 'Hazard red']]
+                : [[x, 400, 400, 48], [x, 456, 194, 48], [x + 206, 456, 194, 48]];
+            [['turnGlow', 'Turn signal glow'], ['doorRed', 'Open door red'], ['hazardRed', 'Hazard red']].forEach(([k, n], i) => {
+                const [bx, by, bw, bh, short] = togs[i];
+                n = short || n;
                 G.button(cv, t, bx, by, bw, bh, n, () => { settings.set(k, settings.get(k) !== true); return redraw(); }, { primary: settings.get(k) === true, key: 'tog-' + k });
             });
             if (!others.comfort && lights.state === 'ours' && S.moves(lights.scene)) cv.text(lights.rate.toFixed(0) + ' writes a second, ' + lights.fps.toFixed(1) + ' frames a second', x, 390, 18, t.dim);
@@ -379,13 +383,14 @@ mgu.run({
                 + (strobe.head ? (strobe.high ? ' · high beam channel ' + strobe.high.map((c) => c.ch).join(', ') : ' · high beam not learned yet') : '')
                 : 'Looking for the headlights\' lamp control...';
             cv.text(kindText, 44, 112, 18, t.dim);
+            // (three checks in the room two had: 26 px apart, the warning and the note under them)
             checks().forEach(([label, ok, why], i) => {
-                const y = 146 + i * 30;
+                const y = 140 + i * 26;
                 cv.arc(52, y - 6, 0, 7, 0, 360, ok ? '#2fd27a' : t.crit);
                 cv.text(label + (!ok && why ? ' · ' + why : ''), 70, y, 20, ok ? t.text : t.dim);
             });
-            cv.text('Only for use on private property.', 44, 214, 20, t.warn, { font: 'bold' });
-            if (strobe && strobe.note) cv.text(strobe.note, 44, 244, 18, strobe.noteType === 'warn' ? t.warn : t.dim);
+            cv.text('Only for use on private property.', 44, 222, 20, t.warn, { font: 'bold' });
+            if (strobe && strobe.note) cv.text(strobe.note, 44, 248, 18, strobe.noteType === 'warn' ? t.warn : t.dim);
             const pat = ['both', 'alternate', 'police'].indexOf(settings.get('strobePattern')) >= 0 ? settings.get('strobePattern') : 'police';
             const rate = settings.get('strobeRate') || 'normal';
             // the headlight units can flash every front light; the body controller only the high beams

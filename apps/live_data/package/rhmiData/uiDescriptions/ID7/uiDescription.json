@@ -1,0 +1,687 @@
+{
+ "schemaVersion": "1.3.0",
+ "containers": {
+  "1": {
+   "type": "state",
+   "name": "MAIN",
+   "components": {
+    "2": {
+     "type": "label",
+     "name": "MAIN_GFX",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 0,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Graphic": {
+        "value": "",
+        "type": "Text"
+       }
+      }
+     ]
+    },
+    "3": {
+     "type": "button",
+     "name": "BTN_ACTION",
+     "properties": {
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text": {
+        "value": "SID_LIVE_DATA_BTN_ACTION",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
+    "4": {
+     "type": "button",
+     "name": "BTN_PAGE",
+     "properties": {
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text": {
+        "value": "SID_LIVE_DATA_BTN_PAGE",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
+    "5": {
+     "type": "button",
+     "name": "BTN_BROWSE",
+     "properties": {
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text": {
+        "value": "SID_LIVE_DATA_BTN_BROWSE",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
+    "6": {
+     "type": "button",
+     "name": "BTN_SETTINGS",
+     "properties": {
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text": {
+        "value": "SID_LIVE_DATA_BTN_SETTINGS",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
+    "7": {
+     "type": "title",
+     "name": "MAIN_TITLE",
+     "rows": [
+      {
+       "Text": {
+        "value": "SID_LIVE_DATA_MAIN_TITLE",
+        "type": "StringId"
+       }
+      }
+     ]
+    }
+   }
+  },
+  "11": {
+   "type": "state",
+   "name": "SETTINGS",
+   "components": {
+    "12": {
+     "type": "dropDownMenu",
+     "name": "SET_SHOW",
+     "rows": [
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0000",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0001",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0002",
+        "type": "StringId"
+       }
+      }
+     ],
+     "cells": {
+      "HeaderText": {
+       "value": "SID_CN_STATIC_0003",
+       "type": "StringId"
+      },
+      "SelectedItem": {
+       "value": 0,
+       "type": "UInt"
+      }
+     }
+    },
+    "13": {
+     "type": "checkBox",
+     "name": "SET_AUTOSCAN",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 2,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text": {
+        "value": "SID_LIVE_DATA_SET_AUTOSCAN",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
+    "14": {
+     "type": "dropDownMenu",
+     "name": "SET_WIDGET",
+     "rows": [
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0004",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0005",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0006",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0007",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0008",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0009",
+        "type": "StringId"
+       }
+      }
+     ],
+     "cells": {
+      "HeaderText": {
+       "value": "SID_CN_STATIC_0010",
+       "type": "StringId"
+      },
+      "SelectedItem": {
+       "value": 0,
+       "type": "UInt"
+      }
+     }
+    },
+    "15": {
+     "type": "dropDownMenu",
+     "name": "SET_WIDGETFIT",
+     "rows": [
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0011",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0012",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0013",
+        "type": "StringId"
+       }
+      }
+     ],
+     "cells": {
+      "HeaderText": {
+       "value": "SID_CN_STATIC_0014",
+       "type": "StringId"
+      },
+      "SelectedItem": {
+       "value": 1,
+       "type": "UInt"
+      }
+     }
+    },
+    "16": {
+     "type": "dropDownMenu",
+     "name": "SET_WIDGETFPS",
+     "rows": [
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0015",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0016",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0017",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0018",
+        "type": "StringId"
+       }
+      }
+     ],
+     "cells": {
+      "HeaderText": {
+       "value": "SID_CN_STATIC_0019",
+       "type": "StringId"
+      },
+      "SelectedItem": {
+       "value": 2,
+       "type": "UInt"
+      }
+     }
+    },
+    "17": {
+     "type": "checkBox",
+     "name": "SET_TRIPS",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 2,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text": {
+        "value": "SID_LIVE_DATA_SET_TRIPS",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
+    "18": {
+     "type": "dropDownMenu",
+     "name": "SET_CURRENCY",
+     "rows": [
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0020",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0021",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0022",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0023",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0024",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0025",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0026",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0027",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0028",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0029",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0030",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0031",
+        "type": "StringId"
+       }
+      }
+     ],
+     "cells": {
+      "HeaderText": {
+       "value": "SID_CN_STATIC_0032",
+       "type": "StringId"
+      },
+      "SelectedItem": {
+       "value": 0,
+       "type": "UInt"
+      }
+     }
+    },
+    "19": {
+     "type": "dropDownMenu",
+     "name": "SET_TEMPUNIT",
+     "rows": [
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0033",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0034",
+        "type": "StringId"
+       }
+      }
+     ],
+     "cells": {
+      "HeaderText": {
+       "value": "SID_CN_STATIC_0035",
+       "type": "StringId"
+      },
+      "SelectedItem": {
+       "value": 0,
+       "type": "UInt"
+      }
+     }
+    },
+    "20": {
+     "type": "checkBox",
+     "name": "SET_DETAILS",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 2,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text": {
+        "value": "SID_LIVE_DATA_SET_DETAILS",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
+    "21": {
+     "type": "checkBox",
+     "name": "SET_ADVANCED",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 2,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text": {
+        "value": "SID_LIVE_DATA_SET_ADVANCED",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
+    "22": {
+     "type": "dropDownMenu",
+     "name": "SET_THEME",
+     "rows": [
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0036",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0037",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0038",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0039",
+        "type": "StringId"
+       }
+      }
+     ],
+     "cells": {
+      "HeaderText": {
+       "value": "SID_CN_STATIC_0040",
+       "type": "StringId"
+      },
+      "SelectedItem": {
+       "value": 1,
+       "type": "UInt"
+      }
+     }
+    },
+    "23": {
+     "type": "dropDownMenu",
+     "name": "SET_LAYOUT",
+     "rows": [
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0041",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0042",
+        "type": "StringId"
+       }
+      }
+     ],
+     "cells": {
+      "HeaderText": {
+       "value": "SID_CN_STATIC_0043",
+       "type": "StringId"
+      },
+      "SelectedItem": {
+       "value": 0,
+       "type": "UInt"
+      }
+     }
+    },
+    "24": {
+     "type": "dropDownMenu",
+     "name": "SET_RENDERER",
+     "rows": [
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0044",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0045",
+        "type": "StringId"
+       }
+      }
+     ],
+     "cells": {
+      "HeaderText": {
+       "value": "SID_CN_STATIC_0046",
+       "type": "StringId"
+      },
+      "SelectedItem": {
+       "value": 0,
+       "type": "UInt"
+      }
+     }
+    },
+    "25": {
+     "type": "dropDownMenu",
+     "name": "SET_DEMO",
+     "rows": [
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0047",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0048",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0049",
+        "type": "StringId"
+       }
+      }
+     ],
+     "cells": {
+      "HeaderText": {
+       "value": "SID_CN_STATIC_0050",
+       "type": "StringId"
+      },
+      "SelectedItem": {
+       "value": 2,
+       "type": "UInt"
+      }
+     }
+    },
+    "26": {
+     "type": "button",
+     "name": "CN_CREDITS",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 2,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text1stRow": {
+        "value": "SID_LIVE_DATA_CN_CREDITS_TITLE",
+        "type": "StringId"
+       },
+       "Text2ndRow": {
+        "value": "SID_LIVE_DATA_CN_CREDITS_LINK",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
+    "27": {
+     "type": "button",
+     "name": "REPO_CREDITS",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 2,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text1stRow": {
+        "value": "SID_LIVE_DATA_REPO_CREDITS_TITLE",
+        "type": "StringId"
+       },
+       "Text2ndRow": {
+        "value": "SID_LIVE_DATA_REPO_CREDITS_LINK",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
+    "28": {
+     "type": "title",
+     "name": "SETTINGS_TITLE",
+     "rows": [
+      {
+       "Text": {
+        "value": "SID_LIVE_DATA_SETTINGS_TITLE",
+        "type": "StringId"
+       }
+      }
+     ]
+    }
+   },
+   "properties": {
+    "ParentState": {
+     "value": 1,
+     "type": "UInt"
+    }
+   }
+  }
+ }
+}

@@ -1,7 +1,7 @@
 {
  "id": "doom",
  "title": "\u6bc1\u706d\u6218\u58eb",
- "version": "1.4.2",
+ "version": "1.7.22",
  "screens": [
   {
    "name": "MAIN",
@@ -68,6 +68,12 @@
   }
  ],
  "settings": [
+  {
+   "key": "parkedOnly",
+   "label": "\u4ec5\u505c\u8f66\u65f6\u8fd0\u884c\uff08\u884c\u9a76\u4e2d\u6682\u505c\uff09",
+   "type": "bool",
+   "default": true
+  },
   {
    "key": "skill",
    "label": "\u96be\u5ea6\uff08\u65b0\u6e38\u620f\uff09",
@@ -148,15 +154,15 @@
    "options": [
     [
      "slow",
-     "\u6162"
+     "\u6162\u901f"
     ],
     [
      "normal",
-     "\u6b63\u5e38"
+     "\u6807\u51c6"
     ],
     [
      "fast",
-     "\u5feb"
+     "\u5feb\u901f"
     ]
    ]
   },
@@ -168,7 +174,7 @@
    "options": [
     [
      "normal",
-     "\u6b63\u5e38"
+     "\u6807\u51c6"
     ],
     [
      "reversed",
@@ -198,8 +204,9 @@
   }
  ],
  "config": null,
+ "startWidget": null,
  "stateIds": {
   "MAIN": 1,
-  "GAME": 15
+  "GAME": 17
  }
 }

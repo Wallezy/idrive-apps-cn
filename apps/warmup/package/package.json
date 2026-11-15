@@ -1,6 +1,6 @@
 {
   "name": "warmup",
-  "version": "1.4.6",
+  "version": "1.8.2",
   "description": "Oil and coolant warm-up calculator (time to ready), safe rev limit and turbo cool-down",
   "main": "javascript/localized-entry.js",
   "private": false,
@@ -31,6 +31,8 @@
     "javascript",
     "rhmiData",
     "LICENSE",
-    "NOTICE.zh-CN.md"
+    "NOTICE.zh-CN.md",
+    "PROVENANCE.json",
+    "CHANGELOG.md"
   ]
 }

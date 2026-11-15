@@ -26,8 +26,10 @@ function family(name) {
 
 /** Smallest baked size >= requested (downscaling looks better), else largest. */
 function get(name, size, text) {
-    // A shared CJK atlas avoids duplicating hundreds of glyphs in every numeric size.
-    if (text && /[\u3000-\u9fff\uff00-\uffef]/.test(text)) name = 'cjk';
+    // Shared supplemental atlases avoid duplicating glyphs in every numeric size.
+    if (text && /[\u1100-\u11ff\u3130-\u318f\ua960-\ua97f\uac00-\ud7ff]/.test(text)) name = 'korean';
+    else if (text && /[\u3000-\u9fff\uff00-\uffef]/.test(text)) name = 'cjk';
+    else if (text && /[\u0400-\u04ff]/.test(text)) name = 'cyrillic';
     const fam = family(name) || family('label');
     if (!fam) return null;
     let best = null;
@@ -37,10 +39,13 @@ function get(name, size, text) {
     return best;
 }
 
+/** Whether a family's atlas is there (get() falls back to 'label' for one that isn't). */
+function has(name) { return !!family(name); }
+
 function measure(f, s) {
     let w = 0;
     for (const ch of s) { const g = f.glyphs[ch.codePointAt(0)] || f.glyphs[63]; if (g) w += g[6]; }
     return w;
 }
 
-module.exports = { get, measure };
+module.exports = { get, has, measure };

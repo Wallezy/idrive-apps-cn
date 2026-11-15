@@ -1,5 +1,14 @@
 [
   {
+    "version": "2.0.43",
+    "upstreamVersion": "2.0.42",
+    "cnRevision": 1,
+    "changes": [
+      "同步来电时 HUD 避让等新版改进。",
+      "完善简体中文显示，保留无水印界面。"
+    ]
+  },
+  {
     "version": "2.0.42",
     "upstreamVersion": "2.0.41",
     "cnRevision": 1,

@@ -1,6 +1,6 @@
 require('./app.js');
-// 中文汉化署名：抖音 小白科技杂物社 / BiliBili 小白151 / GitHub JackieZ123430
-// 汉化仓库：https://github.com/JackieZ123430/idrive7-apps-cn
+// Translation by: 抖音 小白科技杂物社 / BiliBili 小白151 / GitHub JackieZ123430
+// https://github.com/JackieZ123430/idrive7-apps-cn
 'use strict';
 /**
  * Virtual Dyno - power and torque from a full-throttle pull.
@@ -20,6 +20,7 @@ const mgu = require('./kit/mgu');
 const { withAlpha } = require('./kit/canvas');
 const G = require('./kit/gauges');
 const Car = require('./kit/car');
+const Engine = require('./kit/engine');
 
 const W = 1600, H = 520;
 const BIN = 100, MIN_SPAN = 1500;
@@ -29,7 +30,11 @@ const GO = '#2fd27a';
 mgu.run({
     async start(ctx) {
         const { ui, settings, log } = ctx;
-        const car = new Car(ctx, ['rpm', 'speed', 'accel', 'torque']);
+        // engine profile (diesel / petrol): the graph's rpm axis on Auto
+        const engine = new Engine({ settings, dataDir: ctx.dataDir, log });
+        const car = new Car(ctx, ['rpm', 'speed', 'accel', 'torque'], { [Engine.SIGNAL[0]]: engine.handlers() });
+        car.setRedline(engine.redline());
+        engine.onChange(() => car.setRedline(engine.redline()));
 
         /* ---------- storage ---------- */
         const FILE = path.join(ctx.dataDir, 'dyno_runs.json');
@@ -43,13 +48,16 @@ mgu.run({
         const PU = { hp: [745.7, 'hp'], ps: [735.5, 'PS'], kw: [1000, 'kW'] };
         const pw = (w) => (G.isNum(w) ? w / PU[settings.get('powerUnit')][0] : null);
         const pU = () => PU[settings.get('powerUnit')][1];
-        const tq = (nm) => (G.isNum(nm) ? (settings.get('torqueUnit') === 'lbft' ? nm * 0.73756 : nm) : null);
-        const tU = () => (settings.get('torqueUnit') === 'lbft' ? 'lb-ft' : 'Nm');
+        // torque: [factor from Nm, unit, decimals, plot axis at least, axis rounded to] (1 Nm = 0.73756 lb-ft = 1 / 9.80665 kgm)
+        const TU = { nm: [1, 'Nm', 0, 150, 50], lbft: [0.73756, 'lb-ft', 0, 150, 50], kgm: [1 / 9.80665, 'kgm', 1, 15, 5] };
+        const tUnit = () => TU[settings.get('torqueUnit')] || TU.nm;
+        const tq = (nm) => (G.isNum(nm) ? nm * tUnit()[0] : null);
+        const tU = () => tUnit()[1];
 
         /* ---------- pull detection ---------- */
         let pull = null;            // { segs: [{k, pts: []}], start }
         let live = { power: null, state: 'idle' };
-        let lastRun = null, lastT = 0;
+        let lastRun = null, lastT = 0, cleared = false;     // cleared: Reset on the Peak panel, until the next pull
 
         function finishPull() {
             const p = pull; pull = null;
@@ -63,7 +71,7 @@ mgu.run({
             const st = store();
             st.runs.unshift(run); st.runs = st.runs.slice(0, 20);
             if (st === saved) save();
-            lastRun = run; live.state = 'done'; live.until = Date.now() + 6000;
+            lastRun = run; cleared = false; live.state = 'done'; live.until = Date.now() + 6000;
             log.info('dyno run ' + Math.round(run.peakP / 745.7) + ' hp @' + run.peakPrpm + ', ' + Math.round(run.peakT) + ' Nm @' + run.peakTrpm);
         }
 
@@ -117,10 +125,10 @@ mgu.run({
         const nice = (x, step) => Math.max(step, Math.ceil(x / step) * step);
 
         function plot(cv, t, x, y, w, h, runs) {
-            const rMin = 1000, rMax = settings.get('maxRpm');
+            const rMin = 1000, rMax = engine.value('maxRpm', { diesel: 6000, petrol: 8000 });
             const all = runs.filter(Boolean).reduce((a, r) => a.concat(r.curve), []);
             const pMax = nice(Math.max(150, ...all.map((c) => pw(c.p) * 1.12)), 50);
-            const tMax = nice(Math.max(150, ...all.map((c) => Math.max(tq(c.t), tq(c.ecu) || 0) * 1.12)), 50);
+            const tMax = nice(Math.max(tUnit()[3], ...all.map((c) => Math.max(tq(c.t), tq(c.ecu) || 0) * 1.12)), tUnit()[4]);
             const X = (r) => x + (G.clamp(r, rMin, rMax) - rMin) / (rMax - rMin) * w;
             const YP = (v) => y + h - (v / pMax) * h, YT = (v) => y + h - (v / tMax) * h;
             for (let i = 0; i <= 5; i++) {
@@ -160,24 +168,27 @@ mgu.run({
             }
         }
 
-        function bigStat(cv, t, x, y, label, val, unit, sub, col, delta) {
+        /** A big number with its unit; dec: decimals (0 unless given), also for the change against the baseline. */
+        function bigStat(cv, t, x, y, label, val, unit, sub, col, delta, dec) {
+            dec = dec || 0;
             cv.text(label, x, y, 22, t.dim, { font: 'bold', spacing: 2 });
-            const vs = G.fmt(val, 0);
+            const vs = G.fmt(val, dec);
             const vw = cv.text(vs, x, y + 82, 96, G.isNum(val) ? col : t.dim, { font: 'num' });
             cv.text(unit, x + vw + 10, y + 82, 26, t.dim);
             if (sub) cv.text(sub, x, y + 114, 22, t.dim, { font: 'bold', spacing: 1 });
-            if (G.isNum(delta) && Math.abs(delta) >= 0.5) {
-                const s = (delta > 0 ? '+' : '') + delta.toFixed(0);
+            if (G.isNum(delta) && Math.abs(delta) >= 0.5 / Math.pow(10, dec)) {
+                const s = (delta > 0 ? '+' : '') + delta.toFixed(dec);
                 cv.text(s, x + 330, y + 82, 32, delta > 0 ? GO : t.crit, { align: 'right', font: 'num' });
             }
         }
 
         function drawMain(cv, t) {
             const st = store();
-            const cur = lastRun && st.runs.indexOf(lastRun) >= 0 ? lastRun : st.runs[0];
+            const cur = cleared ? null : lastRun && st.runs.indexOf(lastRun) >= 0 ? lastRun : st.runs[0];
             const base = st.baseline;
-            G.panel(cv, t, 24, 44, 1120, 468, 'Dyno sheet');
-            plot(cv, t, 104, 135, 960, 294, [cur, base]);
+            // ex: how much lower the panels reach where the screen has room below the page (else 0); the plot takes all of it
+            const sh = G.panel(cv, t, 24, 44, 1120, 468, 'Dyno sheet'), ex = sh.y + sh.h - G.BOTTOM;
+            plot(cv, t, 104, 135, 960, 294 + G.toMargin(ex, 31), [cur, base]);     // (its axis labels G.MARGIN over the bottom)
             if (base) {
                 cv.fillRect(600, 74, 26, 4, withAlpha(t.dim, 0.7));
                 cv.text('BASELINE ' + Math.round(pw(base.peakP)) + ' ' + pU(), 634, 84, 22, t.dim, { font: 'bold', spacing: 0.5 });
@@ -188,6 +199,8 @@ mgu.run({
             }
 
             G.panel(cv, t, 1168, 44, 408, 468, live.state === 'pull' ? 'Recording' : 'Peak');
+            // Reset: the power and torque shown go blank until the next pull (saved runs stay)
+            if (live.state !== 'pull') G.button(cv, t, 1576 - 20 - 120, 56, 120, 40, 'Reset', () => { cleared = true; lastRun = null; return render(); }, { key: 'reset', busy: !cur, confirm: true });
             const now = Date.now();
             if (live.state === 'pull') {
                 cv.circle(1540, 84, 9, Math.floor(now / 300) % 2 ? t.crit : withAlpha(t.crit, 0.3));
@@ -198,31 +211,37 @@ mgu.run({
             } else {
                 bigStat(cv, t, 1192, 131, 'POWER', cur ? pw(cur.peakP) : null, pU(), cur ? '@ ' + cur.peakPrpm + ' RPM' : null, t.accent,
                     cur && base && cur !== base ? pw(cur.peakP) - pw(base.peakP) : null);
-                bigStat(cv, t, 1192, 299, 'TORQUE', cur ? tq(cur.peakT) : null, tU(), cur ? '@ ' + cur.peakTrpm + ' RPM' : null, t.accent2,
-                    cur && base && cur !== base ? tq(cur.peakT) - tq(base.peakT) : null);
-                let msg = cur ? 'estimate at the crank' : 'waiting for a pull';
+                bigStat(cv, t, 1192, 299 + Math.round(ex / 2), 'TORQUE', cur ? tq(cur.peakT) : null, tU(), cur ? '@ ' + cur.peakTrpm + ' RPM' : null, t.accent2,
+                    cur && base && cur !== base ? tq(cur.peakT) - tq(base.peakT) : null, tUnit()[2]);
+                // a dyno sheet shows power at the wheels too: the same pull without the drivetrain loss
+                let msg = cur ? 'crank (' + cur.loss + ' % loss)  ·  wheels ' + Math.round(pw(cur.peakP * (1 - cur.loss / 100))) + ' ' + pU() : 'waiting for a pull';
                 let col = t.dim;
                 if (live.state === 'done' && now < live.until) { msg = 'NEW RUN RECORDED'; col = GO; }
                 if (live.state === 'short' && now < live.until) { msg = 'pull too short'; col = t.warn; }
-                cv.text(msg, 1192, 486, 22, col, { font: 'bold', spacing: 0.5 });
+                cv.text(msg, 1192, 486 + ex, 22, col, { font: 'bold', spacing: 0.5 });
             }
         }
 
         function drawRuns(cv, t) {
             const st = store();
-            G.panel(cv, t, 24, 44, 1552, 468, 'Saved runs');
-            const cols = [48, 320, 560, 800, 1050, 1300];
+            const sh = G.panel(cv, t, 24, 44, 1552, 468, 'Saved runs');
+            // another row where the panel reaches lower on screen and it fits whole
+            rows = 8 + Math.floor((sh.y + sh.h - G.BOTTOM) / 41);
+            if (sel >= rows) { sel = rows - 1; lastRun = st.runs[sel] || null; }     // (that row went: the room is gone)
+            const cols = [48, 320, 560, 800, 1050, 1430];
             ['WHEN', 'PEAK POWER', 'PEAK TORQUE', 'SPEED RANGE', 'SETUP', ''].forEach((h, i) => cv.text(h, cols[i], 127, 22, t.dim, { font: 'bold', spacing: 1 }));
             if (!st.runs.length) cv.text('No runs yet.', 48, 210, 26, t.dim);
-            st.runs.slice(0, 8).forEach((r, i) => {
+            st.runs.slice(0, rows).forEach((r, i) => {
                 const y = 174 + i * 41, d = new Date(r.at), p = (n) => String(n).padStart(2, '0');
                 const isBase = st.baseline && st.baseline.at === r.at, isSel = i === sel;
                 if (isSel) cv.roundRect(36, y - 28, 1528, 38, 6, withAlpha(t.accent, 0.18));
+                // a run tapped (or pressed with the controller) is the one the dyno sheet shows
+                if (cv.own) cv.target(36, y - 28, 1528, 38, () => { sel = i; lastRun = r; cleared = false; return render(); }, 'run' + i, 6);
                 cv.text(p(d.getDate()) + '.' + p(d.getMonth() + 1) + '. ' + p(d.getHours()) + ':' + p(d.getMinutes()), cols[0], y, 24, t.text);
                 cv.text(Math.round(pw(r.peakP)) + ' ' + pU() + ' @ ' + r.peakPrpm, cols[1], y, 24, t.accent, { font: 'bold' });
-                cv.text(Math.round(tq(r.peakT)) + ' ' + tU() + ' @ ' + r.peakTrpm, cols[2], y, 24, t.accent2, { font: 'bold' });
+                cv.text(G.fmt(tq(r.peakT), tUnit()[2]) + ' ' + tU() + ' @ ' + r.peakTrpm, cols[2], y, 24, t.accent2, { font: 'bold' });
                 cv.text(Math.round(r.v0) + '-' + Math.round(r.v1) + ' km/h', cols[3], y, 24, t.text);
-                cv.text(r.weight + ' kg · ' + r.loss + '%', cols[4], y, 24, t.dim);
+                cv.text(r.weight + ' kg · ' + r.loss + '%  ·  wheels ' + Math.round(pw(r.peakP * (1 - r.loss / 100))) + ' ' + pU(), cols[4], y, 22, t.dim);
                 if (isBase) cv.text('BASELINE', cols[5], y, 22, t.text, { font: 'bold', spacing: 1 });
             });
         }
@@ -241,14 +260,17 @@ mgu.run({
         }
 
         /* ---------- buttons ---------- */
-        let sel = 0;
+        let sel = 0, rows = 8;      // rows: the saved runs the list shows
         const labels = () => ui.text('BTN_ACTION', page ? 'Next run' : 'Baseline');
         const flip = () => { page = 1 - page; sel = 0; labels(); return render(); };
         ui.onClick('BTN_PAGE', flip);
         ui.onClick('BTN_PREV', flip);
+        ctx.onTab((i) => i !== page && flip());
+        // the bar's Baseline / Next run: where the HMI draws the bar (the kit's has neither)
+        ctx.hideButton('BTN_ACTION');
         ui.onClick('BTN_ACTION', () => {
             const st = store();
-            if (page === 1) { if (st.runs.length) sel = (sel + 1) % Math.min(8, st.runs.length); lastRun = st.runs[sel] || null; return render(); }
+            if (page === 1) { if (st.runs.length) sel = (sel + 1) % Math.min(rows, st.runs.length); lastRun = st.runs[sel] || null; return render(); }
             const r = lastRun && st.runs.indexOf(lastRun) >= 0 ? lastRun : st.runs[0];
             if (!r) return null;
             st.baseline = st.baseline && st.baseline.at === r.at ? null : r;

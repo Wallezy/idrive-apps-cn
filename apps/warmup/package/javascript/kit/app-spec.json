@@ -1,7 +1,7 @@
 {
  "id": "warmup",
  "title": "\u6696\u673a\u52a9\u624b",
- "version": "1.4.5",
+ "version": "1.8.2",
  "screens": [
   {
    "name": "MAIN",
@@ -21,6 +21,14 @@
    "label": "\u673a\u6cb9\u6696\u673a\u76ee\u6807\u6e29\u5ea6",
    "type": "number",
    "unit": "\u00b0C",
+   "unitBy": "tempUnit",
+   "units": {
+    "f": {
+     "unit": "\u00b0F",
+     "mul": 1.8,
+     "add": 32
+    }
+   },
    "default": 80,
    "steps": [
     60,
@@ -37,6 +45,14 @@
    "label": "\u51b7\u5374\u6db2\u6696\u673a\u76ee\u6807\u6e29\u5ea6",
    "type": "number",
    "unit": "\u00b0C",
+   "unitBy": "tempUnit",
+   "units": {
+    "f": {
+     "unit": "\u00b0F",
+     "mul": 1.8,
+     "add": 32
+    }
+   },
    "default": 80,
    "steps": [
     60,
@@ -48,17 +64,67 @@
    ]
   },
   {
+   "key": "warmGearbox",
+   "label": "\u53d8\u901f\u7bb1\u6cb9\u6696\u673a\u6e29\u5ea6",
+   "type": "number",
+   "unit": "\u00b0C",
+   "unitBy": "tempUnit",
+   "units": {
+    "f": {
+     "unit": "\u00b0F",
+     "mul": 1.8,
+     "add": 32
+    }
+   },
+   "default": 60,
+   "steps": [
+    40,
+    50,
+    60,
+    70,
+    80
+   ]
+  },
+  {
+   "key": "engine",
+   "label": "\u53d1\u52a8\u673a",
+   "type": "choice",
+   "default": "auto",
+   "options": [
+    [
+     "auto",
+     "\u81ea\u52a8\uff08\u8bfb\u53d6\u8f66\u8f86\uff09"
+    ],
+    [
+     "diesel",
+     "\u67f4\u6cb9"
+    ],
+    [
+     "petrol",
+     "\u6c7d\u6cb9"
+    ]
+   ]
+  },
+  {
    "key": "coldLimit",
    "label": "\u51b7\u673a\u8f6c\u901f\u4e0a\u9650",
    "type": "number",
    "unit": "rpm",
-   "default": 3500,
+   "default": 0,
+   "labels": {
+    "0": "Auto"
+   },
+   "reset": 1,
    "steps": [
+    0,
+    2000,
     2500,
     3000,
     3500,
     4000,
-    4500
+    4500,
+    5000,
+    5500
    ]
   },
   {
@@ -66,15 +132,26 @@
    "label": "\u6362\u6321\u8f6c\u901f",
    "type": "number",
    "unit": "rpm",
-   "default": 7000,
+   "default": 0,
+   "labels": {
+    "0": "Auto"
+   },
+   "reset": 1,
    "steps": [
+    0,
+    4000,
+    4500,
     5000,
     5500,
+    5800,
     6000,
+    6200,
     6500,
+    6800,
     7000,
     7200,
     7500,
+    7800,
     8000,
     8500,
     9000
@@ -162,7 +239,7 @@
    "key": "demo",
    "label": "\u6f14\u793a\u6570\u636e",
    "type": "choice",
-   "default": "auto",
+   "default": "off",
    "options": [
     [
      "auto",
@@ -180,6 +257,7 @@
   }
  ],
  "config": null,
+ "startWidget": null,
  "stateIds": {
   "MAIN": 1,
   "SETTINGS": 8

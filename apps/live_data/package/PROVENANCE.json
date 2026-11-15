@@ -1,0 +1,37 @@
+{
+  "repository": "https://github.com/cauliflowermossgrape/idrive7-apps",
+  "commit": "b2880634eb214e29f008422b970cf22ea2de280f",
+  "language": "zh-CN",
+  "sdk": "Excluded; donor-linked by mgu-deploy",
+  "adaptations": [
+    "Preserve CN app fixes and renderer compatibility",
+    "No corner watermark; attribution files retained",
+    "Numeric three-part CN versions"
+  ],
+  "component": "live_data",
+  "upstreamVersion": "1.0.13",
+  "releaseVersion": "1.0.14",
+  "cnRevision": 1,
+  "adaptedSourceFilesSha256": {
+    "apps/live_data/README.md": "7235b4de0a06abb39c97431c26398406434ca9c6bbdf028fcae730029f206515",
+    "apps/live_data/app.json": "d01f7d31a40d34d6639d2b07e99344af4ff167afb92a7f84cb4e88a0c3afa98e",
+    "apps/live_data/builtin/BATT48.json": "8d0cbc48d8003eac3eaae6fc718a48498ba3a4a25bd41054442a390aad44e305",
+    "apps/live_data/builtin/BATT48.meta.json": "376299d8de8429395933eda93303bb6b4336c51b1b3a40884e8cb94430511a42",
+    "apps/live_data/builtin/DME8FF_R.en.json": "5d1acde498dbb442b4451a0f90894b5baae7b5b4075adba62ea50f1bdb729f7b",
+    "apps/live_data/builtin/DME8FF_R.json": "ad14f2b15480f832049860e90ed9a60143b12f4deb4b58bfa30a3a5203dfc6f6",
+    "apps/live_data/builtin/DME8FF_R.meta.json": "e2e16731dc0529d5c507b5898dcd5ac9d1f0588c240e672a700353f34f0977d9",
+    "apps/live_data/builtin/PCU48.json": "a97cc2f7a26a11159837e01f33fce89365880f81a562c99343d927a6c8e833ec",
+    "apps/live_data/builtin/PCU48.meta.json": "ee1181e3df5e9d6f17a957b4c978b7fb92c944ae0d9b478f0f1358cffebd255e",
+    "apps/live_data/builtin/sgbd_index.json": "8d1842dd7f9ccb961ade1d36cca6aa608a35e76784877dd5cab1ba4b39269faa",
+    "apps/live_data/demo.js": "6289698ea221bda1fe2f13301002102325260d48acb26e42eeb5a829aec81bc0",
+    "apps/live_data/icon.png": "27a70f2f4fd94b447938d83ee479ec8060c0d4d5d9ac65e978f14fe273b17c7d",
+    "apps/live_data/main.js": "c7195942c4a2eb9da406e34f4a3641382314fdfae3c762abcbd315186b6f00e0",
+    "apps/live_data/pages.js": "2563aac6f79d8a5f685cad810205a348e29ae521c8b7d6ca33af86baa70ebd06",
+    "apps/live_data/picker.js": "f4e5006effa8bf89467d6b5e41fb8e5ecd2ab1047f404eb19fd0d53f388418b1",
+    "apps/live_data/screens.js": "9353360b837b922154d7f06085e385fa79a393a468316d2cd829619b5cfb5e79",
+    "apps/live_data/signals.js": "16459afad21e3e20dd4490316d5a0564701b9110902c54906b42746b976ee45c",
+    "apps/live_data/std.js": "df121e85c1b667736dd5b55846a83841996d87e849b087e5d91640c53f363ffb",
+    "apps/live_data/trips.js": "ac5da5987d7474982fca5a486aab094922870ae8849f4372c26a6673a18fd6e2",
+    "apps/live_data/useful.js": "c15e8ae93b73a4d00164118d4d5d1bd898e4ebbdcf807ec9c17abf4ee4810bfc"
+  }
+}

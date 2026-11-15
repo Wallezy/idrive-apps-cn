@@ -29,7 +29,7 @@
     </container>
     <container id="11" type="state" widget="LT_State_Wide">
         <property id="9" value="1"/>
-        <layoutGroup id="24" name="List">
+        <layoutGroup id="25" name="List">
             <property id="3" value="1"/>
             <component id="12" type="dropDownMenu"/>
             <component id="13" type="checkBox" widget="LT_CheckBox_1Row">
@@ -48,9 +48,13 @@
                 <property id="2" value="1"/>
                 <property id="3" value="2"/>
             </component>
+            <component id="23" type="button" widget="LT_Button_2Row_2Text">
+                <property id="2" value="1"/>
+                <property id="3" value="2"/>
+            </component>
         </layoutGroup>
-        <layoutGroup id="25" name="Titlebar">
-            <component id="23" type="title"/>
+        <layoutGroup id="26" name="Titlebar">
+            <component id="24" type="title"/>
         </layoutGroup>
     </container>
 </application>

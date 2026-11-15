@@ -1,0 +1,21 @@
+{
+  "repository": "https://github.com/cauliflowermossgrape/idrive7-apps",
+  "commit": "b2880634eb214e29f008422b970cf22ea2de280f",
+  "language": "zh-CN",
+  "sdk": "Excluded; donor-linked by mgu-deploy",
+  "adaptations": [
+    "Preserve CN app fixes and renderer compatibility",
+    "No corner watermark; attribution files retained",
+    "Numeric three-part CN versions"
+  ],
+  "component": "warmup",
+  "upstreamVersion": "1.8.1",
+  "releaseVersion": "1.8.2",
+  "cnRevision": 1,
+  "adaptedSourceFilesSha256": {
+    "apps/warmup/app.json": "1515dbb55564ebb239350b3f4ce7bc8a2d43b800c00bb62ea6272c624a511b9b",
+    "apps/warmup/gearbox.js": "046127d5565c009b9515f3bd9318454d0a079df36dd21d90babba67b9de7a867",
+    "apps/warmup/icon.png": "712aa342b103c39b3be8879ba071d0d0294620bd3e5abbc8e5bbc7ea67ee15e5",
+    "apps/warmup/main.js": "a599913f38292a71446acf34c1ef31a2effcbc56def6330ad170e923969a9841"
+  }
+}

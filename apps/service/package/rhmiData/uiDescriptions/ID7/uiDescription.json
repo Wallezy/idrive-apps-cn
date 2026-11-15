@@ -65,7 +65,7 @@
     },
     "5": {
      "type": "button",
-     "name": "BTN_PAGE",
+     "name": "BTN_RESET",
      "properties": {
       "Focusable": {
        "value": 3,
@@ -75,7 +75,7 @@
      "rows": [
       {
        "Text": {
-        "value": "SID_SERVICE_BTN_PAGE",
+        "value": "SID_SERVICE_BTN_RESET",
         "type": "StringId"
        }
       }
@@ -119,6 +119,28 @@
    "components": {
     "12": {
      "type": "checkBox",
+     "name": "SET_RESETON",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 2,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text": {
+        "value": "SID_SERVICE_SET_RESETON",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
+    "13": {
+     "type": "checkBox",
      "name": "SET_DIAGPAGE",
      "properties": {
       "Visible": {
@@ -139,7 +161,7 @@
       }
      ]
     },
-    "13": {
+    "14": {
      "type": "dropDownMenu",
      "name": "SET_THEME",
      "rows": [
@@ -179,7 +201,7 @@
       }
      }
     },
-    "14": {
+    "15": {
      "type": "dropDownMenu",
      "name": "SET_LAYOUT",
      "rows": [
@@ -207,7 +229,7 @@
       }
      }
     },
-    "15": {
+    "16": {
      "type": "dropDownMenu",
      "name": "SET_RENDERER",
      "rows": [
@@ -235,7 +257,7 @@
       }
      }
     },
-    "16": {
+    "17": {
      "type": "dropDownMenu",
      "name": "SET_DEMO",
      "rows": [
@@ -264,12 +286,12 @@
        "type": "StringId"
       },
       "SelectedItem": {
-       "value": 0,
+       "value": 2,
        "type": "UInt"
       }
      }
     },
-    "17": {
+    "18": {
      "type": "button",
      "name": "CN_CREDITS",
      "properties": {
@@ -295,7 +317,33 @@
       }
      ]
     },
-    "18": {
+    "19": {
+     "type": "button",
+     "name": "REPO_CREDITS",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 2,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text1stRow": {
+        "value": "SID_SERVICE_REPO_CREDITS_TITLE",
+        "type": "StringId"
+       },
+       "Text2ndRow": {
+        "value": "SID_SERVICE_REPO_CREDITS_LINK",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
+    "20": {
      "type": "title",
      "name": "SETTINGS_TITLE",
      "rows": [

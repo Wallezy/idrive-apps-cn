@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "live_data",
+  "version": "1.0.14",
+  "tree": "package",
+  "modules": [
+    "src/sdk.js"
+  ],
+  "sdk": [
+    "oap-sdk/src/core/OnlineApp.js",
+    "oap-sdk/src/logging/logging"
+  ]
+}

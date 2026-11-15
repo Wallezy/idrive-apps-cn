@@ -1664,12 +1664,38 @@
        "type": "StringId"
       },
       "SelectedItem": {
-       "value": 0,
+       "value": 2,
        "type": "UInt"
       }
      }
     },
     "48": {
+     "type": "button",
+     "name": "CN_CREDITS",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 2,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text1stRow": {
+        "value": "SID_CAR_VITALS_CN_CREDITS_TITLE",
+        "type": "StringId"
+       },
+       "Text2ndRow": {
+        "value": "SID_CAR_VITALS_CN_CREDITS_LINK",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
+    "49": {
      "type": "button",
      "name": "REPO_CREDITS",
      "properties": {
@@ -1695,7 +1721,7 @@
       }
      ]
     },
-    "49": {
+    "50": {
      "type": "title",
      "name": "SETTINGS_TITLE",
      "rows": [

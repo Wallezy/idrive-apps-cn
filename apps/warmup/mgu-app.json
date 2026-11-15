@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "id": "warmup",
-  "version": "1.4.6",
+  "version": "1.8.2",
   "tree": "package",
   "modules": [
     "src/sdk.js"

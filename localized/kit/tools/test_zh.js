@@ -18,12 +18,13 @@ async function main(){
  const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'mgu-language-'));
  try{
   fs.copyFileSync(path.join(kit,'i18n.js'),path.join(tmp,'i18n.js'));
+  if(fs.existsSync(path.join(kit,'ambient-patterns.json')))fs.copyFileSync(path.join(kit,'ambient-patterns.json'),path.join(tmp,'ambient-patterns.json'));
   for(const language of ['en','zh-CN','de-test']){
    fs.writeFileSync(path.join(tmp,'locale.json'),JSON.stringify({language,strings:language==='zh-CN'?{Settings:'设置'}:{Settings:'Einstellungen'}}));
    delete require.cache[require.resolve(path.join(tmp,'i18n.js'))];delete require.cache[require.resolve(path.join(tmp,'locale.json'))];
    assert.strictEqual(require(path.join(tmp,'i18n.js')).t('Settings'),language==='en'?'Settings':language==='zh-CN'?'设置':'Einstellungen');
   }
- }finally{fs.unlinkSync(path.join(tmp,'i18n.js'));fs.unlinkSync(path.join(tmp,'locale.json'));fs.rmdirSync(tmp)}
+ }finally{if(fs.existsSync(path.join(tmp,'ambient-patterns.json')))fs.unlinkSync(path.join(tmp,'ambient-patterns.json'));fs.unlinkSync(path.join(tmp,'i18n.js'));fs.unlinkSync(path.join(tmp,'locale.json'));fs.rmdirSync(tmp)}
  const updates=[],writes=[],component={getStringBundle:()=>({setStrings:async x=>updates.push(x)}),setValue:async(...x)=>writes.push(x)};
  const hmi=new HmiText();await hmi.set(component,'BTN',0,'Text','Scan now');
  if(chinese){assert.deepStrictEqual(updates[0],{[slotId(0)]:'立即扫描'});assert.strictEqual(writes[0][3],'StringId')}

@@ -215,8 +215,7 @@
       "attributes": {
         "statusHighVoltageStorage": "s"
       }
-    },
-    "de.bmw.infotainment.certification.Certification": "*"
+    }
   },
   "services": {
     "de.bmw.infotainment.telematic.oap.AppStatus": {

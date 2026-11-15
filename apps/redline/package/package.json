@@ -1,6 +1,6 @@
 {
   "name": "redline",
-  "version": "2.0.42",
+  "version": "2.0.43",
   "description": "Full-screen rev tach with shift lights, gear, shift scoring and cold-engine rev guard; HUD by @biscotit",
   "main": "javascript/localized-entry.js",
   "private": false,
@@ -31,7 +31,9 @@
     "javascript",
     "rhmiData",
     "LICENSE",
-    "MPL-2.0.txt",
-    "NOTICE.zh-CN.md"
+    "NOTICE.zh-CN.md",
+    "PROVENANCE.json",
+    "CHANGELOG.md",
+    "MPL-2.0.txt"
   ]
 }

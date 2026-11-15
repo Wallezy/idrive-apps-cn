@@ -3060,7 +3060,7 @@
        "type": "StringId"
       },
       "SelectedItem": {
-       "value": 0,
+       "value": 2,
        "type": "UInt"
       }
      }
@@ -3253,6 +3253,32 @@
     },
     "99": {
      "type": "button",
+     "name": "CN_CREDITS",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 2,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text1stRow": {
+        "value": "SID_REDLINE_CN_CREDITS_TITLE",
+        "type": "StringId"
+       },
+       "Text2ndRow": {
+        "value": "SID_REDLINE_CN_CREDITS_LINK",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
+    "100": {
+     "type": "button",
      "name": "REPO_CREDITS",
      "properties": {
       "Visible": {
@@ -3277,7 +3303,7 @@
       }
      ]
     },
-    "100": {
+    "101": {
      "type": "title",
      "name": "SETTINGS_TITLE",
      "rows": [

@@ -1,0 +1,20 @@
+{
+  "repository": "https://github.com/cauliflowermossgrape/idrive7-apps",
+  "commit": "b2880634eb214e29f008422b970cf22ea2de280f",
+  "language": "zh-CN",
+  "sdk": "Excluded; donor-linked by mgu-deploy",
+  "adaptations": [
+    "Preserve CN app fixes and renderer compatibility",
+    "No corner watermark; attribution files retained",
+    "Numeric three-part CN versions"
+  ],
+  "component": "gforce",
+  "upstreamVersion": "1.6.21",
+  "releaseVersion": "1.6.22",
+  "cnRevision": 1,
+  "adaptedSourceFilesSha256": {
+    "apps/gforce/app.json": "7709d7f85444b441a68d335bc25eb179a3b547b9c409787efc0a15d6e73879a6",
+    "apps/gforce/icon.png": "89e9e46537580ac2ae0048720e39ac9a175c1c44f286c4f1d7fc1e1828e79318",
+    "apps/gforce/main.js": "1a360eb78fe31d060f315ce2fe2cb10c97d65a5e257877778db60e4e9be53edb"
+  }
+}

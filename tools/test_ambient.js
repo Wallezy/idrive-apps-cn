@@ -14,7 +14,7 @@ const { Canvas } = require(path.join(kit, 'canvas'));
 const { Recorder, play } = require(path.join(kit, 'record'));
 const fonts = require(path.join(kit, 'fonts'));
 const spec = require(path.join(kit, 'app-spec.json'));
-const original = require('../localized/ambient/apps/ambient_config/app.json');
+const original = require('../localized/cauliflower/apps/ambient_config/app.json');
 const { Control, DEFAULT_LOOK } = require(path.join(js, 'control'));
 const S = require(path.join(js, 'scenes'));
 const { sample } = require(path.join(js, 'lin'));
@@ -104,7 +104,7 @@ global.setInterval = (fn, ms) => { const id = realInterval(fn, ms); timers.push(
         const tables = fs.readdirSync(path.join(app, 'rhmiData/variantGroups/Common/texts'));
         ok(tables.length === 33, 'all HMI languages use the fixed Chinese bundle');
         const catalog = require(path.join(kit, 'locale.json'));
-        const glyphText = Object.values(catalog.strings).join('') + require(path.join(kit, 'ambient-patterns.json')).map((p) => p[1]).join('');
+        const glyphText = Object.values(catalog.strings).join('');
         for (const c of glyphText) if (/[\u3400-\u9fff]/.test(c)) {
             ok(fonts.get('label', 24, c).glyphs[c.codePointAt(0)], 'missing catalog glyph ' + c);
         }

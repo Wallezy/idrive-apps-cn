@@ -1,5 +1,14 @@
 [
   {
+    "version": "2.5.21",
+    "upstreamVersion": "2.5.20",
+    "cnRevision": 1,
+    "changes": [
+      "更新加速计时与成绩页面。",
+      "完善简体中文显示，保留无水印界面。"
+    ]
+  },
+  {
     "version": "2.3.3",
     "upstreamVersion": "2.3.1",
     "cnRevision": 2,

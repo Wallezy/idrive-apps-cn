@@ -1,0 +1,9 @@
+{
+  "rhmiLoadingEnabled": true,
+  "entryPointLoadingEnabled": true,
+  "settings": {
+    "live_adjustments": {
+      "bm3MarkerAddress": "807FFE50"
+    }
+  }
+}

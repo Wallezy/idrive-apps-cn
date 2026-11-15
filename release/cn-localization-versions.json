@@ -1,24 +1,28 @@
 {
   "schema": 1,
-  "purpose": "Beta scene hosting with existing CN fullscreen and persistent mapping guard",
+  "purpose": "Pinned cauliflowermossgrape application set with CN compatibility fixes",
   "sourceCommit": "1fc3812993847096311e629fe4cb2a73439c241e",
   "components": {
     "cluster-render": "0.6.2",
     "waze-on-cluster": "0.10.1",
     "robertn_waze_cluster": "0.6.15",
-    "brake_test": "1.3.3",
-    "car_vitals": "2.27.4",
-    "doom": "1.4.3",
-    "draggy": "2.3.3",
-    "dtc_scanner": "2.9.8",
-    "dyno": "1.2.6",
-    "edrive": "2.9.3",
-    "gforce": "1.4.3",
-    "redline": "2.0.42",
-    "service": "1.1.3",
-    "warmup": "1.4.6",
-    "ambient_config": "2.4.6",
+    "brake_test": "1.5.21",
+    "car_vitals": "2.27.5",
+    "doom": "1.7.22",
+    "draggy": "2.5.21",
+    "dtc_scanner": "2.9.9",
+    "dyno": "1.6.3",
+    "edrive": "2.9.4",
+    "gforce": "1.6.22",
+    "redline": "2.0.43",
+    "service": "1.6.2",
+    "warmup": "1.8.2",
+    "ambient_config": "2.5.1",
     "cluster_themes": "0.17.3",
-    "zf8hp": "1.5.7"
-  }
+    "zf8hp": "1.5.8",
+    "live_adjustments": "0.9.7",
+    "live_data": "1.0.14",
+    "mgu-inputgate": "1.1.1"
+  },
+  "applicationSourceCommit": "b2880634eb214e29f008422b970cf22ea2de280f"
 }

@@ -1,4 +1,6 @@
 {
+  "rhmiLoadingEnabled": true,
+  "entryPointLoadingEnabled": true,
   "settings": {
     "draggy": {
       "comment": "BMW's own scalings (M Laptimer TypeConverters)",

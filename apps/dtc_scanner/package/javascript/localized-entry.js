@@ -1,4 +1,6 @@
 require('./app.js');
+// Translation by: 抖音 小白科技杂物社 / BiliBili 小白151 / GitHub JackieZ123430
+// https://github.com/JackieZ123430/idrive7-apps-cn
 'use strict';
 /**
  * Fault Scanner - reads the fault memory of every control unit over the head

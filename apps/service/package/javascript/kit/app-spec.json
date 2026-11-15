@@ -1,7 +1,7 @@
 {
  "id": "service",
  "title": "\u4fdd\u517b\u4fe1\u606f",
- "version": "1.1.2",
+ "version": "1.6.2",
  "screens": [
   {
    "name": "MAIN",
@@ -17,8 +17,8 @@
      "\u8be6\u60c5"
     ],
     [
-     "BTN_PAGE",
-     "\u4e0b\u4e00\u9875"
+     "BTN_RESET",
+     "\u91cd\u7f6e\u4fdd\u517b\u9879\u76ee"
     ],
     [
      "BTN_SETTINGS",
@@ -28,6 +28,12 @@
   }
  ],
  "settings": [
+  {
+   "key": "resetOn",
+   "label": "\u4fdd\u517b\u91cd\u7f6e\uff08\u5236\u52a8\u6db2\u3001\u8f66\u8f86\u68c0\u67e5\uff09",
+   "type": "bool",
+   "default": false
+  },
   {
    "key": "diagPage",
    "label": "\u8bca\u65ad\u9875\u9762",
@@ -94,7 +100,7 @@
    "key": "demo",
    "label": "\u6f14\u793a\u6570\u636e",
    "type": "choice",
-   "default": "auto",
+   "default": "off",
    "options": [
     [
      "auto",
@@ -112,6 +118,7 @@
   }
  ],
  "config": null,
+ "startWidget": null,
  "stateIds": {
   "MAIN": 1,
   "SETTINGS": 11

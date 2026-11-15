@@ -1,0 +1,72 @@
+{
+  "id": "mgu-inputgate",
+  "kind": "tool",
+  "version": "1.1.1",
+  "title": "Controller gate",
+  "description": "Lets the apps have the iDrive controller (tabs, page buttons, settings, Doom); loads into the HMI at the next start (iDrive 7 and iDrive 8)",
+  "mguHmi": [
+    "ID7"
+  ],
+  "files": [
+    {
+      "path": "mgu-inputgate.so",
+      "mode": "0755",
+      "from": "build/target/mgu-inputgate.so"
+    },
+    {
+      "path": "guard.sh",
+      "mode": "0755"
+    },
+    {
+      "path": "pending.js",
+      "mode": "0644"
+    },
+    {
+      "path": "LICENSE",
+      "mode": "0644"
+    },
+    {
+      "path": "MPL-2.0.txt",
+      "mode": "0644"
+    },
+    {
+      "path": "PROVENANCE.json",
+      "mode": "0644"
+    }
+  ],
+  "units": [
+    {
+      "name": "mgu-inputgate-guard.service"
+    },
+    {
+      "name": "mgu-inputgate-check.service"
+    }
+  ],
+  "dropins": [
+    {
+      "unit": "hmi.service",
+      "name": "zz-mgu-inputgate.conf"
+    }
+  ],
+  "enable": [],
+  "recmgr": [],
+  "restart": [],
+  "uninstallable": true,
+  "build": [
+    "make",
+    "target"
+  ],
+  "requires": {
+    "mgu-deploy": "0.8.18"
+  },
+  "activate": [
+    "node",
+    "pending.js",
+    "install"
+  ],
+  "deactivate": [
+    "node",
+    "pending.js",
+    "remove"
+  ]
+}

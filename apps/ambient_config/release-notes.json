@@ -1,5 +1,14 @@
 [
   {
+    "version": "2.5.1",
+    "upstreamVersion": "2.5.0",
+    "cnRevision": 1,
+    "changes": [
+      "同步新版灯光控制与模式设置。",
+      "完善简体中文显示，保留无水印界面。"
+    ]
+  },
+  {
     "version": "2.4.6",
     "upstreamVersion": "2.4.4",
     "cnRevision": 2,

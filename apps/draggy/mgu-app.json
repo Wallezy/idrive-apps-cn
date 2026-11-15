@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "id": "draggy",
-  "version": "2.3.3",
+  "version": "2.5.21",
   "tree": "package",
   "modules": [
     "src/sdk.js"

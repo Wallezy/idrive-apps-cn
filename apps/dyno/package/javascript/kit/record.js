@@ -89,9 +89,15 @@ class Recorder {
         this.atlases = new Set();    // glyph atlases and colour ramps it uses (uploaded once by the transport)
         this.ramps = new Set();
         this.images = new Set();     // pixel images it draws (setImage)
+        this.targets = [];           // what a tap or the controller can press on the page: { x, y, w, h, run, key } (target)
+        this._extra = 0;
+        this.extraUsed = false;      // the drawing read extra (it reaches below the page: display.js places it so)
         this.recording = true;
     }
-    reset() { this.n = 0; this._cnStamped = false; if (this.layersUsed) this.layersUsed.clear(); this.atlases.clear(); this.ramps.clear(); this.images.clear(); return this; }
+    /** logical px the screen has below the app's page (display.js), 0 if none */
+    get extra() { if (this._extra) this.extraUsed = true; return this._extra; }
+    set extra(v) { this._extra = v || 0; }
+    reset() { this.n = 0; this._cnStamped = false; this.targets = []; this.scroll = false; this.extraUsed = false; if (this.layersUsed) this.layersUsed.clear(); this.atlases.clear(); this.ramps.clear(); this.images.clear(); return this; }
     _grow(k) {
         if (this.n + k <= this.u.length) return;
         let len = this.u.length * 2;
@@ -102,6 +108,12 @@ class Recorder {
     }
     /** the recorded words (a view, valid until the next draw call) */
     words() { return this.u.subarray(0, this.n); }
+    /**
+     * Something on the page a tap (or the iDrive controller, turned onto it and pressed) runs: run().
+     * key names it from frame to frame (the controller stays on it). Drawn by the caller; where the kit
+     * runs the screen (display.js) it rings the one the controller is on.
+     */
+    target(x, y, w, h, run, key, r) { this.targets.push({ x, y, w, h, run, key: String(key), r }); return this; }
 
     /* ---------- canvas.js API ---------- */
     /** Draw pixel image `id` (see setImage) scaled into x, y, w, h (nearest pixel). */
@@ -183,6 +195,22 @@ class Recorder {
         this.u[i++] = pack(c);
         this.n = i; return this;
     }
+    /**
+     * Any simple polygon (concave too), as canvas.js fill(): sent as triangles, played back as one shape. strip: pts
+     * is a top edge then its bottom edge reversed, point for point (Ramp's shapes), cut into quads along it: exact
+     * and quick, where the general cut (ear clipping) can go wrong on walls a hair apart.
+     */
+    fill(pts, c, strip) {
+        const tr = strip && pts && pts.length >= 4 && pts.length % 2 === 0 ? stripTris(pts) : triangulate(pts), k = tr.length;
+        if (!k) return this;
+        const col = pack(c);
+        this._grow(2 + k * 9); const f = this.f, u = this.u; let i = this.n;
+        u[i++] = OP.TRIS; u[i++] = k;
+        tr.forEach((t) => t.forEach((p) => { f[i++] = p[0]; f[i++] = p[1]; u[i++] = col; }));
+        this.n = i; return this;
+    }
+    /** A thick path (canvas.js stroke()): its segments as lines here. */
+    stroke(pts, width, c) { return this.polyline(pts, width, c); }
     /** Area under a trace down to baseY (two triangles per segment). */
     fillUnder(pts, baseY, c) {
         if (pts.length < 2) return this;
@@ -218,7 +246,7 @@ class Recorder {
     /** Text; y is the baseline. Returns the width in logical px (as canvas.js). */
     text(str, x, y, size, c, opts) {
         opts = opts || {};
-        const s = t(str), family = opts.font || 'label';
+        const s = opts.literal ? String(str) : t(str), family = opts.font || 'label';
         const f = fonts.get(family, size * this.textScale, s);
         if (!f) return 0;
         const sc = size / f.size, sp = opts.spacing || 0;
@@ -248,7 +276,7 @@ class Recorder {
         return w;
     }
     textWidth(str, size, opts) {
-        const s = t(str), f = fonts.get((opts && opts.font) || 'label', size * this.textScale, s);
+        const s = opts && opts.literal ? String(str) : t(str), f = fonts.get((opts && opts.font) || 'label', size * this.textScale, s);
         return f ? fonts.measure(f, s) * (size / f.size) + ((opts && opts.spacing) || 0) * Math.max(0, s.length - 1) : 0;
     }
 
@@ -281,6 +309,52 @@ function dropLayer(L) { layerById.delete(L.layerId); }
 function softLayer(L) {
     if (!L.soft) { L.soft = new Canvas(L.w, L.h); play(L.words, L.soft); }
     return L.soft;
+}
+
+/**
+ * A simple polygon (concave too) cut into triangles by ear clipping: [[a, b, c], ...], all wound one way. The
+ * renderer has no polygon op, so fill() sends these. A polygon that crosses itself is cut as far as it goes.
+ */
+function triangulate(pts) {
+    const P = [];
+    (pts || []).forEach((p) => { const q = P[P.length - 1]; if (!q || q[0] !== p[0] || q[1] !== p[1]) P.push(p); });
+    if (P.length > 1 && P[0][0] === P[P.length - 1][0] && P[0][1] === P[P.length - 1][1]) P.pop();
+    if (P.length < 3) return [];
+    let area = 0;
+    for (let i = 0; i < P.length; i++) { const a = P[i], b = P[(i + 1) % P.length]; area += a[0] * b[1] - b[0] * a[1]; }
+    const sg = area < 0 ? -1 : 1, V = P.map((p, i) => i), out = [];
+    const cross = (a, b, c) => ((b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])) * sg;
+    const inside = (p, a, b, c) => cross(a, b, p) > 0 && cross(b, c, p) > 0 && cross(c, a, p) > 0;
+    let i = 0, miss = 0;
+    while (V.length > 3 && miss < V.length) {
+        const ia = V[(i + V.length - 1) % V.length], ib = V[i % V.length], ic = V[(i + 1) % V.length];
+        const a = P[ia], b = P[ib], c = P[ic], cr = cross(a, b, c);
+        let ear = Math.abs(cr) <= 1e-9;                          // a straight run: the middle point just goes
+        if (!ear && cr > 0) {
+            ear = true;
+            for (const j of V) {
+                if (j === ia || j === ib || j === ic) continue;
+                const q = P[j];
+                if ((q[0] === a[0] && q[1] === a[1]) || (q[0] === b[0] && q[1] === b[1]) || (q[0] === c[0] && q[1] === c[1])) continue;
+                if (inside(q, a, b, c)) { ear = false; break; }
+            }
+            if (ear) out.push([a, b, c]);
+        }
+        if (ear) { V.splice(i % V.length, 1); miss = 0; } else { i++; miss++; }
+    }
+    if (V.length === 3 && cross(P[V[0]], P[V[1]], P[V[2]]) > 1e-9) out.push([P[V[0]], P[V[1]], P[V[2]]]);
+    return out;
+}
+
+/** A strip's triangles: pts = top[0..n-1] then bottom[n-1..0]; two per quad, all wound one way, none empty. */
+function stripTris(pts) {
+    const n = pts.length / 2, out = [];
+    const ar = (a, b, c) => (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]);
+    for (let k = 1; k < n; k++) {
+        const t0 = pts[k - 1], t1 = pts[k], b1 = pts[2 * n - 1 - k], b0 = pts[2 * n - k];
+        [[t0, t1, b1], [t0, b1, b0]].forEach((t) => { if (Math.abs(ar(t[0], t[1], t[2])) > 1e-9) out.push(t); });
+    }
+    return out;
 }
 
 const NOP = new Proxy({}, { get: () => () => 0 });
@@ -326,6 +400,18 @@ function play(words, real) {
         case OP.QUAD: cv.quad([[f[i], f[i + 1]], [f[i + 2], f[i + 3]], [f[i + 4], f[i + 5]], [f[i + 6], f[i + 7]]], col(u[i + 8])); i += 9; break;
         case OP.TRIS: {
             const k = u[i++];
+            // one colour, all wound one way (a fill()'s triangles): one shape, so no seams where they meet
+            const tris = [];
+            let one = k > 1 && !!cv.fillPolys, sgn = 0;
+            for (let t = 0; one && t < k; t++) {
+                const b = i + t * 9, q = [[f[b], f[b + 1]], [f[b + 3], f[b + 4]], [f[b + 6], f[b + 7]]];
+                const ar = (q[1][0] - q[0][0]) * (q[2][1] - q[0][1]) - (q[1][1] - q[0][1]) * (q[2][0] - q[0][0]);
+                const sg = ar > 1e-9 ? 1 : ar < -1e-9 ? -1 : 0;
+                if (u[b + 2] !== u[i + 2] || u[b + 5] !== u[i + 2] || u[b + 8] !== u[i + 2] || (sg && sgn && sg !== sgn)) one = false;
+                if (sg) sgn = sg;
+                tris.push(q);
+            }
+            if (one) { cv.fillPolys(tris, col(u[i + 2])); i += k * 9; break; }
             for (let t = 0; t < k; t++) {
                 const b = i + t * 9;
                 cv.triangle([[f[b], f[b + 1]], [f[b + 3], f[b + 4]], [f[b + 6], f[b + 7]]], col(u[b + 2]));
@@ -353,4 +439,4 @@ function play(words, real) {
     return real;
 }
 
-module.exports = { Recorder, OP, pack, unpack, rampId, rampList, atlasId, atlasList, atlasById, makeLayer, dropLayer, layerById, play, softLayer, setImage, imageById };
+module.exports = { triangulate, stripTris, Recorder, OP, pack, unpack, rampId, rampList, atlasId, atlasList, atlasById, makeLayer, dropLayer, layerById, play, softLayer, setImage, imageById };

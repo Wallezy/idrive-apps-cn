@@ -214,6 +214,28 @@
      ]
     },
     "15": {
+     "type": "checkBox",
+     "name": "SET_FLIPLONG",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 2,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text": {
+        "value": "SID_GFORCE_SET_FLIPLONG",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
+    "16": {
      "type": "dropDownMenu",
      "name": "SET_SPEEDUNIT",
      "rows": [
@@ -241,7 +263,29 @@
       }
      }
     },
-    "16": {
+    "17": {
+     "type": "checkBox",
+     "name": "SET_ADVANCED",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 2,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text": {
+        "value": "SID_GFORCE_SET_ADVANCED",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
+    "18": {
      "type": "dropDownMenu",
      "name": "SET_THEME",
      "rows": [
@@ -281,7 +325,7 @@
       }
      }
     },
-    "17": {
+    "19": {
      "type": "dropDownMenu",
      "name": "SET_GRATE",
      "rows": [
@@ -327,7 +371,7 @@
       }
      }
     },
-    "18": {
+    "20": {
      "type": "dropDownMenu",
      "name": "SET_LAYOUT",
      "rows": [
@@ -355,7 +399,7 @@
       }
      }
     },
-    "19": {
+    "21": {
      "type": "dropDownMenu",
      "name": "SET_RENDERER",
      "rows": [
@@ -383,7 +427,7 @@
       }
      }
     },
-    "20": {
+    "22": {
      "type": "dropDownMenu",
      "name": "SET_DEMO",
      "rows": [
@@ -412,12 +456,12 @@
        "type": "StringId"
       },
       "SelectedItem": {
-       "value": 0,
+       "value": 2,
        "type": "UInt"
       }
      }
     },
-    "21": {
+    "23": {
      "type": "button",
      "name": "CN_CREDITS",
      "properties": {
@@ -443,7 +487,33 @@
       }
      ]
     },
-    "22": {
+    "24": {
+     "type": "button",
+     "name": "REPO_CREDITS",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 2,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text1stRow": {
+        "value": "SID_GFORCE_REPO_CREDITS_TITLE",
+        "type": "StringId"
+       },
+       "Text2ndRow": {
+        "value": "SID_GFORCE_REPO_CREDITS_LINK",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
+    "25": {
      "type": "title",
      "name": "SETTINGS_TITLE",
      "rows": [

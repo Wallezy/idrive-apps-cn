@@ -1,7 +1,7 @@
 {
   "name": "service",
-  "version": "1.1.3",
-  "description": "Service requirements from the instrument cluster: oil, brakes, brake fluid, vehicle check, inspection - distance, date and details",
+  "version": "1.6.2",
+  "description": "Service requirements from the instrument cluster: oil, brakes, brake fluid, vehicle check, inspection - distance, date, details; brake fluid and vehicle check reset",
   "main": "javascript/localized-entry.js",
   "private": false,
   "author": "custom",
@@ -31,6 +31,8 @@
     "javascript",
     "rhmiData",
     "LICENSE",
-    "NOTICE.zh-CN.md"
+    "NOTICE.zh-CN.md",
+    "PROVENANCE.json",
+    "CHANGELOG.md"
   ]
 }

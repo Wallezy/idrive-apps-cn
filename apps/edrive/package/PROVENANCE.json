@@ -1,24 +1,24 @@
 {
-  "sourceArchive": "edrive@2.9.2.tgz",
-  "sourceVersion": "2.9.2",
-  "sourceSha256": "3fd913740d97402b3132faed4bbdac33206e18442085e730c4c073c11710c15d",
-  "sourceLicense": "MIT",
+  "repository": "https://github.com/cauliflowermossgrape/idrive7-apps",
+  "commit": "b2880634eb214e29f008422b970cf22ea2de280f",
+  "language": "zh-CN",
+  "sdk": "Excluded; donor-linked by mgu-deploy",
   "adaptations": [
-    "SDK-free source package with donor bridge",
-    "fixed zh-CN UI",
-    "ID7 application and widget resources",
-    "no user data, BMW SDK or node_modules",
-    "reuse repository renderer client: preferred CN socket, handshake timeout, retry and malformed READY checks",
-    "Demo defaults off; offline tests explicitly enable synthetic data",
-    "Fast fitted power displays ~ and ESTIMATED marker",
-    "Gate slow diagnostics for every powertrain while parked; resume after page visibility or explicit interaction"
+    "Preserve CN app fixes and renderer compatibility",
+    "No corner watermark; attribution files retained",
+    "Numeric three-part CN versions"
   ],
-  "baselineVersion": "2.0.3",
-  "exportPackageLicense": "UNLICENSED",
-  "publicSource": {
-    "repository": "https://github.com/cauliflowermossgrape/idrive7-apps",
-    "commit": "8d860de5818a2da11d3a3750aab36866cecf6bde",
-    "licenseSha256": "7c813412dcaf1b9d18c28ca6b6199c4349e15e35beca44ab6cab8e4413fe0aa6",
-    "comparison": "All application JavaScript files and 26 kit runtime JavaScript files match the unmodified vehicle export byte for byte; DTC database also matches."
+  "component": "edrive",
+  "upstreamVersion": "2.9.2",
+  "releaseVersion": "2.9.4",
+  "cnRevision": 2,
+  "adaptedSourceFilesSha256": {
+    "apps/edrive/app.json": "c6f794718cbbe088a17fc527ad1596b4739352a20803e9030242c3b6d7451b20",
+    "apps/edrive/battery12.js": "77212482b19487ba328120b635aa8f64f276d05818febdece0683c0cdd29ec71",
+    "apps/edrive/fastkw.js": "b9a74d9ac3b735b151fb7608c6be4cb959643ff0668d72b67c9ad6d3474e5fd7",
+    "apps/edrive/icon.png": "5869ea41c3c995e8f085e2761277db3e5f5040b6042ad50ad185d9b3b52a824a",
+    "apps/edrive/live.js": "541257bbe65c54377dd794a52a81d37fcaed5bbbc62978f2121149d9bc3774d4",
+    "apps/edrive/main.js": "7fc00c03c3f5192c3956a992e287aa6c5fab4f7899fc96b1039d0eab12601062",
+    "apps/edrive/range.js": "d5c7e5067d0de34cff339cafe8d54ecdda895e6bb472b5ac92efb4b1b46c433f"
   }
 }

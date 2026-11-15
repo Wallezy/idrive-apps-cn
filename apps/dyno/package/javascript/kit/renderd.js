@@ -10,15 +10,31 @@
  * Fonts, colour ramps and cached layers a frame uses are uploaded once per connection
  * (again after a reconnect or a resize). With `file` instead of a socket path the messages
  * are written to that file (for `mgu-renderd --replay`).
+ *
+ * opts.native: ask for mgu-render's own dialect (mgu-render/1, the Store's renderer). There touch
+ * claims and the controller grab work on one connection, and X_STATE says when the renderer has
+ * the app on screen. A renderer that does not speak it answers READY alone and the connection
+ * stays in the upstream dialect. Pixel images (op 18) are upstream only: an app that draws them
+ * (Doom) connects without opts.native.
  */
 const net = require('net');
 const fs = require('fs');
 const EventEmitter = require('events');
 const rec = require('./record');
 
-const SOCKET = process.env.MGU_RENDERD_SOCKET || '/run/mgu-renderd/renderd.sock';
+// the Store's renderer (mgu-render) first, then the community socket (an older renderer, or mgu-render's
+// link): an older renderer still installed beside mgu-render never gets the apps
+const SOCKETS = process.env.MGU_RENDERD_SOCKET ? [process.env.MGU_RENDERD_SOCKET] : ['/run/mgu-render/render.sock', '/run/mgu-renderd/renderd.sock'];
+const SOCKET = SOCKETS[0];
+const CONNECT_MS = 2000, RETRY_MS = 3000;
+const isSocket = (p) => { try { return fs.statSync(p).isSocket(); } catch (e) { return false; } };
 const M = { HELLO: 1, PLACE: 2, SHOW: 3, ATLAS: 4, RAMP: 5, LAYER: 6, FRAME: 7, DROP_LAYER: 8, IMAGE: 9, GRAB: 10 };
 const E = { READY: 101, TICK: 102, ERROR: 103, STATS: 104, CCU: 105 };
+// touch (mgu-render, IterioDev's mgu-renderd): message 9 is CLAIM there; 105 and 106 come back as TOUCH and CLOSED
+const CLAIM = 9, TOUCH = 105, CLOSED = 106;
+// mgu-render/1 (mgu-store native/mgu-render/PROTOCOL.md)
+const X = { MODE: 0x4d520001, GRAB: 0x4d520002, READY: 0x4d520101, STATE: 0x4d520102, CCU: 0x4d520103 };
+const X_MODE_LAYER = 1;
 
 function msg(type, payload) {
     const len = payload ? payload.length : 0;
@@ -49,40 +65,112 @@ class RenderClient extends EventEmitter {
         this.retry = null;
         this.closed = false;
         this.fd = null;              // file sink
+        this.claimed = null;         // the claims sent on this connection (JSON), null: none yet
+        this.native = false;         // this connection speaks mgu-render/1 (X_READY came)
+        this.info = null;            // X_READY: { touch, controller, frontGate }
+        this.area = null;            // X_READY: the app area { x, y, w, h } (screen px), null: not told
+        this.onScreen = null;        // X_STATE: the renderer shows us (null: not told)
+        this.failed = new Set();     // candidates already tried in this retry round
+        this.failures = new Map();   // avoid repeating the same error every retry
     }
 
     /** Socket exists (the renderer is installed and running)? */
-    static available(path) { try { return fs.statSync(path || SOCKET).isSocket(); } catch (e) { return false; } }
+    static available(path) { return path ? isSocket(path) : SOCKETS.some(isSocket); }
+
+    _paths() {
+        const paths = this.opts.socket ? [this.opts.socket] : this.opts.sockets || SOCKETS;
+        const seen = new Set();
+        // A shared symlink to the Store socket is one service, not a second fallback.
+        return paths.filter((p) => {
+            let key = p;
+            try { key = fs.realpathSync(p); } catch (e) { /* a service can appear on the next retry */ }
+            if (seen.has(key)) return false;
+            seen.add(key); return true;
+        });
+    }
+
+    _fail(reason) {
+        if (!this.sock || this.failed.has(this.path)) return;
+        // An established peer can reset the stream during a restart (Node 8 reports
+        // ECONNRESET where newer Node versions may only close). Retry that proven
+        // service first; only failed handshakes reject a candidate for this round.
+        if (!this.ready) this.failed.add(this.path);
+        if (this.failures.get(this.path) !== reason) {
+            this.failures.set(this.path, reason);
+            this.log.warn('renderd: ' + this.path + ': ' + reason);
+        }
+        this.sock.destroy();
+    }
 
     connect() {
+        if (this.closed || this.sock || this.fd !== null) return this;
+        if (this.retry) { clearTimeout(this.retry); this.retry = null; }
         if (this.opts.file) {
             this.fd = fs.openSync(this.opts.file, 'w');
             this.connected = this.ready = true;
-            this._write(msg(M.HELLO, Buffer.from(this.appId)));
+            // testing: the screen another head unit's renderer tells (MGU_RENDERD_SCREEN=2880x960: iDrive 8)
+            const m = /^(\d+)x(\d+)$/.exec(process.env.MGU_RENDERD_SCREEN || '');
+            if (m) this.screen = { w: Number(m[1]), h: Number(m[2]) };
+            // as the car's renderer: touch routing on, so the kit runs the screen (tabs, no button bar)
+            this.touch = process.env.MGU_RENDERD_TOUCH !== '0';
+            this._write(msg(M.HELLO, this._hello()));
+            if (this.opts.native) { this.native = true; this._write(this._u32msg(X.MODE, [X_MODE_LAYER])); }
             setImmediate(() => this.emit('ready', this.screen));
             return this;
         }
-        const path = this.opts.socket || SOCKET;
+        // Keep a service that proved usable across reconnects. Failed, silent or incompatible
+        // candidates are tried once per round; an exhausted round waits before trying again.
+        const list = this._paths().filter((p) => !this.failed.has(p));
+        const path = list.indexOf(this.preferred) >= 0 ? this.preferred : list[0];
+        if (!path) {
+            this.emit('unavailable');
+            this.retry = setTimeout(() => { this.retry = null; this.failed.clear(); this.connect(); }, RETRY_MS);
+            return this;
+        }
+        if (path !== this.path) { this.path = path; this.log.info('renderd: socket ' + path); }
         const s = net.createConnection(path);
         this.sock = s;
+        this.connectTimer = setTimeout(() => {
+            if (this.sock === s && !this.ready) this._fail('renderer handshake timed out');
+        }, CONNECT_MS);
         s.on('connect', () => {
+            if (this.sock !== s || this.closed) return;
             this.connected = true;
             this._reset();
+            this.inbuf = Buffer.alloc(0);   // (a message cut off with the last connection)
             s.setNoDelay && s.setNoDelay(true);
-            this._write(msg(M.HELLO, Buffer.from(this.appId)));
-            if (this.placement) this._sendPlace();
-            if (this.visible) this._write(this._u32msg(M.SHOW, [1]));
-            if (this.grabbing) this._write(this._u32msg(M.GRAB, [1]));
+            this.native = false; this.info = null; this.area = null; this.onScreen = null;
+            this.claimed = null;
+            this._write(msg(M.HELLO, this._hello()));
+            // upstream renderers take these before READY; they are sent again once READY came
+            if (this.placement && !this.opts.interactive) this._sendPlace();
+            if (this.visible && !this.opts.interactive) this._write(this._u32msg(M.SHOW, [1]));
+            if (this.grabbing && !this.opts.native) this._write(this._u32msg(M.GRAB, [1]));
         });
-        s.on('data', (d) => this._data(d));
-        s.on('error', (e) => { if (!this.errLogged) { this.errLogged = true; this.log.warn('renderd: ' + e.message); } });
+        s.on('data', (d) => { if (this.sock === s && !this.failed.has(path)) this._data(d); });
+        s.on('error', (e) => {
+            if (this.sock === s) this._fail(e.code || e.message);
+        });
         s.on('close', () => {
+            if (this.sock !== s) return;
+            clearTimeout(this.connectTimer); this.connectTimer = null;
             const was = this.ready;
-            this.connected = this.ready = false; this.sock = null; this.waiting = false;
+            if (!was) this.failed.add(path); // EOF before READY also advances to the next candidate.
+            this.connected = this.ready = this.native = this.touch = false;
+            this.sock = null; this.waiting = false; this.onScreen = null; this.info = null; this.area = null;
             if (was) { this.log.warn('renderd: connection closed'); this.emit('close'); }
-            if (!this.closed) this.retry = setTimeout(() => { this.retry = null; this.connect(); }, 3000);
+            if (!this.closed) this.retry = setTimeout(() => { this.retry = null; this.connect(); }, !was || this.failed.has(path) || this.soon ? 0 : RETRY_MS);
+            this.soon = false;
         });
         return this;
+    }
+    /** A fresh connection at once: the renderer's READY again, with what it offers now (its capabilities are
+     * those of the moment it answered HELLO). */
+    reconnect() {
+        if (this.closed || !this.sock || !this.ready) return false;
+        this.soon = true;
+        this.sock.destroy();
+        return true;
     }
     /**
      * Have the iDrive controller to ourselves (the HMI ignores the knob, press and tilt while it
@@ -94,13 +182,42 @@ class RenderClient extends EventEmitter {
         if (on === !!this.grabbing) return;
         this.grabbing = on;
         if (this.grabTimer) { clearInterval(this.grabTimer); this.grabTimer = null; }
-        if (on) this.grabTimer = setInterval(() => { if (this.connected) this._write(this._u32msg(M.GRAB, [1])); }, 500);
-        if (this.connected) this._write(this._u32msg(M.GRAB, [on ? 1 : 0]));
+        if (on) this.grabTimer = setInterval(() => { if (this.connected) this._sendGrab(1); }, 500);
+        if (this.connected) this._sendGrab(on ? 1 : 0);
+    }
+    _sendGrab(on) {
+        if (this.opts.interactive && !this.ready) return;
+        if (this.native) this._write(this._u32msg(X.GRAB, [on]));
+        // mgu-render/1 asked for: wait for READY, which tells the dialect (upstream GRAB is IMAGE there)
+        else if (!this.opts.native || this.ready) this._write(this._u32msg(M.GRAB, [on]));
+    }
+    /** HELLO: the app id; with opts.native also the dialect asked for */
+    _hello() {
+        const id = Buffer.from(this.appId);
+        return this.opts.native ? Buffer.concat([id, Buffer.from([0]), Buffer.from('proto=mgu-render/1')]) : id;
+    }
+    /**
+     * Touch in these rects ([{ x, y, w, h }] logical px) comes to this app as 'touch' (phase 1 down,
+     * 2 move, 3 up, x, y) while it is shown; a touch elsewhere goes to the HMI and comes as 'closed'
+     * (the renderer has hidden us). Only on a renderer that routes touch (READY's fourth word), and
+     * only on a connection that never sends images or GRAB: CLAIM shares their message numbers
+     * (not so in mgu-render/1: there claims and the grab go together).
+     */
+    claim(rects) {
+        if (!this.ready || !this.touch || (!this.native && (this.grabbing || this.sent.image.size))) return;
+        const key = JSON.stringify(rects);
+        if (key === this.claimed || (this.claimed === null && !rects.length)) return;
+        const b = Buffer.alloc(4 + rects.length * 16);
+        b.writeUInt32LE(rects.length, 0);
+        rects.forEach((r, i) => ['x', 'y', 'w', 'h'].forEach((k, j) => b.writeFloatLE(r[k], 4 + i * 16 + j * 4)));
+        this._write(msg(CLAIM, b));
+        this.claimed = key;
     }
     close() {
         this.grab(false);
         this.closed = true;
         if (this.retry) clearTimeout(this.retry);
+        if (this.connectTimer) clearTimeout(this.connectTimer);
         if (this.sock) this.sock.destroy();
         if (this.fd !== null) { fs.closeSync(this.fd); this.fd = null; }
     }
@@ -108,6 +225,22 @@ class RenderClient extends EventEmitter {
     _write(b) {
         if (this.fd !== null) { fs.writeSync(this.fd, b); return true; }
         return this.sock && this.connected ? this.sock.write(b) : false;
+    }
+    /* A buffer for one IMAGE message of `size` bytes: the one kept for that size once the socket has passed
+     * it on (a big picture every frame - DOOM's 1920 x 504 view - would otherwise leave two new copies of
+     * several MB a frame, which Node 8 frees late: the app's memory grows until the app manager stops it). */
+    _imageBuf(size) {
+        const pool = this.imgPool || (this.imgPool = new Map());
+        const free = this.fd !== null || !this.sock || this.sock.bufferSize === 0;
+        let b = free ? pool.get(size) : null;
+        if (!b) {
+            b = Buffer.allocUnsafe(size);
+            if (size >= 65536) {
+                if (pool.size >= 4) pool.delete(pool.keys().next().value);
+                pool.set(size, b);
+            }
+        }
+        return b;
     }
     _u32msg(type, arr) { const u = new Uint32Array(arr); return msg(type, words(u)); }
 
@@ -118,15 +251,53 @@ class RenderClient extends EventEmitter {
             if (this.inbuf.length < 8 + len) break;
             const p = this.inbuf.slice(8, 8 + len);
             this.inbuf = this.inbuf.slice(8 + len);
-            if (type === E.READY) {
+            if (type === X.READY && p.length >= 12) {
+                const caps = p.readUInt32LE(8);
+                this.native = p.readUInt32LE(0) === 1;
+                this.layer = !!(p.readUInt32LE(4) & 1);
+                this.info = { touch: !!(caps & 1), controller: !!(caps & 2), frontGate: !!(caps & 4) };
+                // the app area (where the HMI leaves room for apps, in screen px): after the embed box
+                this.area = p.length >= 44 ? { x: p.readInt32LE(28), y: p.readInt32LE(32), w: p.readInt32LE(36), h: p.readInt32LE(40) } : null;
+            } else if (type === E.READY) {
+                if (p.length < 12) { this._fail('invalid READY'); return; }
+                this.touch = p.length >= 16 && p.readUInt32LE(12) !== 0;
+                if (this.opts.interactive && (!this.native || !this.layer || !this.touch || !this.info || !this.info.touch)) {
+                    this._fail('interactive controls need mgu-render/1, layer mode and touch');
+                    return;
+                }
+                clearTimeout(this.connectTimer); this.connectTimer = null;
+                this.preferred = this.path; this.failed.clear(); this.failures.delete(this.path);
                 this.ready = true; this.errLogged = false;
                 this.screen = { w: p.readUInt32LE(4), h: p.readUInt32LE(8) };
-                this.log.info('renderd: connected, screen ' + this.screen.w + 'x' + this.screen.h);
+                this.log.info('renderd: connected, screen ' + this.screen.w + 'x' + this.screen.h +
+                    (this.native ? ', mgu-render/1 ' + JSON.stringify(this.info) : this.opts.native ? ', upstream dialect (no mgu-render/1)' : ''));
+                if (this.native) this._write(this._u32msg(X.MODE, [X_MODE_LAYER]));
+                else if (this.grabbing && this.opts.native) this._write(this._u32msg(M.GRAB, [1]));
                 this.emit('ready', this.screen);
+                // after the app's placement (sent in 'ready'): SHOW again. A SHOW sent before the renderer
+                // knew where the app goes (or before X_MODE) left the first app opened after start blank.
+                if (this.placement) this._sendPlace();
+                if (this.visible) this._write(this._u32msg(M.SHOW, [1]));
+                if (this.native && this.grabbing) this._sendGrab(1);
+            } else if (this.native && type === X.STATE && p.length >= 12) {
+                const on = !!p.readUInt32LE(4), front = !!p.readUInt32LE(8);
+                if (on !== this.onScreen) this.log.info('renderd: ' + (on ? 'on screen' : 'not on screen') + (front ? '' : ' (not in front)'));
+                this.onScreen = on;
+                this.emit('state', { onScreen: on, front });
+            } else if (this.native && type === X.CCU && p.length >= 5) {
+                this.emit('ccu', {
+                    frontSequenceNumberOperatingElement: p[0], frontRotaryEncoderOperation: p.readUInt16BE(1),
+                    frontRotaryEncoderPushButton: p[3], frontRotaryEncoderDeflection: p[4],
+                });
             } else if (type === E.TICK) {
                 this.waiting = false;
                 this.emit('tick', p.readUInt32LE(0), p.readUInt32LE(4));
-            } else if (type === E.CCU && p.length >= 5) {
+            } else if ((this.claimed || this.native) && type === TOUCH && p.length >= 12) {
+                this.emit('touch', p.readUInt32LE(0), p.readFloatLE(4), p.readFloatLE(8));
+            } else if ((this.claimed || this.native) && type === CLOSED) {
+                this.visible = false;
+                this.emit('closed');
+            } else if (!this.native && type === E.CCU && p.length >= 5) {
                 // the controller event the HMI didn't get (we hold the grab): FrontCCU names
                 this.emit('ccu', {
                     frontSequenceNumberOperatingElement: p[0], frontRotaryEncoderOperation: p.readUInt16BE(1),
@@ -150,7 +321,10 @@ class RenderClient extends EventEmitter {
         if (this.placement && !resize && ['x', 'y', 'scale', 'ox', 'oy'].every((k) => pl[k] === this.placement[k])) return;
         const scaleChanged = this.placement && this.placement.scale !== pl.scale;
         this.placement = Object.assign({}, pl);
-        if (resize || scaleChanged) this._reset();     // the renderer dropped our resources
+        // as the renderer: a new size drops all the app's resources, a new scale keeps them but the layers drawn at
+        // the old one (sent again, they replace those)
+        if (resize) this._reset();
+        else if (scaleChanged) { this.sent.layer.clear(); this.waiting = false; }
         if (this.ready) this._sendPlace();
     }
     _sendPlace() {
@@ -193,13 +367,15 @@ class RenderClient extends EventEmitter {
     }
     /** upload a pixel image when this connection hasn't got its current version */
     _ensureImage(id) {
+        if (this.native) { if (!this.imgWarned) { this.imgWarned = true; this.log.warn('renderd: pixel images need the upstream dialect'); } return; }
         const im = rec.imageById.get(id);
         if (!im || !im.data) return;
         if (this.sent.image.get(id) === im.ver) return;
-        const head = Buffer.alloc(12);
-        head.writeUInt32LE(id, 0); head.writeUInt32LE(im.w, 4); head.writeUInt32LE(im.h, 8);
-        const px = Buffer.from(im.data.buffer, im.data.byteOffset, im.w * im.h * 4);
-        this._write(msg(M.IMAGE, Buffer.concat([head, px])));
+        const n = im.w * im.h * 4, b = this._imageBuf(8 + 12 + n);
+        b.writeUInt32LE(M.IMAGE, 0); b.writeUInt32LE(12 + n, 4);
+        b.writeUInt32LE(id, 8); b.writeUInt32LE(im.w, 12); b.writeUInt32LE(im.h, 16);
+        Buffer.from(im.data.buffer, im.data.byteOffset, n).copy(b, 20);
+        this._write(b);
         this.sent.image.set(id, im.ver);
     }
     _ensureLayer(id) {
@@ -225,4 +401,4 @@ class RenderClient extends EventEmitter {
     }
 }
 
-module.exports = { RenderClient, SOCKET };
+module.exports = { RenderClient, SOCKET, SOCKETS };

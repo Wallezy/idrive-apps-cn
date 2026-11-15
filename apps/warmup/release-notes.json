@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.8.2",
+    "upstreamVersion": "1.8.1",
+    "cnRevision": 1,
+    "changes": [
+      "更新温度与暖机状态展示。",
+      "完善简体中文显示，保留无水印界面。"
+    ]
+  },
+  {
     "version": "1.4.6",
     "upstreamVersion": "1.4.4",
     "cnRevision": 2,

@@ -1,7 +1,7 @@
 {
   "name": "ambient_config",
-  "version": "2.4.6",
-  "description": "自定义氛围灯颜色、亮度和动画，按驾驶模式切换并保存收藏。",
+  "version": "2.5.1",
+  "description": "Any colour on the ambient light, animations, and a look for each driving mode",
   "main": "javascript/localized-entry.js",
   "private": false,
   "author": "custom",
@@ -33,7 +33,7 @@
     "rhmiData",
     "LICENSE",
     "NOTICE.zh-CN.md",
-    "provenance.json",
+    "PROVENANCE.json",
     "CHANGELOG.md"
   ]
 }

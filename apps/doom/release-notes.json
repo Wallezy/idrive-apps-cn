@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.7.22",
+    "upstreamVersion": "1.7.21",
+    "cnRevision": 1,
+    "changes": [
+      "更新全屏游戏画面、主菜单与旋钮操作。",
+      "完善简体中文显示，保留无水印界面。"
+    ]
+  },
+  {
     "version": "1.4.3",
     "upstreamVersion": "1.4.1",
     "cnRevision": 2,

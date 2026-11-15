@@ -1,6 +1,6 @@
 {
   "name": "car_vitals",
-  "version": "2.27.4",
+  "version": "2.27.5",
   "description": "Live engine, thermal, intake / fuel / ignition, tyre and chassis gauges",
   "main": "javascript/localized-entry.js",
   "private": false,
@@ -30,8 +30,9 @@
     "config",
     "javascript",
     "rhmiData",
+    "LICENSE",
     "NOTICE.zh-CN.md",
     "PROVENANCE.json",
-    "LICENSE"
+    "CHANGELOG.md"
   ]
 }

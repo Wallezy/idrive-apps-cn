@@ -29,7 +29,7 @@
     </container>
     <container id="11" type="state" widget="LT_State_Wide">
         <property id="9" value="1"/>
-        <layoutGroup id="21" name="List">
+        <layoutGroup id="22" name="List">
             <property id="3" value="1"/>
             <component id="12" type="dropDownMenu"/>
             <component id="13" type="dropDownMenu"/>
@@ -42,9 +42,13 @@
                 <property id="2" value="1"/>
                 <property id="3" value="2"/>
             </component>
+            <component id="20" type="button" widget="LT_Button_2Row_2Text">
+                <property id="2" value="1"/>
+                <property id="3" value="2"/>
+            </component>
         </layoutGroup>
-        <layoutGroup id="22" name="Titlebar">
-            <component id="20" type="title"/>
+        <layoutGroup id="23" name="Titlebar">
+            <component id="21" type="title"/>
         </layoutGroup>
     </container>
 </application>

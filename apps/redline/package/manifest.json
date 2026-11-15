@@ -175,6 +175,12 @@
         "statusLateralAccelerationMassCenter": "rs"
       }
     },
+    "de.bmw.infotainment.connectivity.telephony.ConnectivityAggregator": {
+      "instances": "1",
+      "attributes": {
+        "aggregatedCallState": "rs"
+      }
+    },
     "de.bmw.infrastructure.VehicleCondition": {
       "instances": "1",
       "attributes": {
@@ -280,8 +286,7 @@
         "projectedGuidanceActive": "rs",
         "projectedGuidanceMetadataAvailable": "rs"
       }
-    },
-    "de.bmw.infotainment.certification.Certification": "*"
+    }
   },
   "services": {
     "de.bmw.infotainment.telematic.oap.AppStatus": {

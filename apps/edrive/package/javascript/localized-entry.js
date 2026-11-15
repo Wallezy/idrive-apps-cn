@@ -1,4 +1,6 @@
 require('./app.js');
+// Translation by: 抖音 小白科技杂物社 / BiliBili 小白151 / GitHub JackieZ123430
+// https://github.com/JackieZ123430/idrive7-apps-cn
 'use strict';
 /**
  * eDrive - what the high-voltage battery really gives you.
@@ -311,6 +313,7 @@ mgu.run({
                 const n = Car.conditionOf(v && v.statusConditionVehicle);
                 if (n === undefined || live.left === (n <= 3)) return;
                 live.left = n <= 3;
+                if (!live.left) b12.touched();
                 log.info(live.left ? 'the car is locked and left: no reads, so it can sleep' : 'the car is in use again');
             },
         }, log).catch((e) => log.warn('vehicle state: ' + (e && e.message || e)));

@@ -1,35 +1,35 @@
 {
-  "schemaVersion": "1.3.0",
-  "containers": {
-    "500": {
-      "type": "logical",
-      "name": "startWidgetLogical",
-      "components": {
-        "501": {
-          "type": "startWidget",
-          "name": "EDRIVE_WIDGET",
-          "properties": {
-            "UUID": {
-              "value": "SID_CN_STATIC_0000",
-              "type": "StringId"
-            }
-          },
-          "cells": {
-            "Widget": {
-              "value": "SID_CN_STATIC_0001",
-              "type": "StringId"
-            },
-            "SelectionName": {
-              "value": "SID_EDRIVE_WIDGET_NAME",
-              "type": "StringId"
-            },
-            "SelectionIcon": {
-              "value": "edrive_widget_icon.png",
-              "type": "ResourceId"
-            }
-          }
-        }
+ "schemaVersion": "1.3.0",
+ "containers": {
+  "500": {
+   "type": "logical",
+   "name": "startWidgetLogical",
+   "components": {
+    "501": {
+     "type": "startWidget",
+     "name": "EDRIVE_WIDGET",
+     "properties": {
+      "UUID": {
+       "value": "cb63d7c6-cc55-50b1-a4cf-17e419ab4450",
+       "type": "Text"
       }
+     },
+     "cells": {
+      "Widget": {
+       "value": "LT_Table_OnlineApps_DriveRecorderWidget",
+       "type": "Text"
+      },
+      "SelectionName": {
+       "value": "SID_EDRIVE_WIDGET_NAME",
+       "type": "StringId"
+      },
+      "SelectionIcon": {
+       "value": "edrive_widget_icon.png",
+       "type": "ResourceId"
+      }
+     }
     }
+   }
   }
+ }
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <application>
     <container id="1" type="state" widget="LT_State_Wide">
-        <layoutGroup id="13" name="List">
+        <layoutGroup id="15" name="List">
             <property id="3" value="1"/>
             <component id="2" type="button" widget="LT_Button_1Row">
                 <property id="2" value="1"/>
@@ -15,38 +15,40 @@
                 <property id="2" value="1"/>
                 <property id="3" value="0"/>
             </component>
-            <component id="5" type="dropDownMenu"/>
+            <component id="5" type="checkBox" widget="LT_CheckBox_1Row">
+                <property id="2" value="1"/>
+                <property id="3" value="2"/>
+            </component>
             <component id="6" type="dropDownMenu"/>
             <component id="7" type="dropDownMenu"/>
             <component id="8" type="dropDownMenu"/>
             <component id="9" type="dropDownMenu"/>
             <component id="10" type="dropDownMenu"/>
-            <component id="11" type="button" widget="LT_Button_2Row_2Text">
+            <component id="11" type="dropDownMenu"/>
+            <component id="12" type="button" widget="LT_Button_2Row_2Text">
+                <property id="2" value="1"/>
+                <property id="3" value="2"/>
+            </component>
+            <component id="13" type="button" widget="LT_Button_2Row_2Text">
                 <property id="2" value="1"/>
                 <property id="3" value="2"/>
             </component>
         </layoutGroup>
-        <layoutGroup id="14" name="Titlebar">
-            <component id="12" type="title"/>
+        <layoutGroup id="16" name="Titlebar">
+            <component id="14" type="title"/>
         </layoutGroup>
     </container>
-    <container id="15" type="state" widget="LT_State_Laptimer">
+    <container id="17" type="state" widget="LT_State_Laptimer">
         <property id="9" value="1"/>
-        <layoutGroup id="26" name="List">
+        <layoutGroup id="28" name="List">
             <property id="3" value="1"/>
-            <component id="16" type="label" widget="LT_Label_1Graphic_Scalable">
+            <component id="18" type="label" widget="LT_Label_1Graphic_Scalable">
                 <property id="2" value="1"/>
                 <property id="3" value="0"/>
             </component>
         </layoutGroup>
-        <layoutGroup id="27" name="Bar">
+        <layoutGroup id="29" name="Bar">
             <property id="3" value="1"/>
-            <component id="17" type="button" widget="LT_Button_1Row_Laptimer">
-                <property id="3" value="3"/>
-            </component>
-            <component id="18" type="button" widget="LT_Button_1Row_Laptimer">
-                <property id="3" value="3"/>
-            </component>
             <component id="19" type="button" widget="LT_Button_1Row_Laptimer">
                 <property id="3" value="3"/>
             </component>
@@ -65,9 +67,15 @@
             <component id="24" type="button" widget="LT_Button_1Row_Laptimer">
                 <property id="3" value="3"/>
             </component>
+            <component id="25" type="button" widget="LT_Button_1Row_Laptimer">
+                <property id="3" value="3"/>
+            </component>
+            <component id="26" type="button" widget="LT_Button_1Row_Laptimer">
+                <property id="3" value="3"/>
+            </component>
         </layoutGroup>
-        <layoutGroup id="28" name="Titlebar">
-            <component id="25" type="title"/>
+        <layoutGroup id="30" name="Titlebar">
+            <component id="27" type="title"/>
         </layoutGroup>
     </container>
 </application>

@@ -1,0 +1,10 @@
+{
+  "repository": "cauliflowermossgrape/idrive7-apps",
+  "commit": "b2880634eb214e29f008422b970cf22ea2de280f",
+  "upstreamVersion": "1.1.0",
+  "cnRevision": 1,
+  "releaseVersion": "1.1.1",
+  "changes": [
+    "Build from source; ID7 distribution only; no HMI restart on install"
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "name": "zf8hp",
-  "version": "1.5.7",
+  "version": "1.5.8",
   "description": "Transmission Config, experimental ZF 8HP monitor: live data, clutch fill adaptations, shift maps and temperature history",
   "main": "javascript/localized-entry.js",
   "private": false,
@@ -30,8 +30,9 @@
     "config",
     "javascript",
     "rhmiData",
+    "LICENSE",
     "NOTICE.zh-CN.md",
     "PROVENANCE.json",
-    "LICENSE"
+    "CHANGELOG.md"
   ]
 }

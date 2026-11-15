@@ -1,10 +1,10 @@
 {
   "name": "edrive",
-  "version": "2.9.3",
+  "version": "2.9.4",
   "description": "Real electric range, live battery power, cells and climate power, HV battery health (SOH) and energy, last charge, charge log, the 12 V battery (charge, voltage, what it does, regen, history) and a home-screen widget; on a 48 V mild hybrid its 48 V battery and DC/DC converter",
   "main": "javascript/localized-entry.js",
   "private": false,
-  "author": "cauliflowermossgrape; Chinese translation: JackieZ123430",
+  "author": "custom",
   "license": "MIT",
   "engines": {
     "node": ">=8.7.0"
@@ -32,7 +32,8 @@
     "rhmiData",
     "LICENSE",
     "NOTICE.zh-CN.md",
-    "rhmiDataStartWidget",
-    "PROVENANCE.json"
+    "PROVENANCE.json",
+    "CHANGELOG.md",
+    "rhmiDataStartWidget"
   ]
 }
