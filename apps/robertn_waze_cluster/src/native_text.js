@@ -50,8 +50,8 @@ function decodeText(value) {
 function mapPage(value) {
     const text = String(value || '');
     if (language() !== 'zh-CN') return text;
-    const map = /^Waze map — (\d+) frames\/s \((.*)\)$/.exec(text);
-    if (!map) return text === 'Waze map' ? message('Navigation map') : decodeText(text);
+    const map = /^(?:Waze map|map) — (\d+) frames\/s \((.*)\)$/.exec(text);
+    if (!map) return text === 'Waze map' || text === 'map' ? message('Navigation map') : decodeText(text);
     const cap = /, upload cap (\d+) KB\/s$/.exec(map[2]);
     const decoded = cap ? map[2].slice(0, cap.index) : map[2];
     return message('Map — {0} frames/s ({1})', map[1],

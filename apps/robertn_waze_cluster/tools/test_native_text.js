@@ -42,6 +42,9 @@ eq(decodeText('5.2 MB, 1234 frames [2 decode err, last: EAGAIN]'),
     '5.2 MB，1234 帧（2 次解码错误，最近一次：原始详情：EAGAIN）');
 eq(mapPage('Waze map — 30 frames/s (5.2 MB, 1234 frames, upload cap 200 KB/s)'),
     '导航地图 — 30 帧/秒（5.2 MB，1234 帧，上传上限 200 KB/秒）');
+eq(mapPage('map — 30 frames/s (5.2 MB, 1234 frames, upload cap 200 KB/s)'),
+    '导航地图 — 30 帧/秒（5.2 MB，1234 帧，上传上限 200 KB/秒）');
+eq(mapPage('map'), '导航地图');
 
 const control = new WazeClusterControl({});
 control.patch.link = 'up';
