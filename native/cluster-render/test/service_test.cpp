@@ -66,6 +66,7 @@
 
 #include "../kit/yuv_atlas.h"
 #include "../src/service.h"
+#include "../src/log.h"
 #include "cluster_render/client.h"
 #include "fake_graph.h"
 #include "fake_port.h"
@@ -694,15 +695,23 @@ static void kombi_restart(Rig &r)
  * long after any mapping is no strike; the map (its strike limit the
  * default, as main.cpp leaves it) only has its strikes logged; a client's
  * guard_reset is an unknown op. */
-static void mapping_guard()
+static void mapping_guard(bool with_ceiling = false)
 {
     const std::string path = "/tmp/crs-guard-" + std::to_string(getpid()) + ".txt";
     unlink(path.c_str());
-    Rig r;
+    Rig r(with_ceiling ? 6000 * 1024 : 0);
     r.sc.guard_path = path;
     r.sc.version = "0.3.7";
     r.sc.boot_id = "boot-1";
+    const std::string ceiling_path = path + ".ceiling";
+    if (with_ceiling) {
+        std::ofstream(ceiling_path) << "ceiling_kb 5000\nclean_runs 1\n";
+        r.sc.ceiling.path = ceiling_path;
+    }
     hold_rig(r);
+    if (with_ceiling)
+        ok("CN guard + ceiling: remembered limit used with guard enabled",
+           has(r.svc->server().status_text(r.now), "upload ceiling: 5000 KB/s remembered"));
     cr::Client a("waze", r.path);
     Events ea;
     ea.wire(a);
@@ -763,7 +772,12 @@ static void mapping_guard()
     ok("guard_reset from a client: an unknown op, the hold still disabled",
        has(reset.events(), "unknown op") && has(r.svc->guard().status_text(), "disabled, 2 strikes") &&
            !r.port.row(0x105, kGuide));
+    if (with_ceiling)
+        ok("CN guard + ceiling: both states survive the service restart independently",
+           access(ceiling_path.c_str(), F_OK) == 0 && access(path.c_str(), F_OK) == 0 &&
+           has(r.svc->server().status_text(r.now), "upload ceiling: 5000 KB/s remembered"));
     unlink(path.c_str());
+    unlink(ceiling_path.c_str());
 }
 
 /* A service that answers the hello as told and keeps what the client
@@ -2095,8 +2109,47 @@ int main()
            budgets == 2 && cap == 5500 && why.find("1 x scene removed") != std::string::npos &&
                status.find("upload: cap 5500 KB/s") != std::string::npos);
         ok("the status shows the run's ceiling once a removal barred a level",
-           status.find("upload: cap 5500 KB/s (ceiling 5500 until restart, configured 6000, floor 2000)") !=
+           status.find("upload: cap 5500 KB/s (ceiling 5500, configured 6000, floor 2000)") !=
                std::string::npos);
+    }
+
+    {
+        /* The remembered ceiling: the run starts there, the status shows it,
+         * a removal lowers it and the 30 s before go to the log. */
+        char tmpl[] = "/tmp/crs-ceiling.XXXXXX";
+        const std::string dir = mkdtemp(tmpl) ? tmpl : "/tmp";
+        const std::string file = dir + "/upload-ceiling";
+        { std::ofstream(file) << "ceiling_kb 5000\nclean_runs 1\n"; }
+        Rig lr(6000 * 1024);
+        lr.sc.ceiling.path = file;
+        lr.svc.reset();
+        lr.start();
+        lr.pump(50);
+        const std::string st = lr.svc->server().status_text(lr.now);
+        ok("a remembered 5000 under a configured 6000: the run starts at it, the status says so",
+           lr.svc->compositor().governor().cap() == 5000u * 1024 &&
+               st.find("upload: cap 5000 KB/s (ceiling 5000, configured 6000, floor 2000): remembered ceiling\n"
+                       "upload ceiling: 5000 KB/s remembered, 1 of 3 clean runs before a probe\n") != std::string::npos);
+        lr.pump(2000);
+        uint64_t seq = 0;
+        std::vector<std::string> lines;
+        cld::log_lines_since(&seq, &lines);
+        lr.svc->compositor().governor().activity(lr.now);
+        lr.svc->compositor().governor().evidence(Evidence::Removal, lr.now);
+        lr.svc->slots().on_evidence(Evidence::Removal, "map: taken: fetch removed", lr.now);
+        lr.pump(1100);
+        lines.clear();
+        cld::log_lines_since(&seq, &lines);
+        bool trace = false;
+        for (const std::string &l : lines)
+            trace = trace || l.find("upload: the ") != std::string::npos;
+        std::ifstream in(file);
+        std::string first;
+        std::getline(in, first);
+        ok("a removal at 5000: the 30 s before logged, 4500 remembered", trace && first == "ceiling_kb 4500");
+        lr.svc.reset();
+        if (std::system(("rm -rf " + dir).c_str()) != 0)
+            std::printf("cleanup failed\n");
     }
 
     std::string text = r.svc->server().status_text(r.now);
@@ -2108,6 +2161,7 @@ int main()
     retired_calibration();
     hud_yield_choice();
     mapping_guard();
+    mapping_guard(true);
     repeats();
     framing();
     scene_files();

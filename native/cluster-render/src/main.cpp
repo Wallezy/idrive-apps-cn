@@ -17,12 +17,12 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <fstream>
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <unistd.h>
 
-#include <fstream>
-
+#include "ceiling_memory.h"
 #include "cluster_render/protocol.h"
 #include "config.h"
 #include "head_unit.h"
@@ -43,6 +43,26 @@ namespace {
 /* The drop-ins read with the settings (main()), for the log and the
  * status once the service starts (service_config). */
 std::vector<std::string> drop_in_report;
+
+/* upload_kb_per_s set in local_conf or with -s: the ceiling, the
+ * remembered one not used (ceiling_memory.h). */
+bool ceiling_set = false;
+
+/* Whether the settings file at path sets key. */
+bool sets_key(const std::string &path, const char *key)
+{
+    std::ifstream in(path);
+    std::string line;
+    while (std::getline(in, line)) {
+        const size_t a = line.find_first_not_of(" \t");
+        if (a == std::string::npos || line.compare(a, std::strlen(key), key) != 0)
+            continue;
+        const size_t b = line.find_first_not_of(" \t", a + std::strlen(key));
+        if (b != std::string::npos && (line[b] == '=' || (line[b] == '+' && b + 1 < line.size() && line[b + 1] == '=')))
+            return true;
+    }
+    return false;
+}
 
 }  // namespace
 
@@ -86,6 +106,13 @@ bool crs::service_config(const cld::Config &cfg, int generation, ServiceConfig *
     sc.version = CR_VERSION;
     std::ifstream boot("/proc/sys/kernel/random/boot_id");
     std::getline(boot, sc.boot_id);
+    sc.ceiling.path = "/var/opt/cluster-render/state/upload-ceiling";
+    sc.ceiling.user_set = ceiling_set;
+    sc.ceiling.firmware = firmware_id("/etc");
+    /* The coding image's layout is iDrive 7's. */
+    if (generation == 7)
+        sc.ceiling.kombi = kombi_variant("/dev/shm/rawcodingdata");
+    sc.tcp_tables = {"/proc/net/tcp", "/proc/net/tcp6"};
     return true;
 }
 
@@ -150,7 +177,10 @@ int guard_reset(const cld::Config &cfg)
 bool load_local(cld::Config *cfg, std::string *err)
 {
     const std::string path = cfg->str("local_conf");
-    return path.empty() || access(path.c_str(), F_OK) != 0 || cfg->load(path, err);
+    if (path.empty() || access(path.c_str(), F_OK) != 0)
+        return true;
+    ceiling_set = ceiling_set || sets_key(path, "upload_kb_per_s");
+    return cfg->load(path, err);
 }
 
 }  // namespace
@@ -172,6 +202,7 @@ int main(int argc, char **argv)
             }
             conf = true;
         } else if (!std::strcmp(argv[i], "-s") && has_arg) {
+            ceiling_set = ceiling_set || !std::strncmp(argv[i + 1], "upload_kb_per_s=", 16);
             if (!cfg.set_pair(argv[++i], &err)) {
                 std::fprintf(stderr, "cluster-render: %s\n", err.c_str());
                 return 2;

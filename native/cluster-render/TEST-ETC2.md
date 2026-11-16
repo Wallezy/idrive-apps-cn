@@ -1,12 +1,9 @@
-# ETC2 car tests
+# ETC2 car test
 
-Whether the cluster draws `etc2rgba` assets (PROTOCOL.md): ETC2 RGBA with
-EAC alpha, 1 byte a pixel, made into an immutable `Texture2D`
-(`ETextureFormat_ETC2RGBA`) in each scene of its target.
+Checks that the cluster draws `etc2rgba` assets (PROTOCOL.md): ETC2 RGBA
+with EAC alpha, 1 byte a pixel.
 
-Results:
-
-| Test | Unit | Result |
+| Test | iDrive 7 (G20) | iDrive 8 |
 |---|---|---|
 | 1. 252x280 frame, beside the same frame as rgba8 | iDrive 7, G20 HUD (KOMBI), Nov 12 2026 | **Drawn**: both layers `shown`, the ETC2 frame matched the RGBA8 one, no KOMBI restart; `asset 27 etc2rgba 252x280: 1 writes, 68 KB, 0 failed` |
 | 2. 2048x1024 atlas, one layer | iDrive 7, G20 HUD (KOMBI), Nov 13 2026 | **Drawn**: `--atlas` showed the whole atlas in the HUD window (both copies, the white frame, the red and green bars), `--pan` drifted over it sharp at 1:1; `asset 31: 2048x1024 etc2rgba texture made, 2097152 bytes`, no refusal, no guard strike, no KOMBI restart |
@@ -16,41 +13,25 @@ Results:
 
 ## Files
 
-- Service: `make target`.
 - Client: `tools/etc2_test/etc2_client.js` (Node 8, no deps) with
   `js/cluster_render_client.js`.
-- Test images, from a Live2D close-up atlas (`close.rgba` and its
-  `atlas.json` with a `close` section; not in the repository):
+- Test images, from an RGBA atlas and its `atlas.json` with a `close`
+  section (not in the repository):
 
   ```sh
   python3 tools/etc2_test/etc2_encode.py frame <close.rgba> <atlas.json> <dir>   # test 1: frame.rgba, frame.etc2, frame.json
   python3 tools/etc2_test/etc2_encode.py atlas <close.rgba> <atlas.json> <dir>   # test 2: atlas.etc2, atlas.json
   ```
 
-  Test 1: the close-up's middle pose (frame `zoomSteps + 1`), padded to
-  4x4 blocks (249x278 to 252x280): 282,240 bytes RGBA, 70,560 ETC2.
-  Test 2: the 1024 px atlas twice side by side, each copy padded to
-  1024x1024, a bar along the bottom of each (red left, green right) and a
-  white 4 px frame round the whole: 2048x1024, 2,097,152 bytes (RGBA8
-  would be 8 MiB, past one frame message). The encoder's output decodes
-  byte for byte the same on an Apple GPU (Metal `eac_rgba8`) as with its own
-  decoder; `atlas-etc2-decoded.png` shows what the display should show.
+  Test 2's atlas is the source atlas twice side by side, a bar along the
+  bottom of each copy (red left, green right) and a white 4 px frame round
+  the whole: 2048x1024, 2,097,152 bytes.
 
-## Steps (parked)
+## Steps
 
-1. Build and install the kit (from the repository root; README.md
-   "Install"):
+1. Install a kit built from the working tree (README.md "Install").
 
-   ```sh
-   node release/tool_artifact.js native/cluster-render --out /tmp/kit
-   <mgu-store>/deploy/hu install --artifact /tmp/kit/cluster-render@<version>.tgz
-   ```
-
-   On the unit, `grep -c etc2rgba /var/opt/cluster-render/current/cluster-render-idrive7`
-   prints 1 or more when a build with `etc2rgba` is installed.
-
-2. Copy the files (`deploy/hu connect --hold 900` prints the ssh line; `UNIT`
-   is its host):
+2. Copy the files to the unit (`UNIT` is its address):
 
    ```sh
    ssh root@UNIT mkdir -p /tmp/etc2
@@ -58,15 +39,13 @@ Results:
        <dir>/frame.rgba <dir>/frame.etc2 <dir>/frame.json <dir>/atlas.etc2 <dir>/atlas.json root@UNIT:/tmp/etc2/
    ```
 
-3. Turn off other HUD apps (so only the test draws), the HUD on. In one ssh
-   session follow the log:
+3. Turn off other HUD apps, the HUD on. In one ssh session follow the log:
 
    ```sh
    tail -f /var/opt/cluster-render/log/cluster-render.log | grep -E 'etc2|asset|hud|guard|ramses'
    ```
 
-   In another, run one test at a time, leave it up while you look, Ctrl+C
-   ends it:
+   In another, run one test at a time; Ctrl+C ends it:
 
    ```sh
    /usr/bin/node /tmp/etc2/etc2_client.js /tmp/etc2                 # test 1: rgba8 left, etc2rgba right
@@ -76,19 +55,15 @@ Results:
 
 ## What to look for
 
-Test 1: two Mikus side by side, the right the same as the left (ETC2 a bit
-blockier in colour).
-
-Test 2, `--atlas`: the whole atlas twice, side by side, in the HUD's window:
-the white frame on all four sides, the red bar under the left copy and the
-green one under the right. `--pan`: the window drifts over every part of
-it, sharp (1:1), reaching the green bar and the right and bottom white edges.
-Log: `asset N: 2048x1024 etc2rgba texture made, 2097152 bytes`; client: the
-layer `shown`.
+Test 1: the right frame the same as the left (ETC2 a bit blockier in
+colour). Test 2, `--atlas`: the whole atlas twice, the white frame on all
+four sides, the red and green bars; `--pan`: the window drifts over every
+part of it, sharp. Log: `asset N: 2048x1024 etc2rgba texture made, 2097152
+bytes`; client: the layer `shown`.
 
 | You see | Means |
 |---|---|
-| As above, the layers `shown` | **Drawn.** |
+| As above, the layers `shown` | Drawn |
 | Blank, the layer `error - asset N: the renderer refused ...` | RAMSES on the head unit refused the texture (the log has `ramses: ... refused by createTexture2D`) |
 | Blank, the layer `shown`, no restart | The cluster took the scene and did not draw the texture: too big, or the format unsupported |
 | The left half right, the right half or the far edges garbage or missing | The cluster draws only part of a 2048 px texture: keep atlases at 1024 |

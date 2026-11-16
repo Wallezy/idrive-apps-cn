@@ -20,70 +20,60 @@ iDrive 7, RAMSES 27's DCSM on iDrive 8, "iDrive 8"), shares the display
 slots between its clients, and spends one upload budget for all of them.
 `kit/` is the pixel path it shares with producers that prepare frames.
 
-Labels: **VERIFIED** (seen in the unit's binaries or configuration, or
-observed running), **INFERRED** (reasoned from verified facts),
-**CAR-ONLY** (needs the vehicle).
-
-### Why a service
-
-The display path has three things only one process can hold:
-
-- **The RAMSES identity.** The KOMBI's renderer reaches one unused head-unit
-  participant, 801 ([abi/ABI.md](abi/ABI.md)); two processes cannot both
-  be it.
-- **The Dcsm2 client.** Each client handle has its own 10 s KOMBI watchdog
-  and its own view of the slots ([dcsm/DCSM.md](dcsm/DCSM.md)); a client
-  per app would have every app fighting every other over the same slots.
-- **The link to the KOMBI.** About 11.5 MB/s of TCP for every head-unit
-  participant together, the HMI's own content included; above about 8 MB/s
-  of texture writes the KOMBI dropped scenes. Per-app budgets add up past
-  it.
-
-So the shape is a hybrid:
-
 | Part | What | Who links it |
 |---|---|---|
-| `kit/` | the proven pixel path: 4:2:0 atlas, dirty tiles, packed blocks, SIMD conversion and rounding, pacer, frame clock, map geometry | the service, and any producer that prepares frames |
+| `kit/` | the pixel path: 4:2:0 atlas, dirty tiles, packed blocks, SIMD conversion and rounding, pacer, frame clock, map geometry | the service, and any producer that prepares frames |
 | `src/` | the service: slot arbitration, the layer stack, layers, the upload governor, the iDrive 7 and iDrive 8 backends, the socket | — (one process, `hmi_5000`) |
 | `include/`, `client/` | the C++ client and protocol, `libcluster_render_client.a` on the unit | native producers |
 | `js/cluster_render_client.js` | the Node 8 client | OAP apps |
-| `dcsm/`, `abi/`, `tools/`, `docker/` | the Dcsm2 client, the units' RAMSES 19, RAMSES 27 and vsomeip ABI, the ABI checks and the unit's toolchain | the service's build |
+| `dcsm/`, `abi/`, `tools/`, `docker/` | the Dcsm2 client ([dcsm/DCSM.md](dcsm/DCSM.md)), the units' RAMSES 19, RAMSES 27 and vsomeip ABI ([abi/ABI.md](abi/ABI.md), [abi/ABI27.md](abi/ABI27.md)), the ABI checks and the unit's toolchain | the service's build |
 
-What it costs:
-- frames cross a socket. A whole 1088x480 frame is 783 KB, so 30 a second
-  is about 47 MB/s of kernel copies, and Waze's 16 a second about half that;
-- an app's content cannot use arbitrary RAMSES objects, only the layer
-  kinds and assets below, or on a target that takes them a whole scene file
-  a root install put in place, changed by edits ("Layers").
+Frames cross a socket: a whole 1088x480 video frame is 783 KB. An app's
+content is made of the layer kinds and assets below, or, on a target that
+takes them, a whole scene file a root install put in place ("Layers").
 
-What it gives:
-- no two apps fight over a slot, and clients come and go without unmapping
-  anything;
-- one budget, steered by what the link shows;
-- clients that need no `hmi_5000`;
-- a renderer crash in one app takes nothing else down;
-- one place to port to iDrive 8, and ported there ("iDrive 8").
+### Clients
 
+- **Native producers** link `libcluster_render_client.a` and include
+  `include/cluster_render/client.h`.
+- **OAP apps** copy `js/cluster_render_client.js` into their sources (Node 8,
+  only the `net` and `events` builtins). The installed copy is
+  `/var/opt/cluster-render/current/cluster_render_client.js`.
+- Any other language speaks [PROTOCOL.md](PROTOCOL.md) over the socket.
+
+A client needs only the socket's group, `tm_oap_app`, which every OAP app
+has: no participant, no Dcsm2 client and no `hmi_5000`. A tool or app that
+draws through the service requires `cluster-render` in its catalog entry
+(`"requires"`).
+
+`js/showcase.js` puts content of every layer kind on a target through the
+service and prints every event: a 3D cube in a mesh layer the renderer
+turns, plasma in an effect, labels in effects over a glyph-atlas asset, a
+needle, an alert and a video:
+
+```sh
+node showcase.js [--socket PATH] [all|cube|text|needle|plasma|alert|video] \
+    [--target panel|map|hud|guide|widget] [--size WxH]   # iDrive 8's map: --size 874x749
 ```
- app / producer                     cluster-render (hmi_5000)                      KOMBI / HUD
- ----------------                   ------------------------------------------     -----------
- js client / C++ client --J/F/M-->  server ── compositor ── layers (video, image,   renderer draws
-   layers, frames, meshes             │         │  effect, mesh), assets: a scene   the scene in
-                         <--events--  │         └─ governor ── pacer (one budget)   its slot
-                                      └─ slot manager ── Dcsm2 port/link ──Dcsm2──>  slots
-                                                         RAMSES 19 graph ──scene──>
-```
+
+### Targets
+
+A **target** is one slot with one scene. On iDrive 7:
+
+| Target | Slot | Size | Where |
+|---|---|---|---|
+| `map` | 0x100 | 1088x480 | the central map area, under the gauges |
+| `panel` | 0x203 | 1920x720 | the whole cluster, over the gauges |
+| `hud` | 0x323 | 800x480 | the head-up display |
+
+iDrive 8's targets are in "iDrive 8". The service's `hello` event names the
+targets and their sizes.
 
 ### Arbitration
 
-A **target** is one slot with one scene: `map` (0x100, the central map
-area under the gauges, 1088x480), `panel` (0x203, the whole cluster over
-the gauges, 1920x720), `hud` (0x323, 800x480). Every client's layers on a
-target are drawn in that target's scene (`src/stack.h`, `src/slots.h`).
-This section is iDrive 7's KOMBI; on iDrive 8 a target is a content the
-cluster is offered, and what differs is in "iDrive 8".
+Every client's layers on a target are drawn in that target's scene.
 
-- **Layered stack.** Every layer is drawn at once, bottom to top by class
+- **Order.** Every layer is drawn at once, bottom to top by class
   (ambient, content, overlay, alert), then the client's `z`, then the newest
   on top. A layer marked `exclusive` hides the layers below it while it is
   drawn, from the flush after its first write went: until then they stay
@@ -487,279 +477,131 @@ cluster is offered, and what differs is in "iDrive 8".
 
 ### Upload budget
 
-Every layer of every client writes within one budget (`src/governor.h`,
-`kit/upload_pacer.h`). Its ceiling, `upload_kb_per_s`, is 5500 KB/s: on the
-car the cluster flashed black at 8000 KB/s, and once removed a shown map
-after a minute averaging 5774 KB/s. The cap follows what the link shows while writes go (64 KB
-or more written within the last second, whether or not the flush went);
-evidence at other times is logged, not counted:
+Every head-unit participant shares one link to the KOMBI, and too much
+upload makes the cluster drop scenes. Every layer of every client writes
+within one budget (`src/governor.h`, `kit/upload_pacer.h`):
 
-| Evidence in the last 30 s | Points |
-|---|---|
-| a shown scene removed by the display, with no other content in its slot and the slot not locked | 6 |
-| heartbeat replies silent after replies came (the link stalled) | 3 |
-| a flush or a setData refused | 2 |
-| a flush that took `slow_flush_ms` (150) or longer | 1 |
+- The cap starts at the ceiling: `upload_kb_per_s` (5500 KB/s), or the
+  remembered ceiling below it. When the link shows congestion (a shown
+  scene removed, heartbeat replies stalling, refused or slow flushes) it
+  steps down by 500 KB/s, to 2000 KB/s at the least, and recovers slowly, up
+  to the ceiling. A shown scene the KOMBI removes while the cap is above
+  4000 KB/s lowers the ceiling for the rest of the drive. Clients get a
+  `budget` event when the cap changes.
+- **Remembered ceiling.** A removal also lowers the ceiling for later
+  drives to one step below the level it came at, kept in
+  `/var/opt/cluster-render/state/upload-ceiling`. After 3 clean drives at
+  it (each with a target shown 10 min in all and no removal) the next drive
+  tries one step higher, and keeps it if that drive is clean; a removal
+  there keeps the old ceiling and starts the count over. A firmware update
+  or another KOMBI variant forgets it. `upload_kb_per_s` set in the local
+  conf is the ceiling, and the remembered one is not used.
+- **What the log keeps.** One `INCIDENT` line each time a shown target is
+  lost (why, the cap and ceiling, how long it was shown) and when it is
+  back. On a removal, the 30 s before it second by second: KB written,
+  budget holds, offer-to-flush time and the deepest TCP send queue on the
+  head unit with its peer; once a minute, a summary of the same. In the car
+  logs none of these rose reliably before a removal, so none steers the
+  cap.
+- Within the cap the top layers write first. A video frame whose exact
+  write the budget cannot cover goes as packed 4x4 blocks (with
+  `pan_blocks`), the exact picture follows when the budget allows, and only
+  the newest frame waits.
+- **The HUD's share.** While `hud` has a layer, its layers and assets write
+  from up to half of the budget, only as much as they spend; what the HUD
+  leaves goes to the cluster. With the cluster idle the HUD gets the whole
+  cap. Together they never exceed it.
+- Video tiles wholly covered by opaque layers drawn above them are not
+  written while they stay hidden (`src/occlusion.h`). Opaque means a video,
+  or an image where its pixels have alpha 255, drawn unturned, unanimated
+  and at full opacity, not fading; effect and mesh layers never cover.
 
-- At 6 points the cap steps down 500 KB/s, to the 2000 KB/s floor at most,
-  and the window starts empty. A removal reaches 6 alone: on the car the
-  KOMBI removed a shown map, with healthy heartbeats and no lock, after the
-  busiest minute of upload (5774 KB/s with a 1.3 MB whole-scene resend). No
-  other single event does, so one transient error of another kind never
-  lowers the cap.
-- Another step down waits 15 s.
-- The stock HMI or another app taking a slot, the display locking it (the
-  slot reported disabled, as for a door-open warning), a refused request or
-  one not answered is arbitration, not evidence.
-- The cap steps back up 500 KB/s after each minute of healthy upload (at
-  least 64 KB a second written, nothing in the window), to the run's
-  ceiling: `upload_kb_per_s` (5500) less any level a removal barred (below).
-  Idle time neither counts nor resets that minute.
-- A step down within a minute of a step up doubles the minute (up to
-  10 min); 10 min without a step down restores it.
-- A removal that steps the cap down, or comes at the floor, holds the cap
-  for 10 min before any step up: on the car the KOMBI dropped the map again
-  within a minute of the cap going back up.
-- A removal that steps the cap down from above 4000 KB/s also bars that
-  level until cluster-render restarts: the lowered cap becomes the run's
-  ceiling, and steps up stop there (5500 to 5000, then 5000 is the ceiling;
-  a later removal at 5000 makes it 4500). On the car the KOMBI dropped the
-  map within 10 min of each return to 5500 KB/s, never while it sat at
-  5000. At or below 4000 KB/s nothing is barred: the cap comes back after
-  the hold, to the run's ceiling. Nothing is stored: each start begins at
-  `upload_kb_per_s`.
-
-**The HUD's share** (`kit/upload_pacer.h` share_of, `TargetSpec::share`).
-While the HUD is asked for and has a layer, its layers and assets write from
-a budget of their own: up to half of each refill of the budget, but only as
-much as they spend; what the HUD leaves goes back to the other targets in
-the same refill, so a still or small HUD costs the cluster almost nothing
-(while the cluster writes, the HUD takes at most half of each refill). The
-cluster never gets less than half while the HUD writes, and everything when
-it does not. While the
-cluster's budget sits full, nothing written since a refill filled it (a
-still cluster map, or the HUD alone), the HUD gets the whole refill: then
-the whole cap. The two together never hold more than one burst (what the
-HUD holds comes off what the cluster may hold), so together they send at
-most the burst and the cap's rate over any time, as the cluster alone; the
-ceiling is unchanged. With no HUD layer, the cluster's writes go exactly as
-they would without a HUD, byte for byte and tick for tick
-(`compositor_test`). The HUD's resend is charged to its share too, evidence
-from it (a flush, a refusal, a scene removed) is logged, never counted, and
-its writes are not the link's load the governor counts evidence and healthy
-time by: a HUD the KOMBI drops never lowers the cluster's cap, and the HUD
-alone writing never raises it.
-
-Down is quick and up is slow, so the cap does not oscillate. Within the cap,
-the top layers write first, and in a video layer a
-frame whose exact write the budget cannot cover goes packed, the exact atlas
-comes back when the budget allows, and only the newest frame waits.
-
-The cap and why it is what it is are in the status
-(`cluster-render status`, `/run/cluster-render/status.txt`: `upload: cap
-4500 KB/s (ceiling 5500, floor 2000): lowered from 5000 KB/s: in 30 s, 2 x
-heartbeat replies silent`; with a level barred, `(ceiling 5000 until
-restart, configured 5500, floor 2000)`). Every client also gets a `budget`
-event when it changes. Once a minute, each shown target logs what its layers
-wrote since its last such line, the cap and the run's ceiling, and whether
-it is rendered: `target map: in the last 60 s its layers wrote 1800 frames
-(18 ms from offer to flush on average), 52000 KB, 0 failed, 12 budget holds
-(cap 5000 KB/s, ceiling 5000); rendered:
-renderer 00000000-0000-0000-0000-000000000001 subscribed for 412 s`.
+`cluster-render status` and `/run/cluster-render/status.txt` show the cap,
+why it is what it is, and the remembered ceiling.
 
 ### Layers
 
 | Kind | What the client sends | What the service does |
 |---|---|---|
-| video | 4:2:0 atlases (`w*h*3/2` bytes) | `src/video_layer.h`: one persistent R8 buffer and sampler; dirty 64x64 tiles over a noise filter, settled after `settle_ms`; packed 4x4 blocks in two persistent RGBA8 buffers for motion the budget cannot cover; exact return; the frame clock; newest-frame-only; checked `setData` and flush |
+| video | 4:2:0 atlases (`w*h*3/2` bytes) | one persistent buffer; only 64x64 tiles that changed past a noise filter are written, settled after `settle_ms`; packed 4x4 blocks for motion the budget cannot cover; newest frame only |
 | image | RGBA rectangles that changed | one persistent RGBA8 buffer, written in those rectangles at most `fps` a second |
-| effect | a GLSL ES 1.00 fragment shader, uniforms (arrays too), binds to assets | a quad drawn by it; uniforms in the next flush; `u_time` at `time_fps`, or from the renderer's own clock |
-| mesh | parts: shaders, geometry (`M`), transforms, uniforms, binds to assets | a render pass of its own over its rect at its place in the stack, with its own perspective or orthographic camera (`src/mesh_layer.h`); each part's geometry immutable resources, replaced at most once a second within the budget; depth cleared, never colour |
+| effect | a GLSL ES 1.00 fragment shader, uniforms (arrays too), binds to assets | a quad drawn by it; `u_time` at `time_fps`, or from the renderer's own clock |
+| mesh | parts: shaders, geometry (`M`), transforms, uniforms, binds to assets | a render pass of its own over its rect, with its own perspective or orthographic camera; geometry replaced at most once a second within the budget; depth cleared, never colour |
 
 Beside the layers:
-- **Assets** (`src/asset.h`): RGBA8 or R8 textures a client uploads once
-  and its effect layers and mesh parts on the same target sample, such as a
-  glyph atlas or sprites. Not drawn, so they never make a target wanted;
-  kept on the CPU, written whole into each new scene and in place as they
-  change, before the layers, within the budget. A layer sampling one is
-  drawn only while its buffer holds it whole. An `etc2rgba` asset is ETC2
-  RGBA with EAC alpha, 1 byte a pixel; an `etc2rgb` asset opaque ETC2 RGB,
-  half a byte a pixel. Each is sent whole once, an immutable texture made
-  from it in each scene, charged once (no rectangle scratch), so a
-  2048x1024 atlas takes 2 MiB of the pixel memory as `etc2rgba` and 1 MiB
-  as `etc2rgb` (as RGBA8 it would not fit one frame message). On iDrive 7
-  the KOMBI draws `etc2rgba` (car test, [TEST-ETC2.md](TEST-ETC2.md));
-  `etc2rgb` goes the same way, its GL format checked in the KOMBI's
-  renderer, not tried on a car. iDrive 8's RAMSES 27 path is built the
-  same way, not tried on a car. A texture the renderer refuses puts the
-  layers sampling it in `error`, and their target is released.
-  `tools/etc2_test/etc2_encode.py` encodes both. Which format to use:
-  PROTOCOL.md "Choosing a pixel format". Artwork sent once as
-  assets animates with no more pixels sent (PROTOCOL.md "Animating
-  preloaded assets").
-- **Several videos** (`src/video_composite.h`): the display holds the
-  buffers of at most two videos, its memory unmeasured. While it holds
-  them all, each video draws itself as above. Past that, the videos on a
-  target, unturned, at their frame's size and at even x and y, are composed
-  on the head unit's CPU into one video layer, on as few targets as it
-  takes: one set of buffers, one video in the budget and the dirty-tile
-  planner (so while one of them moves past the budget, all go packed).
-  The composite is made again for its videos' rectangle growing past it
-  at most once a second (over the old rectangle and the new together; till
-  then what lies outside is cut), and smaller once a smaller rectangle has
-  held for 3 s, so a sliding video does not churn the display's buffers.
-  A `set` that makes a video start or stop being composited (an odd x, a
-  turn) takes effect at most once a second on its target; till then a
-  composited one is drawn unturned, at its frame's size and at even x and
-  y. A video moved or shown again keeps its quads where they were until the
-  flush whose write puts it there on the composite, so they never show a
-  place that does not hold it yet. Only the 64x64 tiles a video changed
-  are composed again, copied where the top video is opaque or alone and
-  blended (SSE2) only where translucent videos overlap; each video is drawn
-  by its own quads over its rect, sampling its part, at its place in the
-  stack and its opacity. A turned, scaled or odd-placed video keeps buffers
-  of its own. Clients have up to 8 video layers together.
-- **Hidden tiles** (`src/occlusion.h`): a video's 64x64 tiles wholly under
-  opaque layers drawn above it on its target are not written while they
-  stay hidden, a composite's likewise. Opaque means a video drawn
-  unturned at opacity times the target's fade 1, once its first frame is
-  written; an image likewise, only where its pixels, both those its buffer
-  holds and those waiting to be written, have alpha 255; never an effect or
-  a mesh layer, an animated image, or anything turned, translucent or
-  fading; and only for layers drawn strictly below it. A tile counts as
-  hidden when every on-screen pixel it can change is covered, chroma tiles
-  and the grid's edge tiles included, so a camera as large as the map hides
-  all of it. A hidden tile that has changed goes in the flush that uncovers
-  it (a layer above moved, hidden, made translucent, turned, faded,
-  animated or gone, or the video moved or shown), whatever the video's
-  frame clock; its target stages first, so the write takes the next
-  positive allowance. Until the budget allows it, only that change waits
-  (the scene keeps the layer it concerns as last flushed, its new
-  animations not started), with an exclusive layer and the layers it
-  suspends together, and everything else on the target flushes as usual:
-  the wait is the time the budget takes to repay what it owes, and at most
-  one write of another target that has waited longer (targets uncover
-  longest-waiting first). A held layer's fade applies to its last flushed
-  opacity. An image's pixels waiting to be written count only while the
-  budget allows that write. Changes that cannot wait so go at once: a layer
-  removed (with what an exclusive one resumes), an image hidden after a
-  failed write, video objects made again (a composite made or dropped),
-  and a composited video hidden or put at another place in the draw order.
-  The video they uncover writes in that flush whatever the budget allows:
-  with packed blocks its newest frame packed (the exact atlas follows
-  within the budget), without them every changed tile, and nothing when no
-  tile it uncovers differs from its newest frame past the threshold; it
-  then hides no tile until a write the budget allowed has gone, so such
-  writes never come back to back. With nothing opaque over a
-  video, every tile is planned and written by the dirty-tile rules alone.
-- **Turns**: video, image and effect quads rotate and scale about a pivot
-  (a needle), each under two group nodes in the scene.
-- **Animations**: keys the renderer plays by itself (one real-time
-  animation system per scene) on a quad's rotation, offset and scale, a
-  part's pose, a mesh camera, or a uniform; nothing is sent per frame. Kept
-  and started again in a new scene.
-- **Scene files** (PROTOCOL.md "Scene files", `src/scene_file.h`,
-  `src/scene_edit.h`): on a target with `<target>_scene_files` 1, a RAMSES
-  scene file and its resource files, authored and saved beforehand, loaded
-  as the target's whole scene (RAMSES 19's `loadSceneFromFile`; the file's
-  scene id must be the target's) while the target's layers wait. Taken only
-  from under `/var/opt/`, root's and writable by no one else, each file with
-  the SHA-256 the client gives, so no client can have the service load a
-  file it made. Edit lines (`--hide`, `--rotate`, `--uniform`, `--set`, ...)
-  change its objects by name: kept by key, applied once a tick in the
-  target's one flush, each pattern resolved once per scene and cached by
-  its text, and applied whole to the scene loaded again. A file replaced
-  goes in place, the slot kept. The files' bytes are charged to the upload
-  budget when the scene is published and taken again.
-  - **Layers over it** (`layers` 1, PROTOCOL.md "Layers over a scene
-    file"): the target's layers are drawn in the file's own scene, in
-    passes of the service's after the file's (or from `layers_order`, so
-    passes of the file ordered above them stay on top), and its edits flush
-    with them. RAMSES 19 only (`FileScene::layers`); elsewhere they wait.
-  - **Hosting** (`host`, PROTOCOL.md "Hosting another target"): such a
-    scene may say that another target's content is shown inside it, at a
-    rect and as a part of that target; every client is told, and a
-    producer that follows it draws there, and only there, with only that
-    part. The service moves nothing itself: a producer that does not know
-    the event is unaffected.
 
-Each target's assets and layers are staged, assets first and then layers
-top first, and flushed once a tick, so a tick's changes reach the display
-together. A `setData` a layer cannot finish holds that tick's flush back.
-A video layer or an exclusive image whose buffer that left half written
-then holds the target: nothing else is staged or flushed until its whole
-rewrite goes, as soon as the budget allows, so the cluster keeps showing
-the last frame and never a half-written one. Any other image layer is
-hidden until it is written whole again. An image layer is also hidden in
-each new scene until its first whole write goes, so no flush (another
-layer's included) shows its buffer before it holds the image. A video
-layer's first frame in a scene goes whole and exact even when the
-budget's allowance cannot cover it, its bytes charged as debt.
+- **Assets:** RGBA8, R8, `etc2rgba` or `etc2rgb` textures a client uploads
+  once and its effect layers and mesh parts on the same target sample, such
+  as a glyph atlas or sprites. Not drawn, so they never make a target
+  wanted. A compressed asset is sent whole once: a 2048x1024 atlas takes
+  2 MiB as `etc2rgba` and 1 MiB as `etc2rgb`. On iDrive 7 the KOMBI draws
+  `etc2rgba` atlases up to 2048x2048 on the cluster and the HUD
+  ([TEST-ETC2.md](TEST-ETC2.md)); `etc2rgb`, and both on iDrive 8, have not
+  been tried on a car. `tools/etc2_test/etc2_encode.py encode IN.rgba W H
+  OUT.etc2 [etc2rgb]` encodes them. Which format to use: PROTOCOL.md
+  "Choosing a pixel format"; artwork sent once animates with no more pixels
+  sent: PROTOCOL.md "Animating preloaded assets".
+- **Several videos:** clients have up to 8 video layers together, and the
+  display holds the buffers of at most two. Past two, the videos on a
+  target drawn unturned, at their frame's size and at even x and y are
+  composed on the head unit into one video; a turned, scaled or odd-placed
+  video always takes a buffer of its own (PROTOCOL.md "Client to service").
+- **Turns:** video, image and effect quads rotate and scale about a pivot
+  (a needle).
+- **Animations:** keys the renderer plays by itself on a quad's rotation,
+  offset and scale, a part's pose, a mesh camera, or a uniform; nothing is
+  sent per frame.
+- **Scene files** (PROTOCOL.md "Scene files"): on a target with
+  `<target>_scene_files` 1, a RAMSES scene file and its resource files,
+  authored beforehand, loaded as the target's whole scene and changed live
+  by edit lines (`--hide`, `--rotate`, `--uniform`, `--set`, ...). Taken
+  only from under `/var/opt/`, owned by root and writable by no one else,
+  with the SHA-256 the client gives. With `layers` 1 the target's layers
+  are drawn over the file (RAMSES 19 only), and the scene may host another
+  target's content (PROTOCOL.md "Hosting another target").
 
-Quads and mesh layers share one draw order. In RAMSES 19 each mesh layer is
-a render pass with its own camera, so the quads between two mesh layers
-share a 2D pass, and the passes' render order follows the stack exactly
-(`plan_passes` in `src/graph.h`). Without mesh layers a scene is one pass.
+Each target's changes are flushed together once a tick, so the cluster never
+shows a half-written frame: a video or exclusive image left half written
+holds its target until its whole rewrite goes.
 
 ### Lifecycle
 
 - `cluster-render.socket` listens from boot; the first client starts the
-  service. Clients reconnect by themselves (0.25, 0.5, 1, then every 2 s).
-  They make their assets and layers again with their last settings:
-  uniforms, mesh parts with their geometry and transforms, binds and
-  animations; and send their images and assets whole, and a video layer's
-  last frame whole in place of its next repeat.
-- A client's layers go with its connection, then its assets. A video layer whose frames
-  (or repeats) stop for `stall_ms` stops wanting its slot, which is released
-  after it fades out and the linger.
-- On SIGTERM every target is unmapped and unfetched, the guide hold's
-  included. If the service dies, the KOMBI's watchdog drops its content
-  within about 10 s and systemd starts it again: the watchdog is per client
-  handle and unmaps every mapping of it (`dcsm/DCSM.md` "Heartbeat"), and
-  the guide hold is a mapping of the same client as the map.
-
-### Supported head units
-
-Every head-unit variant runs, HIGH F included (0.3.9 refused it). On a
-head unit whose variant cannot be read, a kernel command line with no
-`hwvariant=` or two that disagree (`src/head_unit.cpp`, the rule
-waze-on-cluster's patches follow too), cluster-render starts nothing that
-reaches the cluster: neither the generation's service nor Dcsm2, vsomeip
-or RAMSES. It
-logs the reason once and stays up holding only its socket, so neither the
-socket nor `Restart=on-failure` starts it again: a status request gets
-`not supported on this car (head unit: ...)`, any other message an `error`
-event with that reason, and the status file says the same. A SIGTERM ends
-it with 0.
+  service. Clients reconnect by themselves (0.25, 0.5, 1, then every 2 s)
+  and make their assets and layers again with their last settings, images
+  and assets sent whole, a video layer's last frame sent whole.
+- A client's layers go with its connection, then its assets. A video layer
+  whose frames (or repeats) stop for `stall_ms` stops wanting its slot.
+- On SIGTERM every target is released.
 
 ### Identity and packaging
 
 `hmi_5000` (the one uid allowed Dcsm2 and the RAMSES offers), participant
-801, vsomeip application `cluster-demo` and clientID `"\0cluster"`: the
-identity proven on the car. A standalone renderer with the same identity
+801, vsomeip application `cluster-demo` and clientID `"\0cluster"`, on
+iDrive 7 and iDrive 8. A standalone renderer with the same identity
 (`cluster-demo.service`) cannot run beside it, so the service conflicts
-with it (`Conflicts=`). iDrive 8 takes the same uid and participant
-("iDrive 8"), so one systemd unit serves both: it runs `cluster-render`,
-which starts `cluster-render-idrive7` or `cluster-render-idrive8` in its
-place.
-`component.json` makes it a Store tool for iDrive 7 and iDrive 8
-(`mguHmi: ["ID7", "ID8"]`), with the Node client shipped beside it for apps
-(`/var/opt/cluster-render/current/cluster_render_client.js`).
+with it (`Conflicts=`). One systemd unit serves both generations: it runs
+`cluster-render`, which starts `cluster-render-idrive7` or
+`cluster-render-idrive8` in its place.
+
+### Supported head units
+
+Every iDrive 7 and iDrive 8 head-unit variant. On a head unit whose variant
+cannot be read (a kernel command line with no `hwvariant=`, or two that
+disagree) the service draws nothing: it stays up holding only its socket, a
+status request gets `not supported on this car (head unit: ...)` and any
+other message an `error` event with that reason.
 
 ### Install
 
-From the Store ([robertnisipeanu/mgu-store](https://github.com/robertnisipeanu/mgu-store))
-on the head unit: add the GitHub source `robertnisipeanu/idrive-apps`
-(a private repository also needs a GitHub token the Store holds). The Store
-reads the `catalog` release's `catalog.json` and installs the newest
-version as a root tool, after the deploy tool it requires: the binaries,
-its settings and the Node client in `/var/opt/cluster-render/`,
-`cluster-render.socket` enabled. The first client starts the service. The
-Store can remove it again. The same kit installs on iDrive 7 and iDrive 8;
-the service tells which it runs on.
+From the Store ([robertnisipeanu/mgu-store](https://github.com/robertnisipeanu/mgu-store)),
+as a requirement of the apps that use it: the binaries, its settings and
+the Node client in `/var/opt/cluster-render/`, `cluster-render.socket`
+enabled. The same kit installs on iDrive 7 and iDrive 8; `cluster-render`
+starts `cluster-render-idrive7` or `cluster-render-idrive8`.
 
-For development, the deploy tool of mgu-store installs a kit built from the
-working tree over SSH (from the repository's root):
+To install a kit built from the working tree over SSH, with mgu-store's
+deploy tool (from this repository's root):
 
 ```sh
 node release/tool_artifact.js native/cluster-render --out /tmp/kit   # runs make target, writes /tmp/kit/cluster-render@<version>.tgz
@@ -769,114 +611,30 @@ node release/tool_artifact.js native/cluster-render --out /tmp/kit   # runs make
 ### Configure
 
 [`cluster-render.conf`](cluster-render.conf) lists every setting with its
-built-in default: the generation (`auto`, `7` or `8`), the identity, the
-targets (slot, content class, scene id, size, linger; on iDrive 8 the
-`id8_` ones: category, content, scene id, size, linger, and the widget's
-menu entry), the targets that take scene files (`<target>_scene_files`,
-none as shipped), the guide hold, the upload budget and the tick. A unit's own settings go in
+default: the generation (`auto`, `7` or `8`), the identity, the targets
+(slot, content class, scene id, size, linger; on iDrive 8 the `id8_` ones),
+the targets that take scene files, the guide hold, the upload budget and
+the tick. A unit's own settings go in
 `/var/opt/cluster-render/cluster-render.local.conf`, which updates keep;
-each key there replaces the shipped value. `-s key=value` on the command
-line overrides both. `key += a,b` adds each entry a list does not have
-yet (`id8_targets += mine`); cluster-render before 0.5.10 refuses `+=`
-and `id8_<name>_` keys it does not know (exit 2), so a unit that may go
-back to one keeps its own widgets in a drop-in, not in local_conf. On
-iDrive 8 a tool adds a widget of its own with a drop-in, read after all of
-these ("iDrive 8" below), and an error in
-a drop-in only skips that file; one in the shipped file, local_conf or the
-command line stops the service (exit 2). `cluster-render status` prints the targets, Dcsm2's
-availability, the subscription's answer per event and the count of what
-Dcsm2 sent (fetch, map and slot events, notifications that did not decode,
-replies), every client's layers and the upload cap.
+each key there replaces the shipped value, and `key += a,b` adds to a list.
+`-s key=value` on the command line overrides both. An error in the shipped
+file, local_conf or the command line stops the service (exit 2).
 
-Every log line also goes to `/var/opt/cluster-render/log/cluster-render.log`
-(`log_file`) with its UTC time: the unit's journal keeps only minutes, and
-the file outlives restarts and reboots. Past `log_file_kb` (512) the file
-becomes `cluster-render.log.1`, so it takes at most about twice that. The
-file is open only while a line is written, so the head unit can make
-`/var/opt` read-only at shutdown; a line that finds `/var/opt` read-only or
-full is dropped, and the lines after it are written once it takes them
-again. The service makes the directory, owned by `hmi_5000`, at each start;
-the deploy tool removes it with the rest of `/var/opt/cluster-render` on
-uninstall.
-For Dcsm2 the log has each change of availability and of the subscription's
-answer, notifications that did not decode (their start in hex, at most every
-10 s per event id), and, for a request that got no answer, what arrived
-since it and the last slot table.
+`cluster-render status` prints the targets, the display service's state,
+every client's layers and the upload cap. The log is in
+`/var/opt/cluster-render/log/cluster-render.log` (and `.log.1`), in UTC.
 
 ### iDrive 8
 
-iDrive 8 draws its cluster and HUD with RAMSES 27 (`.so.27.0`). That
-library has DCSM built in over SOME/IP RemoteContentManager (0xB0A3),
-beside RamsesService (0xB0BE): the head unit offers content in a category,
-and the cluster decides when to show it. On iDrive 8, uid 5000 has no Dcsm2
-and no RAMSES 19 services, and nothing on the unit links the RAMSES 19
-library it also ships. So the service has a second pair of backends, and
-everything above them stays the same ([abi/ABI27.md](abi/ABI27.md) has
-the library):
-
-- **Two programs and a starter** (`src/unit.h`). The two libramses export
-  the same names, so they cannot share a process, and an iDrive 7 unit has
-  no RAMSES 27. `cluster-render`, which links neither, starts
-  `cluster-render-idrive7` (RAMSES 19, Dcsm2) or `cluster-render-idrive8`
-  (RAMSES 27, DCSM) from its own folder with its own arguments, in its own
-  process (exec). `generation` (`auto`, `7`, `8`) decides; `auto` tells the
-  unit as mgu-store's deploy tool does: MainApp's folder
-  (`/usr/lib/oap-mainapp` iDrive 7, `/usr/lib/oap-mainapp21` iDrive 8), and
-  with both (as on the iDrive 8 unit, VERIFIED) or neither, the running HMI
-  (`HmiMain3D`, `Hmi8`). Not known yet (at boot), it asks again every 5 s,
-  and `cluster-render-idrive8` tries a failed connect again every 5 s:
-  neither exits for systemd to restart it (CAR-ONLY below).
-- **The graph** (`src/graph_ramses27.h`): the same scenes as on iDrive 7,
-  on RAMSES 27's API: effects and array resources per scene, texture
-  buffers written with `updateData`, a flush with only a tag. No pass
-  clears colour: the cluster draws the scene into its own area (VERIFIED on
-  the car with icwidget, a test widget of ours whose moving text left no
-  trail).
-- **The port** (`src/dcsm27_port.h`) on the library's `DcsmProvider`. A
-  target's slot is a category and `<target>_content` the content offered
-  in it, as the target's scene:
-  - A request is an offer (with metadata for a widget). Accepted, the
-    target is `parked`: offered, not shown, with no timeout. The cluster
-    shows some categories by itself (the middle, the HUD, the guiding
-    panel) and a widget once it is picked in its widget menu (VERIFIED on
-    the car).
-  - `contentReadyRequested` is answered at once (the scene is published
-    before the offer); `contentShow` is shown; `contentHide` and
-    `contentRelease` park it again and keep the offer. The cluster takes a
-    shown widget back on every layout change and shows it again 1 to 7 s
-    later (VERIFIED on the car).
-  - A release is `requestStopOfferContent`, confirmed once the cluster
-    accepts the stop. The library refuses a new offer of the content until
-    then (even from inside `stopOfferAccepted`), so the next request waits
-    for the confirmation (at most 1 s, as on iDrive 7), and one that comes
-    anyway is refused and waits on the ladder. The scene stays published,
-    warm, as on iDrive 7. A scene taken down while its offer stands or is
-    stopping stays published until the stop is accepted (unpublished at
-    once, a test unit's stand-in cluster logged errors unassigning it), and
-    no new scene with its id is built meanwhile. At shutdown the service
-    waits 1 s for the stops.
-  - Rendering is not verified: the RAMSES 27 console is not read, so the
-    status says the renderer's subscription is not observable.
-  - A refused offer (another provider has the content) waits on the
-    ladder. There is no slot table, no take-over and no heartbeat: parked
-    behind other content and the take-over are Dcsm2's. A cluster that
-    goes away takes its assignments back (`contentRelease`), and the offer
-    is there when it comes back.
-  - The area the cluster gives each content (canvas, category rect, safe
-    rect, layout) is logged when it changes, and a canvas other than the
-    target's size as a warning.
-- **The identity** is iDrive 7's: `hmi_5000` and participant 801. On
-  iDrive 8, 801 is the communication user `MGUTestUser_1` (RamsesService
-  instance 7, DCSM 5), and its offers reach the cluster (VERIFIED on the
-  car). The unit's vsomeip policies let uid 5000 (as Hmi8 runs) and 6031
-  (`nav_didui`, DidUi's) offer both services, and not root (VERIFIED). As
-  `hmi_5000` the service connected and its offers were shown, on a
-  test unit and on the car (VERIFIED, run by hand).
-
-The targets on iDrive 8 (the `id8_` settings), each VERIFIED on the car
-with this category, content, size and scene id (offered as user 801, shown
-by the cluster), but `guide`: its category, size and place VERIFIED with
-another content, its own content and scene id CAR-ONLY (below):
+iDrive 8 draws its cluster and HUD with RAMSES 27, which has DCSM built in:
+the head unit offers content in a category and the cluster decides when to
+show it ([abi/ABI27.md](abi/ABI27.md)). A target's slot is a category and
+`id8_<target>_content` the content offered in it. An offered target is
+`parked` until the cluster shows it; the cluster shows some categories by
+itself (the middle, the HUD, and the head unit's own guiding panel) and a
+widget once it is picked in its widget menu. It takes a shown widget back on every layout
+change and shows it again 1 to 7 s later. There is no take-over and no
+guide hold, and `panel` does not exist (a layer on it is refused).
 
 | Target | Category | Content | Size | Where |
 |---|---|---|---|---|
@@ -886,165 +644,52 @@ another content, its own content and scene id CAR-ONLY (below):
 | `widget` | `Ca_Widget_IC` 43100301 | 43204001, a dynamic widget (43202001-43205000) | canvas 2240x896, most of it shown (below) | the middle of the cluster once picked in its widget menu, with the entry `id8_widget_description`, `_order` and `_preview` |
 | `popup` | `Ca_Widget_IC` 43100301 | 43204003, a dynamic widget | canvas 2240x896, as `widget` | the middle of the cluster, on a black middle, by itself while a client draws on it: a focus request with the offer |
 
-- Target names are iDrive 7's where the place matches, so a client asking
-  for `map` gets the cluster's middle. waze-on-cluster stays iDrive 7 only:
-  its map is 1088x480, not the middle's 874x749. iDrive 8 has no
-  `panel`: a layer on it is refused as on any unknown target. The hello
-  names the backend (`id8`) and the targets with their sizes.
-- The widget's safe rect is in canvas coordinates and moves with the
-  cluster's layout (layout 4: 630x570 at 805,125; layout 5: 612x527 at
-  814,170; VERIFIED on the car). The journal logs it; clients are not told
-  it yet.
-- The widget's canvas is the whole cluster, and far more of it than the
-  safe rect is shown: behind the gauges, dimmed by the cluster's own gauge
-  panels and bottom bar, as the stock navigation map is. Shown, in canvas
+- **The widget's canvas** is the whole cluster. Shown, in canvas
   coordinates: about x 400-1720, y 143-765 in the normal layout and x
   690-1530, y 185-700 in the M layout, with a black notch at the top middle
-  down to about y 167 (VERIFIED on the car with a grid drawn over the whole
-  canvas).
-- A widget's offer can carry its background (`id8_<target>_background_id`)
-  and the cluster views it is shown in (`_layouts`), and ask the cluster to
-  show it (`_focus` 1: `enableFocusRequest` with each offer). VERIFIED on
-  the car (an M4 in its ROAD view, layout 4) with icwidget, a test provider
-  of ours making the same calls as communication user 802:
-  - a focus request on a widget nobody picked: the cluster switched to it
-    by itself, asking for it 0.1 s and showing it 0.4 to 0.9 s after the
-    offer; it answers with the widget's focus status (focused). A new
-    request (another handle) takes the widget back and shows it again
-    within 0.25 s;
-  - background 43400001, 43400004, 43400005 or 43400006: the cluster blacks
-    out its own artwork in the middle behind the widget, the gauges stay,
-    no new area is sent; 43400002 and 43400003 changed nothing visible;
-  - layouts is a mask of the cluster's views: 1 (ROAD) kept the widget
-    shown, 2 alone made the cluster take it away at once, 255 brought it
-    back; the M SPORT view is layout 5 (category rect 670x527 at 785,170);
-  - a big picture fits best at 1140x480 at 550,220 in layout 4: centred on
-    the cluster (x 1120), its top and bottom edges shown, its sides faded
-    behind the gauge panels;
-  - nothing visible from the displayed-data flags (bits 0-31), the
-    exclusive background, the car model's visibility or id, or the
-    configurator priority (a member of the unit's DcsmMetadataCreator not in
-    the open-source headers); the voice assistant's category
-    (`Ca_IPA_IC` 43100501) and `Ca_Widget_L_Mutex_ComCenter_IC` 43100341
-    were never assigned to a dynamic content.
-- A second participant with the service's communication user gets no
-  answer from any other participant (no offers seen, nothing assigned;
-  VERIFIED on the car with the service running as 801): a test provider
-  run beside the service takes another one (802, the second test user,
-  VERIFIED on the car).
-- In `Ca_GuidingPanel_IC` the cluster showed, by itself and at the place
-  in the table, the head unit's own content `C_GuidingPanels_IC` 43201101
-  offered as user 801 (VERIFIED on the car: canvas 702x213, the category
-  rect the whole canvas, no safe rect). DidUi
-  offers that content itself during route guidance, so `guide` offers a
-  dynamic content in the same category instead; whether the cluster shows
-  it, and which of the two it shows during guidance, is CAR-ONLY.
+  down to about y 167, dimmed behind the gauge panels and the bottom bar. A
+  big picture fits best at 1140x480 at 550,220 in layout 4. The safe rect
+  moves with the layout (layout 4: 630x570 at 805,125; layout 5: 612x527 at
+  814,170); clients are not told it.
+- **Widget options:** `id8_<target>_background_id` (43400001, 43400004,
+  43400005 or 43400006 black out the cluster's own artwork behind the
+  widget), `_layouts` (a mask of the cluster views it is shown in; 1 is
+  ROAD) and `_focus` 1 (the cluster switches to the widget by itself
+  when it is offered).
+- **Your own widget.** A target is its keys: `id8_<name>_<field>` for any
+  name of lowercase letters and digits, with the fields `category`,
+  `content`, `scene_id`, `size`, `linger_ms`, `description`, `order`,
+  `preview`, `background_id`, `layouts` and `focus`. A tool installed under
+  `/var/opt/<id>/current` adds one with a drop-in there,
+  `cluster-render.d/<name>.conf`, which goes with the tool on uninstall;
+  the unit's own drop-ins go in `/var/opt/cluster-render/conf.d/`
+  (`cluster-render.conf` has an example). A drop-in adds its targets and
+  scene ids with `+=` (`id8_targets += mywidget`, `id8_scene_ids_allowed +=
+  0x4d4755000020`) and sets only those targets' keys. Each target it adds
+  is a widget: category `Ca_Widget_IC` 43100301, a dynamic widget content
+  (43202001-43205000, never the head unit's own 43202020-43202120) and a
+  scene id `0x4d4755……`, none of them another target's; the drop-ins
+  together add at most 8 targets. `_preview` is a regular file of at most
+  1 MB. A drop-in is read only as a regular file owned by root and writable
+  by no one else; a bad one is skipped whole, with a warning in the log,
+  and the service runs without it. `cluster-render status` lists each
+  drop-in, `loaded` or `skipped` and why.
+- Whether the cluster shows `guide`'s content, and which content it shows
+  there during route guidance while the head unit offers its own guiding
+  panel in the same category, is not known yet.
+- What the head unit does when `cluster-render.service` exits or is
+  restarted on iDrive 8 is not known: don't stop or restart it on an
+  iDrive 8 car.
 - Content ids the head unit offers itself (`C_NaviMap_IC` 43200501,
   `C_GuidingPanels_IC` 43201101, `C_Media_IC` 43202120, ...) are never
-  offered: two providers of one content fight. Scene ids are `0x4d4755……`
-  ("MGU"), allowed by `id8_scene_ids_allowed`.
-- Any number of targets: a target is its keys. `id8_<name>_<field>` is
-  taken for any name of lowercase letters and digits and the fields above
-  (`category`, `content`, `scene_id`, `size`, `linger_ms`, `description`,
-  `order`, `preview`, `background_id`, `layouts`, `focus`; one left out is
-  empty, 0), so a target needs no code; any other unknown key is still an
-  error. A tool installed under `/var/opt/<id>/current` adds a widget of
-  its own with a drop-in there, `cluster-render.d/<name>.conf`, which goes
-  with the tool on uninstall; the unit's own drop-ins go in
-  `/var/opt/cluster-render/conf.d/` (`drop_ins`; cluster-render.conf has an
-  example). A drop-in adds its targets and their scene ids with `+=`
-  (`id8_targets += mywidget`, `id8_scene_ids_allowed += 0x4d4755000020`)
-  and sets only those targets' keys. A target it adds is a widget with a
-  name no target has yet: the widget category `Ca_Widget_IC` 43100301, a
-  dynamic widget content (43202001-43205000, never the head unit's own
-  43202020-43202120), a scene id `0x4d4755……`, as is every scene id it
-  allows; the drop-ins together add at most 8 targets. A widget's picture
-  (`_preview`) is a regular file of at most 1 MB; any other is left out,
-  with an error in the log. It is read at the service's start,
-  after local_conf and the command line, in the order of the paths, and
-  only as a regular file owned by root and writable by no one else; each
-  goes onto a copy of the settings, kept only when the targets still load
-  and each target it adds has a content and a scene id no other target
-  has. Anything else skips the file whole, with a warning in the log, and
-  the service runs without it: a third party's broken file never stops the
-  service. The status lists each drop-in, `loaded` or `skipped` and why.
-  The cluster lists every offered `Ca_Widget_IC` dynamic widget in its
-  widget menu with its description (two of ours at once, `widget` and
-  `popup`, VERIFIED on the car). A second instance run by hand beside the
-  installed service takes `-s drop_ins=`: their contents would be the same.
-
-VERIFIED on the car with the service itself (before 0.2.2 was merged),
-run by hand as `hmi_5000` with `showcase.js all` on `map` and on `widget`:
-- `map` offered, parked and shown within 1 s; every layer kind drawn:
-  plasma, dial and needle, the lit cube, glyph text, the video and the
-  exclusive alert;
-- `widget` listed in the cluster's widget menu without a picture, picked
-  and shown, with the same layers;
-- a release and a request 30 ms later: the cluster accepted the stop
-  within about 30 ms, and the next offer followed after the 1 s request
-  gap and was shown;
-- SIGTERM: the offers stopped, exit 0, the head unit kept running;
-- with the same build, a video client drew a camera stream in `widget`,
-  hardware-decoded, at 15 fps.
-
-VERIFIED on the car (an M4) with 0.4.1, run by hand as `hmi_5000` beside
-the installed 0.4.0 (communication user 802, its own socket, `id8_targets =
-popup`) with `showcase.js all` on `popup`, the widget picked in the
-cluster's menu another one: `popup` offered, asked for, and shown by the
-cluster by itself 0.44 s after the offer (focus status focused), every
-layer shown; the client gone, its offer stopped after the linger and the
-stop accepted within 60 ms, and the cluster showed the picked widget
-again; SIGTERM: stopped, the head unit kept running.
-
-CAR-ONLY on iDrive 8:
-- the release since 0.2.2 (host-tested only): the
-  scene kept published, warm, and the next request waiting for the stop's
-  acceptance;
-- the `hud` target, and how the upload budget fits the cluster's link
-  over a long run;
-- how a focus request, the backgrounds and the views mask behave on other
-  iDrive 8 cars than an M4;
-- more than two of our widgets offered at once (drop-ins, host-tested
-  only);
-- the `guide` target: its dynamic content shown in `Ca_GuidingPanel_IC`,
-  and which content the cluster shows there during route guidance, when
-  the head unit offers its own guiding panel in the same category;
-- how long the cluster shows the middle and the HUD, and what takes them
-  away (guidance, media, a call);
-- whether RemoteContentManager has a watchdog (none seen in the library: an
-  offer stands while the participant is connected);
-- what the unit does when `cluster-render.service` exits or is restarted:
-  on the car, stopping a service restarted the head unit. The service
-  waits for the generation and for RAMSES instead of exiting; a
-  configuration fault or a refused communication user still exits 1.
-
-### Clients
-
-- **Native producers** link `libcluster_render_client.a` and include
-  `include/cluster_render/client.h`.
-- **OAP apps** copy `js/cluster_render_client.js` into their sources (Node 8,
-  only the `net` and `events` builtins).
-- Any other language speaks [PROTOCOL.md](PROTOCOL.md) over the socket.
-
-A client needs only the socket's group, `tm_oap_app`, which every OAP app
-has: no participant, no Dcsm2 client and no `hmi_5000`.
-
-- **waze-on-cluster** ([native/waze-on-cluster](../waze-on-cluster))
-  draws the CarPlay map: its map feed hands each decoded atlas to a
-  `cr::Client` video layer on `map` with `contend`. It needs only the
-  `video`, `mgu_ufipc` and `tm_oap_app` groups, holds no participant or
-  Dcsm2 client, and requires cluster-render through its `component.json`
-  `requires`.
-- **`js/showcase.js`** shows every layer kind on a target: a 3D cube in a
-  mesh layer the renderer turns, plasma in an effect, labels in effects
-  over a glyph-atlas asset, a needle, an alert and a video.
+  offered: two providers of one content fight.
 
 ### Building and testing
 
 In `native/cluster-render`:
 
 ```sh
-make test                       # every host test (below)
+make test                       # every host test
 make test-x86                   # the C++ tests with the unit's gcc 7.5 in Docker (SSE2 paths)
 make target                     # build/target/cluster-render, cluster-render-idrive7, cluster-render-idrive8
                                 # and libcluster_render_client.a, every import checked against the units' libraries

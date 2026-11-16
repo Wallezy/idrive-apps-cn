@@ -15,7 +15,7 @@ See [localization and migration](docs/LOCALIZATION.zh-CN.md).
 
 Shows your phone's navigation map on the instrument cluster: CarPlay (Waze,
 Apple Maps or Google Maps) or Android Auto (Google Maps). It can also show it
-on the head-up display (experimental). Formerly called Waze on cluster.
+on the head-up display (experimental).
 
 ![The map on the cluster](docs/hud/cluster-map.jpg)
 

@@ -1,6 +1,15 @@
 {
   "cluster-render": [
     {
+      "version": "0.6.6",
+      "changes": [
+        "记住仪表适用的地图传输速率，减少重启后反复掉图。",
+        "完善掉图原因与恢复日志。"
+      ],
+      "upstreamVersion": "0.6.5",
+      "cnRevision": 1
+    },
+    {
       "version": "0.6.5",
       "changes": [
         "改善仪表地图短暂黑屏后的恢复，减少反复掉图。",
@@ -55,6 +64,15 @@
     }
   ],
   "waze-on-cluster": [
+    {
+      "version": "0.10.5",
+      "changes": [
+        "修正兼容 CarPlay 地图的到达时间显示请求。",
+        "改进日志导出，减少无关内容并隐藏敏感信息。"
+      ],
+      "upstreamVersion": "0.10.5",
+      "cnRevision": 1
+    },
     {
       "version": "0.10.4",
       "changes": [
