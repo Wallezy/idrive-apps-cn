@@ -191,7 +191,7 @@ test('the Waze chain: app -> waze-on-cluster -> cluster-render and a hook-runnin
         catalog.compareVersions(renderer.version, calibrationNeeds) >= 0),
     'the calibration app requires a supported renderer with parking calibration');
     assert.deepStrictEqual(Object.keys(tool.requires), ['mgu-deploy', 'cluster-render'], 'the deploy tool installs first');
-    assert.strictEqual(tool.requires['mgu-deploy'], '0.8.19', 'CN recovery deactivation and safe-mode unit support');
+    assert.strictEqual(tool.requires['mgu-deploy'], '0.8.21', 'CN recovery deactivation and safe-mode unit support');
     const needs = tool.requires['cluster-render'];
     assert.ok(needs === 'next' || (catalog.SEMVER.test(needs) && catalog.compareVersions(renderer.version, needs) >= 0),
         'the renderer released beside it meets the tool\'s minimum, or is the one released with it');

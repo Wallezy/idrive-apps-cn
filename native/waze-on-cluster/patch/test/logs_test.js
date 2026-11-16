@@ -114,7 +114,7 @@ function get(url, opts) {
     var empty = await get(a.state.url);
     assert.strictEqual(empty.status, 200);
     assert(empty.body.toString().indexOf('<html lang="zh-CN">') > 0);
-    assert(empty.body.toString().indexOf('<title>Waze 仪表盘显示日志</title>') > 0);
+    assert(empty.body.toString().indexOf('<title>仪表盘地图日志</title>') > 0);
     assert(empty.body.toString().indexOf('<p>暂无已保存的日志</p>') > 0);
     assert.strictEqual(Number(empty.headers['content-length']), empty.body.length, 'UTF-8 length is in bytes');
     assert.strictEqual(empty.headers['content-type'], 'text/html; charset=utf-8');
@@ -138,7 +138,7 @@ function get(url, opts) {
     var r = await get(base);
     assert.strictEqual(r.status, 200);
     assert(r.body.toString().indexOf('href="' + name + '"') > 0, 'the page lists it');
-    assert(r.body.toString().indexOf('<h1>Waze 仪表盘显示日志</h1>') > 0);
+    assert(r.body.toString().indexOf('<h1>仪表盘地图日志</h1>') > 0);
     assert(r.body.toString().indexOf('暂无已保存的日志') < 0);
     var unsafeName = '<img src=x onerror=alert(1)>.tar.gz';
     fs.writeFileSync(path.join(s.dir, unsafeName), 'not a log archive');

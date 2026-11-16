@@ -1,7 +1,16 @@
 {
   "cluster-render": [
     {
-      "version": "next",
+      "version": "0.6.5",
+      "changes": [
+        "改善仪表地图短暂黑屏后的恢复，减少反复掉图。",
+        "优化转向卡片避让，保留仪表全屏和防花屏修复。"
+      ],
+      "upstreamVersion": "0.6.4",
+      "cnRevision": 1
+    },
+    {
+      "version": "0.6.2",
       "changes": [
         "修复主题切换时短暂花屏。"
       ],
@@ -47,6 +56,15 @@
   ],
   "waze-on-cluster": [
     {
+      "version": "0.10.4",
+      "changes": [
+        "支持兼容的 CarPlay 地图显示到达时间卡片。",
+        "完善旧补丁升级与恢复处理。"
+      ],
+      "upstreamVersion": "0.10.3",
+      "cnRevision": 1
+    },
+    {
       "version": "0.10.1",
       "upstreamVersion": "0.10.0",
       "cnRevision": 1,
@@ -70,6 +88,17 @@
       "changes": [
         "简化应用说明，方便了解安装与使用方式。"
       ]
+    }
+  ],
+  "robertn_waze_cluster": [
+    {
+      "version": "0.6.16",
+      "changes": [
+        "应用更名为“仪表盘地图”，继续支持苹果和安卓手机。",
+        "增加旧地图补丁更新提示，保留全屏和中文设置。"
+      ],
+      "upstreamVersion": "0.6.10",
+      "cnRevision": 1
     }
   ]
 }

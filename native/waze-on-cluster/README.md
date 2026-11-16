@@ -1,13 +1,13 @@
 # waze-on-cluster
 
-The part of [Waze on cluster](../../apps/robertn_waze_cluster) that runs in
+The part of [Maps on cluster](../../apps/robertn_waze_cluster) that runs in
 the background: it puts the CarPlay or Android Auto map on the instrument
 cluster of a BMW with iDrive 7.
 
 You don't install or use it on its own. The Store installs it with the
-**Waze on cluster** app, and you control it from that app. Settings, what to
+**Maps on cluster** app, and you control it from that app. Settings, what to
 do if the map doesn't show, and how to send logs:
-[Waze on cluster](../../apps/robertn_waze_cluster/README.md).
+[Maps on cluster](../../apps/robertn_waze_cluster/README.md).
 
 ## For developers
 
@@ -181,7 +181,7 @@ density change while the card is hidden, takes effect at the next head-unit
 start.
 
 Set **Instrument cluster > Central display area** to **Map view**: the
-cluster shows the stock map, the Waze map replaces it while CarPlay's cluster
+cluster shows the stock map, the phone's map replaces it while CarPlay's cluster
 stream is live and shows a map, and the stock map is back when the stream
 ends or shows no map. **Off** works
 too, with an empty centre instead of the stock map. With Route preview or
@@ -234,7 +234,8 @@ the car.
 CarPlay starts the cluster stream as soon as the phone connects (PATCH.md
 Edit 3), and, where Edit 5's sites are found, gives the cluster display the
 map's URL, so the phone streams its map from connect, route or not (on the
-car the map showed within about 8 s of a reconnect). Without Edit 5 the
+car the map showed within about 8 s of a reconnect), and Apple Maps and
+Google Maps draw their arrival-time card on it during a route. Without Edit 5 the
 phone sends a blank picture until a navigation app draws on the cluster: on
 the car about 100 blank frames in the first 2 s, then nothing; in the field
 the map came once a route started in Waze or Google Maps, and stayed after
@@ -459,7 +460,10 @@ Every line the render logs also goes to
 `/var/opt/waze-on-cluster/log/waze-on-cluster.log` (`log_file`) with its UTC
 time, so it outlives the journal's few minutes on the unit, restarts and
 reboots; past `log_file_kb` (512) the file becomes `waze-on-cluster.log.1`.
-The service makes the directory, owned by `hmi_5000`, at each start; the
+The file is open only while a line is written, so the head unit can make
+`/var/opt` read-only at shutdown; a line that finds `/var/opt` read-only or
+full is dropped, and the lines after it are written once it takes them
+again. The service makes the directory, owned by `hmi_5000`, at each start; the
 deploy tool removes it with the rest of `/var/opt/waze-on-cluster`. The log
 has the status when its state, reason or target changes, each loss and a
 decoder behind the stream (above), and once a minute while frames come, how
@@ -749,11 +753,13 @@ sites in carplay 22.28.3:
 | sink | second-stream sink URL: stock `avb://`, or `udp://…`, `file://…` | ≤ 59 B at `0x2a20b0` |
 | selfstart | `onSuggestUi`'s `setStreamStatus(AVAILABLE)` call → `requestStream()` | rel32 at `0x18176c` |
 | resolution | IC_HIGH geometry → 1088x480 px at 138x61 mm, safe area 504x368+286+72 | four 8 B immediates at `0x20ca32`–`0x20ca7c` |
-| mapurl | the cluster display's initial URL `""` → `maps:/car/instrumentcluster/map`, so the phone streams the map from connect | 55 B log string at `0x257838`, `lea` at `0x7b533` |
+| mapurl | the cluster display's initial URL `""` → `maps:/car/instrumentcluster/map?showETA=yes`, so the phone streams the map from connect, and Apple Maps and Google Maps add their arrival-time card during a route | 55 B log string at `0x257838`, `lea` at `0x7b533` |
 
 The map URL edit's sites are found by structure like the others; a build
 where they are not found gets the other four edits without it (PATCH.md
-"Edit 5"). Releases before 0.9.11 do not know it; mgu-deploy 0.7.17, which
+"Edit 5"). Releases before 0.9.11 do not know it, and 0.9.11–0.10.1 wrote
+it with `maps:/car/instrumentcluster/map`, which this version recognises and
+replaces; mgu-deploy 0.7.17, which
 this tool requires, runs this version's deactivate before a rollback, a
 downgrade or a removal, and PATCH.md "Rollback" lists what each release does with it and
 the paths left open.

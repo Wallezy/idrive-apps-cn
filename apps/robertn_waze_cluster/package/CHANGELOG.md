@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.6.16
+
+应用更名为“仪表盘地图”，继续支持苹果和安卓手机。 增加旧地图补丁更新提示，保留全屏和中文设置。
+
 ## 0.6.15
 
 - 仪表全屏地图开关名称统一为“仪表盘全屏”。
@@ -37,6 +41,19 @@
 - Check page control IDs before packaging to prevent conflicting controls from breaking app startup.
 
 - The CN app defaults to Simplified Chinese while the HMI language is unavailable and follows explicit display-language selections. Chinese status rows translate known renderer and patch messages, frame counts and transfer limits; unknown diagnostics retain their original detail. Native protocol fields and logs are unchanged.
+## 0.6.10
+
+Waze on cluster is renamed Maps on cluster, with its name translated in
+every language, since it shows the map of Waze, Google Maps or Apple Maps.
+Your settings stay as they are.
+
+## 0.6.9
+
+CarPlay's Status shows `Update needed` while the CarPlay patch on the car
+lacks the arrival time on the cluster map; its Patch button adds it. With
+the patch, Apple Maps and Google Maps show your arrival time on the cluster
+during a route.
+
 ## 0.6.8
 
 A plainer description in the Store: on supported cars the map turns on by

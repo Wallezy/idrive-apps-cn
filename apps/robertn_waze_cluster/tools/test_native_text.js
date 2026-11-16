@@ -75,7 +75,7 @@ for (const locale of ['zh_CN', 'zh_yue_Hans_CN']) {
     const words = JSON.parse(fs.readFileSync(path.join(__dirname,
         '../package/rhmiData/variantGroups/Common/texts', `${locale}.json`)));
     eq(words.SID_WOC_LOGS, '日志');
-    eq(words.SID_WOC_TITLE, 'Waze 仪表盘显示');
+    eq(words.SID_WOC_TITLE, '仪表盘地图');
 }
 i18n.setHmiLanguage('ENGLISCH__US');
 cases.forEach(([raw]) => eq(nativeText(raw), raw));

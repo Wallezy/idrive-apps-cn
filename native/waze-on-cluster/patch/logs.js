@@ -144,11 +144,11 @@ function page(list) {
             Math.max(1, Math.round(a.size / 1024)) + ' KB</span></li>';
     }).join('');
     return '<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">' +
-        '<meta name="viewport" content="width=device-width, initial-scale=1"><title>Waze 仪表盘显示日志</title>' +
+        '<meta name="viewport" content="width=device-width, initial-scale=1"><title>仪表盘地图日志</title>' +
         '<style>body{margin:0;padding:20px 16px;font:16px/1.4 system-ui,sans-serif;background:#111;color:#eee}' +
         'h1{font-size:20px}ul{list-style:none;padding:0}li{display:flex;justify-content:space-between;gap:12px;' +
         'padding:12px 0;border-bottom:1px solid #333}a{color:#6af;overflow-wrap:anywhere}span{color:#999;flex:none}</style>' +
-        '</head><body><h1>Waze 仪表盘显示日志</h1>' + (rows ? '<ul>' + rows + '</ul>' : '<p>暂无已保存的日志</p>') +
+        '</head><body><h1>仪表盘地图日志</h1>' + (rows ? '<ul>' + rows + '</ul>' : '<p>暂无已保存的日志</p>') +
         '</body></html>\n';
 }
 

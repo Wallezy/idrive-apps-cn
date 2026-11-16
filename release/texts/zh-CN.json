@@ -4,11 +4,11 @@
     "description": "为仪表盘和抬头显示器（HUD）提供共用的图像显示服务，协调各应用的显示区域和传输带宽。由需要它的应用自动安装。"
   },
   "waze-on-cluster": {
-    "title": "Waze 地图投屏服务",
-    "description": "在后台接收并显示手机地图，随“Waze 仪表盘显示”应用自动安装，在应用中设置。"
+    "title": "地图投屏服务",
+    "description": "在后台接收并显示手机地图，随“仪表盘地图”应用自动安装，在应用中设置。"
   },
   "robertn_waze_cluster": {
-    "title": "Waze 仪表盘显示",
+    "title": "仪表盘地图",
     "description": "将 CarPlay 或 Android Auto 地图显示在仪表盘，也可选择显示在 HUD。在支持的车辆上，安装并重启主机后自动开启。"
   },
   "brake_test": {

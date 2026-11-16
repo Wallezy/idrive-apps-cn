@@ -1,11 +1,11 @@
 {
   "schema": 1,
   "purpose": "Pinned cauliflowermossgrape application set with CN compatibility fixes",
-  "sourceCommit": "1fc3812993847096311e629fe4cb2a73439c241e",
+  "sourceCommit": "25c9e3b5eda1b4dfd76aabbfc88e1aea2001975c",
   "components": {
-    "cluster-render": "0.6.2",
-    "waze-on-cluster": "0.10.1",
-    "robertn_waze_cluster": "0.6.15",
+    "cluster-render": "0.6.5",
+    "waze-on-cluster": "0.10.4",
+    "robertn_waze_cluster": "0.6.16",
     "brake_test": "1.5.21",
     "car_vitals": "2.27.5",
     "doom": "1.7.22",
