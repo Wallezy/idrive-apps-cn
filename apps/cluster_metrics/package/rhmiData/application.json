@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "1.3.0",
+  "application": {
+    "uuid": "45219b5b-e913-5c2f-a7ad-b3266c1f7a2d",
+    "type": "OnlineApp",
+    "name": "cluster_metrics",
+    "vendor": "chyiz",
+    "version": "0.5.1",
+    "defaultLanguage": "en_GB",
+    "stringBundleUuid": "1d426b7d-e21a-54c6-b738-c2bf09694bfb",
+    "resourceBundleUuid": "7414718d-ffa9-50be-beeb-80dd24f2354e",
+    "entryPoints": [
+      {
+        "name": "CLUSTER_METRICS_ENTRY",
+        "uuid": "e7350c7f-e1b9-530f-be9d-a5cca0aaf2f9",
+        "textId": "SID_CLUSTER_METRICS_TITLE",
+        "icon": "cluster_metrics_icon.png",
+        "insertionStateId": 20974,
+        "insertionFocusId": 2,
+        "insertionMode": "INSERT_BELOW",
+        "insertionOrder": 0,
+        "insertionPriority": 0,
+        "previewType": "NONE",
+        "bookmarkable": true,
+        "private": false,
+        "appearance": "DEFAULT",
+        "isGroupHeader": false,
+        "insertionGroup": 0
+      }
+    ],
+    "uiDescriptions": [
+      {
+        "applicationFilePath": "./uiDescriptions/ID7/application.xml",
+        "uiDescriptionFilePath": "./uiDescriptions/ID7/uiDescription.json",
+        "hmi": [
+          "ID7"
+        ]
+      }
+    ],
+    "variantGroups": [
+      {
+        "stringsPath": "./variantGroups/Common/texts",
+        "resourcesPath": "./variantGroups/Common/images",
+        "hmi": [
+          "ID7"
+        ],
+        "brands": [
+          "BMW"
+        ]
+      }
+    ]
+  }
+}

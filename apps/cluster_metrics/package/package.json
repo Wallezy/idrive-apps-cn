@@ -1,0 +1,44 @@
+{
+  "name": "cluster_metrics",
+  "version": "0.5.1",
+  "description": "在仪表或抬头显示上查看能耗、温度、电量与挡位，支持导航叠加。简体中文设置；首次使用需手动开启，Beta 待车机验证。",
+  "main": "javascript/localized-entry.js",
+  "private": false,
+  "author": "chyiz",
+  "license": "MIT",
+  "engines": {
+    "node": ">=8.7.0"
+  },
+  "oapAppSettings": {
+    "maxDiskUsage": 20971520,
+    "cpuLimit": 60,
+    "memoryThresholdKB": 196608,
+    "priority": "PRIO_LOW",
+    "visibility": "FOREGROUND",
+    "latencyClass": "FOREGROUND",
+    "loggingId": "OA7E",
+    "userLoginRequired": false,
+    "backgroundPriority": 200,
+    "someipManifest": "manifest.json"
+  },
+  "mguHmi": [
+    "ID7"
+  ],
+  "mguLocalOnly": true,
+  "files": [
+    "package.json",
+    "npm-shrinkwrap.json",
+    "manifest.json",
+    "permissions.json",
+    "config",
+    "javascript",
+    "rhmiData",
+    "LICENSE",
+    "KIT-LICENSE",
+    "MPL-2.0.txt",
+    "NOTICE",
+    "NOTICE.zh-CN.md",
+    "provenance.json",
+    "CHANGELOG.md"
+  ]
+}

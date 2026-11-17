@@ -78,5 +78,9 @@
   "mgu-inputgate": {
     "title": "旋钮输入支持",
     "description": "供应用使用 iDrive 旋钮；保留返回和菜单键，下次车机正常启动后生效。"
+  },
+  "cluster_metrics": {
+    "title": "组合仪表数据 (Cluster Metrics)",
+    "description": "在仪表或抬头显示上查看能耗、温度、电量与挡位，支持导航叠加。简体中文设置；首次使用需手动开启，Beta 待车机验证。"
   }
 }

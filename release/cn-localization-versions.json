@@ -22,7 +22,8 @@
     "zf8hp": "1.5.8",
     "live_adjustments": "0.9.7",
     "live_data": "1.0.14",
-    "mgu-inputgate": "1.1.1"
+    "mgu-inputgate": "1.1.1",
+    "cluster_metrics": "0.5.1"
   },
   "applicationSourceCommit": "b2880634eb214e29f008422b970cf22ea2de280f"
 }

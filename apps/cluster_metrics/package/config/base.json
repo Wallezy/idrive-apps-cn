@@ -1,0 +1,236 @@
+{
+  "rhmiLoadingEnabled": true,
+  "entryPointLoadingEnabled": true,
+  "settings": {
+    "cluster_metrics": {
+      "scaling": {
+        "rpm": {
+          "factor": 0.25,
+          "offset": 0,
+          "invalid": 65535
+        },
+        "speed": {
+          "factor": 0.015625,
+          "offset": 0,
+          "invalid": 65535
+        },
+        "accel": {
+          "factor": 0.002,
+          "offset": -65,
+          "invalid": 65535
+        },
+        "temp": {
+          "factor": 1,
+          "offset": -48,
+          "invalid": 255
+        },
+        "boost": {
+          "factor": 0.01,
+          "offset": 0,
+          "invalid": 255
+        },
+        "batteryTemp": {
+          "factor": 1,
+          "offset": -50,
+          "invalid": 255
+        },
+        "ambient": {
+          "factor": 0.5,
+          "offset": -40,
+          "invalid": 255
+        },
+        "pedal": {
+          "factor": 0.025,
+          "offset": 0,
+          "invalid": 65535
+        },
+        "torque": {
+          "factor": 0.5,
+          "offset": -1023.5,
+          "invalidFrom": 4095
+        }
+      },
+      "dids": {
+        "powerSign": -1,
+        "sme": {
+          "ecu": 7,
+          "hvV": [
+            {
+              "did": "DDB4",
+              "bytes": 2,
+              "at": 0,
+              "factor": 0.01,
+              "min": 150,
+              "max": 500,
+              "timeoutMs": 800
+            },
+            {
+              "did": "DD68",
+              "bytes": 2,
+              "at": 0,
+              "factor": 0.01,
+              "min": 150,
+              "max": 500,
+              "timeoutMs": 800
+            },
+            {
+              "did": "DD66",
+              "bytes": 2,
+              "at": 0,
+              "factor": 0.01,
+              "min": 150,
+              "max": 500,
+              "timeoutMs": 800
+            },
+            {
+              "did": "DDEF",
+              "bytes": 2,
+              "at": 0,
+              "factor": 1,
+              "min": 150,
+              "max": 500,
+              "timeoutMs": 800
+            }
+          ],
+          "hvI": [
+            {
+              "did": "DD69",
+              "bytes": 4,
+              "at": 0,
+              "factor": 0.01,
+              "signed": true,
+              "min": -800,
+              "max": 800,
+              "timeoutMs": 800
+            }
+          ],
+          "soc": [
+            {
+              "did": "DDBC",
+              "bytes": 2,
+              "at": 0,
+              "factor": 0.1,
+              "min": 0,
+              "max": 100,
+              "timeoutMs": 1200
+            }
+          ],
+          "cellT": [
+            {
+              "did": "DDC0",
+              "at": 4,
+              "bytes": 2,
+              "factor": 0.01,
+              "signed": true,
+              "min": -40,
+              "max": 80,
+              "timeoutMs": 1200
+            }
+          ]
+        },
+        "dme": {
+          "ecu": 18,
+          "fuelRate": [
+            {
+              "did": "5656",
+              "bytes": 2,
+              "at": 0,
+              "factor": 0.01,
+              "min": 0,
+              "max": 150,
+              "timeoutMs": 900
+            },
+            {
+              "obd": "5E",
+              "bytes": 2,
+              "at": 0,
+              "factor": 0.05,
+              "min": 0,
+              "max": 150,
+              "timeoutMs": 900
+            }
+          ],
+          "v12": [
+            {
+              "did": "F442",
+              "bytes": 2,
+              "at": 0,
+              "factor": 0.001,
+              "min": 5,
+              "max": 18,
+              "timeoutMs": 1000
+            },
+            {
+              "ecu": 7,
+              "did": "F442",
+              "bytes": 2,
+              "at": 0,
+              "factor": 0.001,
+              "min": 5,
+              "max": 18,
+              "timeoutMs": 1000
+            },
+            {
+              "obd": "42",
+              "bytes": 2,
+              "at": 0,
+              "factor": 0.001,
+              "min": 5,
+              "max": 18,
+              "timeoutMs": 1000
+            }
+          ],
+          "iat": [
+            {
+              "did": "F40F",
+              "bytes": 1,
+              "at": 0,
+              "factor": 1,
+              "offset": -40,
+              "min": -40,
+              "max": 150,
+              "timeoutMs": 1000
+            },
+            {
+              "obd": "0F",
+              "bytes": 1,
+              "at": 0,
+              "factor": 1,
+              "offset": -40,
+              "min": -40,
+              "max": 150,
+              "timeoutMs": 1000
+            }
+          ],
+          "oil": [
+            {
+              "obd": "5C",
+              "bytes": 1,
+              "at": 0,
+              "factor": 1,
+              "offset": -40,
+              "min": -40,
+              "max": 170,
+              "timeoutMs": 1000
+            }
+          ]
+        },
+        "egs": {
+          "ecu": 24,
+          "gearboxOil": [
+            {
+              "did": "6000",
+              "bytes": 1,
+              "at": 0,
+              "factor": 1,
+              "offset": -40,
+              "min": -40,
+              "max": 160,
+              "timeoutMs": 1000
+            }
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,16 @@
+# Build output and local SDK stub (never commit oap-sdk)
+dist/
+oap-sdk/
+*.log
+bench/.data/
+.emu-data/
+preview/emu/
+__pycache__/
+*.pyc
+.DS_Store
+
+# User car screenshots and derived photo plates (contain personal info)
+design/resources/
+bench/assets/*.jpg
+bench/assets/*.jpeg
+bench/assets/*.png

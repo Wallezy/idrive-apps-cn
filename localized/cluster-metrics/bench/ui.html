@@ -1,0 +1,834 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>idrive7-cluster-metrics bench simulator</title>
+<style>
+  :root {
+    --bg: #0a0d14;
+    --panel: #111824;
+    --border: #233146;
+    --text: #dce5f2;
+    --muted: #8496ad;
+    --cyan: #38c7ff;
+    --amber: #f59e0b;
+    --green: #2ee68a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 14px 18px 28px;
+    background: var(--bg);
+    color: var(--text);
+    font: 13px/1.42 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  h1 { margin: 0 0 4px; font-size: 16px; font-weight: 600; letter-spacing: 0.2px; }
+  .sub { color: var(--muted); font-size: 12px; margin-bottom: 12px; }
+  .toolbar {
+    display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+    padding: 9px 12px; margin-bottom: 12px;
+  }
+  .toolbar label { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text); cursor: pointer; }
+  select, input[type="number"] {
+    background: #0b111b; color: var(--text); border: 1px solid var(--border);
+    border-radius: 6px; padding: 3px 7px; font-size: 12px;
+  }
+  .presets { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  button {
+    background: #172132; color: var(--text); border: 1px solid #2b3c55;
+    border-radius: 7px; padding: 5px 10px; font-size: 12px; cursor: pointer;
+    transition: background .12s, border-color .12s;
+  }
+  button:hover { background: #1f2e45; border-color: #46628a; }
+  button.active { background: #12314a; border-color: var(--cyan); color: #fff; }
+  .grid { display: grid; grid-template-columns: 1fr; gap: 12px; max-width: 1120px; }
+  .card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px;
+  }
+  .card-hd { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 12px; color: var(--muted); }
+  .card-hd strong { color: var(--text); font-size: 13px; }
+  .canvas-wrap { background: #04070c; border-radius: 8px; overflow: hidden; border: 1px solid #1a2434; }
+  canvas#panel { display: block; width: 100%; max-width: 960px; aspect-ratio: 1920 / 720; height: auto; }
+  canvas#hud { display: block; width: 100%; max-width: 480px; aspect-ratio: 800 / 480; height: auto; }
+  .two-col { display: grid; grid-template-columns: minmax(320px, 480px) 1fr; gap: 12px; align-items: start; }
+  @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+  .controls-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 7px 10px; }
+  .ctrl { display: flex; flex-direction: column; gap: 2px; font-size: 11px; color: var(--muted); }
+  .ctrl-row { display: flex; align-items: center; gap: 6px; }
+  .ctrl input[type="range"] { width: 100%; margin: 0; accent-color: var(--cyan); }
+  .pill { display: inline-block; padding: 1px 7px; border-radius: 99px; font-size: 11px; border: 1px solid var(--border); background: #0c131e; color: var(--cyan); }
+  .settings-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
+  .setting-item { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12px; background: #0c121c; border: 1px solid #1b2638; border-radius: 7px; padding: 5px 8px; }
+  pre#log {
+    margin: 0; max-height: 150px; overflow: auto; background: #06090f; border-radius: 6px;
+    padding: 8px; font: 11px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace; color: #9cb0c9;
+  }
+</style>
+</head>
+<body>
+  <h1>idrive7-cluster-metrics · Instrument Cluster &amp; HUD Bench Simulator</h1>
+  <div class="sub">Photo-exact 1920&times;720 G30 530e Live Cockpit Professional &amp; 800&times;480 HUD compositor bench (assumes iDrive <em>Displays &rarr; Instrument panel &rarr; Second speed = Off</em>).</div>
+
+  <div class="toolbar">
+    <label><input type="checkbox" id="carView" checked> Car View (Real 530e Cluster + HUD)</label>
+    <label>Cluster Scene:
+      <select id="clusterStyle">
+        <option value="media" selected>530e Driving + Full Album Art</option>
+        <option value="edrive">530e Driving + eDrive Widget</option>
+        <option value="autohold">530e Metric + G-Meter + AUTO H</option>
+        <option value="telltales">530e Startup + All Warning Telltales</option>
+      </select>
+    </label>
+    <label>Map Source:
+      <select id="mapSource">
+        <option value="bmw" selected>BMW Built-in Map</option>
+        <option value="carplay">CarPlay / AA (waze-on-cluster)</option>
+      </select>
+    </label>
+    <label title="Preview overlap if BMW's optional secondary km/h box is left enabled"><input type="checkbox" id="bmwSecondSpeed"> BMW Second Speed (km/h)</label>
+    <label><input type="checkbox" id="showGuides"> Keep-out &amp; Layer Guides</label>
+    <span class="pill" id="statPill">connecting...</span>
+  </div>
+
+  <div class="presets" id="presets"></div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="card-hd">
+        <strong>Instrument Cluster (1920 &times; 720)</strong>
+        <span id="panelMeta">—</span>
+      </div>
+      <div class="canvas-wrap">
+        <canvas id="panel" width="1920" height="720"></canvas>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <div class="card-hd">
+          <strong>Windshield HUD (800 &times; 480)</strong>
+          <span id="hudMeta">—</span>
+        </div>
+        <div class="canvas-wrap">
+          <canvas id="hud" width="800" height="480"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd">
+          <strong>Manual Signal Bench</strong>
+          <span id="telemSummary">demo loop</span>
+        </div>
+        <div class="controls-grid" id="manualControls"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hd">
+        <strong>Live App Settings (iDrive UI Schema)</strong>
+        <span>instant IPC push</span>
+      </div>
+      <div class="settings-grid" id="settingsBox"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-hd">
+        <strong>App Status &amp; Scene Layers</strong>
+        <span id="sceneMeta">—</span>
+      </div>
+      <pre id="log"></pre>
+    </div>
+  </div>
+
+<script>
+'use strict';
+
+const panelCv = document.getElementById('panel');
+const panelCtx = panelCv.getContext('2d');
+const hudCv = document.getElementById('hud');
+const hudCtx = hudCv.getContext('2d');
+
+let carView = true;
+let showGuides = false;
+let clusterStyle = 'media';
+let mapSource = 'bmw';
+let bmwSecondSpeed = false;
+let simMode = 'demo';
+let activePreset = 'demo';
+let geometry = {};
+let layers = new Map();       // key -> meta
+let layerCanvases = new Map(); // key -> HTMLCanvasElement (offscreen RGBA image)
+let latestSettings = null;
+let telemetry = {
+  speedKmh: 108, rpm: 0, gear: 5, stage: 'D', program: 'D',
+  hvKw: 14.2, soc: 68, battTempC: 23.5, oilTempC: 48, coolantTempC: 73,
+  boostBar: 0, gLong: 0.02, pedalPct: 18, driverBraking: false, absActive: false,
+  frictionG: 0, pureRegen: false, erangeKm: 31, frangeKm: 410, ambientC: 21.5,
+  driveMode: 'comfort', isEv: true, tyreFlBar: 2.4,
+};
+
+let manualState = {
+  speed: 108, rpm: 0, gear: 5, program: 'D', hvKw: 14.2, soc: 68, battTemp: 23.5,
+  oil: 48, coolant: 73, boost: 0, gLong: 0.02, pedalPct: 18,
+  driverBraking: false, absActive: false, tyreFlBar: 2.4,
+};
+
+const PRESETS = [
+  { id: 'demo', label: 'Demo (48s Cycle)', mode: 'demo' },
+  { id: 'ev_sweet', label: 'EV Sweet-Spot (67 mph)', mode: 'manual', v: { speed: 108, rpm: 0, gear: 5, program: 'D', hvKw: 14.2, soc: 68, battTemp: 23.5, oil: 48, coolant: 73, boost: 0, gLong: 0.02, pedalPct: 18, driverBraking: false, absActive: false, tyreFlBar: 2.4 } },
+  { id: 'pure_regen', label: 'EV Pure Regen', mode: 'manual', v: { speed: 54, rpm: 0, gear: 4, program: 'D', hvKw: -26.0, soc: 69, battTemp: 24.0, oil: 48, coolant: 73, boost: 0, gLong: -0.11, pedalPct: 0, driverBraking: true, absActive: false, tyreFlBar: 2.4 } },
+  { id: 'blended_brake', label: 'Blended Friction Brake', mode: 'manual', v: { speed: 36, rpm: 0, gear: 3, program: 'D', hvKw: -22.0, soc: 69, battTemp: 24.5, oil: 48, coolant: 73, boost: 0, gLong: -0.34, pedalPct: 0, driverBraking: true, absActive: false, tyreFlBar: 2.4 } },
+  { id: 'hard_brake_abs', label: 'Hard Brake + ABS', mode: 'manual', v: { speed: 78, rpm: 0, gear: 5, program: 'D', hvKw: -18.0, soc: 65, battTemp: 25.0, oil: 52, coolant: 74, boost: 0, gLong: -0.58, pedalPct: 0, driverBraking: true, absActive: true, tyreFlBar: 2.4 } },
+  { id: 'cold_batt', label: 'Cold Batt (37°F)', mode: 'manual', v: { speed: 58, rpm: 0, gear: 4, program: 'D', hvKw: 18.0, soc: 52, battTemp: 3.0, oil: 36, coolant: 60, boost: 0, gLong: 0.02, pedalPct: 24, driverBraking: false, absActive: false, tyreFlBar: 2.4 } },
+  { id: 'hot_batt', label: 'Hot Batt (108°F)', mode: 'manual', v: { speed: 74, rpm: 0, gear: 5, program: 'D', hvKw: 16.5, soc: 44, battTemp: 42.0, oil: 65, coolant: 82, boost: 0, gLong: 0.02, pedalPct: 20, driverBraking: false, absActive: false, tyreFlBar: 2.4 } },
+  { id: 'cold_gas', label: 'Cold Gas (D6)', mode: 'manual', v: { speed: 98, rpm: 2350, gear: 6, program: 'D', hvKw: 2.1, soc: 14, battTemp: 24.0, oil: 48, coolant: 73, boost: 0.24, gLong: 0.04, pedalPct: 28, driverBraking: false, absActive: false, tyreFlBar: 2.4 } },
+  { id: 'warm_boost', label: 'Warm Gas + Boost (D5)', mode: 'manual', v: { speed: 104, rpm: 2950, gear: 5, program: 'D', hvKw: 4.5, soc: 18, battTemp: 25.0, oil: 94, coolant: 92, boost: 0.58, gLong: 0.22, pedalPct: 55, driverBraking: false, absActive: false, tyreFlBar: 2.4 } },
+  { id: 'sport_s4', label: 'Sport S4 (No Digit)', mode: 'manual', v: { speed: 82, rpm: 2650, gear: 4, program: 'S', hvKw: 3.0, soc: 20, battTemp: 26.0, oil: 96, coolant: 92, boost: 0.36, gLong: 0.08, pedalPct: 35, driverBraking: false, absActive: false, tyreFlBar: 2.4 } },
+  { id: 'low_tpms', label: 'Low FL Tire (28 psi)', mode: 'manual', v: { speed: 72, rpm: 0, gear: 5, program: 'D', hvKw: 14.0, soc: 62, battTemp: 23.0, oil: 48, coolant: 73, boost: 0, gLong: 0.02, pedalPct: 18, driverBraking: false, absActive: false, tyreFlBar: 1.93 } },
+];
+
+const SLIDERS = [
+  { key: 'speed', label: 'Speed (km/h)', min: 0, max: 180, step: 1 },
+  { key: 'rpm', label: 'ICE RPM', min: 0, max: 6800, step: 50 },
+  { key: 'gear', label: 'Gear (1-8)', min: 1, max: 8, step: 1 },
+  { key: 'hvKw', label: 'HV kW (-regen/+drv)', min: -50, max: 83, step: 0.5 },
+  { key: 'soc', label: 'HV SoC %', min: 0, max: 100, step: 1 },
+  { key: 'battTemp', label: 'Batt Temp (°C)', min: -5, max: 50, step: 0.5 },
+  { key: 'oil', label: 'Oil Temp (°C)', min: 20, max: 135, step: 1 },
+  { key: 'coolant', label: 'Coolant (°C)', min: 30, max: 120, step: 1 },
+  { key: 'boost', label: 'Boost (bar)', min: 0, max: 1.5, step: 0.02 },
+  { key: 'gLong', label: 'gLong (-brake/+acc)', min: -0.75, max: 0.5, step: 0.01 },
+  { key: 'pedalPct', label: 'Pedal (%)', min: 0, max: 100, step: 1 },
+  { key: 'tyreFlBar', label: 'FL Tire (bar)', min: 1.4, max: 3.0, step: 0.05 },
+];
+
+function buildUiControls() {
+  const pBox = document.getElementById('presets');
+  pBox.innerHTML = '';
+  PRESETS.forEach((p) => {
+    const b = document.createElement('button');
+    b.textContent = p.label;
+    b.dataset.id = p.id;
+    if (p.id === activePreset) b.className = 'active';
+    b.onclick = () => applyPreset(p);
+    pBox.appendChild(b);
+  });
+
+  const mBox = document.getElementById('manualControls');
+  mBox.innerHTML = '';
+  SLIDERS.forEach((s) => {
+    const d = document.createElement('div');
+    d.className = 'ctrl';
+    d.innerHTML = '<span>' + s.label + ': <strong id="val_' + s.key + '">' + manualState[s.key] + '</strong></span>' +
+      '<input type="range" id="rng_' + s.key + '" min="' + s.min + '" max="' + s.max + '" step="' + s.step + '" value="' + manualState[s.key] + '">';
+    d.querySelector('input').oninput = (ev) => {
+      manualState[s.key] = Number(ev.target.value);
+      document.getElementById('val_' + s.key).textContent = manualState[s.key];
+      activePreset = 'custom';
+      syncPresetButtons();
+      pushManual();
+    };
+    mBox.appendChild(d);
+  });
+
+  const progDiv = document.createElement('div');
+  progDiv.className = 'ctrl';
+  progDiv.innerHTML = '<span>Shifter</span><select id="sel_program"><option value="D">D</option><option value="S">S</option><option value="M">M</option></select>';
+  progDiv.querySelector('select').onchange = (ev) => {
+    manualState.program = ev.target.value;
+    pushManual();
+  };
+  mBox.appendChild(progDiv);
+
+  const brDiv = document.createElement('div');
+  brDiv.className = 'ctrl';
+  brDiv.innerHTML = '<label><input type="checkbox" id="chk_driverBraking"> Driver Braking</label>' +
+    '<label><input type="checkbox" id="chk_absActive"> ABS Active</label>';
+  brDiv.querySelector('#chk_driverBraking').onchange = (ev) => { manualState.driverBraking = ev.target.checked; pushManual(); };
+  brDiv.querySelector('#chk_absActive').onchange = (ev) => { manualState.absActive = ev.target.checked; pushManual(); };
+  mBox.appendChild(brDiv);
+}
+
+function syncPresetButtons() {
+  document.querySelectorAll('#presets button').forEach((b) => {
+    b.className = b.dataset.id === activePreset ? 'active' : '';
+  });
+}
+
+function syncSliders() {
+  SLIDERS.forEach((s) => {
+    const r = document.getElementById('rng_' + s.key);
+    const v = document.getElementById('val_' + s.key);
+    if (r) r.value = manualState[s.key];
+    if (v) v.textContent = manualState[s.key];
+  });
+  const sel = document.getElementById('sel_program');
+  if (sel) sel.value = manualState.program;
+  const br = document.getElementById('chk_driverBraking');
+  if (br) br.checked = Boolean(manualState.driverBraking);
+  const ab = document.getElementById('chk_absActive');
+  if (ab) ab.checked = Boolean(manualState.absActive);
+}
+
+function applyPreset(p) {
+  activePreset = p.id;
+  simMode = p.mode;
+  syncPresetButtons();
+  if (p.mode === 'demo') {
+    fetch('/signals', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ mode: 'demo' }) });
+    return;
+  }
+  manualState = Object.assign({}, manualState, p.v);
+  syncSliders();
+  pushManual();
+}
+
+function pushManual() {
+  simMode = 'manual';
+  fetch('/signals', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ mode: 'manual', values: manualState }),
+  });
+}
+
+function renderSettingsUi(msg) {
+  latestSettings = msg;
+  const box = document.getElementById('settingsBox');
+  box.innerHTML = '';
+  (msg.schema || []).forEach((item) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'setting-item';
+    const lbl = document.createElement('span');
+    lbl.textContent = item.label || item.key;
+    wrap.appendChild(lbl);
+    const cur = msg.values ? msg.values[item.key] : item.default;
+    if (item.type === 'bool') {
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.checked = Boolean(cur);
+      cb.onchange = () => fetch('/setting', { method: 'POST', body: JSON.stringify({ key: item.key, value: cb.checked }) });
+      wrap.appendChild(cb);
+    } else {
+      const sel = document.createElement('select');
+      const opts = item.type === 'choice' ? item.options : (item.steps || []).map((v) => [v, String(v) + (item.unit ? ' ' + item.unit : '')]);
+      opts.forEach(([val, text]) => {
+        const o = document.createElement('option');
+        o.value = JSON.stringify(val);
+        o.textContent = text;
+        if (val === cur) o.selected = true;
+        sel.appendChild(o);
+      });
+      sel.onchange = () => {
+        const parsed = JSON.parse(sel.value);
+        fetch('/setting', { method: 'POST', body: JSON.stringify({ key: item.key, value: parsed }) });
+      };
+      wrap.appendChild(sel);
+    }
+    box.appendChild(wrap);
+  });
+}
+
+function appendLog(line) {
+  const pre = document.getElementById('log');
+  pre.textContent = line + '\n' + pre.textContent.slice(0, 4000);
+}
+
+// --- Photo-Exact BMW G30 530e Live Cockpit Professional (1920x720) & HUD (800x480) ---
+const SCENE_ASSETS = {
+  media: '/assets/cluster_530e_media.jpg',
+  edrive: '/assets/cluster_530e_edrive.jpg',
+  autohold: '/assets/cluster_530e_autohold.jpg',
+  telltales: '/assets/cluster_530e_telltales.jpg',
+};
+const sceneImages = {};
+Object.keys(SCENE_ASSETS).forEach((key) => {
+  const img = new Image();
+  img.onload = () => renderPanel();
+  img.src = SCENE_ASSETS[key];
+  sceneImages[key] = img;
+});
+
+function unitSettings() {
+  const vals = (latestSettings && latestSettings.values) || {};
+  const sys = vals.unitSystem || 'auto';
+  const mph = vals.distUnit === 'km' ? false : (vals.distUnit === 'mi' ? true : (sys !== 'metric'));
+  const cels = vals.tempUnit === 'C' ? true : (vals.tempUnit === 'F' ? false : (sys === 'metric' || sys === 'uk'));
+  return { mph, cels };
+}
+
+function drawWazeOnClusterMap(ctx) {
+  // CarPlay / Android Auto map window (waze-on-cluster: Waze, Google Maps, Apple Maps) inside [660..1195, 124..582]
+  ctx.save();
+  ctx.beginPath();
+  ctx.roundRect(664, 126, 528, 452, 22);
+  ctx.clip();
+
+  const mapGrad = ctx.createLinearGradient(664, 126, 664, 578);
+  mapGrad.addColorStop(0, '#0c1624');
+  mapGrad.addColorStop(0.6, '#101d30');
+  mapGrad.addColorStop(1, '#09111c');
+  ctx.fillStyle = mapGrad;
+  ctx.fillRect(664, 126, 528, 452);
+
+  // Subtle city/arterial road network
+  ctx.strokeStyle = 'rgba(115, 148, 190, 0.20)';
+  ctx.lineWidth = 4;
+  [[680, 250, 1180, 225], [670, 368, 1185, 392], [685, 488, 1175, 462], [790, 130, 745, 575], [1065, 130, 1110, 575]].forEach(([x0, y0, x1, y1]) => {
+    ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+  });
+
+  // Highlighted CarPlay / AA active navigation route
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = 'rgba(30, 100, 220, 0.45)';
+  ctx.lineWidth = 22;
+  ctx.beginPath();
+  ctx.moveTo(918, 566); ctx.quadraticCurveTo(926, 390, 956, 260); ctx.lineTo(1038, 152);
+  ctx.stroke();
+
+  ctx.strokeStyle = '#38bdf8';
+  ctx.lineWidth = 11;
+  ctx.beginPath();
+  ctx.moveTo(918, 566); ctx.quadraticCurveTo(926, 390, 956, 260); ctx.lineTo(1038, 152);
+  ctx.stroke();
+
+  // Navigation puck
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath(); ctx.arc(925, 470, 16, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#0284c7';
+  ctx.beginPath();
+  ctx.moveTo(925, 457); ctx.lineTo(935, 479); ctx.lineTo(925, 474); ctx.lineTo(915, 479);
+  ctx.closePath(); ctx.fill();
+
+  // Compact turn pill at top of CarPlay / AA map
+  ctx.fillStyle = 'rgba(13, 25, 42, 0.90)';
+  ctx.strokeStyle = 'rgba(90, 155, 225, 0.35)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.roundRect(760, 144, 336, 44, 12); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = '#38bdf8';
+  ctx.font = '700 16px -apple-system, BlinkMacSystemFont, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('0.4 mi', 778, 172);
+  ctx.fillStyle = '#eaf2fc';
+  ctx.font = '600 16px -apple-system, BlinkMacSystemFont, sans-serif';
+  ctx.fillText('Keep right onto I-280 N', 842, 172);
+
+  // Feather outer border into cluster glass so left speed & right album art stay untouched
+  const edgeL = ctx.createLinearGradient(664, 0, 704, 0);
+  edgeL.addColorStop(0, 'rgba(11, 16, 24, 0.92)');
+  edgeL.addColorStop(1, 'rgba(11, 16, 24, 0)');
+  ctx.fillStyle = edgeL; ctx.fillRect(664, 126, 40, 452);
+
+  const edgeR = ctx.createLinearGradient(1152, 0, 1192, 0);
+  edgeR.addColorStop(0, 'rgba(11, 16, 24, 0)');
+  edgeR.addColorStop(1, 'rgba(11, 16, 24, 0.92)');
+  ctx.fillStyle = edgeR; ctx.fillRect(1152, 126, 40, 452);
+  ctx.restore();
+}
+
+function drawDynamicPhotoPatches(ctx) {
+  const { mph } = unitSettings();
+  const spdMph = Math.max(0, (telemetry.speedKmh || 0) * 0.621371);
+  const dispSpd = Math.round(mph ? spdMph : (telemetry.speedKmh || 0));
+
+  // On driving plates ('media' & 'edrive'), photo natively displays '67 mph' and 'ELECTRIC  D'.
+  // Patch cleanly when user tests other speeds, metric km/h, Gas/Sport modes, or S/M/P/R/N selector!
+  if (clusterStyle === 'media' || clusterStyle === 'edrive') {
+    if (!mph || dispSpd !== 67) {
+      const g = ctx.createLinearGradient(458, 344, 642, 424);
+      g.addColorStop(0, '#171d27');
+      g.addColorStop(1, '#121720');
+      ctx.save();
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.roundRect(458, 344, 184, 80, 8); ctx.fill();
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#f3f6fb';
+      ctx.font = '700 62px -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif';
+      ctx.fillText(String(dispSpd), 556, 412);
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#d4deec';
+      ctx.font = '600 22px -apple-system, BlinkMacSystemFont, sans-serif';
+      ctx.fillText(mph ? 'mph' : 'km/h', 564, 412);
+      ctx.restore();
+    }
+
+    const needSelectorPatch = !telemetry.isEv || telemetry.program === 'S' || telemetry.program === 'M' || (telemetry.stage && telemetry.stage !== 'D');
+    if (needSelectorPatch) {
+      ctx.save();
+      ctx.fillStyle = '#0c1017';
+      ctx.fillRect(1234, 656, 198, 56);
+      ctx.textAlign = 'right';
+      const modeName = telemetry.program === 'S' || telemetry.driveMode === 'sport'
+        ? 'SPORT'
+        : (telemetry.isEv ? 'ELECTRIC' : 'HYBRID');
+      ctx.fillStyle = modeName === 'SPORT' ? '#f87171' : (modeName === 'ELECTRIC' ? '#38bdf8' : '#a9bdd6');
+      ctx.font = '700 22px -apple-system, BlinkMacSystemFont, sans-serif';
+      ctx.fillText(modeName, 1384, 699);
+
+      const stockSel = (telemetry.program === 'S' || telemetry.program === 'M')
+        ? (telemetry.program + String(Math.round(telemetry.gear || 1)))
+        : (telemetry.stage || 'D');
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#f2f5fa';
+      ctx.font = '700 40px -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif';
+      ctx.fillText(stockSel, 1402, 696);
+      ctx.restore();
+    }
+  } else if (clusterStyle === 'telltales' && (telemetry.stage || 'D') !== 'P') {
+    const stockSel = (telemetry.program === 'S' || telemetry.program === 'M')
+      ? (telemetry.program + String(Math.round(telemetry.gear || 1)))
+      : (telemetry.stage || 'D');
+    ctx.save();
+    ctx.fillStyle = '#0c1017';
+    ctx.fillRect(1386, 658, 46, 54);
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#f2f5fa';
+    ctx.font = '700 40px -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif';
+    ctx.fillText(stockSel, 1402, 696);
+    ctx.restore();
+  }
+
+  // Optional stock BMW secondary speed box (when user turns ON "BMW Second Speed (km/h)" to test overlap)
+  if (bmwSecondSpeed && clusterStyle !== 'autohold') {
+    const secVal = mph ? Math.round(telemetry.speedKmh || 0) : Math.round(spdMph);
+    const secUnit = mph ? 'km/h' : 'mph';
+    ctx.save();
+    ctx.textAlign = 'right';
+    ctx.fillStyle = 'rgba(218, 228, 240, 0.90)';
+    ctx.font = '600 38px -apple-system, BlinkMacSystemFont, sans-serif';
+    ctx.fillText(String(secVal), 548, 480);
+    ctx.textAlign = 'left';
+    ctx.font = '600 20px -apple-system, BlinkMacSystemFont, sans-serif';
+    ctx.fillText(secUnit, 556, 480);
+    ctx.restore();
+  }
+}
+
+function drawSyntheticClusterFallback(ctx) {
+  // Vector G30 530e Live Cockpit Professional fallback when local bench/assets/*.jpg are absent
+  const bg = ctx.createLinearGradient(0, 0, 0, 720);
+  bg.addColorStop(0, '#0a0f18');
+  bg.addColorStop(0.55, '#111826');
+  bg.addColorStop(1, '#090d14');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, 1920, 720);
+
+  // Left & right angular BMW Live Cockpit boomerangs
+  ctx.save();
+  ctx.strokeStyle = 'rgba(205, 220, 242, 0.85)';
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.moveTo(695, 58); ctx.lineTo(395, 92); ctx.lineTo(222, 232); ctx.lineTo(188, 375); ctx.lineTo(298, 560); ctx.lineTo(445, 646); ctx.lineTo(745, 646);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(1225, 58); ctx.lineTo(1525, 92); ctx.lineTo(1698, 232); ctx.lineTo(1732, 375); ctx.lineTo(1622, 560); ctx.lineTo(1475, 646); ctx.lineTo(1175, 646);
+  ctx.stroke();
+
+  // Lower-left Fuel & lower-right SoC sub-gauge arcs
+  ctx.strokeStyle = 'rgba(148, 168, 196, 0.55)';
+  ctx.lineWidth = 4;
+  ctx.beginPath(); ctx.moveTo(150, 445); ctx.lineTo(106, 540); ctx.lineTo(176, 636); ctx.lineTo(270, 642); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(1770, 445); ctx.lineTo(1814, 540); ctx.lineTo(1744, 636); ctx.lineTo(1650, 642); ctx.stroke();
+
+  // Stock speed ("67 mph", patched dynamically when speed != 67 or metric)
+  ctx.textAlign = 'right';
+  ctx.fillStyle = '#f3f6fb';
+  ctx.font = '700 62px -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif';
+  ctx.fillText('67', 556, 412);
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#d4deec';
+  ctx.font = '600 22px -apple-system, BlinkMacSystemFont, sans-serif';
+  ctx.fillText('mph', 564, 412);
+  ctx.strokeStyle = 'rgba(210, 224, 244, 0.55)';
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(418, 424); ctx.lineTo(664, 424); ctx.stroke();
+
+  // Right-side album artwork preview when 'media' selected
+  if (clusterStyle === 'media') {
+    const artGlow = ctx.createRadialGradient(1425, 365, 24, 1425, 365, 235);
+    artGlow.addColorStop(0, 'rgba(168, 85, 247, 0.36)');
+    artGlow.addColorStop(1, 'rgba(15, 23, 42, 0)');
+    ctx.fillStyle = artGlow;
+    ctx.fillRect(1185, 160, 505, 430);
+    ctx.fillStyle = '#3b1d5e';
+    ctx.fillRect(1344, 232, 108, 108);
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#f2f5fa';
+    ctx.font = '700 21px -apple-system, BlinkMacSystemFont, sans-serif';
+    ctx.fillText('Media Artwork', 1398, 382);
+  }
+
+  // Power % label, bottom bar stock items (range, clock, ELECTRIC D, ambient, EV range)
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#b4c5dc';
+  ctx.font = '600 18px -apple-system, BlinkMacSystemFont, sans-serif';
+  ctx.fillText('Power %', 1468, 594);
+  ctx.fillStyle = '#e5edf8';
+  ctx.font = '600 26px -apple-system, BlinkMacSystemFont, sans-serif';
+  ctx.fillText('312 mi', 156, 699);
+  ctx.fillText('12:00', 344, 699);
+  ctx.textAlign = 'right';
+  ctx.fillStyle = '#38bdf8';
+  ctx.font = '700 22px -apple-system, BlinkMacSystemFont, sans-serif';
+  ctx.fillText('ELECTRIC', 1384, 696);
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#f2f5fa';
+  ctx.font = '700 40px -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif';
+  ctx.fillText('D', 1402, 696);
+  ctx.fillStyle = '#e5edf8';
+  ctx.font = '600 26px -apple-system, BlinkMacSystemFont, sans-serif';
+  ctx.fillText('+68.0 °F', 1546, 696);
+  ctx.fillText('21 mi', 1732, 696);
+  ctx.restore();
+}
+
+function drawStockClusterBg(ctx) {
+  const img = sceneImages[clusterStyle] || sceneImages.media;
+  if (img && img.complete && img.naturalWidth > 0) {
+    ctx.drawImage(img, 0, 0, 1920, 720);
+  } else {
+    drawSyntheticClusterFallback(ctx);
+  }
+  if (mapSource === 'carplay') {
+    drawWazeOnClusterMap(ctx);
+  }
+  drawDynamicPhotoPatches(ctx);
+}
+
+function drawGuides(ctx, targetName) {
+  ctx.save();
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([5, 4]);
+  const g = geometry || {};
+
+  if (targetName === 'panel' && Array.isArray(g.HOOD) && g.HOOD.length > 1) {
+    ctx.strokeStyle = '#f87171';
+    ctx.beginPath();
+    ctx.moveTo(g.HOOD[0][0], g.HOOD[0][1]);
+    for (let i = 1; i < g.HOOD.length; i++) ctx.lineTo(g.HOOD[i][0], g.HOOD[i][1]);
+    ctx.stroke();
+    ctx.font = '12px monospace';
+    ctx.fillStyle = '#f87171';
+    ctx.fillText('HOOD_BEZEL', 890, 18);
+  }
+
+  const winBox = g.HUD_WINDOW ? [g.HUD_WINDOW.x, g.HUD_WINDOW.y, g.HUD_WINDOW.x + g.HUD_WINDOW.w, g.HUD_WINDOW.y + g.HUD_WINDOW.h] : null;
+  const boxes = targetName === 'panel'
+    ? [
+        ['LANE_CENTER', g.LANE_CENTERING, '#fbbf24'],
+        ['BRAKE_ABS_DSC', g.BRAKE_ABS_DSC, '#fbbf24'],
+        ['AUTO_HOLD_PARK', g.AUTO_HOLD_PARK, '#fbbf24'],
+        ['STEERING_FAULT', g.STEERING_FAULT, '#fbbf24'],
+        ['MID_RIGHT', g.MIDDLE_RIGHT_ICONS, '#fbbf24'],
+        ['NEEDLE_FAN', g.SPEED_NEEDLE_FAN, '#f87171'],
+        ['MAIN_SPEED', g.MAIN_SPEED_DIGITS, '#94a3b8'],
+        ['TRAFFIC_SIGN', g.TRAFFIC_LIGHT_SIGN, '#fbbf24'],
+        ['CENTER_MAP', g.CENTER_MAP, '#60a5fa'],
+        ['MEDIA_ART', g.MEDIA_WIDGET, '#a78bfa'],
+        ['WARN_TRI', g.MASTER_WARN_TRIANGLE, '#fbbf24'],
+        ['POWER_%', g.POWER_PCT_LABEL, '#34d399'],
+        ['FUEL_GAUGE', g.FUEL_GAUGE_LOWER_LEFT, '#94a3b8'],
+        ['REAR_BELTS', g.REAR_BELTS_AIRBAG, '#fbbf24'],
+        ['GEAR_WIN', g.GEAR_WIN || g.STOCK_D_INDICATOR, '#f87171'],
+        ['AMBIENT', g.AMBIENT_TEMP, '#34d399'],
+        ['SOC_GAUGE', g.SOC_GAUGE_LOWER_RIGHT, '#94a3b8'],
+        ['EV_RANGE', g.EV_RANGE, '#34d399'],
+      ]
+    : [
+        ['HUD_WINDOW', winBox, '#60a5fa'],
+        ['STOCK_SPD', g.HUD_STOCK_SPEED, '#34d399'],
+        ['STOCK_NAV', g.HUD_STOCK_NAV, '#a78bfa'],
+      ];
+  ctx.font = '11px monospace';
+  boxes.forEach(([name, b, col]) => {
+    if (!b || b.length < 4) return;
+    ctx.strokeStyle = col;
+    ctx.strokeRect(b[0], b[1], b[2] - b[0], b[3] - b[1]);
+    ctx.fillStyle = col;
+    ctx.fillText(name, b[0] + 4, b[1] + 13);
+  });
+
+  // Active ClusterRender overlay layers outline
+  ctx.setLineDash([3, 2]);
+  ctx.lineWidth = 2;
+  layers.forEach((l) => {
+    if (!l.visible || l.target !== targetName) return;
+    ctx.strokeStyle = '#38c7ff';
+    ctx.strokeRect(l.x, l.y, l.w, l.h);
+    ctx.fillStyle = '#38c7ff';
+    ctx.fillText('L:' + l.ref + ' (' + l.x + ',' + l.y + ' ' + l.w + 'x' + l.h + ')', l.x + 2, Math.max(12, l.y - 4));
+  });
+  ctx.restore();
+}
+
+function renderPanel() {
+  const ctx = panelCtx;
+  ctx.clearRect(0, 0, 1920, 720);
+  if (carView) {
+    drawStockClusterBg(ctx);
+  } else {
+    ctx.fillStyle = '#04070c';
+    ctx.fillRect(0, 0, 1920, 720);
+  }
+
+  // Composite uploaded overlay layers in z-order directly over the 1920x720 cluster
+  const list = Array.from(layers.values()).filter((l) => l.target === 'panel' && l.visible)
+    .sort((a, b) => (a.z - b.z) || (a.ref - b.ref));
+  list.forEach((l) => {
+    const img = layerCanvases.get(l.key);
+    if (img) ctx.drawImage(img, 0, 0, l.iw, l.ih, l.x, l.y, l.w, l.h);
+  });
+
+  if (showGuides) drawGuides(ctx, 'panel');
+  document.getElementById('panelMeta').textContent = list.length + ' layers visible · ' + clusterStyle;
+}
+
+function drawHudBg(ctx) {
+  const W = 800, H = 480;
+  // Dusk road & windshield scene
+  const sky = ctx.createLinearGradient(0, 0, 0, H);
+  sky.addColorStop(0, '#0c1626');
+  sky.addColorStop(0.45, '#192638');
+  sky.addColorStop(0.5, '#141920');
+  sky.addColorStop(1, '#080b0f');
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, W, H);
+
+  // Perspective lanes
+  ctx.strokeStyle = 'rgba(200, 215, 235, 0.24)';
+  ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(400, 235); ctx.lineTo(130, 480); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(400, 235); ctx.lineTo(670, 480); ctx.stroke();
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+  ctx.setLineDash([14, 18]);
+  ctx.beginPath(); ctx.moveTo(400, 235); ctx.lineTo(400, 480); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Subtle HUD optical combiner aperture matching visible.HUD_WINDOW (120, 100, 485x278)
+  ctx.strokeStyle = 'rgba(90, 150, 210, 0.18)';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(120, 100, 560, 280);
+
+  // Stock BMW HUD Speed Limit + Speed in lower-left (matching HUD_STOCK_SPEED = [135, 308, 395, 378])
+  const { mph } = unitSettings();
+  const dispSpd = Math.round(mph ? (telemetry.speedKmh || 0) * 0.621371 : (telemetry.speedKmh || 0));
+
+  ctx.beginPath(); ctx.arc(172, 344, 21, 0, Math.PI * 2);
+  ctx.fillStyle = '#f3f6fa'; ctx.fill();
+  ctx.lineWidth = 4; ctx.strokeStyle = '#dc2626'; ctx.stroke();
+  ctx.fillStyle = '#0f141c'; ctx.textAlign = 'center';
+  ctx.font = '700 17px -apple-system, sans-serif';
+  ctx.fillText('65', 172, 350);
+
+  ctx.fillStyle = 'rgba(255, 146, 68, 0.95)';
+  ctx.textAlign = 'right';
+  ctx.font = '700 54px -apple-system, BlinkMacSystemFont, sans-serif';
+  ctx.fillText(String(dispSpd), 308, 362);
+  ctx.textAlign = 'left';
+  ctx.fillStyle = 'rgba(225, 195, 165, 0.88)';
+  ctx.font = '600 18px -apple-system, sans-serif';
+  ctx.fillText(mph ? 'mph' : 'km/h', 316, 362);
+
+  // Stock BMW HUD Navigation on Right (matching HUD_STOCK_NAV = [405, 115, 680, 378])
+  ctx.strokeStyle = '#38bdf8';
+  ctx.lineWidth = 6;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.beginPath();
+  ctx.moveTo(458, 252); ctx.lineTo(458, 178); ctx.lineTo(506, 178);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(492, 164); ctx.lineTo(510, 178); ctx.lineTo(492, 192);
+  ctx.stroke();
+  ctx.fillStyle = 'rgba(240, 247, 255, 0.92)';
+  ctx.textAlign = 'left';
+  ctx.font = '700 22px -apple-system, sans-serif';
+  ctx.fillText('0.3 mi', 528, 186);
+  ctx.fillStyle = 'rgba(186, 208, 232, 0.85)';
+  ctx.font = '500 17px -apple-system, sans-serif';
+  ctx.fillText('Oak Creek Rd', 528, 214);
+}
+
+function renderHud() {
+  const ctx = hudCtx;
+  ctx.clearRect(0, 0, 800, 480);
+  if (carView) drawHudBg(ctx);
+  else { ctx.fillStyle = '#04070c'; ctx.fillRect(0, 0, 800, 480); }
+
+  const list = Array.from(layers.values()).filter((l) => l.target === 'hud' && l.visible)
+    .sort((a, b) => (a.z - b.z) || (a.ref - b.ref));
+  list.forEach((l) => {
+    const img = layerCanvases.get(l.key);
+    if (img) ctx.drawImage(img, 0, 0, l.iw, l.ih, l.x, l.y, l.w, l.h);
+  });
+  if (showGuides) drawGuides(ctx, 'hud');
+  document.getElementById('hudMeta').textContent = list.length + ' layers visible';
+}
+
+function renderAll() {
+  renderPanel();
+  renderHud();
+}
+
+async function fetchPxPatch(m) {
+  const url = '/px?key=' + encodeURIComponent(m.key) + '&x=' + m.x + '&y=' + m.y + '&w=' + m.w + '&h=' + m.h;
+  const res = await fetch(url);
+  if (!res.ok) return;
+  const buf = new Uint8Array(await res.arrayBuffer());
+  let cv = layerCanvases.get(m.key);
+  if (!cv || cv.width !== m.iw || cv.height !== m.ih) {
+    cv = document.createElement('canvas');
+    cv.width = m.iw;
+    cv.height = m.ih;
+    layerCanvases.set(m.key, cv);
+  }
+  const cctx = cv.getContext('2d');
+  const imgData = new ImageData(new Uint8ClampedArray(buf), m.w, m.h);
+  cctx.putImageData(imgData, m.x, m.y);
+  renderAll();
+}
+
+document.getElementById('carView').onchange = (ev) => { carView = ev.target.checked; renderAll(); };
+document.getElementById('showGuides').onchange = (ev) => { showGuides = ev.target.checked; renderAll(); };
+document.getElementById('clusterStyle').onchange = (ev) => { clusterStyle = ev.target.value; renderAll(); };
+document.getElementById('mapSource').onchange = (ev) => { mapSource = ev.target.value; renderAll(); };
+document.getElementById('bmwSecondSpeed').onchange = (ev) => { bmwSecondSpeed = ev.target.checked; renderAll(); };
+
+buildUiControls();
+
+const es = new EventSource('/events');
+es.onmessage = (ev) => {
+  const m = JSON.parse(ev.data);
+  if (m.t === 'hello') {
+    geometry = m.geometry || {};
+    const tStr = m.targets && typeof m.targets === 'object' ? Object.keys(m.targets).join(' ') : String(m.targets || '');
+    document.getElementById('statPill').textContent = 'connected · ' + tStr;
+    renderAll();
+  } else if (m.t === 'scene') {
+    const next = new Map();
+    (m.layers || []).forEach((l) => next.set(l.key, l));
+    layers = next;
+    document.getElementById('sceneMeta').textContent = m.layers.length + ' layers · ' + Math.round((m.pixels || 0) / 1024) + ' KiB';
+    renderAll();
+  } else if (m.t === 'px') {
+    fetchPxPatch(m);
+  } else if (m.t === 'settings') {
+    renderSettingsUi(m);
+    renderAll();
+  } else if (m.t === 'status') {
+    appendLog('[STATUS] ' + m.s);
+  } else if (m.t === 'telemetry') {
+    telemetry = Object.assign(telemetry, m.v || {});
+    const fg = telemetry.frictionG > 0 ? telemetry.frictionG.toFixed(2) + 'g brake' : (telemetry.pureRegen ? 'pure regen' : 'coast/drv');
+    document.getElementById('telemSummary').textContent =
+      (telemetry.isEv ? 'EV' : 'ICE') + ' · ' + Math.round(telemetry.speedKmh || 0) + 'km/h · ' +
+      (telemetry.program || 'D') + (telemetry.gear || '') + ' · ' + fg;
+    renderAll();
+  }
+};
+es.onerror = () => { document.getElementById('statPill').textContent = 'reconnecting...'; };
+</script>
+</body>
+</html>

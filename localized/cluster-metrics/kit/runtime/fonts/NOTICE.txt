@@ -1,0 +1,6 @@
+Font atlases retained unchanged from chyiz/idrive7-cluster-metrics b357d55af663970cb9e1270f28be2ec9f093744c.
+Atlas source metadata: Ubuntu[wdth,wght].ttf. Ubuntu font copyright: Canonical Ltd.
+Upstream NOTICE declares OFL-1.1 for the prebaked atlases; its notice and the OFL text are retained.
+Ubuntu Font Licence 1.0 is additionally included for the Ubuntu font source identified in the atlas metadata.
+No original font files are bundled. Internal atlas family labels are unchanged.
+UFL source: https://github.com/google/fonts/blob/main/ufl/ubuntu/UFL.txt

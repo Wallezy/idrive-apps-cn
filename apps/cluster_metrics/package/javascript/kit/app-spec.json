@@ -1,0 +1,835 @@
+{
+ "id": "cluster_metrics",
+ "title": "\u7ec4\u5408\u4eea\u8868\u6570\u636e",
+ "version": "0.5.1",
+ "screens": [
+  {
+   "name": "MAIN",
+   "kind": "menu",
+   "title": "\u7ec4\u5408\u4eea\u8868\u6570\u636e",
+   "settings": true,
+   "items": [
+    [
+     "tworow",
+     "STATUS_SUMMARY",
+     "\u7ec4\u5408\u4eea\u8868\u72b6\u6001"
+    ],
+    [
+     "button",
+     "BTN_DIAG",
+     "\u5b9e\u65f6\u6570\u636e\u4e0e\u8bca\u65ad"
+    ]
+   ]
+  },
+  {
+   "name": "DIAG",
+   "kind": "menu",
+   "title": "\u5b9e\u65f6\u6570\u636e\u4e0e\u8bca\u65ad",
+   "items": [
+    [
+     "button",
+     "BTN_READ_NOW",
+     "\u7acb\u5373\u8bfb\u53d6\u4f20\u611f\u5668"
+    ],
+    [
+     "button",
+     "BTN_PROBE_BRAKE",
+     "\u8bb0\u5f55 30 \u79d2\u5236\u52a8\u4e0e\u5bfc\u822a\u6570\u636e"
+    ],
+    [
+     "tworow",
+     "DIAG_RENDER",
+     "\u4eea\u8868\u4e0e\u62ac\u5934\u663e\u793a\u670d\u52a1"
+    ],
+    [
+     "tworow",
+     "DIAG_NAV",
+     "\u62ac\u5934\u5bfc\u822a\u4e0e\u8def\u53e3\u5730\u56fe"
+    ],
+    [
+     "tworow",
+     "DIAG_BRAKE_ECU",
+     "\u5236\u52a8\u6a21\u5757\uff08\u6db2\u538b\u4e0e\u80fd\u91cf\u56de\u6536\uff09"
+    ],
+    [
+     "tworow",
+     "DIAG_POWERTRAIN",
+     "\u52a8\u529b\u7cfb\u7edf\u4e0e\u5b9e\u65f6\u80fd\u8017"
+    ],
+    [
+     "tworow",
+     "DIAG_BATTERY",
+     "\u52a8\u529b\u7535\u6c60\uff08\u7535\u91cf\uff0f\u529f\u7387\uff0f\u6e29\u5ea6\uff09"
+    ],
+    [
+     "tworow",
+     "DIAG_TEMPS",
+     "\u53d1\u52a8\u673a\u4e0e\u53d8\u901f\u7bb1\u6e29\u5ea6"
+    ],
+    [
+     "tworow",
+     "DIAG_CHASSIS",
+     "\u6321\u4f4d\u4e0e\u673a\u68b0\u5236\u52a8"
+    ],
+    [
+     "tworow",
+     "DIAG_UDS",
+     "\u53ea\u8bfb\u8bca\u65ad\u4e0e\u8f85\u52a9\u6570\u636e"
+    ]
+   ]
+  }
+ ],
+ "settings": [
+  {
+   "key": "enabled",
+   "label": "\u5f00\u542f\u6570\u636e\u663e\u793a\uff08\u9996\u6b21\u4f7f\u7528\u8bf7\u624b\u52a8\u5f00\u542f\uff09",
+   "type": "bool",
+   "default": false
+  },
+  {
+   "key": "displayTarget",
+   "label": "\u663e\u793a\u4f4d\u7f6e",
+   "type": "choice",
+   "default": "both",
+   "options": [
+    [
+     "both",
+     "\u4eea\u8868\u4e0e\u62ac\u5934\u663e\u793a"
+    ],
+    [
+     "cluster",
+     "\u4ec5\u4eea\u8868"
+    ],
+    [
+     "hud",
+     "\u4ec5\u62ac\u5934\u663e\u793a"
+    ]
+   ]
+  },
+  {
+   "key": "clusterSlotMode",
+   "label": "\u4eea\u8868\u663e\u793a\u65b9\u5f0f",
+   "type": "choice",
+   "default": "auto",
+   "options": [
+    [
+     "auto",
+     "\u81ea\u52a8\uff08\u624b\u673a\u5730\u56fe\u4e0a\u53e0\u52a0\uff0f\u539f\u5382\u5730\u56fe\u65c1\u663e\u793a\uff09"
+    ],
+    [
+     "map_only",
+     "\u4ec5\u53e0\u52a0\u624b\u673a\u5730\u56fe\uff08\u4fdd\u7559\u53f3\u4fa7\u884c\u8f66\u4fe1\u606f\uff09"
+    ],
+    [
+     "panel_only",
+     "\u5b8c\u6574\u4eea\u8868\u533a\u57df\uff08\u53ef\u80fd\u9690\u85cf\u53f3\u4fa7\u884c\u8f66\u4fe1\u606f\uff09"
+    ]
+   ]
+  },
+  {
+   "key": "hudNavMode",
+   "label": "\u5bfc\u822a\u65f6\u7684\u62ac\u5934\u663e\u793a",
+   "type": "choice",
+   "default": "yield_route",
+   "reset": 2,
+   "options": [
+    [
+     "own_nav_minimap",
+     "\u663e\u793a\u5bfc\u822a\uff0c\u9047\u8def\u53e3\u5730\u56fe\u65f6\u8ba9\u4f4d"
+    ],
+    [
+     "own_nav_keep",
+     "\u6301\u7eed\u663e\u793a\u5e94\u7528\u5bfc\u822a\u4e0e\u6570\u636e"
+    ],
+    [
+     "yield_lanes",
+     "\u663e\u793a\u5bfc\u822a\uff0c\u9047\u8f66\u9053\u6216\u8def\u53e3\u5730\u56fe\u65f6\u8ba9\u4f4d"
+    ],
+    [
+     "yield_route",
+     "\u5bfc\u822a\u671f\u95f4\u9690\u85cf\u5e94\u7528\u62ac\u5934\u5185\u5bb9"
+    ]
+   ]
+  },
+  {
+   "key": "hudLine1",
+   "label": "\u62ac\u5934\u663e\u793a\u7b2c\u4e00\u884c",
+   "type": "choice",
+   "default": "efficiency",
+   "options": [
+    [
+     "efficiency",
+     "\u5b9e\u65f6\u80fd\u8017\uff08\u8ddf\u968f\u6240\u9009\u5355\u4f4d\uff09"
+    ],
+    [
+     "power_gear",
+     "\u529f\u7387\uff0f\u589e\u538b\u4e0e\u6321\u4f4d"
+    ],
+    [
+     "gear",
+     "\u5f53\u524d\u6321\u4f4d\uff08D1\u2013D8\uff09"
+    ],
+    [
+     "soc",
+     "\u52a8\u529b\u7535\u6c60\u7535\u91cf"
+    ],
+    [
+     "temps",
+     "\u673a\u6cb9\u4e0e\u51b7\u5374\u6db2\u6e29\u5ea6"
+    ],
+    [
+     "off",
+     "\u5173\u95ed"
+    ]
+   ]
+  },
+  {
+   "key": "hudLine2",
+   "label": "\u62ac\u5934\u663e\u793a\u7b2c\u4e8c\u884c",
+   "type": "choice",
+   "default": "power_gear",
+   "options": [
+    [
+     "power_gear",
+     "\u529f\u7387\uff0f\u589e\u538b\u4e0e\u6321\u4f4d"
+    ],
+    [
+     "power",
+     "\u4ec5\u529f\u7387\uff0f\u589e\u538b"
+    ],
+    [
+     "gear",
+     "\u5f53\u524d\u6321\u4f4d\uff08D1\u2013D8\uff09"
+    ],
+    [
+     "soc",
+     "\u52a8\u529b\u7535\u6c60\u7535\u91cf"
+    ],
+    [
+     "soc_oil",
+     "\u52a8\u529b\u7535\u6c60\u7535\u91cf\u4e0e\u6cb9\u6e29"
+    ],
+    [
+     "temps",
+     "\u673a\u6cb9\u4e0e\u51b7\u5374\u6db2\u6e29\u5ea6"
+    ],
+    [
+     "off",
+     "\u5173\u95ed"
+    ]
+   ]
+  },
+  {
+   "key": "hudLine3",
+   "label": "\u62ac\u5934\u663e\u793a\u7b2c\u4e09\u884c",
+   "type": "choice",
+   "default": "brake",
+   "options": [
+    [
+     "brake",
+     "\u673a\u68b0\u5236\u52a8\u5f3a\u5ea6\u6761"
+    ],
+    [
+     "soc",
+     "\u52a8\u529b\u7535\u6c60\u7535\u91cf"
+    ],
+    [
+     "temps",
+     "\u673a\u6cb9\u4e0e\u51b7\u5374\u6db2\u6e29\u5ea6"
+    ],
+    [
+     "soc_oil",
+     "\u52a8\u529b\u7535\u6c60\u7535\u91cf\u4e0e\u6cb9\u6e29"
+    ],
+    [
+     "gear",
+     "\u5f53\u524d\u6321\u4f4d\uff08D1\u2013D8\uff09"
+    ],
+    [
+     "off",
+     "\u5173\u95ed"
+    ]
+   ]
+  },
+  {
+   "key": "cornerRightDisplay",
+   "label": "\u53f3\u4e0b\u89d2\u6570\u636e",
+   "type": "choice",
+   "default": "auto",
+   "reset": 2,
+   "options": [
+    [
+     "auto",
+     "\u7535\u91cf\uff08\u71c3\u6cb9\u8f66\u663e\u793a\u8fdb\u6c14\u6e29\u5ea6\uff09"
+    ],
+    [
+     "soc",
+     "\u52a8\u529b\u7535\u6c60\u7535\u91cf"
+    ],
+    [
+     "batt",
+     "\u52a8\u529b\u7535\u6c60\u6e29\u5ea6"
+    ],
+    [
+     "gbx",
+     "\u53d8\u901f\u7bb1\u6cb9\u6e29"
+    ],
+    [
+     "v12",
+     "12V \u7535\u6c60\u7535\u538b"
+    ],
+    [
+     "iat",
+     "\u8fdb\u6c14\u6e29\u5ea6"
+    ],
+    [
+     "off",
+     "\u5173\u95ed"
+    ]
+   ]
+  },
+  {
+   "key": "cornerLeftDisplay",
+   "label": "\u5de6\u4e0b\u89d2\u6e29\u5ea6",
+   "type": "choice",
+   "default": "oil_cool",
+   "options": [
+    [
+     "oil_cool",
+     "\u673a\u6cb9\u4e0e\u51b7\u5374\u6db2\u6e29\u5ea6"
+    ],
+    [
+     "oil_gbx",
+     "\u673a\u6cb9\u4e0e\u53d8\u901f\u7bb1\u6cb9\u6e29"
+    ],
+    [
+     "off",
+     "\u5173\u95ed"
+    ]
+   ]
+  },
+  {
+   "key": "gearDisplay",
+   "label": "\u524d\u8fdb\u6321\u4f4d\uff081\u20138 \u6321\uff09",
+   "type": "choice",
+   "default": "next_to_d",
+   "options": [
+    [
+     "next_to_d",
+     "\u663e\u793a\u5728\u5e95\u90e8 D \u6321\u65c1"
+    ],
+    [
+     "below_speed",
+     "\u663e\u793a\u5728\u8f66\u901f\u4e0b\u65b9"
+    ],
+    [
+     "off",
+     "\u5173\u95ed"
+    ]
+   ]
+  },
+  {
+   "key": "brakeIndicator",
+   "label": "\u673a\u68b0\u5236\u52a8\u6307\u793a",
+   "type": "choice",
+   "default": "bar_num",
+   "options": [
+    [
+     "bar_num",
+     "\u5f3a\u5ea6\u6761\u4e0e\u538b\u529b\uff0f\u51cf\u901f\u5ea6"
+    ],
+    [
+     "bar_only",
+     "\u4ec5\u5f3a\u5ea6\u6761"
+    ],
+    [
+     "off",
+     "\u5173\u95ed"
+    ]
+   ]
+  },
+  {
+   "key": "smartAlerts",
+   "label": "\u5f02\u5e38\u63d0\u9192\uff08\u80ce\u538b\uff0f12V \u7535\u6c60\uff0f\u53d8\u901f\u7bb1\uff09",
+   "type": "bool",
+   "default": true
+  },
+  {
+   "key": "unitSystem",
+   "label": "\u5355\u4f4d\u5236",
+   "type": "choice",
+   "default": "auto",
+   "options": [
+    [
+     "auto",
+     "\u81ea\u52a8\u8ddf\u968f\u8f66\u8f86"
+    ],
+    [
+     "us",
+     "\u7f8e\u5236\uff08mph\uff0fMPG\uff0f\u00b0F\uff0fpsi\uff09"
+    ],
+    [
+     "metric",
+     "\u516c\u5236\uff08km/h\uff0fL/100km\uff0f\u00b0C\uff0fbar\uff09"
+    ],
+    [
+     "uk",
+     "\u82f1\u5236\uff08mph\uff0f\u82f1\u5236 MPG\uff0f\u00b0C\uff0fpsi\uff09"
+    ]
+   ]
+  },
+  {
+   "key": "tempUnit",
+   "label": "\u6e29\u5ea6\u5355\u4f4d",
+   "type": "choice",
+   "default": "auto",
+   "options": [
+    [
+     "auto",
+     "\u81ea\u52a8"
+    ],
+    [
+     "F",
+     "\u534e\u6c0f\u5ea6"
+    ],
+    [
+     "C",
+     "\u6444\u6c0f\u5ea6"
+    ]
+   ]
+  },
+  {
+   "key": "evEffUnit",
+   "label": "\u7535\u8017\u5355\u4f4d",
+   "type": "choice",
+   "default": "auto",
+   "options": [
+    [
+     "auto",
+     "\u81ea\u52a8"
+    ],
+    [
+     "mi_kwh",
+     "mi/kWh"
+    ],
+    [
+     "kwh_100km",
+     "kWh/100km"
+    ],
+    [
+     "wh_mi",
+     "Wh/mi"
+    ]
+   ]
+  },
+  {
+   "key": "fuelEffUnit",
+   "label": "\u6cb9\u8017\u5355\u4f4d",
+   "type": "choice",
+   "default": "auto",
+   "options": [
+    [
+     "auto",
+     "\u81ea\u52a8"
+    ],
+    [
+     "mpg_us",
+     "MPG\uff08\u7f8e\u5236\uff09"
+    ],
+    [
+     "mpg_uk",
+     "MPG\uff08\u82f1\u5236\uff09"
+    ],
+    [
+     "l_100km",
+     "L/100km"
+    ],
+    [
+     "km_l",
+     "km/L"
+    ]
+   ]
+  },
+  {
+   "key": "pressUnit",
+   "label": "\u589e\u538b\u4e0e\u538b\u529b\u5355\u4f4d",
+   "type": "choice",
+   "default": "auto",
+   "options": [
+    [
+     "auto",
+     "\u81ea\u52a8"
+    ],
+    [
+     "psi",
+     "psi"
+    ],
+    [
+     "bar",
+     "bar"
+    ]
+   ]
+  },
+  {
+   "key": "vehicle",
+   "label": "\u52a8\u529b\u7c7b\u578b",
+   "type": "choice",
+   "default": "auto",
+   "options": [
+    [
+     "auto",
+     "\u81ea\u52a8\u8bc6\u522b\u63d2\u6df7\uff0f\u71c3\u6cb9\u8f66"
+    ],
+    [
+     "phev",
+     "\u63d2\u7535\u6df7\u52a8\uff08530e\uff0f330e\uff0f45e\uff09"
+    ],
+    [
+     "ice",
+     "\u6c7d\u6cb9\uff0f\u67f4\u6cb9\u8f66"
+    ]
+   ]
+  },
+  {
+   "key": "coldOilC",
+   "label": "\u673a\u6cb9\u6696\u673a\u6e29\u5ea6",
+   "type": "number",
+   "unit": "degC",
+   "default": 75,
+   "steps": [
+    65,
+    70,
+    75,
+    80,
+    85
+   ]
+  },
+  {
+   "key": "hudNudgeX",
+   "label": "\u62ac\u5934\u663e\u793a\u6c34\u5e73\u504f\u79fb",
+   "type": "number",
+   "unit": "px",
+   "default": 0,
+   "steps": [
+    -40,
+    -30,
+    -20,
+    -10,
+    0,
+    10,
+    20,
+    30,
+    40
+   ]
+  },
+  {
+   "key": "hudNudgeY",
+   "label": "\u62ac\u5934\u663e\u793a\u5782\u76f4\u504f\u79fb",
+   "type": "number",
+   "unit": "px",
+   "default": 0,
+   "steps": [
+    -40,
+    -30,
+    -20,
+    -10,
+    0,
+    10,
+    20,
+    30,
+    40
+   ]
+  },
+  {
+   "key": "clusterNudgeX",
+   "label": "\u4eea\u8868\u6570\u636e\u6c34\u5e73\u504f\u79fb",
+   "type": "number",
+   "unit": "px",
+   "default": 0,
+   "steps": [
+    -12,
+    -8,
+    -4,
+    0,
+    4,
+    8,
+    12
+   ]
+  },
+  {
+   "key": "clusterNudgeY",
+   "label": "\u4eea\u8868\u6570\u636e\u5782\u76f4\u504f\u79fb",
+   "type": "number",
+   "unit": "px",
+   "default": 0,
+   "steps": [
+    -12,
+    -8,
+    -4,
+    0,
+    4,
+    8,
+    12
+   ]
+  },
+  {
+   "key": "demo",
+   "label": "\u6f14\u793a\u6570\u636e",
+   "type": "choice",
+   "default": "auto",
+   "options": [
+    [
+     "auto",
+     "\u79bb\u8f66\u65f6\u81ea\u52a8\u6f14\u793a"
+    ],
+    [
+     "phev",
+     "\u63d2\u6df7\u6f14\u793a\uff08530e\uff09"
+    ],
+    [
+     "ice",
+     "\u71c3\u6cb9\u8f66\u6f14\u793a\uff08B48\uff0fB58\uff09"
+    ],
+    [
+     "off",
+     "\u5173\u95ed"
+    ]
+   ]
+  }
+ ],
+ "config": {
+  "scaling": {
+   "rpm": {
+    "factor": 0.25,
+    "offset": 0,
+    "invalid": 65535
+   },
+   "speed": {
+    "factor": 0.015625,
+    "offset": 0,
+    "invalid": 65535
+   },
+   "accel": {
+    "factor": 0.002,
+    "offset": -65,
+    "invalid": 65535
+   },
+   "temp": {
+    "factor": 1,
+    "offset": -48,
+    "invalid": 255
+   },
+   "boost": {
+    "factor": 0.01,
+    "offset": 0,
+    "invalid": 255
+   },
+   "batteryTemp": {
+    "factor": 1,
+    "offset": -50,
+    "invalid": 255
+   },
+   "ambient": {
+    "factor": 0.5,
+    "offset": -40,
+    "invalid": 255
+   },
+   "pedal": {
+    "factor": 0.025,
+    "offset": 0,
+    "invalid": 65535
+   },
+   "torque": {
+    "factor": 0.5,
+    "offset": -1023.5,
+    "invalidFrom": 4095
+   }
+  },
+  "dids": {
+   "powerSign": -1,
+   "sme": {
+    "ecu": 7,
+    "hvV": [
+     {
+      "did": "DDB4",
+      "bytes": 2,
+      "at": 0,
+      "factor": 0.01,
+      "min": 150,
+      "max": 500,
+      "timeoutMs": 800
+     },
+     {
+      "did": "DD68",
+      "bytes": 2,
+      "at": 0,
+      "factor": 0.01,
+      "min": 150,
+      "max": 500,
+      "timeoutMs": 800
+     },
+     {
+      "did": "DD66",
+      "bytes": 2,
+      "at": 0,
+      "factor": 0.01,
+      "min": 150,
+      "max": 500,
+      "timeoutMs": 800
+     },
+     {
+      "did": "DDEF",
+      "bytes": 2,
+      "at": 0,
+      "factor": 1,
+      "min": 150,
+      "max": 500,
+      "timeoutMs": 800
+     }
+    ],
+    "hvI": [
+     {
+      "did": "DD69",
+      "bytes": 4,
+      "at": 0,
+      "factor": 0.01,
+      "signed": true,
+      "min": -800,
+      "max": 800,
+      "timeoutMs": 800
+     }
+    ],
+    "soc": [
+     {
+      "did": "DDBC",
+      "bytes": 2,
+      "at": 0,
+      "factor": 0.1,
+      "min": 0,
+      "max": 100,
+      "timeoutMs": 1200
+     }
+    ],
+    "cellT": [
+     {
+      "did": "DDC0",
+      "at": 4,
+      "bytes": 2,
+      "factor": 0.01,
+      "signed": true,
+      "min": -40,
+      "max": 80,
+      "timeoutMs": 1200
+     }
+    ]
+   },
+   "dme": {
+    "ecu": 18,
+    "fuelRate": [
+     {
+      "did": "5656",
+      "bytes": 2,
+      "at": 0,
+      "factor": 0.01,
+      "min": 0,
+      "max": 150,
+      "timeoutMs": 900
+     },
+     {
+      "obd": "5E",
+      "bytes": 2,
+      "at": 0,
+      "factor": 0.05,
+      "min": 0,
+      "max": 150,
+      "timeoutMs": 900
+     }
+    ],
+    "v12": [
+     {
+      "did": "F442",
+      "bytes": 2,
+      "at": 0,
+      "factor": 0.001,
+      "min": 5,
+      "max": 18,
+      "timeoutMs": 1000
+     },
+     {
+      "ecu": 7,
+      "did": "F442",
+      "bytes": 2,
+      "at": 0,
+      "factor": 0.001,
+      "min": 5,
+      "max": 18,
+      "timeoutMs": 1000
+     },
+     {
+      "obd": "42",
+      "bytes": 2,
+      "at": 0,
+      "factor": 0.001,
+      "min": 5,
+      "max": 18,
+      "timeoutMs": 1000
+     }
+    ],
+    "iat": [
+     {
+      "did": "F40F",
+      "bytes": 1,
+      "at": 0,
+      "factor": 1,
+      "offset": -40,
+      "min": -40,
+      "max": 150,
+      "timeoutMs": 1000
+     },
+     {
+      "obd": "0F",
+      "bytes": 1,
+      "at": 0,
+      "factor": 1,
+      "offset": -40,
+      "min": -40,
+      "max": 150,
+      "timeoutMs": 1000
+     }
+    ],
+    "oil": [
+     {
+      "obd": "5C",
+      "bytes": 1,
+      "at": 0,
+      "factor": 1,
+      "offset": -40,
+      "min": -40,
+      "max": 170,
+      "timeoutMs": 1000
+     }
+    ]
+   },
+   "egs": {
+    "ecu": 24,
+    "gearboxOil": [
+     {
+      "did": "6000",
+      "bytes": 1,
+      "at": 0,
+      "factor": 1,
+      "offset": -40,
+      "min": -40,
+      "max": 160,
+      "timeoutMs": 1000
+     }
+    ]
+   }
+  }
+ },
+ "startWidget": null,
+ "stateIds": {
+  "MAIN": 1,
+  "DIAG": 32
+ }
+}

@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "repository": "chyiz/idrive7-cluster-metrics",
+  "commit": "b357d55af663970cb9e1270f28be2ec9f093744c",
+  "upstreamVersion": "0.5.0",
+  "releaseVersion": "0.5.1",
+  "cnRevision": 1,
+  "channel": "beta",
+  "authorization": "Owner reports permission from the author; upstream code is MIT licensed.",
+  "changes": [
+    "Chinese RHMI controls, status and diagnostic messages; original instrument glyphs retained",
+    "Display disabled initially; HUD yields during navigation by default",
+    "Source package links the head unit SDK; no BMW SDK redistributed",
+    "Full license files and provenance accompany the package"
+  ]
+}

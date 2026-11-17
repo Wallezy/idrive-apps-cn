@@ -78,5 +78,9 @@
   "mgu-inputgate": {
     "title": "Controller input support",
     "description": "Controller routing for ported apps; keeps BACK and MENU. Loads at the next normal head-unit start."
+  },
+  "cluster_metrics": {
+    "title": "Cluster Metrics (简体中文)",
+    "description": "Cluster and HUD telemetry with Chinese controls. Enable manually after choosing a display. Beta: vehicle integration pending."
   }
 }

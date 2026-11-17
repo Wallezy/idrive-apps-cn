@@ -52,3 +52,8 @@ jobs:
         run: |
           node tools/test_cauliflower.js
           make -C native/mgu-inputgate test
+      - name: Cluster Metrics Chinese Beta
+        run: |
+          node tools/test_cluster_metrics.js
+          python3 localized/cluster-metrics/kit/tools/build.py --omit-sdk cluster_metrics
+          node localized/cluster-metrics/test/run_tests.js

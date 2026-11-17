@@ -1,0 +1,974 @@
+{
+  "id": "cluster_metrics",
+  "title": "Cluster Metrics",
+  "description": "Real-time efficiency, HV battery %, powertrain temperatures, gear in D, HUD turn-by-turn nav, and hydraulic friction brake indicator on Cluster + HUD for BMW iDrive 7",
+  "version": "0.5.0",
+  "vendor": "chyiz",
+  "repoTitle": "GitHub Repository",
+  "repoLink": "github.com/chyiz/mgu-apps",
+  "loggingId": "OA7E",
+  "iconGlyph": "cluster_metrics",
+  "mguHmi": [
+    "ID7"
+  ],
+  "requires": {
+    "cluster-render": "0.4.0"
+  },
+  "signals": {
+    "de.bmw.infotainment.vehicle.CDS": {
+      "statusEngineSpeed2": "rs",
+      "statusEngineTemperature": "rs"
+    },
+    "de.bmw.infotainment.vehicle.CDS2": {
+      "_optional": "g-force, fuel injection rate and alternate engine oil temp",
+      "statusLongitudinalAccelerationMassCenter": "rs",
+      "statusLateralAccelerationMassCenter": "rs",
+      "statusInjectionVolume": "rs"
+    },
+    "de.bmw.infotainment.vehicle.Vehicle": {
+      "_optional": "BMW display unit configuration (temperature, distance, fuel/EV consumption, tire pressure)",
+      "statusNewCurrentUnitsStatusExt": "rs"
+    },
+    "de.bmw.infotainment.vehicle.Vehicle2": {
+      "statusCarSpeed2": "rs",
+      "highVoltageStorageInfoToExternal": "s",
+      "statusVehicleMass": "rs"
+    },
+    "de.bmw.chassis.VehicleStabilizationManagement": {
+      "_optional": "driver braking switch and ABS intervention for friction-brake blend",
+      "StabilizationManagement": "s"
+    },
+    "de.bmw.powertrain.AcceleratorPedal": {
+      "_optional": "pedal angle to gate regen vs active acceleration",
+      "AngleAcceleratorPedal": "s"
+    },
+    "de.bmw.infotainment.drivingexcitement.FES": {
+      "_optional": "drive mode, live turbo boost pressure and crankshaft torque",
+      "statusFESVehicleDynamicSwitchHMI": "rs",
+      "statusSwitchDriveDynamicSport2": "rs",
+      "statusActualValueTorque2": "rs"
+    },
+    "de.bmw.infotainment.drivingexcitement.Efficiencytainment2": {
+      "_optional": "PHEV high-voltage battery temperature, charge state, and real-time eDRIVE / regen needle %",
+      "statusBatteryTemperature": "rs",
+      "statusPowerRelativHybrid": "rs",
+      "statusChargeOfBatteryHybrid": "rs"
+    },
+    "de.bmw.infotainment.lsc.LSCDataSink": {
+      "_optional": "PHEV high-voltage battery pack voltage",
+      "statusHighVoltageStorage": "s"
+    },
+    "de.bmw.infrastructure.VehicleCondition": {
+      "_optional": "pause UDS polling when car is locked & asleep",
+      "VehicleCondition": "s"
+    },
+    "de.bmw.infotainment.navigation.guiding.Guidance": {
+      "_optional": "read BMW navigation route state, turns, lanes & intersection state for HUD navigation",
+      "_instances": "Main_Instance",
+      "guidanceState": "rs",
+      "guidingProvider": "rs",
+      "conclusiveDart": "rs",
+      "currentLaneGuiding": "rs",
+      "nextIntersection": "rs"
+    },
+    "de.bmw.infotainment.navigation.guiding.GuidanceEventList": {
+      "_optional": "read turn-by-turn maneuvers for HUD navigation re-rendering",
+      "_instances": "Main_Instance",
+      "_methods": [
+        "queryContent"
+      ]
+    },
+    "de.bmw.infotainment.navigation.guiding.GuidanceRenderedContent": {
+      "_optional": "first-party HUD intersection mini-map / 3D junction view state (HIGH_GUIDING / JUNCTION_VIEW / CITY_HIGHWAY_MAP)",
+      "_instances": "Main_Instance",
+      "registeredViews": "rs",
+      "_methods": [
+        "getViewConfig",
+        "getViewContent"
+      ],
+      "_broadcasts": [
+        "viewContentChanged"
+      ]
+    },
+    "de.bmw.infotainment.navigation.projectedmodeguiding.ProjectedModeGuiding": {
+      "_optional": "detect CarPlay / Android Auto lane guidance",
+      "_instances": "Main_Instance",
+      "currentLaneGuiding": "rs"
+    },
+    "de.bmw.infotainment.a4a.carplay.CarPlayManager": {
+      "_optional": "detect active Apple Maps / CarPlay route guidance",
+      "_instances": "CarPlayManagerInst1",
+      "projectedGuidanceActive": "rs"
+    },
+    "de.bmw.infotainment.sdi.aap.androidautoprojectedmanager.AndroidAutoProjectedManager": {
+      "_optional": "detect active Google Maps / Android Auto route guidance",
+      "_instances": "AndroidAutoProjectedManagerInst1",
+      "projectedGuidanceActive": "rs"
+    },
+    "de.bmw.infrastructure.VehicleInformation": {
+      "_optional": "current gear 1-8 in D and selector stage (P/R/N/D)",
+      "statusGearboxDrive": "s",
+      "DataPowerTrain2": "s"
+    },
+    "de.bmw.infotainment.misc.MDrive": {
+      "_optional": "S/M gearbox program detection",
+      "dataDisplayGearbox": "s"
+    },
+    "de.bmw.infrastructure.analytics.BasicDataSet": {
+      "_optional": "ZF8 transmission oil temperature and xDrive front/rear torque split",
+      "basicDataSet": "s"
+    },
+    "de.bmw.infrastructure.EnvironmentalInformation": {
+      "ExteriorTemperature": "s",
+      "UnitBN2020": "rs"
+    },
+    "de.bmw.infotainment.KombiIF": {
+      "_optional": "trip consumption, fuel & electric range, and electrical power distribution",
+      "statusRangeTankStatus": "rs",
+      "displayRangeElectricVehicle": "rs",
+      "statusBordcomputerAverage": "rs",
+      "statusDisplayElectricalPowerDistribution": "rs"
+    },
+    "de.bmw.infotainment.vehicle.TPMS": {
+      "_optional": "tire pressures, temperatures and targets for smart alerts",
+      "statusTyreTemperature": "rs",
+      "statusTyrePressure": "rs",
+      "statusTargetTyrePressure": "rs"
+    },
+    "com.harman.infotainment.systemfunctions.tasu.tasu.InternalTasu": {
+      "_optional": "read-only UDS telemetry (HV battery kW/SoC, DME fuel rate, 12V battery, IAT)",
+      "_instances": "SystemFunctionsInternalTasuInst1",
+      "_methods": [
+        "sendTasuRequest"
+      ],
+      "_broadcasts": [
+        "sendTasuResponse"
+      ]
+    }
+  },
+  "screens": [
+    {
+      "name": "MAIN",
+      "kind": "menu",
+      "title": "Cluster Metrics",
+      "settings": true,
+      "items": [
+        [
+          "tworow",
+          "STATUS_SUMMARY",
+          "Cluster Metrics Status"
+        ],
+        [
+          "button",
+          "BTN_DIAG",
+          "Live Telemetry & Diagnostics"
+        ]
+      ]
+    },
+    {
+      "name": "DIAG",
+      "kind": "menu",
+      "title": "Live Telemetry & Diagnostics",
+      "items": [
+        [
+          "button",
+          "BTN_READ_NOW",
+          "Read UDS Sensors Now"
+        ],
+        [
+          "button",
+          "BTN_PROBE_BRAKE",
+          "Record 30s Brake & HUD Nav Probe"
+        ],
+        [
+          "tworow",
+          "DIAG_RENDER",
+          "Cluster & HUD Renderer"
+        ],
+        [
+          "tworow",
+          "DIAG_NAV",
+          "HUD Navigation & Mini-Map Detector"
+        ],
+        [
+          "tworow",
+          "DIAG_BRAKE_ECU",
+          "Brake ECU (DSC 0x29 Hydraulic & Regen)"
+        ],
+        [
+          "tworow",
+          "DIAG_POWERTRAIN",
+          "Powertrain & Instant Efficiency"
+        ],
+        [
+          "tworow",
+          "DIAG_BATTERY",
+          "HV Battery (Charge / Power / Temp)"
+        ],
+        [
+          "tworow",
+          "DIAG_TEMPS",
+          "Engine & Gearbox Temperatures"
+        ],
+        [
+          "tworow",
+          "DIAG_CHASSIS",
+          "Gearbox & Friction Brake"
+        ],
+        [
+          "tworow",
+          "DIAG_UDS",
+          "Read-Only UDS & Aux Telemetry"
+        ]
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "key": "enabled",
+      "label": "Enable cluster & HUD metrics",
+      "type": "bool",
+      "default": false
+    },
+    {
+      "key": "displayTarget",
+      "label": "Display target",
+      "type": "choice",
+      "default": "both",
+      "options": [
+        [
+          "both",
+          "Cluster + HUD"
+        ],
+        [
+          "cluster",
+          "Cluster only"
+        ],
+        [
+          "hud",
+          "HUD only"
+        ]
+      ]
+    },
+    {
+      "key": "clusterSlotMode",
+      "label": "Cluster display mode",
+      "type": "choice",
+      "default": "auto",
+      "options": [
+        [
+          "auto",
+          "Auto (Map slot over CarPlay/AA map; Panel on BMW map)"
+        ],
+        [
+          "map_only",
+          "Map slot only (keeps right BC widget; shows over CarPlay/AA map)"
+        ],
+        [
+          "panel_only",
+          "Full 1920x720 panel (all 5 zones; KOMBI hides right BC widget)"
+        ]
+      ]
+    },
+    {
+      "key": "hudNavMode",
+      "label": "HUD during navigation",
+      "type": "choice",
+      "default": "yield_route",
+      "reset": 2,
+      "options": [
+        [
+          "own_nav_minimap",
+          "Draw HUD nav + yield for intersection mini-map"
+        ],
+        [
+          "own_nav_keep",
+          "Always draw HUD nav + metrics (never yield)"
+        ],
+        [
+          "yield_lanes",
+          "Draw HUD nav + yield during lane / mini-map"
+        ],
+        [
+          "yield_route",
+          "Hide HUD metrics during entire active route"
+        ]
+      ]
+    },
+    {
+      "key": "hudLine1",
+      "label": "HUD Line 1 (top)",
+      "type": "choice",
+      "default": "efficiency",
+      "options": [
+        [
+          "efficiency",
+          "Efficiency (mi/kWh or MPG)"
+        ],
+        [
+          "power_gear",
+          "Power / Boost + Gear"
+        ],
+        [
+          "gear",
+          "Current gear (D1-D8)"
+        ],
+        [
+          "soc",
+          "HV Battery %"
+        ],
+        [
+          "temps",
+          "Oil + Coolant temp"
+        ],
+        [
+          "off",
+          "Off"
+        ]
+      ]
+    },
+    {
+      "key": "hudLine2",
+      "label": "HUD Line 2 (middle)",
+      "type": "choice",
+      "default": "power_gear",
+      "options": [
+        [
+          "power_gear",
+          "Power / Boost + Gear"
+        ],
+        [
+          "power",
+          "Power / Boost only"
+        ],
+        [
+          "gear",
+          "Current gear (D1-D8)"
+        ],
+        [
+          "soc",
+          "HV Battery %"
+        ],
+        [
+          "soc_oil",
+          "HV Battery % + Oil temp"
+        ],
+        [
+          "temps",
+          "Oil + Coolant temp"
+        ],
+        [
+          "off",
+          "Off"
+        ]
+      ]
+    },
+    {
+      "key": "hudLine3",
+      "label": "HUD Line 3 (bottom)",
+      "type": "choice",
+      "default": "brake",
+      "options": [
+        [
+          "brake",
+          "Friction brake bar"
+        ],
+        [
+          "soc",
+          "HV Battery %"
+        ],
+        [
+          "temps",
+          "Oil + Coolant temp"
+        ],
+        [
+          "soc_oil",
+          "HV Battery % + Oil temp"
+        ],
+        [
+          "gear",
+          "Current gear (D1-D8)"
+        ],
+        [
+          "off",
+          "Off"
+        ]
+      ]
+    },
+    {
+      "key": "cornerRightDisplay",
+      "label": "Bottom-right indicator",
+      "type": "choice",
+      "default": "auto",
+      "reset": 2,
+      "options": [
+        [
+          "auto",
+          "HV Battery % (IAT on ICE)"
+        ],
+        [
+          "soc",
+          "HV Battery %"
+        ],
+        [
+          "batt",
+          "HV Battery temp"
+        ],
+        [
+          "gbx",
+          "Gearbox oil temp"
+        ],
+        [
+          "v12",
+          "12V battery voltage"
+        ],
+        [
+          "iat",
+          "Intake air temp"
+        ],
+        [
+          "off",
+          "Off"
+        ]
+      ]
+    },
+    {
+      "key": "cornerLeftDisplay",
+      "label": "Bottom-left temperatures",
+      "type": "choice",
+      "default": "oil_cool",
+      "options": [
+        [
+          "oil_cool",
+          "Oil + Coolant (always)"
+        ],
+        [
+          "oil_gbx",
+          "Oil + Gearbox oil"
+        ],
+        [
+          "off",
+          "Off"
+        ]
+      ]
+    },
+    {
+      "key": "gearDisplay",
+      "label": "Current gear (1-8 in D)",
+      "type": "choice",
+      "default": "next_to_d",
+      "options": [
+        [
+          "next_to_d",
+          "Next to D (bottom bar)"
+        ],
+        [
+          "below_speed",
+          "Below speed"
+        ],
+        [
+          "off",
+          "Off"
+        ]
+      ]
+    },
+    {
+      "key": "brakeIndicator",
+      "label": "Friction brake indicator",
+      "type": "choice",
+      "default": "bar_num",
+      "options": [
+        [
+          "bar_num",
+          "Segments + bar / g"
+        ],
+        [
+          "bar_only",
+          "Segments only"
+        ],
+        [
+          "off",
+          "Off"
+        ]
+      ]
+    },
+    {
+      "key": "smartAlerts",
+      "label": "Smart anomaly alerts (TPMS / 12V / Gearbox)",
+      "type": "bool",
+      "default": true
+    },
+    {
+      "key": "unitSystem",
+      "label": "Units system",
+      "type": "choice",
+      "default": "auto",
+      "options": [
+        [
+          "auto",
+          "Auto (follow car)"
+        ],
+        [
+          "us",
+          "US (mph, MPG, mi/kWh, degF, psi)"
+        ],
+        [
+          "metric",
+          "Metric (km/h, L/100km, kWh/100km, degC, bar)"
+        ],
+        [
+          "uk",
+          "UK (mph, MPG UK, mi/kWh, degC, psi)"
+        ]
+      ]
+    },
+    {
+      "key": "tempUnit",
+      "label": "Temperature unit",
+      "type": "choice",
+      "default": "auto",
+      "options": [
+        [
+          "auto",
+          "Auto"
+        ],
+        [
+          "F",
+          "Fahrenheit"
+        ],
+        [
+          "C",
+          "Celsius"
+        ]
+      ]
+    },
+    {
+      "key": "evEffUnit",
+      "label": "Electric efficiency unit",
+      "type": "choice",
+      "default": "auto",
+      "options": [
+        [
+          "auto",
+          "Auto"
+        ],
+        [
+          "mi_kwh",
+          "mi/kWh"
+        ],
+        [
+          "kwh_100km",
+          "kWh/100km"
+        ],
+        [
+          "wh_mi",
+          "Wh/mi"
+        ]
+      ]
+    },
+    {
+      "key": "fuelEffUnit",
+      "label": "Fuel efficiency unit",
+      "type": "choice",
+      "default": "auto",
+      "options": [
+        [
+          "auto",
+          "Auto"
+        ],
+        [
+          "mpg_us",
+          "MPG (US)"
+        ],
+        [
+          "mpg_uk",
+          "MPG (UK)"
+        ],
+        [
+          "l_100km",
+          "L/100km"
+        ],
+        [
+          "km_l",
+          "km/L"
+        ]
+      ]
+    },
+    {
+      "key": "pressUnit",
+      "label": "Boost & pressure unit",
+      "type": "choice",
+      "default": "auto",
+      "options": [
+        [
+          "auto",
+          "Auto"
+        ],
+        [
+          "psi",
+          "psi"
+        ],
+        [
+          "bar",
+          "bar"
+        ]
+      ]
+    },
+    {
+      "key": "vehicle",
+      "label": "Vehicle type",
+      "type": "choice",
+      "default": "auto",
+      "options": [
+        [
+          "auto",
+          "Auto (detect PHEV / ICE)"
+        ],
+        [
+          "phev",
+          "Plug-in Hybrid (530e / 330e / 45e)"
+        ],
+        [
+          "ice",
+          "Petrol / Diesel (ICE)"
+        ]
+      ]
+    },
+    {
+      "key": "coldOilC",
+      "label": "Warm oil threshold",
+      "type": "number",
+      "unit": "degC",
+      "default": 75,
+      "steps": [
+        65,
+        70,
+        75,
+        80,
+        85
+      ]
+    },
+    {
+      "key": "hudNudgeX",
+      "label": "HUD horizontal offset",
+      "type": "number",
+      "unit": "px",
+      "default": 0,
+      "steps": [
+        -40,
+        -30,
+        -20,
+        -10,
+        0,
+        10,
+        20,
+        30,
+        40
+      ]
+    },
+    {
+      "key": "hudNudgeY",
+      "label": "HUD vertical offset",
+      "type": "number",
+      "unit": "px",
+      "default": 0,
+      "steps": [
+        -40,
+        -30,
+        -20,
+        -10,
+        0,
+        10,
+        20,
+        30,
+        40
+      ]
+    },
+    {
+      "key": "clusterNudgeX",
+      "label": "Cluster readout X offset",
+      "type": "number",
+      "unit": "px",
+      "default": 0,
+      "steps": [
+        -12,
+        -8,
+        -4,
+        0,
+        4,
+        8,
+        12
+      ]
+    },
+    {
+      "key": "clusterNudgeY",
+      "label": "Cluster readout Y offset",
+      "type": "number",
+      "unit": "px",
+      "default": 0,
+      "steps": [
+        -12,
+        -8,
+        -4,
+        0,
+        4,
+        8,
+        12
+      ]
+    },
+    {
+      "key": "demo",
+      "label": "Demo data",
+      "type": "choice",
+      "default": "auto",
+      "options": [
+        [
+          "auto",
+          "Auto (when off car)"
+        ],
+        [
+          "phev",
+          "Demo PHEV (530e)"
+        ],
+        [
+          "ice",
+          "Demo ICE (B48 / B58)"
+        ],
+        [
+          "off",
+          "Off"
+        ]
+      ]
+    }
+  ],
+  "config": {
+    "scaling": {
+      "rpm": {
+        "factor": 0.25,
+        "offset": 0,
+        "invalid": 65535
+      },
+      "speed": {
+        "factor": 0.015625,
+        "offset": 0,
+        "invalid": 65535
+      },
+      "accel": {
+        "factor": 0.002,
+        "offset": -65,
+        "invalid": 65535
+      },
+      "temp": {
+        "factor": 1,
+        "offset": -48,
+        "invalid": 255
+      },
+      "boost": {
+        "factor": 0.01,
+        "offset": 0,
+        "invalid": 255
+      },
+      "batteryTemp": {
+        "factor": 1,
+        "offset": -50,
+        "invalid": 255
+      },
+      "ambient": {
+        "factor": 0.5,
+        "offset": -40,
+        "invalid": 255
+      },
+      "pedal": {
+        "factor": 0.025,
+        "offset": 0,
+        "invalid": 65535
+      },
+      "torque": {
+        "factor": 0.5,
+        "offset": -1023.5,
+        "invalidFrom": 4095
+      }
+    },
+    "dids": {
+      "powerSign": -1,
+      "sme": {
+        "ecu": 7,
+        "hvV": [
+          {
+            "did": "DDB4",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.01,
+            "min": 150,
+            "max": 500,
+            "timeoutMs": 800
+          },
+          {
+            "did": "DD68",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.01,
+            "min": 150,
+            "max": 500,
+            "timeoutMs": 800
+          },
+          {
+            "did": "DD66",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.01,
+            "min": 150,
+            "max": 500,
+            "timeoutMs": 800
+          },
+          {
+            "did": "DDEF",
+            "bytes": 2,
+            "at": 0,
+            "factor": 1,
+            "min": 150,
+            "max": 500,
+            "timeoutMs": 800
+          }
+        ],
+        "hvI": [
+          {
+            "did": "DD69",
+            "bytes": 4,
+            "at": 0,
+            "factor": 0.01,
+            "signed": true,
+            "min": -800,
+            "max": 800,
+            "timeoutMs": 800
+          }
+        ],
+        "soc": [
+          {
+            "did": "DDBC",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.1,
+            "min": 0,
+            "max": 100,
+            "timeoutMs": 1200
+          }
+        ],
+        "cellT": [
+          {
+            "did": "DDC0",
+            "at": 4,
+            "bytes": 2,
+            "factor": 0.01,
+            "signed": true,
+            "min": -40,
+            "max": 80,
+            "timeoutMs": 1200
+          }
+        ]
+      },
+      "dme": {
+        "ecu": 18,
+        "fuelRate": [
+          {
+            "did": "5656",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.01,
+            "min": 0,
+            "max": 150,
+            "timeoutMs": 900
+          },
+          {
+            "obd": "5E",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.05,
+            "min": 0,
+            "max": 150,
+            "timeoutMs": 900
+          }
+        ],
+        "v12": [
+          {
+            "did": "F442",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.001,
+            "min": 5,
+            "max": 18,
+            "timeoutMs": 1000
+          },
+          {
+            "ecu": 7,
+            "did": "F442",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.001,
+            "min": 5,
+            "max": 18,
+            "timeoutMs": 1000
+          },
+          {
+            "obd": "42",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.001,
+            "min": 5,
+            "max": 18,
+            "timeoutMs": 1000
+          }
+        ],
+        "iat": [
+          {
+            "did": "F40F",
+            "bytes": 1,
+            "at": 0,
+            "factor": 1,
+            "offset": -40,
+            "min": -40,
+            "max": 150,
+            "timeoutMs": 1000
+          },
+          {
+            "obd": "0F",
+            "bytes": 1,
+            "at": 0,
+            "factor": 1,
+            "offset": -40,
+            "min": -40,
+            "max": 150,
+            "timeoutMs": 1000
+          }
+        ],
+        "oil": [
+          {
+            "obd": "5C",
+            "bytes": 1,
+            "at": 0,
+            "factor": 1,
+            "offset": -40,
+            "min": -40,
+            "max": 170,
+            "timeoutMs": 1000
+          }
+        ]
+      },
+      "egs": {
+        "ecu": 24,
+        "gearboxOil": [
+          {
+            "did": "6000",
+            "bytes": 1,
+            "at": 0,
+            "factor": 1,
+            "offset": -40,
+            "min": -40,
+            "max": 160,
+            "timeoutMs": 1000
+          }
+        ]
+      }
+    }
+  }
+}
