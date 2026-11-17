@@ -523,16 +523,6 @@
       "cnRevision": 1
     }
   ],
-  "mgu-inputgate": [
-    {
-      "version": "1.1.1",
-      "changes": [
-        "新增应用运行支持，保留原作者和第三方许可。"
-      ],
-      "upstreamVersion": "1.1.0",
-      "cnRevision": 1
-    }
-  ],
   "mgu-browser": [
     {
       "version": "0.16.2",
