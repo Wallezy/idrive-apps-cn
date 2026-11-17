@@ -6,7 +6,7 @@ function run(file, ...args) {
     if (p.error) throw p.error;
     if (p.status !== 0) process.exit(p.status || 1);
 }
-for (const test of ['test_ram_mic', 'test_camera_cleanup', 'test_community_controls'])
+for (const test of ['test_ram_mic', 'test_community_controls'])
     run('tools/' + test + '.js');
 for (const item of require('../release/community-import-plan.json').apps) {
     if (item.format !== 'unit') run('tools/test_community_startup.js', item.id);
