@@ -22,7 +22,7 @@ try {
         assert.strictEqual(pkg.version, manifest.version);
         assert.strictEqual(pkg.mguLocalOnly, true);
         assert.deepStrictEqual(release.mguHmi, ['ID7']);
-        assert.strictEqual(release.requires['mgu-deploy'], '0.8.18');
+        assert.strictEqual(release.requires['mgu-deploy'], id === 'cluster_metrics' ? '0.8.23' : '0.8.18');
         assert(fs.existsSync(path.join(tree, pkg.main)));
         assert(!fs.existsSync(path.join(tree, 'javascript/app.js')));
         const files = link.packSource(app, path.join(tmp, id + '.tgz'));
@@ -33,7 +33,8 @@ try {
         assert(zlib.gunzipSync(first).length > 0);
         const kit = path.join(tree, 'javascript/kit');
         const suite = id === 'ambient_config' ? 'tools/test_ambient.js' :
-            id === 'cluster_themes' ? 'tools/test_cluster_themes.js' : 'localized/kit/tools/test_zh.js';
+            id === 'cluster_themes' ? 'tools/test_cluster_themes.js' :
+                id === 'cluster_metrics' ? 'tools/test_cluster_metrics.js' : 'localized/kit/tools/test_zh.js';
         const result = cp.spawnSync(process.execPath, [path.join(root, suite), kit],
             { encoding: 'utf8', timeout: 30000 });
         assert.strictEqual(result.status, 0, id + ': ' + result.stdout + result.stderr);
