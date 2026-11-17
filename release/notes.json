@@ -186,18 +186,6 @@
       "cnRevision": 1
     }
   ],
-  "front_camera_cluster": [
-    {
-      "version": "0.2.2",
-      "changes": [
-        "新增简体中文应用，接入国内商店更新。",
-        "兼容商店渲染与输入组件，清理界面推广水印。",
-        "退出时保留其他应用图层；车速失效或连接中断后停止投射。"
-      ],
-      "upstreamVersion": "0.2.1",
-      "cnRevision": 1
-    }
-  ],
   "green_light_alert": [
     {
       "version": "0.2.6",
@@ -273,16 +261,6 @@
         "兼容商店渲染与输入组件，清理界面推广水印。"
       ],
       "upstreamVersion": "0.1.5",
-      "cnRevision": 1
-    }
-  ],
-  "front-camera-cluster-helper": [
-    {
-      "version": "0.2.2",
-      "changes": [
-        "新增应用运行支持，保留原作者和第三方许可。"
-      ],
-      "upstreamVersion": "0.2.1",
       "cnRevision": 1
     }
   ]

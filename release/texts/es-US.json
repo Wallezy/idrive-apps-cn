@@ -87,10 +87,6 @@
     "title": "颗粒捕集器监测",
     "description": "只读监测柴油颗粒捕集器积碳、再生进度、温度、压差及历史记录"
   },
-  "front_camera_cluster": {
-    "title": "仪表夜视",
-    "description": "全屏控制宝马夜视和泊车摄像头在仪表中的显示"
-  },
   "green_light_alert": {
     "title": "绿灯起步提醒",
     "description": "监测 KAFAS 原始红绿灯信号，并以宝马已验证的显示信号作为后备"
@@ -118,9 +114,5 @@
   "xdrive_studio": {
     "title": "xDrive 动力分配",
     "description": "只读查看 xDrive 扭矩分配、分动箱扭矩、车轮滑差和底盘动态"
-  },
-  "front-camera-cluster-helper": {
-    "title": "仪表夜视服务",
-    "description": "为对应应用提供后台支持，可随应用安装和卸载。"
   }
 }

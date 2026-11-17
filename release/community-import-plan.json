@@ -81,50 +81,6 @@
       ]
     },
     {
-      "id": "front_camera_cluster",
-      "kind": "app",
-      "title": "仪表夜视",
-      "description": "全屏控制宝马夜视和泊车摄像头在仪表中的显示",
-      "version": "0.2.1",
-      "artifact": {
-        "name": "front_camera_cluster@0.2.1.tgz",
-        "url": "packages/front_camera_cluster@0.2.1.tgz",
-        "size": 946450,
-        "sha256": "6b6e865bd6ecc6aa8192bc71e917c338fbc813da47cce09cbf8ff55784a1a15e"
-      },
-      "requires": {
-        "idrive7-renderd": "2.1.7",
-        "mgu-inputgate": "1.0.0",
-        "front-camera-cluster-helper": "0.2.1"
-      },
-      "uninstallable": true,
-      "mguHmi": [
-        "ID7"
-      ],
-      "icon": "front_camera_cluster.png",
-      "iconSha256": "0e8ce500fa378cfbc9fcd5b86bf73d74fb5fba91ea889887ab1f548938e312e5",
-      "author": "汉化 小白151",
-      "releaseVersion": "0.2.2",
-      "license": "MIT",
-      "source": "https://github.com/alexp50/bmw-apps/pull/3",
-      "attribution": "原项目：https://github.com/alexp50/bmw-apps/pull/3。汉化：小白151（GitHub: JackieZ123430）。应用框架：cauliflowermossgrape。",
-      "cnRequires": {
-        "mgu-inputgate": "1.1.1",
-        "front-camera-cluster-helper": "0.2.2",
-        "mgu-deploy": "0.8.18",
-        "mgu-render": "0.6.24",
-        "robertn_store": "0.9.47"
-      },
-      "legalNotices": {
-        "LICENSE": "MIT License\n\nCopyright (c) 2026 cauliflowermossgrape\nCopyright (c) 2026 小白151 (GitHub: JackieZ123430), Chinese translation\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n"
-      },
-      "changes": [
-        "新增简体中文应用，接入国内商店更新。",
-        "兼容商店渲染与输入组件，清理界面推广水印。",
-        "退出时保留其他应用图层；车速失效或连接中断后停止投射。"
-      ]
-    },
-    {
       "id": "green_light_alert",
       "kind": "app",
       "title": "绿灯起步提醒",

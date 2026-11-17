@@ -25,15 +25,13 @@
     "mgu-inputgate": "1.1.1",
     "ram_mic_calibration": "0.1.2",
     "dpf_monitor": "0.3.3",
-    "front_camera_cluster": "0.2.2",
     "green_light_alert": "0.2.6",
     "parking_clearance": "0.1.9",
     "rear_comfort": "0.4.5",
     "ride_height": "0.6.1",
     "road_trip_computer": "1.0.1",
     "start_stop_insight": "0.1.4",
-    "xdrive_studio": "0.1.6",
-    "front-camera-cluster-helper": "0.2.2"
+    "xdrive_studio": "0.1.6"
   },
   "applicationSourceCommit": "b2880634eb214e29f008422b970cf22ea2de280f"
 }
