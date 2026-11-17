@@ -1,0 +1,255 @@
+{
+  "schemaVersion": "1.3.0",
+  "containers": {
+    "1": {
+      "type": "state",
+      "name": "MAIN",
+      "components": {
+        "2": {
+          "type": "label",
+          "name": "MAIN_GFX",
+          "properties": {
+            "Visible": {
+              "value": 1,
+              "type": "UInt"
+            },
+            "Focusable": {
+              "value": 0,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Graphic": {
+                "value": "",
+                "type": "Text"
+              }
+            }
+          ]
+        },
+        "3": {
+          "type": "button",
+          "name": "BTN_PAGE",
+          "properties": {
+            "Focusable": {
+              "value": 3,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "SID_AMBIENT_STUDIO_FULL_BTN_PAGE",
+                "type": "StringId"
+              }
+            }
+          ]
+        },
+        "4": {
+          "type": "button",
+          "name": "BTN_SELECT",
+          "properties": {
+            "Focusable": {
+              "value": 3,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "SID_AMBIENT_STUDIO_FULL_BTN_SELECT",
+                "type": "StringId"
+              }
+            }
+          ]
+        },
+        "5": {
+          "type": "button",
+          "name": "BTN_ACTION",
+          "properties": {
+            "Focusable": {
+              "value": 3,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "SID_AMBIENT_STUDIO_FULL_BTN_ACTION",
+                "type": "StringId"
+              }
+            }
+          ]
+        },
+        "6": {
+          "type": "button",
+          "name": "BTN_BACK",
+          "properties": {
+            "Focusable": {
+              "value": 3,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "SID_AMBIENT_STUDIO_FULL_BTN_BACK",
+                "type": "StringId"
+              }
+            }
+          ]
+        },
+        "7": {
+          "type": "button",
+          "name": "BTN_SETTINGS",
+          "properties": {
+            "Focusable": {
+              "value": 3,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "SID_AMBIENT_STUDIO_FULL_BTN_SETTINGS",
+                "type": "StringId"
+              }
+            }
+          ]
+        },
+        "8": {
+          "type": "title",
+          "name": "MAIN_TITLE",
+          "rows": [
+            {
+              "Text": {
+                "value": "SID_AMBIENT_STUDIO_FULL_MAIN_TITLE",
+                "type": "StringId"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "12": {
+      "type": "state",
+      "name": "SETTINGS",
+      "components": {
+        "13": {
+          "type": "dropDownMenu",
+          "name": "SET_LAYOUT",
+          "rows": [
+            {
+              "ItemText": {
+                "value": "SID_CN_STATIC_0000",
+                "type": "StringId"
+              }
+            }
+          ],
+          "cells": {
+            "HeaderText": {
+              "value": "SID_CN_STATIC_0001",
+              "type": "StringId"
+            },
+            "SelectedItem": {
+              "value": 0,
+              "type": "UInt"
+            }
+          }
+        },
+        "14": {
+          "type": "dropDownMenu",
+          "name": "SET_RENDERER",
+          "rows": [
+            {
+              "ItemText": {
+                "value": "SID_CN_STATIC_0002",
+                "type": "StringId"
+              }
+            }
+          ],
+          "cells": {
+            "HeaderText": {
+              "value": "SID_CN_STATIC_0003",
+              "type": "StringId"
+            },
+            "SelectedItem": {
+              "value": 0,
+              "type": "UInt"
+            }
+          }
+        },
+        "15": {
+          "type": "button",
+          "name": "CN_CREDITS",
+          "properties": {
+            "Visible": {
+              "value": 1,
+              "type": "UInt"
+            },
+            "Focusable": {
+              "value": 2,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text1stRow": {
+                "value": "SID_AMBIENT_STUDIO_FULL_CN_CREDITS_TITLE",
+                "type": "StringId"
+              },
+              "Text2ndRow": {
+                "value": "SID_AMBIENT_STUDIO_FULL_CN_CREDITS_LINK",
+                "type": "StringId"
+              }
+            }
+          ]
+        },
+        "16": {
+          "type": "button",
+          "name": "REPO_CREDITS",
+          "properties": {
+            "Visible": {
+              "value": 1,
+              "type": "UInt"
+            },
+            "Focusable": {
+              "value": 2,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text1stRow": {
+                "value": "SID_AMBIENT_STUDIO_FULL_REPO_CREDITS_TITLE",
+                "type": "StringId"
+              },
+              "Text2ndRow": {
+                "value": "SID_AMBIENT_STUDIO_FULL_REPO_CREDITS_LINK",
+                "type": "StringId"
+              }
+            }
+          ]
+        },
+        "17": {
+          "type": "title",
+          "name": "SETTINGS_TITLE",
+          "rows": [
+            {
+              "Text": {
+                "value": "SID_AMBIENT_STUDIO_FULL_SETTINGS_TITLE",
+                "type": "StringId"
+              }
+            }
+          ]
+        }
+      },
+      "properties": {
+        "ParentState": {
+          "value": 1,
+          "type": "UInt"
+        }
+      }
+    }
+  }
+}

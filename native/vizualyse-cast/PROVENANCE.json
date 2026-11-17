@@ -1,0 +1,45 @@
+{
+  "sourceArtifact": {
+    "name": "vizualyse-cast@0.4.100.tgz",
+    "url": "https://github.com/JackieZ123430/vizualyse-idrive-apps-cn/releases/download/vizualyse-zh-cn.1/vizualyse-cast%400.4.100.tgz",
+    "size": 31549537,
+    "sha256": "eb8c75e8770bd0aae0689b0166de680a74a1274e01355c6e81d4b57299018247"
+  },
+  "unchangedBinaryPayloads": [
+    {
+      "path": "ffmpeg",
+      "sha256": "e7e7fb30477f717e6f55f9180a70386c62677ef8a4d4d1a5d948f4098aa3eb99"
+    }
+  ],
+  "sourceNotice": "Original LICENSE and THIRD-PARTY notices retained in files/. Original binary payloads are unmodified; this is not a local rebuild of those upstream binaries.",
+  "catalogProvenance": [
+    {
+      "id": "vizualyse_cast",
+      "version": "0.4.100",
+      "build": "0.4.100-zh.cn.1",
+      "upstream": "https://github.com/Vizualyse/idrive-apps",
+      "upstreamCommit": "9dda7625c5036a8cbc8f25a99f1e34e02d5b8c90",
+      "source": "https://github.com/JackieZ123430/vizualyse-idrive-apps-cn/tree/332fa51c7d736b006739e510bfdeba304b1622a9",
+      "upstreamArtifact": {
+        "name": "vizualyse_cast@0.4.0.tgz",
+        "size": 43104,
+        "sha256": "94d00fd764bbe233b0b4c6174b708dc873e3d209e78935b814e692e7fc24a83d",
+        "url": "https://github.com/Vizualyse/idrive-apps/releases/download/vizualyse_cast%400.4.0/vizualyse_cast%400.4.0.tgz"
+      }
+    },
+    {
+      "id": "vizualyse-cast",
+      "version": "0.4.100",
+      "build": "0.4.100-zh.cn.1",
+      "upstream": "https://github.com/Vizualyse/idrive-apps",
+      "upstreamCommit": "9dda7625c5036a8cbc8f25a99f1e34e02d5b8c90",
+      "source": "https://github.com/JackieZ123430/vizualyse-idrive-apps-cn/tree/332fa51c7d736b006739e510bfdeba304b1622a9",
+      "upstreamArtifact": {
+        "name": "vizualyse-cast@0.4.0.tgz",
+        "size": 30059172,
+        "sha256": "9b8f17f96776bde01a5edee9b2e4d969c6c0de2fd8f4cf8c80ce915e62177311",
+        "url": "https://github.com/Vizualyse/idrive-apps/releases/download/vizualyse-cast%400.4.0/vizualyse-cast%400.4.0.tgz"
+      }
+    }
+  ]
+}

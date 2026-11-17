@@ -4,7 +4,9 @@ const assert = require('assert');
 const fs = require('fs');
 const net = require('net');
 const path = require('path');
-const { RenderClient, SOCKETS } = require('../apps/ambient_config/package/javascript/kit/renderd');
+const kit = process.argv[2] ? path.resolve(process.argv[2]) :
+    path.join(__dirname, '../apps/ambient_config/package/javascript/kit');
+const { RenderClient, SOCKETS } = require(path.join(kit, 'renderd'));
 const root = fs.mkdtempSync('/tmp/mgu-compat-');
 const servers = [], clients = [];
 let serial = 0, checks = 0;

@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "jap_ridetube",
+  "version": "0.3.9",
+  "tree": "package",
+  "modules": [
+    "src/sdk.js"
+  ],
+  "sdk": [
+    "oap-sdk/src/core/OnlineApp.js",
+    "oap-sdk/src/logging/logging"
+  ]
+}

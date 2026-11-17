@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "1.3.0",
+  "application": {
+    "uuid": "a7182de0-82a6-5aa8-ab0f-a8647f0cd24c",
+    "type": "OnlineApp",
+    "name": "ram_mic_calibration",
+    "vendor": "custom",
+    "version": "0.1.2",
+    "defaultLanguage": "en_GB",
+    "stringBundleUuid": "bcd460df-755b-5027-8a57-741a3f8abd13",
+    "resourceBundleUuid": "8450e705-0f60-53cc-9740-4c3117f3558e",
+    "entryPoints": [
+      {
+        "name": "RAM_MIC_CALIBRATION_ENTRY",
+        "uuid": "272911ce-0f0d-500b-a8a2-892222f5bf74",
+        "textId": "SID_RAM_MIC_CALIBRATION_TITLE",
+        "icon": "ram_mic_calibration_icon.png",
+        "insertionStateId": 20974,
+        "insertionFocusId": 2,
+        "insertionMode": "INSERT_BELOW",
+        "insertionOrder": 0,
+        "insertionPriority": 0,
+        "previewType": "NONE",
+        "bookmarkable": true,
+        "private": false,
+        "appearance": "DEFAULT",
+        "isGroupHeader": false,
+        "insertionGroup": 0
+      }
+    ],
+    "uiDescriptions": [
+      {
+        "applicationFilePath": "./uiDescriptions/ID7/application.xml",
+        "uiDescriptionFilePath": "./uiDescriptions/ID7/uiDescription.json",
+        "hmi": [
+          "ID7"
+        ]
+      }
+    ],
+    "variantGroups": [
+      {
+        "stringsPath": "./variantGroups/Common/texts",
+        "resourcesPath": "./variantGroups/Common/images",
+        "hmi": [
+          "ID7"
+        ],
+        "brands": [
+          "BMW"
+        ]
+      }
+    ]
+  }
+}

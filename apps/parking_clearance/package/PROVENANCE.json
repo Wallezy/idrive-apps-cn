@@ -1,0 +1,17 @@
+{
+  "catalogUrl": "https://gitee.com/xiaobai-151/mgu-cn-xiaobai/raw/main/catalog.json",
+  "catalogSha256": "75ec5122c7fa286774deaf57b2c447faaf7bfa2d2db0bcc018207f981a70704d",
+  "component": "parking_clearance",
+  "sourceArtifact": {
+    "name": "parking_clearance@0.1.8.tgz",
+    "url": "packages/parking_clearance@0.1.8.tgz",
+    "size": 1176286,
+    "sha256": "7d7e0cc4c5ae8e2bd47f778226202d784a9e7813d73d47cf84a7bef366ae2b08"
+  },
+  "upstreamVersion": "0.1.8",
+  "releaseVersion": "0.1.9",
+  "cnRevision": 1,
+  "source": "https://github.com/alexp50/bmw-apps/pull/3",
+  "license": "MIT",
+  "vehicleTested": false
+}

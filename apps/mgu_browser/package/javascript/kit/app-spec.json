@@ -1,0 +1,33 @@
+{
+  "id": "mgu_browser",
+  "title": "Browser",
+  "version": "0.16.2",
+  "screens": [
+    {
+      "name": "MAIN",
+      "kind": "canvas",
+      "title": " ",
+      "bar": false,
+      "buttons": [
+        [
+          "BTN_OPEN",
+          "Startseite öffnen"
+        ],
+        [
+          "BTN_BACK",
+          "Zurück"
+        ],
+        [
+          "BTN_STOP",
+          "Schließen"
+        ]
+      ]
+    }
+  ],
+  "settings": [],
+  "config": {},
+  "startWidget": null,
+  "stateIds": {
+    "MAIN": 1
+  }
+}

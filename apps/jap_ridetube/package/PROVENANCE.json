@@ -1,0 +1,17 @@
+{
+  "catalogUrl": "https://gitee.com/xiaobai-151/mgu-cn-xiaobai/raw/main/catalog.json",
+  "catalogSha256": "75ec5122c7fa286774deaf57b2c447faaf7bfa2d2db0bcc018207f981a70704d",
+  "component": "jap_ridetube",
+  "sourceArtifact": {
+    "name": "jap_ridetube@0.3.8.tgz",
+    "url": "packages/jap_ridetube@0.3.8.tgz",
+    "size": 1938655,
+    "sha256": "d60231ab44b6dfadf2d850fdb880b904052ac83b9e903bed3a9f5ef67599ec99"
+  },
+  "upstreamVersion": "0.3.8",
+  "releaseVersion": "0.3.9",
+  "cnRevision": 1,
+  "source": "https://github.com/JustAnotherPU/ridetube/pull/3",
+  "license": "GPL-3.0-or-later",
+  "vehicleTested": false
+}

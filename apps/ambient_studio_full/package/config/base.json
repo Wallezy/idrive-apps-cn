@@ -1,0 +1,9 @@
+{
+  "rhmiLoadingEnabled": true,
+  "entryPointLoadingEnabled": true,
+  "settings": {
+    "ambient_studio_full": {
+      "fullScreenRequired": true
+    }
+  }
+}

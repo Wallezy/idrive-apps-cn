@@ -1,0 +1,15 @@
+{
+  "id": "vizualyse-moonlight",
+  "artifact": {
+    "name": "vizualyse-moonlight@0.3.100.tgz",
+    "url": "https://github.com/JackieZ123430/vizualyse-idrive-apps-cn/releases/download/vizualyse-zh-cn.1/vizualyse-moonlight%400.3.100.tgz",
+    "size": 1526763,
+    "sha256": "d8917289a1127d97ae9aecbd2ed4235f02b502e4655c6cabcc67d85f5bf107f6"
+  },
+  "files": [
+    {
+      "path": "moonlight-core",
+      "sha256": "8d9d0e44cdb0b43ce38163ae483ec92176edf57e7e8bc803b6bfad15b9fb38ad"
+    }
+  ]
+}

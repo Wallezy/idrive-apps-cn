@@ -8,3 +8,5 @@ release/out/
 release/published/
 __pycache__/
 *.pyc
+native/*/.payload/
+native/*/.payload-cache/

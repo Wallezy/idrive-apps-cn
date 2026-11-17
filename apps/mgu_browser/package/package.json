@@ -1,0 +1,41 @@
+{
+  "name": "mgu_browser",
+  "version": "0.16.2",
+  "description": "浏览网页，支持主页、历史记录、书签和 iDrive 旋钮操作。",
+  "main": "javascript/localized-entry.js",
+  "private": false,
+  "author": "custom",
+  "license": "MIT",
+  "engines": {
+    "node": ">=8.7.0"
+  },
+  "oapAppSettings": {
+    "maxDiskUsage": 268435456,
+    "cpuLimit": 60,
+    "memoryThresholdKB": 196608,
+    "priority": "PRIO_LOW",
+    "visibility": "FOREGROUND",
+    "latencyClass": "FOREGROUND",
+    "loggingId": "OA9B",
+    "userLoginRequired": false,
+    "backgroundPriority": 200,
+    "someipManifest": "manifest.json"
+  },
+  "mguHmi": [
+    "ID7"
+  ],
+  "mguLocalOnly": true,
+  "files": [
+    "CHANGELOG.md",
+    "LICENSE",
+    "NOTICE.zh-CN.md",
+    "PROVENANCE.json",
+    "config",
+    "javascript",
+    "manifest.json",
+    "npm-shrinkwrap.json",
+    "package.json",
+    "permissions.json",
+    "rhmiData"
+  ]
+}

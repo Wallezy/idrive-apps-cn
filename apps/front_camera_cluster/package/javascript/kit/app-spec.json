@@ -1,0 +1,68 @@
+{
+  "id": "front_camera_cluster",
+  "title": "仪表夜视",
+  "version": "0.2.2",
+  "screens": [
+    {
+      "name": "MAIN",
+      "kind": "canvas",
+      "title": "仪表夜视",
+      "settingsTab": false,
+      "buttons": [
+        [
+          "BTN_NIGHT",
+          "夜视"
+        ],
+        [
+          "BTN_PARK",
+          "泊车摄像头"
+        ],
+        [
+          "BTN_STOP",
+          "停止"
+        ],
+        [
+          "BTN_REFRESH",
+          "刷新状态"
+        ]
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "key": "layout",
+      "label": "屏幕布局",
+      "type": "choice",
+      "default": "full",
+      "reset": 2,
+      "options": [
+        [
+          "full",
+          "全屏"
+        ]
+      ]
+    },
+    {
+      "key": "renderer",
+      "label": "渲染器",
+      "type": "choice",
+      "default": "auto",
+      "reset": 2,
+      "options": [
+        [
+          "auto",
+          "GPU 60 帧／秒"
+        ]
+      ]
+    }
+  ],
+  "config": {
+    "fullScreenRequired": true,
+    "maxProjectionSpeedKmh": 15
+  },
+  "startWidget": null,
+  "stateIds": {
+    "MAIN": 1,
+    "SETTINGS": 11
+  }
+}

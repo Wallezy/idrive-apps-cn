@@ -1,0 +1,17 @@
+{
+  "catalogUrl": "https://gitee.com/xiaobai-151/mgu-cn-xiaobai/raw/main/catalog.json",
+  "catalogSha256": "75ec5122c7fa286774deaf57b2c447faaf7bfa2d2db0bcc018207f981a70704d",
+  "component": "ride_height",
+  "sourceArtifact": {
+    "name": "ride_height@0.6.0.tgz",
+    "url": "packages/ride_height@0.6.0.tgz",
+    "size": 949855,
+    "sha256": "ba236f978c837ec915c878f513cf1c09ceb6ec27a607e903e36ec4e69d57cd96"
+  },
+  "upstreamVersion": "0.6.0",
+  "releaseVersion": "0.6.1",
+  "cnRevision": 1,
+  "source": "https://github.com/alexp50/bmw-apps/pull/3",
+  "license": "MIT",
+  "vehicleTested": false
+}

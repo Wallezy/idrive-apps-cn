@@ -1,0 +1,9 @@
+{
+  "rhmiLoadingEnabled": true,
+  "entryPointLoadingEnabled": true,
+  "settings": {
+    "drive_hud_full": {
+      "fullScreenRequired": true
+    }
+  }
+}

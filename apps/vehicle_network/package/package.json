@@ -1,0 +1,38 @@
+{
+  "name": "vehicle_network",
+  "version": "0.1.4",
+  "description": "显示 MGU 网络接口、观测到的车辆网络设备和电脑 IPv4 设置",
+  "main": "javascript/localized-entry.js",
+  "private": false,
+  "author": "alexp50",
+  "license": "MIT",
+  "engines": {
+    "node": ">=8.7.0"
+  },
+  "oapAppSettings": {
+    "maxDiskUsage": 20971520,
+    "cpuLimit": 60,
+    "memoryThresholdKB": 196608,
+    "priority": "PRIO_LOW",
+    "visibility": "FOREGROUND",
+    "latencyClass": "FOREGROUND",
+    "loggingId": "OAB6",
+    "userLoginRequired": false,
+    "backgroundPriority": 200,
+    "someipManifest": "manifest.json"
+  },
+  "mguLocalOnly": true,
+  "files": [
+    "CHANGELOG.md",
+    "NOTICE.zh-CN.md",
+    "PROVENANCE.json",
+    "config",
+    "javascript",
+    "manifest.json",
+    "npm-shrinkwrap.json",
+    "package.json",
+    "permissions.json",
+    "rhmiData",
+    "LICENSE"
+  ]
+}

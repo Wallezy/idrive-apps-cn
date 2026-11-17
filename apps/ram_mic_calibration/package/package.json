@@ -1,0 +1,38 @@
+{
+  "name": "ram_mic_calibration",
+  "version": "0.1.2",
+  "description": "在 ID7 车机读取 RAM01 麦克风校准状态，并在停车后二次确认启动校准。",
+  "main": "javascript/localized-entry.js",
+  "private": false,
+  "author": "custom",
+  "license": "MIT",
+  "engines": {
+    "node": ">=8.7.0"
+  },
+  "oapAppSettings": {
+    "maxDiskUsage": 20971520,
+    "cpuLimit": 60,
+    "memoryThresholdKB": 196608,
+    "priority": "PRIO_LOW",
+    "visibility": "FOREGROUND",
+    "latencyClass": "FOREGROUND",
+    "loggingId": "OAA6",
+    "userLoginRequired": false,
+    "backgroundPriority": 200,
+    "someipManifest": "manifest.json"
+  },
+  "mguLocalOnly": true,
+  "files": [
+    "CHANGELOG.md",
+    "NOTICE.zh-CN.md",
+    "PROVENANCE.json",
+    "config",
+    "javascript",
+    "manifest.json",
+    "npm-shrinkwrap.json",
+    "package.json",
+    "permissions.json",
+    "rhmiData",
+    "LICENSE"
+  ]
+}

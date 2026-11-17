@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "vizualyse_moonlight",
+  "version": "0.3.101",
+  "tree": "package",
+  "modules": [
+    "src/vizualyse_moonlight.js",
+    "src/moonlight_control.js",
+    "src/touch_mode.js",
+    "src/vehicle_speed.js",
+    "src/qr_png.js",
+    "src/qrcode.js",
+    "src/i18n.js"
+  ],
+  "sdk": [
+    "oap-sdk/src/core/OnlineApp.js",
+    "oap-sdk/src/logging/logging",
+    "oap-sdk/src/someip/someipBuilders"
+  ]
+}

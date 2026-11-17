@@ -1,0 +1,891 @@
+{
+  "schemaVersion": "1.3.0",
+  "containers": {
+    "1": {
+      "type": "state",
+      "name": "VIEW",
+      "components": {
+        "2": {
+          "type": "label",
+          "name": "VIEW_GFX",
+          "properties": {
+            "Visible": {
+              "value": 1,
+              "type": "UInt"
+            },
+            "Focusable": {
+              "value": 0,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Graphic": {
+                "value": "",
+                "type": "Text"
+              }
+            }
+          ]
+        },
+        "3": {
+          "type": "button",
+          "name": "BTN_PLAY",
+          "properties": {
+            "Focusable": {
+              "value": 3,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "SID_JAP_RIDETUBE_BTN_PLAY",
+                "type": "StringId"
+              }
+            }
+          ]
+        },
+        "4": {
+          "type": "button",
+          "name": "BTN_RW",
+          "properties": {
+            "Focusable": {
+              "value": 3,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "SID_JAP_RIDETUBE_BTN_RW",
+                "type": "StringId"
+              }
+            }
+          ]
+        },
+        "5": {
+          "type": "button",
+          "name": "BTN_FF",
+          "properties": {
+            "Focusable": {
+              "value": 3,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "SID_JAP_RIDETUBE_BTN_FF",
+                "type": "StringId"
+              }
+            }
+          ]
+        },
+        "6": {
+          "type": "button",
+          "name": "BTN_LIST",
+          "properties": {
+            "Focusable": {
+              "value": 3,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "SID_JAP_RIDETUBE_BTN_LIST",
+                "type": "StringId"
+              }
+            }
+          ]
+        },
+        "7": {
+          "type": "button",
+          "name": "BTN_FIND",
+          "properties": {
+            "Focusable": {
+              "value": 3,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "SID_JAP_RIDETUBE_BTN_FIND",
+                "type": "StringId"
+              }
+            }
+          ]
+        },
+        "8": {
+          "type": "title",
+          "name": "VIEW_TITLE",
+          "rows": [
+            {
+              "Text": {
+                "value": "SID_JAP_RIDETUBE_VIEW_TITLE",
+                "type": "StringId"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "12": {
+      "type": "state",
+      "name": "MAIN",
+      "components": {
+        "13": {
+          "type": "button",
+          "name": "BTN_SEARCH",
+          "properties": {
+            "Visible": {
+              "value": 1,
+              "type": "UInt"
+            },
+            "Focusable": {
+              "value": 2,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "SID_JAP_RIDETUBE_BTN_SEARCH",
+                "type": "StringId"
+              }
+            }
+          ]
+        },
+        "14": {
+          "type": "label",
+          "name": "MAIN_INFO",
+          "properties": {
+            "Visible": {
+              "value": 1,
+              "type": "UInt"
+            },
+            "Focusable": {
+              "value": 0,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "",
+                "type": "Text"
+              }
+            }
+          ]
+        },
+        "15": {
+          "type": "button",
+          "name": "BTN_NOW",
+          "properties": {
+            "Visible": {
+              "value": 1,
+              "type": "UInt"
+            },
+            "Focusable": {
+              "value": 2,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "SID_JAP_RIDETUBE_BTN_NOW",
+                "type": "StringId"
+              }
+            }
+          ]
+        },
+        "16": {
+          "type": "button",
+          "name": "BTN_RESULTS",
+          "properties": {
+            "Visible": {
+              "value": 1,
+              "type": "UInt"
+            },
+            "Focusable": {
+              "value": 2,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "SID_JAP_RIDETUBE_BTN_RESULTS",
+                "type": "StringId"
+              }
+            }
+          ]
+        },
+        "17": {
+          "type": "button",
+          "name": "BTN_HOME",
+          "properties": {
+            "Visible": {
+              "value": 1,
+              "type": "UInt"
+            },
+            "Focusable": {
+              "value": 2,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "SID_JAP_RIDETUBE_BTN_HOME",
+                "type": "StringId"
+              }
+            }
+          ]
+        },
+        "18": {
+          "type": "button",
+          "name": "BTN_SUBS",
+          "properties": {
+            "Visible": {
+              "value": 1,
+              "type": "UInt"
+            },
+            "Focusable": {
+              "value": 2,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "SID_JAP_RIDETUBE_BTN_SUBS",
+                "type": "StringId"
+              }
+            }
+          ]
+        },
+        "19": {
+          "type": "button",
+          "name": "BTN_WL",
+          "properties": {
+            "Visible": {
+              "value": 1,
+              "type": "UInt"
+            },
+            "Focusable": {
+              "value": 2,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "SID_JAP_RIDETUBE_BTN_WL",
+                "type": "StringId"
+              }
+            }
+          ]
+        },
+        "20": {
+          "type": "button",
+          "name": "BTN_S1",
+          "properties": {
+            "Visible": {
+              "value": 1,
+              "type": "UInt"
+            },
+            "Focusable": {
+              "value": 2,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "",
+                "type": "Text"
+              }
+            }
+          ]
+        },
+        "21": {
+          "type": "button",
+          "name": "BTN_S2",
+          "properties": {
+            "Visible": {
+              "value": 1,
+              "type": "UInt"
+            },
+            "Focusable": {
+              "value": 2,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "",
+                "type": "Text"
+              }
+            }
+          ]
+        },
+        "22": {
+          "type": "button",
+          "name": "BTN_S3",
+          "properties": {
+            "Visible": {
+              "value": 1,
+              "type": "UInt"
+            },
+            "Focusable": {
+              "value": 2,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "",
+                "type": "Text"
+              }
+            }
+          ]
+        },
+        "23": {
+          "type": "button",
+          "name": "BTN_S4",
+          "properties": {
+            "Visible": {
+              "value": 1,
+              "type": "UInt"
+            },
+            "Focusable": {
+              "value": 2,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "",
+                "type": "Text"
+              }
+            }
+          ]
+        },
+        "24": {
+          "type": "button",
+          "name": "BTN_S5",
+          "properties": {
+            "Visible": {
+              "value": 1,
+              "type": "UInt"
+            },
+            "Focusable": {
+              "value": 2,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "",
+                "type": "Text"
+              }
+            }
+          ]
+        },
+        "25": {
+          "type": "button",
+          "name": "BTN_S6",
+          "properties": {
+            "Visible": {
+              "value": 1,
+              "type": "UInt"
+            },
+            "Focusable": {
+              "value": 2,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "",
+                "type": "Text"
+              }
+            }
+          ]
+        },
+        "26": {
+          "type": "button",
+          "name": "BTN_ACCOUNT",
+          "properties": {
+            "Visible": {
+              "value": 1,
+              "type": "UInt"
+            },
+            "Focusable": {
+              "value": 2,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "SID_JAP_RIDETUBE_BTN_ACCOUNT",
+                "type": "StringId"
+              }
+            }
+          ]
+        },
+        "27": {
+          "type": "label",
+          "name": "MAIN_SB",
+          "properties": {
+            "Visible": {
+              "value": 1,
+              "type": "UInt"
+            },
+            "Focusable": {
+              "value": 0,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "SID_JAP_RIDETUBE_MAIN_SB",
+                "type": "StringId"
+              }
+            }
+          ]
+        },
+        "28": {
+          "type": "checkBox",
+          "name": "SET_FILL",
+          "properties": {
+            "Visible": {
+              "value": 1,
+              "type": "UInt"
+            },
+            "Focusable": {
+              "value": 2,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "SID_JAP_RIDETUBE_SET_FILL",
+                "type": "StringId"
+              }
+            }
+          ]
+        },
+        "29": {
+          "type": "dropDownMenu",
+          "name": "SET_QUALITY",
+          "rows": [
+            {
+              "ItemText": {
+                "value": "SID_CN_STATIC_0000",
+                "type": "StringId"
+              }
+            },
+            {
+              "ItemText": {
+                "value": "SID_CN_STATIC_0001",
+                "type": "StringId"
+              }
+            },
+            {
+              "ItemText": {
+                "value": "SID_CN_STATIC_0002",
+                "type": "StringId"
+              }
+            },
+            {
+              "ItemText": {
+                "value": "SID_CN_STATIC_0003",
+                "type": "StringId"
+              }
+            }
+          ],
+          "cells": {
+            "HeaderText": {
+              "value": "SID_CN_STATIC_0004",
+              "type": "StringId"
+            },
+            "SelectedItem": {
+              "value": 0,
+              "type": "UInt"
+            }
+          }
+        },
+        "30": {
+          "type": "checkBox",
+          "name": "SET_VIDEO_DRIVING",
+          "properties": {
+            "Visible": {
+              "value": 1,
+              "type": "UInt"
+            },
+            "Focusable": {
+              "value": 2,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "SID_JAP_RIDETUBE_SET_VIDEO_DRIVING",
+                "type": "StringId"
+              }
+            }
+          ]
+        },
+        "31": {
+          "type": "checkBox",
+          "name": "SET_MEMBERS",
+          "properties": {
+            "Visible": {
+              "value": 1,
+              "type": "UInt"
+            },
+            "Focusable": {
+              "value": 2,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "SID_JAP_RIDETUBE_SET_MEMBERS",
+                "type": "StringId"
+              }
+            }
+          ]
+        },
+        "32": {
+          "type": "dropDownMenu",
+          "name": "SET_SB_SPONSOR",
+          "rows": [
+            {
+              "ItemText": {
+                "value": "SID_CN_STATIC_0005",
+                "type": "StringId"
+              }
+            },
+            {
+              "ItemText": {
+                "value": "SID_CN_STATIC_0006",
+                "type": "StringId"
+              }
+            },
+            {
+              "ItemText": {
+                "value": "SID_CN_STATIC_0007",
+                "type": "StringId"
+              }
+            }
+          ],
+          "cells": {
+            "HeaderText": {
+              "value": "SID_CN_STATIC_0008",
+              "type": "StringId"
+            },
+            "SelectedItem": {
+              "value": 0,
+              "type": "UInt"
+            }
+          }
+        },
+        "33": {
+          "type": "dropDownMenu",
+          "name": "SET_SB_SELFPROMO",
+          "rows": [
+            {
+              "ItemText": {
+                "value": "SID_CN_STATIC_0009",
+                "type": "StringId"
+              }
+            },
+            {
+              "ItemText": {
+                "value": "SID_CN_STATIC_0010",
+                "type": "StringId"
+              }
+            },
+            {
+              "ItemText": {
+                "value": "SID_CN_STATIC_0011",
+                "type": "StringId"
+              }
+            }
+          ],
+          "cells": {
+            "HeaderText": {
+              "value": "SID_CN_STATIC_0012",
+              "type": "StringId"
+            },
+            "SelectedItem": {
+              "value": 0,
+              "type": "UInt"
+            }
+          }
+        },
+        "34": {
+          "type": "dropDownMenu",
+          "name": "SET_SB_INTERACTION",
+          "rows": [
+            {
+              "ItemText": {
+                "value": "SID_CN_STATIC_0013",
+                "type": "StringId"
+              }
+            },
+            {
+              "ItemText": {
+                "value": "SID_CN_STATIC_0014",
+                "type": "StringId"
+              }
+            },
+            {
+              "ItemText": {
+                "value": "SID_CN_STATIC_0015",
+                "type": "StringId"
+              }
+            }
+          ],
+          "cells": {
+            "HeaderText": {
+              "value": "SID_CN_STATIC_0016",
+              "type": "StringId"
+            },
+            "SelectedItem": {
+              "value": 0,
+              "type": "UInt"
+            }
+          }
+        },
+        "35": {
+          "type": "dropDownMenu",
+          "name": "SET_SB_INTRO",
+          "rows": [
+            {
+              "ItemText": {
+                "value": "SID_CN_STATIC_0017",
+                "type": "StringId"
+              }
+            },
+            {
+              "ItemText": {
+                "value": "SID_CN_STATIC_0018",
+                "type": "StringId"
+              }
+            },
+            {
+              "ItemText": {
+                "value": "SID_CN_STATIC_0019",
+                "type": "StringId"
+              }
+            }
+          ],
+          "cells": {
+            "HeaderText": {
+              "value": "SID_CN_STATIC_0020",
+              "type": "StringId"
+            },
+            "SelectedItem": {
+              "value": 0,
+              "type": "UInt"
+            }
+          }
+        },
+        "36": {
+          "type": "dropDownMenu",
+          "name": "SET_SB_OUTRO",
+          "rows": [
+            {
+              "ItemText": {
+                "value": "SID_CN_STATIC_0021",
+                "type": "StringId"
+              }
+            },
+            {
+              "ItemText": {
+                "value": "SID_CN_STATIC_0022",
+                "type": "StringId"
+              }
+            },
+            {
+              "ItemText": {
+                "value": "SID_CN_STATIC_0023",
+                "type": "StringId"
+              }
+            }
+          ],
+          "cells": {
+            "HeaderText": {
+              "value": "SID_CN_STATIC_0024",
+              "type": "StringId"
+            },
+            "SelectedItem": {
+              "value": 1,
+              "type": "UInt"
+            }
+          }
+        },
+        "37": {
+          "type": "dropDownMenu",
+          "name": "SET_SB_MUSIC_OFFTOPIC",
+          "rows": [
+            {
+              "ItemText": {
+                "value": "SID_CN_STATIC_0025",
+                "type": "StringId"
+              }
+            },
+            {
+              "ItemText": {
+                "value": "SID_CN_STATIC_0026",
+                "type": "StringId"
+              }
+            },
+            {
+              "ItemText": {
+                "value": "SID_CN_STATIC_0027",
+                "type": "StringId"
+              }
+            }
+          ],
+          "cells": {
+            "HeaderText": {
+              "value": "SID_CN_STATIC_0028",
+              "type": "StringId"
+            },
+            "SelectedItem": {
+              "value": 2,
+              "type": "UInt"
+            }
+          }
+        },
+        "38": {
+          "type": "dropDownMenu",
+          "name": "SET_BATTERY",
+          "rows": [
+            {
+              "ItemText": {
+                "value": "SID_CN_STATIC_0029",
+                "type": "StringId"
+              }
+            },
+            {
+              "ItemText": {
+                "value": "SID_CN_STATIC_0030",
+                "type": "StringId"
+              }
+            },
+            {
+              "ItemText": {
+                "value": "SID_CN_STATIC_0031",
+                "type": "StringId"
+              }
+            },
+            {
+              "ItemText": {
+                "value": "SID_CN_STATIC_0032",
+                "type": "StringId"
+              }
+            }
+          ],
+          "cells": {
+            "HeaderText": {
+              "value": "SID_CN_STATIC_0033",
+              "type": "StringId"
+            },
+            "SelectedItem": {
+              "value": 1,
+              "type": "UInt"
+            }
+          }
+        },
+        "39": {
+          "type": "button",
+          "name": "CN_CREDITS",
+          "properties": {
+            "Visible": {
+              "value": 1,
+              "type": "UInt"
+            },
+            "Focusable": {
+              "value": 2,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text1stRow": {
+                "value": "SID_JAP_RIDETUBE_CN_CREDITS_TITLE",
+                "type": "StringId"
+              },
+              "Text2ndRow": {
+                "value": "SID_JAP_RIDETUBE_CN_CREDITS_LINK",
+                "type": "StringId"
+              }
+            }
+          ]
+        },
+        "40": {
+          "type": "button",
+          "name": "REPO_CREDITS",
+          "properties": {
+            "Visible": {
+              "value": 1,
+              "type": "UInt"
+            },
+            "Focusable": {
+              "value": 2,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text1stRow": {
+                "value": "SID_JAP_RIDETUBE_REPO_CREDITS_TITLE",
+                "type": "StringId"
+              },
+              "Text2ndRow": {
+                "value": "SID_JAP_RIDETUBE_REPO_CREDITS_LINK",
+                "type": "StringId"
+              }
+            }
+          ]
+        },
+        "41": {
+          "type": "title",
+          "name": "MAIN_TITLE",
+          "rows": [
+            {
+              "Text": {
+                "value": "SID_JAP_RIDETUBE_MAIN_TITLE",
+                "type": "StringId"
+              }
+            }
+          ]
+        }
+      },
+      "properties": {
+        "ParentState": {
+          "value": 1,
+          "type": "UInt"
+        }
+      }
+    }
+  }
+}

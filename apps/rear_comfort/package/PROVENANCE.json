@@ -1,0 +1,17 @@
+{
+  "catalogUrl": "https://gitee.com/xiaobai-151/mgu-cn-xiaobai/raw/main/catalog.json",
+  "catalogSha256": "75ec5122c7fa286774deaf57b2c447faaf7bfa2d2db0bcc018207f981a70704d",
+  "component": "rear_comfort",
+  "sourceArtifact": {
+    "name": "rear_comfort@0.4.4.tgz",
+    "url": "packages/rear_comfort@0.4.4.tgz",
+    "size": 5490736,
+    "sha256": "bf1bd20c03b3c78ba055528f81fb35b8a390b74cdb50d537a16fe82a2ed8719f"
+  },
+  "upstreamVersion": "0.4.4",
+  "releaseVersion": "0.4.5",
+  "cnRevision": 1,
+  "source": "https://github.com/alexp50/bmw-apps/pull/3",
+  "license": "MIT",
+  "vehicleTested": false
+}

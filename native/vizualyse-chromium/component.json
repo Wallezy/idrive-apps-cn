@@ -1,0 +1,211 @@
+{
+  "id": "vizualyse-chromium",
+  "kind": "tool",
+  "version": "0.3.101",
+  "title": "浏览器（后台组件）",
+  "description": "在车机中使用 Chromium 浏览网页，通过手机输入网址和文字。",
+  "files": [
+    {
+      "path": "server.js",
+      "mode": "0644",
+      "from": "files/server.js"
+    },
+    {
+      "path": "env.js",
+      "mode": "0644",
+      "from": "files/env.js"
+    },
+    {
+      "path": "unpack.js",
+      "mode": "0644",
+      "from": "files/unpack.js"
+    },
+    {
+      "path": "browser.js",
+      "mode": "0644",
+      "from": "files/browser.js"
+    },
+    {
+      "path": "screen.js",
+      "mode": "0644",
+      "from": "files/screen.js"
+    },
+    {
+      "path": "firewall.js",
+      "mode": "0644",
+      "from": "files/firewall.js"
+    },
+    {
+      "path": "control.js",
+      "mode": "0644",
+      "from": "files/control.js"
+    },
+    {
+      "path": "proxy.js",
+      "mode": "0644",
+      "from": "files/proxy.js"
+    },
+    {
+      "path": "mqtt_bus.js",
+      "mode": "0644",
+      "from": "files/mqtt_bus.js"
+    },
+    {
+      "path": "touch_screen.js",
+      "mode": "0644",
+      "from": "files/touch_screen.js"
+    },
+    {
+      "path": "touch_view.js",
+      "mode": "0644",
+      "from": "files/touch_view.js"
+    },
+    {
+      "path": "qrcode.js",
+      "mode": "0644",
+      "from": "files/qrcode.js"
+    },
+    {
+      "path": "ui_canvas.js",
+      "mode": "0644",
+      "from": "files/ui_canvas.js"
+    },
+    {
+      "path": "ui_kit.js",
+      "mode": "0644",
+      "from": "files/ui_kit.js"
+    },
+    {
+      "path": "ui_host.js",
+      "mode": "0644",
+      "from": "files/ui_host.js"
+    },
+    {
+      "path": "ui_png.js",
+      "mode": "0644",
+      "from": "files/ui_png.js"
+    },
+    {
+      "path": "touch_reader.py",
+      "mode": "0644",
+      "from": "files/touch_reader.py"
+    },
+    {
+      "path": "ui.fonts.json",
+      "mode": "0644",
+      "from": "files/ui.fonts.json"
+    },
+    {
+      "path": "ui.f20.font.gz",
+      "mode": "0644",
+      "from": "files/ui.f20.font.gz"
+    },
+    {
+      "path": "ui.f24.font.gz",
+      "mode": "0644",
+      "from": "files/ui.f24.font.gz"
+    },
+    {
+      "path": "ui.f32.font.gz",
+      "mode": "0644",
+      "from": "files/ui.f32.font.gz"
+    },
+    {
+      "path": "ui.f44.font.gz",
+      "mode": "0644",
+      "from": "files/ui.f44.font.gz"
+    },
+    {
+      "path": "page.html",
+      "mode": "0644",
+      "from": "files/page.html"
+    },
+    {
+      "path": "chromium.tgz",
+      "mode": "0644",
+      "from": ".payload/chromium.tgz"
+    },
+    {
+      "path": "bundle-VERSION.txt",
+      "mode": "0644",
+      "from": "files/bundle-VERSION.txt"
+    },
+    {
+      "path": "THIRD-PARTY.md",
+      "mode": "0644",
+      "from": "files/THIRD-PARTY.md"
+    },
+    {
+      "path": "LICENSE",
+      "mode": "0644",
+      "from": "files/LICENSE"
+    },
+    {
+      "path": "i18n.js",
+      "mode": "0644",
+      "from": "files/i18n.js"
+    },
+    {
+      "path": "NOTICE.zh-CN.md",
+      "mode": "0644",
+      "from": "files/NOTICE.zh-CN.md"
+    },
+    {
+      "path": "OFL-NotoSansSC.txt",
+      "mode": "0644",
+      "from": "files/OFL-NotoSansSC.txt"
+    },
+    {
+      "path": "ui.f14.font.gz",
+      "mode": "0644",
+      "from": "files/ui.f14.font.gz"
+    }
+  ],
+  "units": [
+    {
+      "name": "vizualyse-chromium.service",
+      "from": "units/vizualyse-chromium.service"
+    }
+  ],
+  "enable": [
+    {
+      "unit": "vizualyse-chromium.service",
+      "target": "multi-user.target"
+    }
+  ],
+  "recmgr": [
+    "vizualyse-chromium"
+  ],
+  "restart": [
+    "vizualyse-chromium.service"
+  ],
+  "internet": true,
+  "uids": [
+    12997
+  ],
+  "mguHmi": [
+    "ID7"
+  ],
+  "crashNames": [
+    "chromium",
+    "chrome_crashpad_handler",
+    "chromium-wl",
+    "chromium-touch"
+  ],
+  "deactivate": [
+    "node",
+    "firewall.js",
+    "remove"
+  ],
+  "requires": {
+    "mgu-deploy": "0.7.0",
+    "mgu-python": "1.0.0",
+    "mgu-render": "0.6.11",
+    "vizualyse-bus": "0.1.1"
+  },
+  "uninstallable": true,
+  "build": [
+    "python3",
+    "../../tools/materialize_community_payload.py"
+  ]
+}

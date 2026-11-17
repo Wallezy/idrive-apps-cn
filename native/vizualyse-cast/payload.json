@@ -1,0 +1,15 @@
+{
+  "id": "vizualyse-cast",
+  "artifact": {
+    "name": "vizualyse-cast@0.4.100.tgz",
+    "url": "https://github.com/JackieZ123430/vizualyse-idrive-apps-cn/releases/download/vizualyse-zh-cn.1/vizualyse-cast%400.4.100.tgz",
+    "size": 31549537,
+    "sha256": "eb8c75e8770bd0aae0689b0166de680a74a1274e01355c6e81d4b57299018247"
+  },
+  "files": [
+    {
+      "path": "ffmpeg",
+      "sha256": "e7e7fb30477f717e6f55f9180a70386c62677ef8a4d4d1a5d948f4098aa3eb99"
+    }
+  ]
+}

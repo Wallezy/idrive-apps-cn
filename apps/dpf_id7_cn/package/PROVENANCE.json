@@ -1,0 +1,17 @@
+{
+  "catalogUrl": "https://gitee.com/xiaobai-151/mgu-cn-xiaobai/raw/main/catalog.json",
+  "catalogSha256": "75ec5122c7fa286774deaf57b2c447faaf7bfa2d2db0bcc018207f981a70704d",
+  "component": "dpf_id7_cn",
+  "sourceArtifact": {
+    "name": "dpf_id7_cn@0.1.1.tgz",
+    "url": "packages/dpf_id7_cn@0.1.1.tgz",
+    "size": 905949,
+    "sha256": "4e84cf0ee8785f86523b4bc52352d36e7e4412876795d547d1ca70013bb48ae3"
+  },
+  "upstreamVersion": "0.1.1",
+  "releaseVersion": "0.1.2",
+  "cnRevision": 1,
+  "source": "https://github.com/giuseppesalatino-boop/mgu-apps",
+  "license": "MIT",
+  "vehicleTested": false
+}

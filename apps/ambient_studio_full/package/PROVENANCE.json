@@ -1,0 +1,17 @@
+{
+  "catalogUrl": "https://gitee.com/xiaobai-151/mgu-cn-xiaobai/raw/main/catalog.json",
+  "catalogSha256": "75ec5122c7fa286774deaf57b2c447faaf7bfa2d2db0bcc018207f981a70704d",
+  "component": "ambient_studio_full",
+  "sourceArtifact": {
+    "name": "ambient_studio_full@0.1.5.tgz",
+    "url": "packages/ambient_studio_full@0.1.5.tgz",
+    "size": 957143,
+    "sha256": "87973e4c5c975de11a54db02f4b943517138495215f388745bd0f2af0192ae41"
+  },
+  "upstreamVersion": "0.1.5",
+  "releaseVersion": "0.1.6",
+  "cnRevision": 1,
+  "source": "https://github.com/alexp50/bmw-apps/pull/3",
+  "license": "MIT",
+  "vehicleTested": false
+}

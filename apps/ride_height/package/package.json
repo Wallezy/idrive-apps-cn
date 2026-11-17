@@ -1,0 +1,38 @@
+{
+  "name": "ride_height",
+  "version": "0.6.1",
+  "description": "全屏设置 VDP 预设及前后空气弹簧充放气",
+  "main": "javascript/localized-entry.js",
+  "private": false,
+  "author": "alexp50",
+  "license": "MIT",
+  "engines": {
+    "node": ">=8.7.0"
+  },
+  "oapAppSettings": {
+    "maxDiskUsage": 20971520,
+    "cpuLimit": 60,
+    "memoryThresholdKB": 196608,
+    "priority": "PRIO_LOW",
+    "visibility": "FOREGROUND",
+    "latencyClass": "FOREGROUND",
+    "loggingId": "OAA6",
+    "userLoginRequired": false,
+    "backgroundPriority": 200,
+    "someipManifest": "manifest.json"
+  },
+  "mguLocalOnly": true,
+  "files": [
+    "CHANGELOG.md",
+    "NOTICE.zh-CN.md",
+    "PROVENANCE.json",
+    "config",
+    "javascript",
+    "manifest.json",
+    "npm-shrinkwrap.json",
+    "package.json",
+    "permissions.json",
+    "rhmiData",
+    "LICENSE"
+  ]
+}

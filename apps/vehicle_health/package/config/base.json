@@ -1,0 +1,10 @@
+{
+  "rhmiLoadingEnabled": true,
+  "entryPointLoadingEnabled": true,
+  "settings": {
+    "vehicle_health": {
+      "ddeAddress": 18,
+      "fullScreenRequired": true
+    }
+  }
+}

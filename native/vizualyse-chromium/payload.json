@@ -1,0 +1,15 @@
+{
+  "id": "vizualyse-chromium",
+  "artifact": {
+    "name": "vizualyse-chromium@0.3.100.tgz",
+    "url": "https://github.com/JackieZ123430/vizualyse-idrive-apps-cn/releases/download/vizualyse-zh-cn.1/vizualyse-chromium%400.3.100.tgz",
+    "size": 189549123,
+    "sha256": "935c8ac1d14bb8275f0c9d59d23259b313ad5b00adfc6206c9a67f4744a6254c"
+  },
+  "files": [
+    {
+      "path": "chromium.tgz",
+      "sha256": "b6cd7746407a2abc559fd239d474ae15f08e6c395b0dbe4d6654a926012bb697"
+    }
+  ]
+}

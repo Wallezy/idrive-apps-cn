@@ -1,0 +1,11 @@
+{
+  "rhmiLoadingEnabled": true,
+  "entryPointLoadingEnabled": true,
+  "settings": {
+    "dpf_monitor": {
+      "ddeAddress": 18,
+      "readOnly": true,
+      "fullScreenRequired": true
+    }
+  }
+}

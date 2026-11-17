@@ -1,0 +1,487 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- Copyright (C) 2026 Yousaf Khan -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Steam on the car</title>
+<style>
+  :root { --bg: #111; --fg: #eee; --dim: #999; --card: #1d1d1d; --acc: #3b82f6; --bad: #f87171; --ok: #4ade80; --warn: #fbbf24; }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 16px; background: var(--bg); color: var(--fg); font: 16px/1.4 system-ui, sans-serif; }
+  h1 { font-size: 20px; margin: 0 0 12px; }
+  h2 { font-size: 16px; margin: 0 0 8px; }
+  .card { background: var(--card); border-radius: 12px; padding: 12px; margin-bottom: 12px; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .row + .row { margin-top: 8px; }
+  input[type=text], input[type=password], input[type=number], select { flex: 1; min-width: 0; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #000; color: var(--fg); font-size: 16px; }
+  input[type=range] { flex: 1; }
+  button { padding: 12px 14px; border-radius: 8px; border: 0; background: #2a2a2a; color: var(--fg); font-size: 15px; }
+  button.acc { background: var(--acc); }
+  button.bad { background: #7f1d1d; }
+  button:disabled { opacity: .4; }
+  label { color: var(--dim); }
+  .dim { color: var(--dim); font-size: 14px; }
+  .err { color: var(--bad); }
+  .ok { color: var(--ok); }
+  .warn { color: var(--warn); }
+  .game { border-top: 1px solid #333; padding: 10px 0; }
+  .game:first-child { border-top: 0; padding-top: 0; }
+  .bar { height: 8px; background: #333; border-radius: 4px; overflow: hidden; margin-top: 8px; }
+  .bar > div { height: 100%; background: var(--acc); width: 0; }
+  details summary { color: var(--dim); font-size: 14px; margin-top: 6px; }
+  .hidden { display: none; }
+  .chart { margin-top: 12px; }
+  .chart .head { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; color: var(--dim); }
+  .chart svg { display: block; width: 100%; height: 96px; background: #000; border-radius: 6px; margin-top: 4px; }
+  .chart .legend { font-size: 13px; margin-top: 2px; }
+  .chart .legend span { margin-right: 10px; white-space: nowrap; }
+</style>
+</head>
+<body>
+<h1>Steam on the car</h1>
+<p id="note" class="warn"></p>
+
+<div class="card" id="now">
+  <h2>Playing</h2>
+  <p id="playing" class="dim">Nothing.</p>
+  <div class="row"><button class="acc" id="show">Show on the screen</button><button id="hide">Hide</button><button class="bad" id="stop">Stop the game</button></div>
+  <div class="row"><button id="winston">Compatibility mode: off</button></div>
+  <p class="dim">The game's pictures go straight to the car's own screen compositor (Winston), in full colour. Compatibility mode sends them through mgu-render instead, as older versions did; Steam does that by itself if Winston can't be reached. From the next Show.</p>
+  <p class="dim">Only while parked. A hidden game keeps running; Stop ends it. Games can't be controlled yet (no touch or gamepad input in this version).</p>
+</div>
+
+<div class="card">
+  <details id="perfBox"><summary>Performance graphs</summary>
+    <p class="dim" id="perfNote">The running game's (or the last one's) measurements, a point every 10 seconds, the last hour. Read only while this is open.</p>
+    <div id="perfGraphs"></div>
+  </details>
+</div>
+
+<div class="card">
+  <h2>Library</h2>
+  <div id="library"><p class="dim">No games yet: install one below.</p></div>
+</div>
+
+<div class="card">
+  <h2>Install a game</h2>
+  <div class="row"><input id="appid" type="number" inputmode="numeric" placeholder="Steam app id"><button class="acc" id="install">Install</button></div>
+  <div class="row"><button id="sts2">Slay the Spire 2 (2868840)</button></div>
+  <p class="dim">The app id is the number in the game's Steam store address (store.steampowered.com/app/<b>2868840</b>/...). The account must own it. The Windows version is downloaded.</p>
+  <div id="dl" class="hidden">
+    <p id="dlText"></p>
+    <div class="bar"><div id="dlBar"></div></div>
+    <div id="ask" class="hidden">
+      <div class="row" style="margin-top:8px"><input id="answer" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="acc" id="send">Send</button></div>
+    </div>
+    <div class="row" style="margin-top:8px"><button id="cancel">Cancel</button></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Steam account</h2>
+  <div class="row"><input id="user" type="text" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Account name (not the email)"><button id="saveUser">Save</button></div>
+  <p class="dim" id="acct"></p>
+  <p class="dim">Steam asks for the password and a Steam Guard code once, during the first install, right on this page. The car keeps only Steam's sign-in token, never the password.</p>
+</div>
+
+<div class="card">
+  <h2>Settings</h2>
+  <div class="row"><label for="res">Picture</label><select id="res"></select></div>
+  <div class="row"><label for="fps">Frames per second</label><select id="fps"></select></div>
+  <div class="row"><label for="ups">Upscaling</label><select id="ups"></select></div>
+  <div class="row"><label for="mem">Memory for the game</label><select id="mem"></select></div>
+  <div class="row"><label for="where">Install games on</label><select id="where"></select></div>
+  <div class="row"><label for="region">Download from</label><select id="region"></select></div>
+  <p class="dim" id="whereNote"></p>
+  <div class="row"><button id="sound">Sound: on</button><label for="vol">Volume</label><input id="vol" type="range" min="0" max="150" step="5"></div>
+  <p class="dim">Picture, frames and memory apply from the next game. More memory lets bigger games run but leaves less to the car's own screens. Upscaling applies at once: FSR sharpens a small picture (896x320, say) as it is enlarged to the screen, for some of the graphics chip's time.</p>
+  <dl id="info" class="dim"></dl>
+</div>
+<p id="msg" class="err"></p>
+
+<script>
+'use strict';
+const T = new URLSearchParams(location.search).get('t') || '';
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s === null || s === undefined ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+let last = null;
+let editing = false;
+
+function api(p, body) {
+  $('msg').textContent = '';
+  return fetch(p, { method: body === undefined ? 'GET' : 'POST', headers: { 'X-Steam-Token': T, 'Content-Type': 'application/json' },
+      body: body === undefined ? undefined : JSON.stringify(body) })
+    .then((r) => r.json().then((j) => { if (!r.ok) { $('msg').textContent = j.error || r.status; if (j.status) render(j.status); throw new Error(j.error); } return j; }))
+    .then((s) => { if (s && s.library) render(s); return s; });
+}
+
+function opts(sel, list, cur) {
+  if (document.activeElement === sel) return;
+  sel.innerHTML = list.map((o) => '<option value="' + esc(o.v) + '"' + (String(o.v) === String(cur) ? ' selected' : '') + '>' + esc(o.t) + '</option>').join('');
+}
+
+/* ---- the performance graphs: /api/perf's points (one each 10 s), read
+ * only while their panel is open; inline SVG, nothing fetched from outside */
+const CHARTS = [
+  { title: 'Frames a second', unit: '', series: [['fps', 'the game', '#4ade80'], ['low1', '1% low', '#fbbf24'], ['pictures', 'shown', '#3b82f6']] },
+  { title: 'GPU awake', unit: ' %', max: 100, series: [['gpuBusy', 'out of its idle state: not how full it is (the car\'s screens too)', '#f87171']] },
+  { title: 'GPU clock', unit: ' MHz', series: [['gpuMhz', 'clock', '#a78bfa']] },
+  { title: 'CPU', unit: ' %', series: [['cpu', 'the unit (all 4 cores)', '#3b82f6'], ['gameCpu', 'the game (of one core)', '#4ade80']] },
+  { title: 'Memory', unit: ' MB', series: [['gameMb', 'the game', '#4ade80'], ['availMb', 'available', '#3b82f6'], ['swapMb', 'swapped', '#f87171']] },
+  { title: 'Time a picture', unit: ' ms', series: [['fsrMs', 'FSR (GPU)', '#fbbf24'], ['sinkMs', 'wl-sink', '#3b82f6']] },
+];
+let perf = { key: null, points: [], timer: null, name: null, running: false };
+
+function niceMax(v) {
+  if (!(v > 0)) return 1;
+  const p = Math.pow(10, Math.floor(Math.log10(v))), n = v / p;
+  return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10) * p;
+}
+
+function chartSvg(c, pts) {
+  const W = 600, H = 96, t0 = pts[0].t, t1 = Math.max(pts[pts.length - 1].t, t0 + 1);
+  const vals = [];
+  c.series.forEach((s) => pts.forEach((p) => { if (p[s[0]] !== null && p[s[0]] !== undefined) vals.push(p[s[0]]); }));
+  if (!vals.length) return null;
+  const top = c.max || niceMax(Math.max.apply(null, vals) * 1.05);
+  const x = (t) => ((t - t0) / (t1 - t0)) * W, y = (v) => H - (Math.min(v, top) / top) * H;
+  let svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none">';
+  [0.25, 0.5, 0.75].forEach((f) => { svg += '<line x1="0" x2="' + W + '" y1="' + H * f + '" y2="' + H * f + '" stroke="#222" vector-effect="non-scaling-stroke"/>'; });
+  /* a change of upscaling: a line where it happened */
+  pts.forEach((p, i) => { if (i && p.mode !== pts[i - 1].mode) svg += '<line x1="' + x(p.t) + '" x2="' + x(p.t) + '" y1="0" y2="' + H + '" stroke="#666" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/>'; });
+  c.series.forEach((s) => {
+    let d = '', pen = false;
+    pts.forEach((p) => {
+      const v = p[s[0]];
+      if (v === null || v === undefined) { pen = false; return; }
+      d += (pen ? 'L' : 'M') + x(p.t).toFixed(1) + ' ' + y(v).toFixed(1);
+      pen = true;
+    });
+    if (d) svg += '<path d="' + d + '" fill="none" stroke="' + s[2] + '" stroke-width="2" vector-effect="non-scaling-stroke"/>';
+  });
+  return { svg: svg + '</svg>', top: top };
+}
+
+function drawPerf() {
+  const pts = perf.points;
+  if (!pts.length) {
+    $('perfGraphs').innerHTML = '<p class="dim">' + (perf.name ? esc(perf.name) + ': no measurements yet (the first after 10 s of pictures).' : 'No game has run since the tool started.') + '</p>';
+    return;
+  }
+  const lastP = pts[pts.length - 1], mins = Math.round((lastP.t - pts[0].t) / 60000);
+  const modes = pts.map((p) => p.mode).filter((m, i, a) => !i || m !== a[i - 1]);
+  let html = '<p class="dim">' + esc(perf.name) + (perf.running ? ' (running)' : ' (ended)') + ': the last ' + (mins || 1) + ' min' +
+    ', upscaling ' + esc(modes.join(' -> ')) + (modes.length > 1 ? ' (dashed lines: where it changed)' : '') + '.</p>';
+  CHARTS.forEach((c) => {
+    const g = chartSvg(c, pts);
+    if (!g) return;
+    html += '<div class="chart"><div class="head"><span>' + esc(c.title) + '</span><span>top: ' + g.top + esc(c.unit) + '</span></div>' + g.svg +
+      '<div class="legend">' + c.series.map((s) => (lastP[s[0]] === null || lastP[s[0]] === undefined) ? '' :
+        '<span style="color:' + s[2] + '">' + esc(s[1]) + ' ' + lastP[s[0]] + esc(c.unit) + '</span>').join('') + '</div></div>';
+  });
+  $('perfGraphs').innerHTML = html;
+}
+
+/* one request at a time (a slow link, the panel opened again): two with the
+ * same "since" would add the same points twice */
+function perfFetch() {
+  if (perf.busy) return;
+  perf.busy = true;
+  const since = perf.points.length ? perf.points[perf.points.length - 1].t : 0;
+  let again = false;
+  fetch('/api/perf?since=' + since, { headers: { 'X-Steam-Token': T } }).then((r) => r.json()).then((j) => {
+    const key = (j.name || '') + '@' + (j.started || '');
+    if (key !== perf.key) {
+      /* another game, or the same one again: start over */
+      again = perf.key !== null && since > 0;
+      perf.key = key; perf.points = [];
+      if (again) return;
+    }
+    perf.name = j.name; perf.running = !!j.running;
+    perf.points = perf.points.concat((j.points || []).filter((p) => !perf.points.length || p.t > perf.points[perf.points.length - 1].t)).slice(-360);
+    drawPerf();
+  }).catch(() => null).then(() => { perf.busy = false; if (again) perfFetch(); });
+}
+
+$('perfBox').addEventListener('toggle', () => {
+  clearInterval(perf.timer);
+  perf.timer = null;
+  if (!$('perfBox').open) return;
+  perfFetch();
+  perf.timer = setInterval(perfFetch, 10000);
+});
+
+function render(s) {
+  last = s;
+  const notes = [];
+  if (s.bundle === 'unpacking') notes.push('Installing the tool on the car (a few minutes, once)...');
+  if (s.error) notes.push('Error: ' + s.error);
+  if (s.restartNote) notes.push('Note: ' + s.restartNote + '.');
+  if (s.busNote) notes.push('The last game ' + s.busNote + '.');
+  if (s.memory && s.memory.note) notes.push(s.memory.note);
+  if (s.moving) notes.push('The car is moving: games are hidden until it stops.');
+  $('note').textContent = notes.join(' ');
+
+  const g = s.game;
+  if (g && g.state !== 'ended') {
+    /* FSR's size only while it draws (its pictures are counted in all; its
+     * output, rebuilt after a hide, is 0x0 until it draws again) */
+    const fsrText = (x, shown) => {
+      const f = x.fsr, sz = f && f.size || [];
+      if (f && f.now > 0 && sz[0] > 0 && sz[1] > 0) return ', FSR to ' + sz.join('x') + (f.gpuMs >= 0 ? ' (' + f.gpuMs.toFixed(1) + ' ms a picture)' : '');
+      if (shown && x.fsrWhy) return ', FSR not used: ' + x.fsrWhy;
+      return '';
+    };
+    $('playing').textContent = g.name + ': ' + (g.state === 'starting' ? 'starting (this can take a minute)...' :
+      'running, ' + g.fps + ' pictures/s' + (g.gpuBuffers ? '' : ' (no GPU buffers)') + (s.shown ? ', on the screen' : ', hidden') +
+      fsrText(g, s.shown)) +
+      (s.memory.usedMb ? ' - ' + s.memory.usedMb + ' of ' + s.memory.capMb + ' MB' : '');
+  } else {
+    $('playing').textContent = g ? 'Nothing. ' + g.name + ' ended' + (g.note ? ': ' + g.note : '') + '.' : 'Nothing.';
+  }
+  const wn = s.winston || {};
+  $('winston').textContent = 'Compatibility mode (mgu-render): ' + (wn.on ? 'off (turn on)' : 'on (turn off)') +
+    (wn.on && s.shown ? ' - showing through ' + wn.via : '') + (wn.note ? ' - ' + wn.note : '');
+  $('show').disabled = !s.running || s.shown || s.moving;
+  $('hide').disabled = !s.shown;
+  $('stop').disabled = !s.running;
+
+  /* the per-game switches' labels: drawn with the library, and while an
+   * Options panel is open (no redraw then: it would close it and lose what
+   * is being typed) put on its buttons as they are, so a switch shows its
+   * new state at once, not after a reload */
+  const label = (act, x) => ({
+    nosteam: 'Run without Steam: ' + (x.noSteam ? 'on' : 'off'),
+    vulkan: 'Vulkan: ' + (x.vulkan ? 'on' : 'off') + (x.vulkan === x.vulkanDefault ? ' (the default)' : ''),
+    iris: 'OpenGL driver: ' + (x.iris ? 'iris' + (x.irisDefault ? ' (the default)' : '') + (x.vulkan ? ', used only with Vulkan off' : '') : 'i965'),
+    detail: 'Detail: ' + (x.detail || 'normal'),
+  })[act];
+  if (editing) {
+    s.library.forEach((x) => {
+      const card = $('library').querySelector('.game[data-app="' + x.appId + '"]');
+      if (!card) return;
+      card.querySelectorAll('button[data-act]').forEach((b) => {
+        const t = label(b.dataset.act, x);
+        if (t !== undefined && b.textContent !== t) b.textContent = t;
+        if (b.dataset.act === 'play') b.disabled = !!(s.running || !x.present);
+      });
+    });
+  }
+  if (!editing) {
+    $('library').innerHTML = s.library.length ? s.library.map((x) =>
+      '<div class="game" data-app="' + x.appId + '"><div class="row"><b style="flex:1">' + esc(x.name) + '</b>' +
+      '<button class="acc" data-act="play"' + (s.running || !x.present ? ' disabled' : '') + '>Play</button></div>' +
+      (x.usb && !x.present ? '<div class="err">On the USB stick ' + esc(x.usb) + ': plug it in</div>' : '') +
+      (x.steamStub ? '<div class="err">Steam\'s DRM wrapper (SteamStub) is on this game\'s program: it needs the Steam client to start, ' +
+        'which the car doesn\'t have (Run without Steam can\'t help). It will most likely quit at once.</div>' : '') +
+      '<div class="dim">' + x.appId + (x.sizeMb ? ' - ' + (x.sizeMb / 1024).toFixed(1) + ' GB' : '') + (x.usb ? ' - USB ' + esc(x.usb) : '') + (x.engine ? ' - ' + esc(x.engine) : '') +
+      ' - ' + (x.exe ? esc(x.exe) : '<span class="err">no program found</span>') + '</div>' +
+      '<details><summary>Options</summary>' +
+      '<div class="row"><label>Program</label><select data-f="exe"><option>' + esc(x.exe || '') + '</option></select></div>' +
+      '<div class="row"><input type="text" data-f="args" value="' + esc(x.args) + '" placeholder="Launch options" autocapitalize="off" spellcheck="false"><button data-act="save">Save</button></div>' +
+      (x.steamApi === 0 ? '' :
+        '<div class="row"><button data-act="nosteam">' + esc(label('nosteam', x)) + '</button></div>' +
+        '<p class="dim">For a game that says to start it from Steam: its Steam library is swapped for gbe_fork (Goldberg\'s emulator); ' +
+        'achievements and cloud saves stay on the car. Off puts Steam\'s back. Steam\'s DRM wrapper still stops some games.</p>') +
+      (s.vulkanAvailable || x.vulkan ?
+        '<div class="row"><button data-act="vulkan">' + esc(label('vulkan', x)) + '</button></div>' +
+        '<p class="dim">Direct3D 9-11 through DXVK, or a Godot 4 game\'s own Vulkan renderer, instead of OpenGL: on by default, 32- and 64-bit. ' +
+        'If the unit restarts during the game, Vulkan turns itself off for it. ' +
+        'A Godot 4 game\'s default launch options switch to Vulkan by themselves.</p>' : '') +
+      (s.irisAvailable || x.iris ?
+        '<div class="row"><button data-act="iris">' + esc(label('iris', x)) + '</button></div>' +
+        '<p class="dim">With Vulkan off: the game\'s OpenGL (and Direct3D through WineD3D) on iris, Mesa\'s newer Intel driver (the default), ' +
+        'or on the car\'s own i965. If the unit restarts during the game, it goes back to i965.</p>' : '') +
+      '<div class="row"><button data-act="detail">' + esc(label('detail', x)) + '</button></div>' +
+      '<p class="dim">Lite: no anti-aliasing or tessellation, and the game\'s own low settings where the tool knows its engine ' +
+      '(Unity, Unreal, Source). Potato: also Direct3D 11 at 10.1, shader model 2 for Direct3D 9, less video memory reported: ' +
+      'faster and plainer, and some games won\'t start (then Lite). From the next start.</p>' +
+      '<div class="row"><button data-act="validate">Check and update files</button><button class="bad" data-act="remove">Remove</button></div>' +
+      '</details></div>').join('') : '<p class="dim">No games yet: install one below.</p>';
+  }
+
+  const d = s.download;
+  $('dl').classList.toggle('hidden', !d);
+  if (d) {
+    const what = (d.name || 'App ' + d.appId);
+    const text = { starting: d.note || 'Starting...', password: 'Steam asks for the password of ' + (s.account.username || 'the account') + ':',
+      code: (d.note || 'Steam Guard code:') + (d.wrongCode ? ' (the last one was wrong)' : ''), confirm: d.note,
+      downloading: 'Downloading ' + what + ': ' + d.percent.toFixed(1) + ' %', done: what + ' is installed.',
+      failed: 'Failed: ' + (d.note || 'see the log'), stopped: 'Cancelled.' }[d.state] || d.state;
+    $('dlText').textContent = text;
+    $('dlText').className = d.state === 'failed' ? 'err' : d.state === 'done' ? 'ok' : '';
+    $('dlBar').style.width = (d.state === 'done' ? 100 : d.percent || 0) + '%';
+    const asking = d.state === 'password' || d.state === 'code';
+    $('ask').classList.toggle('hidden', !asking);
+    if (asking && $('answer').dataset.kind !== d.state) {
+      $('answer').dataset.kind = d.state;
+      $('answer').type = d.state === 'password' ? 'password' : 'text';
+      $('answer').placeholder = d.state === 'password' ? 'Password' : 'Code';
+      $('answer').value = '';
+    }
+    if (!asking) $('answer').dataset.kind = '';
+    $('cancel').disabled = ['done', 'failed', 'stopped'].indexOf(d.state) >= 0;
+  }
+  $('install').disabled = $('sts2').disabled = !!(d && ['done', 'failed', 'stopped'].indexOf(d.state) < 0);
+
+  if (document.activeElement !== $('user')) $('user').value = s.account.username || '';
+  $('acct').textContent = s.account.username ? 'Signed in to Steam on the car: ' + (s.account.remembered ? 'yes' : 'not yet (at the next install)') : 'No account yet.';
+
+  const st = s.settings, ch = s.choices;
+  opts($('res'), ch.resolutions.map((r) => ({ v: r.id, t: r.name })), st.resolution);
+  opts($('fps'), ch.fps.map((f) => ({ v: f, t: f })), st.fps);
+  if (ch.upscales) opts($('ups'), ch.upscales.map((u) => ({ v: u.id, t: u.name })), st.upscale);
+  opts($('mem'), ch.memMb.map((m) => ({ v: m, t: (m / 1024).toFixed(1).replace('.0', '') + ' GB' })), st.memMb);
+  if (ch.regions) opts($('region'), ch.regions.map((r) => ({ v: r.id, t: r.name })), st.cellId || 0);
+  opts($('where'), [{ v: 'internal', t: 'The car\'s memory' + (s.space.internalMb !== null ? ' (' + (s.space.internalMb / 1024).toFixed(1) + ' GB free)' : '') }]
+    .concat(ch.disk ? [{ v: 'disk', t: 'The hard disk' + (s.space.diskMb !== null ? ' (' + (s.space.diskMb / 1024).toFixed(1) + ' GB free)' : '') }] : [])
+    .concat(ch.usb.map((u) => ({ v: 'usb:' + u.id, t: 'USB stick ' + u.id + ' (' + u.fs + (u.fat32 ? ', no file over 4 GB' : '') + ')' +
+      (s.space.usbMb[u.id] != null ? ' (' + (s.space.usbMb[u.id] / 1024).toFixed(1) + ' GB free)' : '') })))
+    .concat(/^usb:/.test(st.where) && !ch.usb.some((u) => 'usb:' + u.id === st.where) ? [{ v: st.where, t: 'USB stick ' + st.where.slice(4) + ' (not plugged in)' }] : []), st.where);
+  $('whereNote').textContent = ch.usb.some((u) => u.fat32 && 'usb:' + u.id === st.where)
+    ? 'This stick is FAT32: a game with a file over 4 GB can\'t go on it (reformat it as exFAT). Games on a stick run while it is plugged in; it stays readable by the car\'s media player.' : '';
+  $('sound').textContent = 'Sound: ' + (st.sound ? 'on' : 'off');
+  if (document.activeElement !== $('vol')) $('vol').value = st.volume;
+  $('info').textContent = 'Uplink: ' + s.uplink + ' - tool: ' + s.bundle + (s.prefixNote ? ' - ' + s.prefixNote : '');
+}
+
+$('show').onclick = () => api('/api/show', {}).catch(() => null);
+$('winston').onclick = () => api('/api/winston', { on: !(last && last.winston && last.winston.on) }).catch(() => null);
+$('hide').onclick = () => api('/api/hide', {}).catch(() => null);
+$('stop').onclick = () => api('/api/stop', {}).catch(() => null);
+$('install').onclick = () => api('/api/install', { appId: Number($('appid').value) }).catch(() => null);
+$('sts2').onclick = () => { $('appid').value = '2868840'; $('install').click(); };
+$('send').onclick = () => { const v = $('answer').value; $('answer').value = ''; api('/api/answer', { text: v }).catch(() => null); };
+$('answer').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('send').click(); });
+$('cancel').onclick = () => api('/api/cancel', {}).catch(() => null);
+$('saveUser').onclick = () => api('/api/user', { username: $('user').value }).catch(() => null);
+$('res').onchange = () => api('/api/settings', { resolution: $('res').value }).then(() => $('res').blur(), () => null);
+$('fps').onchange = () => api('/api/settings', { fps: Number($('fps').value) }).then(() => $('fps').blur(), () => null);
+$('ups').onchange = () => api('/api/settings', { upscale: $('ups').value }).then(() => $('ups').blur(), () => null);
+$('mem').onchange = () => api('/api/settings', { memMb: Number($('mem').value) }).then(() => $('mem').blur(), () => null);
+$('region').onchange = () => api('/api/settings', { cellId: Number($('region').value) }).then(() => $('region').blur(), () => null);
+$('where').onchange = () => api('/api/settings', { where: $('where').value }).then(() => $('where').blur(), () => null);
+$('sound').onclick = () => api('/api/settings', { sound: !(last && last.settings.sound) }).catch(() => null);
+$('vol').onchange = () => api('/api/settings', { volume: Number($('vol').value) }).then(() => $('vol').blur(), () => null);
+
+/* the library's buttons; its Options panel stops the redraw while open */
+$('library').addEventListener('toggle', (e) => {
+  editing = !!$('library').querySelector('details[open]');
+  const det = e.target;
+  if (!det.open) return;
+  const app = det.closest('.game').dataset.app;
+  const sel = det.querySelector('[data-f=exe]');
+  fetch('/api/exes?appId=' + app, { headers: { 'X-Steam-Token': T } }).then((r) => r.json()).then((list) => {
+    if (!Array.isArray(list)) return;
+    const cur = sel.value;
+    sel.innerHTML = list.map((x) => '<option' + (x.rel === cur ? ' selected' : '') + '>' + esc(x.rel) + '</option>').join('');
+  }).catch(() => null);
+}, true);
+$('library').addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-act]');
+  if (!b) return;
+  const card = b.closest('.game'), appId = Number(card.dataset.app), act = b.dataset.act;
+  if (act === 'play') api('/api/play', { appId: appId }).catch(() => null);
+  if (act === 'nosteam') {
+    const g = last && last.library.filter((x) => x.appId === appId)[0];
+    api('/api/game', { appId: appId, noSteam: !(g && g.noSteam) }).catch(() => null);
+  }
+  if (act === 'vulkan') {
+    const g = last && last.library.filter((x) => x.appId === appId)[0];
+    api('/api/game', { appId: appId, vulkan: !(g && g.vulkan) }).catch(() => null);
+  }
+  if (act === 'iris') {
+    const g = last && last.library.filter((x) => x.appId === appId)[0];
+    api('/api/game', { appId: appId, iris: !(g && g.iris) }).catch(() => null);
+  }
+  if (act === 'detail') {
+    const g = last && last.library.filter((x) => x.appId === appId)[0];
+    const ds = (last && last.choices && last.choices.details) || ['normal', 'lite', 'potato'];
+    const next = ds[(ds.indexOf((g && g.detail) || 'normal') + 1) % ds.length];
+    api('/api/game', { appId: appId, detail: next }).catch(() => null);
+  }
+  if (act === 'validate') api('/api/validate', { appId: appId }).catch(() => null);
+  if (act === 'remove' && confirm('Remove this game and its files from the car? (Saves in the Windows prefix stay.)')) {
+    editing = false;
+    api('/api/remove', { appId: appId }).catch(() => null);
+  }
+  if (act === 'save') {
+    api('/api/game', { appId: appId, exe: card.querySelector('[data-f=exe]').value, args: card.querySelector('[data-f=args]').value })
+      .then(() => { editing = false; }, () => null);
+  }
+});
+
+const poll = () => api('/api/status').catch(() => null).then(() => setTimeout(poll, 1500));
+poll();
+</script>
+
+
+<script>
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 小白151 (JackieZ123430)
+'use strict';
+/* Translate only at display boundaries. Commands, paths and stored settings
+ * remain the original protocol values. Also used in the phone page. */
+function createTranslator(dictionary) {
+    const keys = Object.keys(dictionary).sort((a, b) => b.length - a.length);
+    const escape = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const re = new RegExp(keys.map(escape).join('|'), 'g');
+    return function translate(value) {
+        if (typeof value !== 'string' || !value) return value;
+        if (Object.prototype.hasOwnProperty.call(dictionary, value)) return dictionary[value];
+        // Do not translate addresses, filenames, tokens, or user-entered URLs.
+        return value.split(/(https?:\/\/[^\s<>]+|\/[A-Za-z0-9_.-]+\/[\S]+|\b[a-z_]+\.(?:js|json|tgz|html)\b)/g).map((part, index) => {
+            if (index % 2) return part;
+            return part.replace(re, (match, offset, input) => {
+                if (/^[A-Za-z]/.test(match) && offset && /[A-Za-z]/.test(input[offset - 1])) return match;
+                if (/[A-Za-z]$/.test(match) && /[A-Za-z]/.test(input[offset + match.length] || '')) return match;
+                return dictionary[match];
+            });
+        }).join('');
+    };
+}
+if (typeof module !== 'undefined') module.exports = { createTranslator };
+
+const VIZUALYSE_ZH_CN = {"Settings": "设置", "Themes": "主题", "Theme": "主题", "Cast": "投射", "Cast to cluster": "仪表投射", "Cast to iDrive": "iDrive 投射控制", "Cluster themes": "仪表主题", "Browser": "浏览器", "Browse": "浏览", "Moonlight on iDrive": "Moonlight 串流控制", "Steam on the car": "车载 Steam", "Steam account": "Steam 账号", "Info": "信息", "List": "列表", "Touch screen": "触控界面", "Touch screen (only while parked)": "触控界面（仅停车时可用）", "Touch screen (needs mgu-render)": "触控界面（需要 mgu-render）", "The touch screen is up. List (top right) or Back shows the list.": "触控界面已打开，点右上角“列表”或返回键可查看列表。", "The touch screen or the browser is up. List (top right) or Back shows the list.": "触控界面或浏览器已打开，点“列表”或返回键可查看列表。", "The touch screen or the game is up. List (top right) or Back shows the list.": "触控界面或游戏已打开，点“列表”或返回键可查看列表。", "The touch screen is up - List (top right) or the back arrow returns here": "触控界面已打开，点右上角“列表”或返回箭头可回到此页", "Stop": "停止", "Play": "播放", "Pause": "暂停", "Show": "显示", "Hide": "隐藏", "Start": "启动", "Back": "返回", "Forward": "前进", "Home": "主页", "Home page": "主页", "Reload": "重新加载", "Refresh": "刷新", "Save": "保存", "Send": "发送", "Cancel": "取消", "Close": "关闭", "Add": "添加", "Go": "前往", "Enter": "回车", "Install": "安装", "Remove": "移除", "Delete": "删除", "Forget this PC": "取消与此电脑的配对", "Restart the browser": "重启浏览器", "Make home": "设为主页", "Show on the screen": "在车机屏幕显示", "On the screen": "正在车机屏幕显示", "On the screen - the back arrow on the left returns here": "正在车机屏幕显示，点左侧返回箭头回到此页", "Shown once the browser runs": "浏览器启动后显示", "Ready": "就绪", "Ready - pick a game": "已就绪，请选择游戏", "Ready - scan the QR code to pair and pick a game": "已就绪，请扫码配对并选择游戏", "Ready - scan the QR code with your phone": "已就绪，请用手机扫描二维码", "Ready: scan the QR code with your phone": "已就绪，请用手机扫描二维码", "Ready: scan the QR code to pair a PC and pick a game": "已就绪，请扫码配对电脑并选择游戏", "Ready, waiting for the phone": "已就绪，等待手机连接", "Ready. Show puts the page on the screen": "已就绪，点“显示”将网页放到车机屏幕", "Ready - Show puts it on the screen; scan the QR code to type addresses": "已就绪，点“显示”打开画面；扫码可输入网址", "Connecting...": "正在连接…", "Connecting…": "正在连接…", "Starting": "正在启动", "Starting the browser": "正在启动浏览器", "Waiting": "等待中", "Waiting for the hotspot": "等待热点连接", "Waiting for the phone's hotspot": "等待手机热点连接", "Waiting for the phone's picture": "等待手机画面", "Waiting for the PIN…": "等待配对码…", "Loading the games…": "正在加载游戏…", "Nothing streaming": "暂无串流", "nothing streaming": "暂无串流", "Nothing playing": "暂无播放内容", "Nothing playing yet": "尚未播放", "nothing played yet": "尚未播放", "Nothing running": "暂无运行内容", "Not playing": "未播放", "Not ready": "未就绪", "not ready": "未就绪", "not running": "未运行", "not installed": "未安装", "not paired": "未配对", "not checked yet": "尚未检查", "not probed yet": "尚未检测", "none yet": "暂无", "No page": "暂无网页", "No link yet": "暂无连接地址", "no link yet": "暂无连接地址", "No hotspot": "未连接热点", "No phone connected": "没有手机连接", "No game running": "没有游戏运行", "No games yet": "暂无游戏", "No games yet: install one below.": "暂无游戏，请在下方安装。", "No games yet - scan the QR code to sign in to Steam and install one": "暂无游戏，请扫码登录 Steam 并安装游戏", "No game has run since the tool started.": "组件启动后尚未运行游戏。", "No account yet.": "尚未登录账号。", "No controller connected to the car": "未连接游戏手柄", "no controllers": "无手柄", "Speed unknown": "车速未知", "unknown (counts as parked)": "未知（按停车处理）", "On": "开启", "Off": "关闭", "on": "开启", "off": "关闭", "Enabled": "已启用", "Disabled": "已停用", "Auto": "自动", "always": "始终", "Sport": "运动", "Comfort": "舒适", "Sport or Comfort": "运动／舒适模式", "by the drive mode": "随驾驶模式切换", "always Sport": "始终使用运动模式", "always Comfort": "始终使用舒适模式", "Sport or Comfort: by the drive mode": "运动／舒适：随驾驶模式切换", "Preview": "预览", "In use": "正在使用", "In use: Sport or Comfort by the drive mode": "正在使用：随驾驶模式切换运动／舒适主题", "Previewing: themes are off": "正在预览：仪表主题已关闭", "Use this theme": "使用此主题", "Turn on with this theme": "启用并使用此主题", "Try on the cluster": "在仪表上试用", "Trying a theme on the cluster...": "正在仪表上试用主题…", "Trying it on the cluster, then back": "正在仪表上试用，结束后自动恢复", "for 10 s, then back": "试用 10 秒后恢复", "then back": "随后恢复", "its theme": "当前主题", "on the cluster": "在仪表上", "On the cluster": "仪表画面", "Cover the car's bottom strip": "遮盖原车底部信息栏", "black under the theme": "主题下方显示黑色遮罩", "the strip shows under the theme": "主题下方保留原车信息栏", "covered (black)": "已遮盖（黑色）", "off (the car's own cluster)": "关闭（显示原车仪表）", "Off - the car's own cluster shows": "已关闭，显示原车仪表", "On - starting the theme...": "已开启，正在加载主题…", "on: the chosen theme shows": "开启：显示所选主题", "off: the car's own cluster shows": "关闭：显示原车仪表", "The cluster themes tool is not running - install Cluster themes (the tool) from the Store": "仪表主题组件未运行，请在商店安装“仪表主题”后台组件", "The Browser tool is not running - install Browser (the tool) from the Store": "浏览器组件未运行，请在商店安装“浏览器”后台组件", "The Moonlight tool is not running - install Moonlight (the tool) from the Store": "Moonlight 组件未运行，请在商店安装 Moonlight 后台组件", "The Steam tool is not running - install Steam (the tool) from the Store": "Steam 组件未运行，请在商店安装 Steam 后台组件", "Cast service not running - install Cast to cluster in the Store": "投射服务未运行，请在商店安装“仪表投射”", "Phone page": "手机控制页", "Scan with the phone whose hotspot the car is on": "请用提供车机热点的手机扫码", "Scan with the phone whose hotspot the car is on, or open the link": "请用提供车机热点的手机扫码，或打开连接地址", "Scan with the phone whose hotspot the car is on to pair and pick the PC and game": "请用提供车机热点的手机扫码，配对并选择电脑和游戏", "Scan with the phone whose hotspot the car is on to type addresses and text": "请用提供车机热点的手机扫码，输入网址和文字", "Scan with the phone whose hotspot the car is on: sign in to Steam, install games": "请用提供车机热点的手机扫码，登录 Steam 并安装游戏", "Scan it with the phone on the car's hotspot,": "请用连接车机热点的手机扫码，", "then cast from its page": "然后在手机控制页开始投射", "Scan it to type addresses and text": "扫码输入网址和文字", "Scan it: pair a PC, pick a game": "扫码配对电脑并选择游戏", "Scan it: sign in, install games": "扫码登录并安装游戏", "from the phone whose hotspot the car is on": "使用提供车机热点的手机", "Turn on the phone's hotspot": "请开启手机热点", "QR code on the cluster": "仪表二维码", "QR code on the cluster while idle": "空闲时在仪表显示二维码", "while nothing plays there": "仪表未播放内容时显示", "while nothing streams": "未进行串流时显示", "Cluster": "仪表", "Cluster map": "仪表地图", "cluster map": "仪表地图", "the cluster map": "仪表地图", "Map on Cluster": "地图显示在仪表", "Map on HUD": "地图显示在 HUD", "Media console": "中控屏幕", "Centre console": "中控屏幕", "This screen": "此屏幕", "this screen": "此屏幕", "the HUD": "HUD 抬头显示", "the speakers only": "仅通过扬声器播放", "Audio only": "仅音频", "Video output": "视频输出", "Picture on": "画面输出位置", "Stream URL": "串流地址", "Stream from the phone": "手机串流", "Stream": "串流", "Last stream": "上次串流", "Play last on the cluster map": "在仪表地图区域重播", "Play last on the HUD": "在 HUD 上重播", "Play last on this screen": "在此屏幕重播", "Play the last stream again on": "选择上次串流的重播位置", "Turn Cast to cluster on": "开启仪表投射", "Turn Cast to cluster on to play it": "开启仪表投射后播放", "Cast is off": "投射已关闭", "Cast to cluster is off: nothing plays": "仪表投射已关闭，停止播放", "on: the phone page is open": "开启：手机控制页已开放", "off: nothing plays, the page is closed": "关闭：停止播放并关闭手机控制页", "Off - turn Cast to cluster on to use it": "已关闭，请开启仪表投射后使用", "CarPlay second screen": "CarPlay 副屏", "Directions card": "转向指引卡片", "Time and distance card": "时间与距离卡片", "Time / distance card": "时间／距离卡片", "Centre the map": "地图居中", "HUD alternate mode": "HUD 替代显示模式", "Zoom the map": "地图缩放", "CarPlay map on the cluster": "CarPlay 地图显示在仪表", "CarPlay map on the HUD": "CarPlay 地图显示在 HUD", "CarPlay map: zoom in": "放大 CarPlay 地图", "CarPlay map: zoom out": "缩小 CarPlay 地图", "CarPlay map": "CarPlay 地图", "CarPlay directions card": "CarPlay 转向指引卡片", "CarPlay time / distance card": "CarPlay 时间／距离卡片", "CarPlay: centre the map": "CarPlay 地图居中", "CarPlay HUD alternate mode": "CarPlay HUD 替代显示模式", "needs hook111 (in the Store)": "需要安装 hook111（可在商店获取）", "(hook111 is not installed)": "（未安装 hook111）", "hook111 is not running": "hook111 未运行", "Play the map on the cluster or the HUD to see it here": "在仪表或 HUD 播放地图后，此处显示预览", "Maps' own layout": "地图应用原有布局", "the car between the two cards": "车辆位于两张卡片之间", "the cluster's picture, fitted": "将仪表画面缩放以适应显示区域", "the phone's size": "使用手机输出尺寸", "the wide picture fills the HUD": "宽画面填满 HUD", "(wider, not centred)": "（更宽，不居中）", "arrival time, time and miles left": "到达时间、剩余时间与距离", "CarPlay's own cluster view (Google Maps or Apple Maps), next to the main CarPlay screen. The phone draws it at the size of the chosen output from its next connection; until then it is scaled to fit.": "使用 CarPlay 自带的仪表视图（Google 地图或 Apple 地图），与 CarPlay 主屏同时显示。手机下次连接时按所选输出尺寸绘制；此前会缩放适应显示区域。", "Volume": "音量", "Sound through the speakers": "通过车载扬声器播放声音", "with sound": "有声", "with sound through the speakers": "通过车载扬声器播放声音", "without sound": "无声", "no sound": "无声", "Playing": "正在播放", "Paused": "已暂停", "Ended": "已结束", "Stopped": "已停止", "Failed": "失败", "Error": "错误", "ffmpeg ended": "ffmpeg 已退出", "the stream failed": "串流失败", "the command failed": "命令执行失败", "see the log": "请查看日志", "only while parked": "仅停车时可用", "Only while parked: the car is moving": "仅停车时可用，车辆正在行驶", "Only while parked. The iDrive back arrow (left of the page) hides it too.": "仅停车时可用。点击页面左侧的 iDrive 返回箭头也可隐藏画面。", "Hidden: it keeps running until you stop it": "画面已隐藏，后台继续运行，直到手动停止", "The car is moving: games are hidden until it stops.": "车辆正在行驶，游戏画面会隐藏，停车后可恢复显示。", "Games": "游戏", "Game": "游戏", "A game": "一款游戏", "a game": "游戏", "Gaming PCs": "游戏电脑", "Library": "游戏库", "Running now": "当前运行", "Play one from the library below": "从下方游戏库选择游戏开始游玩", "Install a game": "安装游戏", "Install games on": "游戏安装位置", "Download from": "下载来源", "Download cancelled": "下载已取消", "No PC yet. Run": "尚未添加电脑，请运行", "Add a PC first.": "请先添加电脑。", "Pair a PC to see its games.": "配对电脑后查看游戏。", "Pair with": "配对", "and type:": "然后输入：", "Close the game on the PC to start another.": "请先关闭电脑上的游戏，再启动另一个游戏。", "closes it on the PC": "同时关闭电脑上的游戏", "the game keeps running on the PC": "游戏仍在电脑上运行", "Quit game": "退出游戏", "Stop the game": "停止游戏", "Resume last": "继续上次游戏", "Play (once the game stops)": "播放（请先停止当前游戏）", "The Moonlight switch turns it on": "打开 Moonlight 开关后启用", "Moonlight is off": "Moonlight 已关闭", "Moonlight is off: the phone page is closed": "Moonlight 已关闭，手机控制页已关闭", "Off - turn Moonlight on to use it": "已关闭，请开启 Moonlight 后使用", "when Moonlight is on": "Moonlight 开启时", "off: the phone page is closed": "关闭：手机控制页已关闭", "Let the PC change its resolution": "允许电脑调整分辨率", "(Sunshine: optimise game settings)": "（Sunshine：优化游戏设置）", "on the PC, put it on the same Wi-Fi as the car (the phone's hotspot), and add its address.": "在电脑上运行，并将电脑与车机连接到同一 Wi-Fi（手机热点），然后添加电脑地址。", "(this phone; a real one connected to the car works too)": "（使用此手机；也支持连接到车机的实体手柄）", "The picture covers the whole centre screen. To stop it: hold the screen for 2 s, or hold Start + Back + LB + RB on a controller for 2 s, or Stop here.": "画面覆盖整个中控屏。停止播放：长按屏幕 2 秒，或同时按住手柄的 Start + Back + LB + RB 2 秒，也可在此页点“停止”。", "Controller": "手柄", "Controllers": "手柄", "Picture": "画面", "Pictures": "帧数", "Picture size": "画面尺寸", "Frames a second": "每秒帧数", "Frames per second": "每秒帧数", "Bitrate": "码率", "Bitrate: as the size and rate need": "码率：根据画面尺寸和帧率调整", "GPU decoding": "GPU 解码", "Software decoding": "软件解码", "decoded in software": "软件解码", "decoded on the GPU": "GPU 解码", "Compatibility mode": "兼容模式", "Compatibility mode: off": "兼容模式：关闭", "The browser is off": "浏览器已关闭", "The browser is not running": "浏览器未运行", "Off - turn the browser on to use it": "已关闭，请开启浏览器后使用", "Off: turn the browser on in Settings": "已关闭，请在设置中开启浏览器", "off: Chromium is stopped": "关闭：Chromium 已停止", "on: Chromium runs": "开启：Chromium 正在运行", "Resolution": "分辨率", "Resolution: full": "分辨率：全尺寸", "Resolution (the page drawn with fewer pixels, scaled up)": "分辨率（降低网页绘制尺寸后放大显示）", "Lower draws fewer pixels: faster on the car's processor and lighter on memory, a little blurrier. The page keeps its layout.": "较低的分辨率会减少绘制像素，让车机运行更快、占用更少内存，画面会略微模糊。网页布局不变。", "Full": "全尺寸", "Memory for the browser": "浏览器内存上限", "More memory lets bigger pages and games load, but leaves less to the car's own screens, which may get slower while a big page runs. Only the browser itself can run out.": "提高内存上限可加载更大的网页和游戏，但会减少原车界面可用内存，运行大型网页时原车界面可能变慢。该上限仅约束浏览器进程。", "GPU mode": "GPU 模式", "GPU mode: off": "GPU 模式：关闭", "Game mode": "游戏模式", "Game mode: off": "游戏模式：关闭", "Check the GPU again": "重新检测 GPU", "GPU: checking...": "GPU：正在检测…", "GPU mode (experimental): WebGL on the car's own graphics driver instead of the CPU. Chromium restarts for it, and it is off again whenever the tool starts. If the screen ever freezes or goes black, the car restarts and comes back without it.": "GPU 模式（实验性）：WebGL 使用原车显卡驱动绘制，取代 CPU 软件绘制。切换时会重启 Chromium；后台组件每次启动后默认关闭。如果画面冻结或黑屏，车机会重启，并在恢复后关闭此模式。", "Game mode (experimental): WebGPU stops checking each command a page sends, which saves time in games. Only for sites you trust: a page with mistakes can crash the browser's graphics. Chromium restarts for it, and it is off again whenever the tool starts. While it is on, the other tools are asked to make way: a Steam game stops, and Cast pauses on the cluster and the HUD. A Steam game started later stops the browser until it ends.": "游戏模式（实验性）：WebGPU 跳过网页命令检查，降低游戏开销。仅用于可信网站，网页错误可能导致浏览器图形进程崩溃。切换时会重启 Chromium；后台组件每次启动后默认关闭。开启时会停止 Steam 游戏并暂停仪表和 HUD 投射；之后启动 Steam 游戏会暂时停止浏览器，直到游戏退出。", "experimental: trusted games only": "实验性：仅用于可信游戏", "on (experimental)": "开启（实验性）", "on (trusted games only)": "开启（仅限可信游戏）", "turn it on in Settings": "请在设置中开启", "Turn it on in Settings": "请在设置中开启", "Turn it on to open the page": "开启后可打开手机控制页", "Installing the browser (about a minute, once)...": "正在安装浏览器（首次安装约需一分钟）…", "Installing the tool on the car (a few minutes, once)...": "正在车机上安装后台组件（首次安装约需几分钟）…", "Installing Steam on the car (a few minutes, once)...": "正在车机上安装 Steam（首次安装约需几分钟）…", "the browser could not be installed": "浏览器安装失败", "the tool could not be installed": "后台组件安装失败", "Steam is installing itself on the car": "正在车机上安装 Steam", "Steam is off": "Steam 已关闭", "Off - turn Steam on to use it": "已关闭，请开启 Steam 后使用", "off: no game, no download, no phone page": "关闭：停止游戏、下载和手机控制页", "on: games and downloads run, the phone page is open": "开启：允许运行游戏和下载，开放手机控制页", "Steam asks for the password - answer on the phone page": "Steam 需要密码，请在手机控制页输入", "Steam Guard asks for a code - answer on the phone page": "Steam 令牌需要验证码，请在手机控制页输入", "Steam Guard: approve the sign-in in the Steam app": "Steam 令牌：请在 Steam 手机应用中批准登录", "Steam Guard code:": "Steam 令牌验证码：", "Steam asks for the password and a Steam Guard code once, during the first install, right on this page. The car keeps only Steam's sign-in token, never the password.": "首次安装时，Steam 会在本页要求输入密码和 Steam 令牌验证码。车机仅保存 Steam 登录令牌，不保存密码。", "Scan the QR code in Settings with your phone: sign in to Steam and install a game there": "请用手机扫描设置页的二维码，登录 Steam 并安装游戏", "Remove this game and its files from the car? (Saves in the Windows prefix stay.)": "是否从车机移除此游戏及文件？（Windows 兼容环境中的存档会保留。）", "Memory for the game": "游戏内存上限", "The picture the game draws": "游戏绘制画面", "The screen's shape": "屏幕比例", "fills the screen": "填满屏幕", "bars at the sides": "两侧保留黑边", "Upscaling": "画面放大", "Upscaling: off": "画面放大：关闭", "Upscaling: not in this Steam tool (update it)": "当前 Steam 组件不支持画面放大，请更新组件", "Upscaling (a smaller picture enlarged to the screen; at once)": "画面放大（将较小画面放大至全屏，立即生效）", "no sharpening": "不锐化", "FSR, no sharpening": "FSR，不锐化", "Picture, frames and memory apply from the next game. More memory lets bigger games run but leaves less to the car's own screens. Upscaling applies at once: FSR sharpens a small picture (896x320, say) as it is enlarged to the screen, for some of the graphics chip's time.": "画面尺寸、帧率和内存设置在下次启动游戏时生效。提高内存上限可运行更大的游戏，但会减少原车界面可用内存。画面放大立即生效：FSR 会在小画面（如 896×320）放大至全屏时锐化图像，并占用部分 GPU 运算时间。", "Performance graphs": "性能曲线", "The running game's (or the last one's) measurements, a point every 10 seconds, the last hour. Read only while this is open.": "显示当前或上次游戏的测量结果，每 10 秒记录一次，保留最近一小时。仅在此页打开时读取。", "The car's memory": "车机内存", "The hard disk": "硬盘", "The last game": "上次游戏", "Time a picture": "单帧耗时", "GPU clock": "GPU 频率", "GPU awake": "GPU 活跃时间", "out of its idle state: not how full it is (the car's screens too)": "离开空闲状态的时间占比，并非负载占用率（包括原车界面）", "the game (of one core)": "游戏进程（按单核计）", "the unit (all 4 cores)": "整台车机（全部 4 核）", "If the unit restarts during the game, Vulkan turns itself off for it.": "如果车机在游戏中重启，此游戏的 Vulkan 会自动关闭。", "Only while parked. A hidden game keeps running; Stop ends it. Games can't be controlled yet (no touch or gamepad input in this version).": "仅停车时可用。隐藏画面后游戏仍在运行，点“停止”才会退出。本版本尚不支持触控或手柄操作游戏。", "The game's pictures go straight to the car's own screen compositor (Winston), in full colour. Compatibility mode sends them through mgu-render instead, as older versions did; Steam does that by itself if Winston can't be reached. From the next Show.": "游戏画面以全彩直接传给原车屏幕合成器 Winston。兼容模式改用 mgu-render；如果 Winston 无法连接，Steam 会自动使用兼容模式。下次点“显示”时生效。", "On the centre console the picture goes straight to the car's own screen compositor (Winston), converted by the graphics card. Compatibility mode sends it through mgu-render instead, as older versions did; Moonlight does that by itself if Winston can't be reached. From the next stream.": "中控画面由显卡转换后直接传给原车屏幕合成器 Winston。兼容模式改用 mgu-render；如果 Winston 无法连接，Moonlight 会自动使用兼容模式。下次串流时生效。", "The pictures go straight to the car's own screen compositor (Winston): in full colour, and in the GPU mode without copying them back from the graphics card. Compatibility mode sends them through mgu-render instead, as older versions did; the browser does that by itself if Winston can't be reached.": "画面以全彩直接传给原车屏幕合成器 Winston，GPU 模式无需将画面回读到 CPU。兼容模式改用 mgu-render；如果 Winston 无法连接，浏览器会自动使用兼容模式。", "Uplink": "网络连接", "Renderer": "渲染器", "Cluster renderer": "仪表渲染器", "Host": "主机", "Vehicle": "车辆", "Source": "来源", "Speed": "车速", "Text": "文字", "Picture: 1280x720": "画面：1280×720", "Sound: on": "声音：开启", "Browser: on": "浏览器：开启", "Steam: on": "Steam：开启", "Moonlight: on": "Moonlight：开启", "Cast to cluster: on": "仪表投射：开启", "Cluster themes: off": "仪表主题：关闭", "QR code on the cluster: off": "仪表二维码：关闭", "The car's strip under the theme: shown": "主题下方原车信息栏：显示"};
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 小白151 (JackieZ123430)
+/* Appended after the original controller script. No handlers or protocol
+ * payloads are replaced; updates to visible text are translated as they arrive. */
+(function () {
+    'use strict';
+    const translate = createTranslator(VIZUALYSE_ZH_CN);
+    const ignored = /^(SCRIPT|STYLE|CODE|PRE|TEXTAREA)$/;
+    function visit(node) {
+        if (node.nodeType === 3) {
+            if (node.parentNode && ignored.test(node.parentNode.nodeName)) return;
+            const text = translate(node.nodeValue);
+            if (text !== node.nodeValue) {
+                const parent = node.parentNode;
+                if (parent && parent.nodeName === 'OPTION' && !parent.hasAttribute('value')) {
+                    parent.setAttribute('value', parent.value);
+                }
+                node.nodeValue = text;
+            }
+        } else if (node.nodeType === 1) {
+            if (ignored.test(node.nodeName)) return;
+            ['placeholder', 'title', 'aria-label'].forEach((key) => {
+                const text = node.getAttribute(key);
+                if (text) { const result = translate(text); if (result !== text) node.setAttribute(key, result); }
+            });
+            Array.prototype.slice.call(node.childNodes).forEach(visit);
+        }
+    }
+    document.documentElement.lang = 'zh-CN';
+    visit(document.documentElement);
+    new MutationObserver((changes) => changes.forEach((change) => {
+        if (change.type === 'childList') Array.prototype.slice.call(change.addedNodes).forEach(visit);
+        else visit(change.target);
+    })).observe(document.body, { subtree: true, childList: true, characterData: true,
+        attributes: true, attributeFilter: ['placeholder', 'title', 'aria-label'] });
+})();
+
+</script>
+</body>
+</html>
