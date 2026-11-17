@@ -74,6 +74,10 @@ def main():
         write(app / 'release-notes.json', [{
             'version': version, 'upstreamVersion': provenance['upstreamVersion'],
             'cnRevision': provenance['cnRevision'], 'changes': changes}])
+        notes_path = ROOT / 'release/notes.json'
+        notes = json.loads(notes_path.read_text())
+        notes['cluster_metrics'] = json.loads((app / 'release-notes.json').read_text())
+        write(notes_path, notes)
     path = ROOT / 'release/repo.json'
     repo = json.loads(path.read_text())
     repo['unprefixedAppIds'] = sorted(set(repo['unprefixedAppIds']) | {'cluster_metrics'})
