@@ -175,17 +175,6 @@
       "cnRevision": 1
     }
   ],
-  "ambient_studio_full": [
-    {
-      "version": "0.1.6",
-      "changes": [
-        "新增简体中文应用，接入国内商店更新。",
-        "兼容商店渲染与输入组件，清理界面推广水印。"
-      ],
-      "upstreamVersion": "0.1.5",
-      "cnRevision": 1
-    }
-  ],
   "dpf_monitor": [
     {
       "version": "0.3.3",
@@ -194,17 +183,6 @@
         "兼容商店渲染与输入组件，清理界面推广水印。"
       ],
       "upstreamVersion": "0.3.2",
-      "cnRevision": 1
-    }
-  ],
-  "drive_hud_full": [
-    {
-      "version": "0.1.7",
-      "changes": [
-        "新增简体中文应用，接入国内商店更新。",
-        "兼容商店渲染与输入组件，清理界面推广水印。"
-      ],
-      "upstreamVersion": "0.1.6",
       "cnRevision": 1
     }
   ],
@@ -228,17 +206,6 @@
         "兼容商店渲染与输入组件，清理界面推广水印。"
       ],
       "upstreamVersion": "0.2.5",
-      "cnRevision": 1
-    }
-  ],
-  "hotspot_studio": [
-    {
-      "version": "0.1.6",
-      "changes": [
-        "新增简体中文应用，接入国内商店更新。",
-        "兼容商店渲染与输入组件，清理界面推广水印。"
-      ],
-      "upstreamVersion": "0.1.5",
       "cnRevision": 1
     }
   ],
@@ -298,40 +265,6 @@
       "cnRevision": 1
     }
   ],
-  "telemetry_studio": [
-    {
-      "version": "0.2.1",
-      "changes": [
-        "新增简体中文应用，接入国内商店更新。",
-        "兼容商店渲染与输入组件，清理界面推广水印。"
-      ],
-      "upstreamVersion": "0.2.0",
-      "cnRevision": 1
-    }
-  ],
-  "vehicle_health": [
-    {
-      "version": "0.1.10",
-      "changes": [
-        "新增简体中文应用，接入国内商店更新。",
-        "兼容商店渲染与输入组件，清理界面推广水印。",
-        "缺少车辆数据时显示等待，避免误报状态正常。"
-      ],
-      "upstreamVersion": "0.1.9",
-      "cnRevision": 1
-    }
-  ],
-  "vehicle_network": [
-    {
-      "version": "0.1.4",
-      "changes": [
-        "新增简体中文应用，接入国内商店更新。",
-        "兼容商店渲染与输入组件，清理界面推广水印。"
-      ],
-      "upstreamVersion": "0.1.3",
-      "cnRevision": 1
-    }
-  ],
   "xdrive_studio": [
     {
       "version": "0.1.6",
@@ -343,213 +276,6 @@
       "cnRevision": 1
     }
   ],
-  "spotify": [
-    {
-      "version": "1.0.24",
-      "changes": [
-        "新增简体中文应用，接入国内商店更新。",
-        "兼容商店渲染与输入组件，清理界面推广水印。"
-      ],
-      "upstreamVersion": "1.0.23",
-      "cnRevision": 1
-    }
-  ],
-  "true_time_cn": [
-    {
-      "version": "0.3.2",
-      "changes": [
-        "新增简体中文应用，接入国内商店更新。",
-        "兼容商店渲染与输入组件，清理界面推广水印。"
-      ],
-      "upstreamVersion": "0.3.1",
-      "cnRevision": 1
-    }
-  ],
-  "boostline_cn": [
-    {
-      "version": "1.0.2",
-      "changes": [
-        "新增简体中文应用，接入国内商店更新。",
-        "兼容商店渲染与输入组件，清理界面推广水印。"
-      ],
-      "upstreamVersion": "1.0.1",
-      "cnRevision": 1
-    }
-  ],
-  "dpf_id7_cn": [
-    {
-      "version": "0.1.2",
-      "changes": [
-        "新增简体中文应用，接入国内商店更新。",
-        "兼容商店渲染与输入组件，清理界面推广水印。"
-      ],
-      "upstreamVersion": "0.1.1",
-      "cnRevision": 1
-    }
-  ],
-  "jap_ridetube": [
-    {
-      "version": "0.3.9",
-      "changes": [
-        "新增简体中文应用，接入国内商店更新。",
-        "清理界面推广文字，保留作者和许可记录。"
-      ],
-      "upstreamVersion": "0.3.8",
-      "cnRevision": 1
-    }
-  ],
-  "mgu_browser": [
-    {
-      "version": "0.16.2",
-      "changes": [
-        "新增简体中文应用，接入国内商店更新。",
-        "清理界面推广文字，保留作者和许可记录。",
-        "默认使用简体中文界面。"
-      ],
-      "upstreamVersion": "0.16.1",
-      "cnRevision": 1
-    }
-  ],
-  "vizualyse_cast": [
-    {
-      "version": "0.4.101",
-      "changes": [
-        "新增简体中文应用，清理界面推广文字。"
-      ],
-      "upstreamVersion": "0.4.100",
-      "cnRevision": 1
-    }
-  ],
-  "vizualyse_chromium": [
-    {
-      "version": "0.3.101",
-      "changes": [
-        "新增简体中文应用，清理界面推广文字。"
-      ],
-      "upstreamVersion": "0.3.100",
-      "cnRevision": 1
-    }
-  ],
-  "vizualyse_cluster": [
-    {
-      "version": "0.3.101",
-      "changes": [
-        "新增简体中文应用，清理界面推广文字。"
-      ],
-      "upstreamVersion": "0.3.100",
-      "cnRevision": 1
-    }
-  ],
-  "vizualyse_moonlight": [
-    {
-      "version": "0.3.101",
-      "changes": [
-        "新增简体中文应用，清理界面推广文字。"
-      ],
-      "upstreamVersion": "0.3.100",
-      "cnRevision": 1
-    }
-  ],
-  "vizualyse_steam": [
-    {
-      "version": "0.2.101",
-      "changes": [
-        "新增简体中文应用，清理界面推广文字。"
-      ],
-      "upstreamVersion": "0.2.100",
-      "cnRevision": 1
-    }
-  ],
-  "vizualyse-steam": [
-    {
-      "version": "0.3.101",
-      "changes": [
-        "新增应用运行支持，保留原作者和第三方许可。"
-      ],
-      "upstreamVersion": "0.3.100",
-      "cnRevision": 1
-    }
-  ],
-  "jap-ridetube-d": [
-    {
-      "version": "0.3.10",
-      "changes": [
-        "新增应用运行支持，保留原作者和第三方许可。"
-      ],
-      "upstreamVersion": "0.3.9",
-      "cnRevision": 1
-    }
-  ],
-  "vizualyse-chromium": [
-    {
-      "version": "0.3.101",
-      "changes": [
-        "新增应用运行支持，保留原作者和第三方许可。"
-      ],
-      "upstreamVersion": "0.3.100",
-      "cnRevision": 1
-    }
-  ],
-  "hotspot-studio-helper": [
-    {
-      "version": "0.1.8",
-      "changes": [
-        "新增应用运行支持，保留原作者和第三方许可。"
-      ],
-      "upstreamVersion": "0.1.7",
-      "cnRevision": 1
-    }
-  ],
-  "vizualyse-cast": [
-    {
-      "version": "0.4.101",
-      "changes": [
-        "新增应用运行支持，保留原作者和第三方许可。"
-      ],
-      "upstreamVersion": "0.4.100",
-      "cnRevision": 1
-    }
-  ],
-  "mgu-browser": [
-    {
-      "version": "0.16.2",
-      "changes": [
-        "新增应用运行支持，保留原作者和第三方许可。"
-      ],
-      "upstreamVersion": "0.16.1",
-      "cnRevision": 1
-    }
-  ],
-  "jap-node22": [
-    {
-      "version": "22.23.5",
-      "changes": [
-        "新增应用运行支持，保留原作者和第三方许可。"
-      ],
-      "upstreamVersion": "22.23.4",
-      "cnRevision": 1
-    }
-  ],
-  "mgu-browser-engine": [
-    {
-      "version": "0.1.1",
-      "changes": [
-        "新增应用运行支持，保留原作者和第三方许可。"
-      ],
-      "upstreamVersion": "0.1.0",
-      "cnRevision": 1
-    }
-  ],
-  "vehicle-network-observer": [
-    {
-      "version": "0.1.3",
-      "changes": [
-        "新增应用运行支持，保留原作者和第三方许可。"
-      ],
-      "upstreamVersion": "0.1.2",
-      "cnRevision": 1
-    }
-  ],
   "front-camera-cluster-helper": [
     {
       "version": "0.2.2",
@@ -557,36 +283,6 @@
         "新增应用运行支持，保留原作者和第三方许可。"
       ],
       "upstreamVersion": "0.2.1",
-      "cnRevision": 1
-    }
-  ],
-  "vizualyse-cluster": [
-    {
-      "version": "0.4.101",
-      "changes": [
-        "新增应用运行支持，保留原作者和第三方许可。"
-      ],
-      "upstreamVersion": "0.4.100",
-      "cnRevision": 1
-    }
-  ],
-  "vizualyse-bus": [
-    {
-      "version": "0.1.1",
-      "changes": [
-        "新增应用运行支持，保留原作者和第三方许可。"
-      ],
-      "upstreamVersion": "0.1.0",
-      "cnRevision": 1
-    }
-  ],
-  "vizualyse-moonlight": [
-    {
-      "version": "0.3.101",
-      "changes": [
-        "新增应用运行支持，保留原作者和第三方许可。"
-      ],
-      "upstreamVersion": "0.3.100",
       "cnRevision": 1
     }
   ]

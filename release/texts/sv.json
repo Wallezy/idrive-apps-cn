@@ -83,17 +83,9 @@
     "title": "RAM 麦克风校准",
     "description": "在 ID7 车机读取 RAM01 麦克风校准状态，并在停车后二次确认启动校准。"
   },
-  "ambient_studio_full": {
-    "title": "氛围灯工作室",
-    "description": "全屏设置驾驶模式配色和氛围灯提醒"
-  },
   "dpf_monitor": {
     "title": "颗粒捕集器监测",
     "description": "只读监测柴油颗粒捕集器积碳、再生进度、温度、压差及历史记录"
-  },
-  "drive_hud_full": {
-    "title": "抬头显示助手",
-    "description": "全屏设置 HUD 转向箭头、运动挡位和转速、换挡提示及发动机暖机信息"
   },
   "front_camera_cluster": {
     "title": "仪表夜视",
@@ -102,10 +94,6 @@
   "green_light_alert": {
     "title": "绿灯起步提醒",
     "description": "监测 KAFAS 原始红绿灯信号，并以宝马已验证的显示信号作为后备"
-  },
-  "hotspot_studio": {
-    "title": "热点工作室",
-    "description": "通过宝马热点提供华为网络代理，并按需开启单客户端限时 ENET 转发"
   },
   "parking_clearance": {
     "title": "泊车距离",
@@ -127,116 +115,12 @@
     "title": "自动启停状态",
     "description": "显示当前及最近十条自动启停抑制状态，以及实时用电负载"
   },
-  "telemetry_studio": {
-    "title": "车辆遥测",
-    "description": "分类全屏显示动力、热管理、底盘、轮胎、空调和电气实时数据"
-  },
-  "vehicle_health": {
-    "title": "车辆健康中心",
-    "description": "只读查看轮胎、油液、温度、保养需求、检查控制、DPF 和当前故障"
-  },
-  "vehicle_network": {
-    "title": "车辆网络",
-    "description": "显示 MGU 网络接口、观测到的车辆网络设备和电脑 IPv4 设置"
-  },
   "xdrive_studio": {
     "title": "xDrive 动力分配",
     "description": "只读查看 xDrive 扭矩分配、分动箱扭矩、车轮滑差和底盘动态"
   },
-  "spotify": {
-    "title": "Spotify 音乐",
-    "description": "BMW iDrive 7 的 Spotify Connect 播放控制和曲库浏览应用"
-  },
-  "true_time_cn": {
-    "title": "精准计时",
-    "description": "通过 DSC 加速度信号修正坡度，记录加速和制动测试。"
-  },
-  "boostline_cn": {
-    "title": "ECU 实时数据",
-    "description": "只读查看发动机实时数据，支持 CSV 记录、道路测功与加速计时。"
-  },
-  "dpf_id7_cn": {
-    "title": "DPF 监测",
-    "description": "只读查看柴油颗粒捕集器的积炭、灰分、排温、压差和再生记录。"
-  },
-  "jap_ridetube": {
-    "title": "RideTube 视频",
-    "description": "ID7 非官方 YouTube 客户端，支持搜索、频道、章节及登录后的首页、订阅和稍后观看。通过车机播放声音，默认停车时显示画面。需要 jap-ridetube-d 服务。"
-  },
-  "mgu_browser": {
-    "title": "网页浏览器",
-    "description": "浏览网页，支持主页、历史记录、书签和 iDrive 旋钮操作。"
-  },
-  "vizualyse_cast": {
-    "title": "仪表投射",
-    "description": "将手机串流投射到仪表、HUD 或中控屏，支持配套的 CarPlay 第二屏设置。"
-  },
-  "vizualyse_chromium": {
-    "title": "Chromium 浏览器",
-    "description": "在车机中使用 Chromium 浏览网页，通过手机输入网址和文字。"
-  },
-  "vizualyse_cluster": {
-    "title": "Vizualyse 仪表主题",
-    "description": "预览及切换仪表主题，可按驾驶模式选用不同外观。"
-  },
-  "vizualyse_moonlight": {
-    "title": "Moonlight 串流",
-    "description": "连接 Sunshine 主机，将电脑游戏和声音串流到车机。"
-  },
-  "vizualyse_steam": {
-    "title": "车载 Steam",
-    "description": "在车机运行支持的 Steam 游戏，管理安装位置和画面设置。"
-  },
   "front-camera-cluster-helper": {
     "title": "仪表夜视服务",
-    "description": "为对应应用提供后台支持，可随应用安装和卸载。"
-  },
-  "hotspot-studio-helper": {
-    "title": "热点工作室服务",
-    "description": "为对应应用提供后台支持，可随应用安装和卸载。"
-  },
-  "vehicle-network-observer": {
-    "title": "车辆网络监测服务",
-    "description": "为对应应用提供后台支持，可随应用安装和卸载。"
-  },
-  "jap-ridetube-d": {
-    "title": "RideTube 视频服务",
-    "description": "为对应应用提供后台支持，可随应用安装和卸载。"
-  },
-  "mgu-browser": {
-    "title": "网页浏览器服务",
-    "description": "为对应应用提供后台支持，可随应用安装和卸载。"
-  },
-  "vizualyse-bus": {
-    "title": "应用通信服务",
-    "description": "为对应应用提供后台支持，可随应用安装和卸载。"
-  },
-  "vizualyse-cast": {
-    "title": "仪表投射服务",
-    "description": "为对应应用提供后台支持，可随应用安装和卸载。"
-  },
-  "vizualyse-chromium": {
-    "title": "Chromium 浏览器服务",
-    "description": "为对应应用提供后台支持，可随应用安装和卸载。"
-  },
-  "vizualyse-cluster": {
-    "title": "仪表主题服务",
-    "description": "为对应应用提供后台支持，可随应用安装和卸载。"
-  },
-  "vizualyse-moonlight": {
-    "title": "Moonlight 串流服务",
-    "description": "为对应应用提供后台支持，可随应用安装和卸载。"
-  },
-  "jap-node22": {
-    "title": "Node.js 运行环境",
-    "description": "为对应应用提供后台支持，可随应用安装和卸载。"
-  },
-  "mgu-browser-engine": {
-    "title": "网页浏览器引擎",
-    "description": "为对应应用提供后台支持，可随应用安装和卸载。"
-  },
-  "vizualyse-steam": {
-    "title": "Steam 运行服务",
     "description": "为对应应用提供后台支持，可随应用安装和卸载。"
   }
 }
