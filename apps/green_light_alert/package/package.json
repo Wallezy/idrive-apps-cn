@@ -1,0 +1,38 @@
+{
+  "name": "green_light_alert",
+  "version": "0.2.6",
+  "description": "监测 KAFAS 原始红绿灯信号，并以宝马已验证的显示信号作为后备",
+  "main": "javascript/localized-entry.js",
+  "private": false,
+  "author": "alexp50",
+  "license": "MIT",
+  "engines": {
+    "node": ">=8.7.0"
+  },
+  "oapAppSettings": {
+    "maxDiskUsage": 20971520,
+    "cpuLimit": 60,
+    "memoryThresholdKB": 196608,
+    "priority": "PRIO_LOW",
+    "visibility": "FOREGROUND",
+    "latencyClass": "FOREGROUND",
+    "loggingId": "OAB4",
+    "userLoginRequired": false,
+    "backgroundPriority": 200,
+    "someipManifest": "manifest.json"
+  },
+  "mguLocalOnly": true,
+  "files": [
+    "CHANGELOG.md",
+    "NOTICE.zh-CN.md",
+    "PROVENANCE.json",
+    "config",
+    "javascript",
+    "manifest.json",
+    "npm-shrinkwrap.json",
+    "package.json",
+    "permissions.json",
+    "rhmiData",
+    "LICENSE"
+  ]
+}

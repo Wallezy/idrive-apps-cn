@@ -1,0 +1,13 @@
+{
+  "sourceCatalog": "https://gitee.com/xiaobai-151/mgu-cn-xiaobai/raw/main/catalog.json",
+  "sourceArtifact": {
+    "name": "hotspot-studio-helper@0.1.7.tgz",
+    "size": 9437,
+    "sha256": "a2350a9d330008649f3cbe948f48d018be3a97f5cf179a5ab0305b1198ab135a",
+    "url": "packages/hotspot-studio-helper@0.1.7.tgz"
+  },
+  "upstreamVersion": "0.1.7",
+  "cnVersion": "0.1.8",
+  "license": "MIT",
+  "notice": "Original source copyright and licence retained in files/LICENSE."
+}

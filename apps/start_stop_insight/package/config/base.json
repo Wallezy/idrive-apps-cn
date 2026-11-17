@@ -1,0 +1,11 @@
+{
+  "rhmiLoadingEnabled": true,
+  "entryPointLoadingEnabled": true,
+  "settings": {
+    "start_stop_insight": {
+      "ddeAddress": 18,
+      "readOnly": true,
+      "fullScreenRequired": true
+    }
+  }
+}

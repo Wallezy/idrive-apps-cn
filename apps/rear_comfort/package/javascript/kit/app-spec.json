@@ -1,0 +1,66 @@
+{
+  "id": "rear_comfort",
+  "title": "后排舒适控制",
+  "version": "0.4.5",
+  "screens": [
+    {
+      "name": "MAIN",
+      "kind": "canvas",
+      "title": "后排舒适控制",
+      "buttons": [
+        [
+          "BTN_PAGE",
+          "下一页"
+        ],
+        [
+          "BTN_SELECT",
+          "下一项控制"
+        ],
+        [
+          "BTN_ACTION",
+          "执行"
+        ],
+        [
+          "BTN_BACK",
+          "概览"
+        ]
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "key": "layout",
+      "label": "屏幕布局",
+      "type": "choice",
+      "default": "full",
+      "reset": 2,
+      "options": [
+        [
+          "full",
+          "全屏"
+        ]
+      ]
+    },
+    {
+      "key": "renderer",
+      "label": "渲染器",
+      "type": "choice",
+      "default": "auto",
+      "reset": 2,
+      "options": [
+        [
+          "auto",
+          "GPU 60 帧／秒"
+        ]
+      ]
+    }
+  ],
+  "config": {
+    "fullScreenRequired": true
+  },
+  "startWidget": null,
+  "stateIds": {
+    "MAIN": 1,
+    "SETTINGS": 11
+  }
+}

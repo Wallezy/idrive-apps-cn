@@ -1,0 +1,10 @@
+{
+  "rhmiLoadingEnabled": true,
+  "entryPointLoadingEnabled": true,
+  "settings": {
+    "green_light_alert": {
+      "fullScreenRequired": true,
+      "nativeSetting": "Configured through iDrive > Traffic light recognition > Drive off reminder"
+    }
+  }
+}

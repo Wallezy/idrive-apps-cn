@@ -1,0 +1,90 @@
+{
+  "id": "xdrive_studio",
+  "title": "xDrive 动力分配",
+  "version": "0.1.6",
+  "screens": [
+    {
+      "name": "MAIN",
+      "kind": "canvas",
+      "title": "xDrive 动力分配",
+      "buttons": [
+        [
+          "BTN_PAGE",
+          "下一页"
+        ],
+        [
+          "BTN_REFRESH",
+          "刷新分动箱"
+        ],
+        [
+          "BTN_SETTINGS",
+          "设置"
+        ]
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "key": "demo",
+      "label": "演示数据",
+      "type": "choice",
+      "default": "off",
+      "options": [
+        [
+          "off",
+          "从不"
+        ],
+        [
+          "on",
+          "始终"
+        ]
+      ]
+    },
+    {
+      "key": "layout",
+      "label": "屏幕布局",
+      "type": "choice",
+      "default": "full",
+      "reset": 2,
+      "options": [
+        [
+          "full",
+          "全屏"
+        ]
+      ]
+    },
+    {
+      "key": "renderer",
+      "label": "渲染器",
+      "type": "choice",
+      "default": "auto",
+      "reset": 2,
+      "options": [
+        [
+          "auto",
+          "GPU 60 帧／秒"
+        ]
+      ]
+    }
+  ],
+  "config": {
+    "lmvAddress": 25,
+    "lmvDid": "DB32",
+    "gearRatios": [
+      5.0,
+      3.2,
+      2.143,
+      1.72,
+      1.313,
+      1.0,
+      0.823,
+      0.64
+    ],
+    "fullScreenRequired": true
+  },
+  "startWidget": null,
+  "stateIds": {
+    "MAIN": 1,
+    "SETTINGS": 10
+  }
+}

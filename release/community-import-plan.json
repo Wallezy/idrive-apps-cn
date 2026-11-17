@@ -1,0 +1,1095 @@
+{
+  "schema": 1,
+  "catalogUrl": "https://gitee.com/xiaobai-151/mgu-cn-xiaobai/raw/main/catalog.json",
+  "catalogSha256": "75ec5122c7fa286774deaf57b2c447faaf7bfa2d2db0bcc018207f981a70704d",
+  "apps": [
+    {
+      "id": "ram_mic_calibration",
+      "kind": "app",
+      "title": "RAM 麦克风校准",
+      "description": "在 ID7 车机读取 RAM01 麦克风校准状态，并在停车后二次确认启动校准。",
+      "version": "0.1.1",
+      "artifact": {
+        "name": "ram_mic_calibration@0.1.1.tgz",
+        "url": "packages/ram_mic_calibration@0.1.1.tgz",
+        "size": 762299,
+        "sha256": "207b97122c766c370e9e563a4c3759191737707fdf155184de2bd0cff51308b2"
+      },
+      "requires": {},
+      "uninstallable": true,
+      "mguHmi": [
+        "ID7"
+      ],
+      "icon": "ram_mic_calibration.png",
+      "iconSha256": "75246d4f553e331e644c962ad414f1501951d41952e6c004e919f962f85955db",
+      "author": "小白151 · 小白科技杂物社",
+      "releaseVersion": "0.1.2",
+      "license": "MIT",
+      "source": "https://gitee.com/xiaobai-151/mgu-cn-xiaobai/raw/main/packages/ram_mic_calibration@0.1.1.tgz",
+      "attribution": "原作者：小白151（GitHub: JackieZ123430）；应用框架：cauliflowermossgrape。原包 javascript/LICENSE 的 MIT 许可与版权声明完整保留。",
+      "changes": [
+        "新增 RAM 麦克风状态读取和停车确认校准。",
+        "清理界面推广文字，保留作者和许可记录。"
+      ],
+      "cnRequires": {
+        "mgu-deploy": "0.8.18",
+        "robertn_store": "0.9.47"
+      },
+      "legalNotices": {
+        "LICENSE": "MIT License\n\nCopyright (c) 2026 cauliflowermossgrape\nCopyright (c) 2026 小白151 (GitHub: JackieZ123430), Chinese localization\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n"
+      }
+    },
+    {
+      "id": "ambient_studio_full",
+      "kind": "app",
+      "title": "氛围灯工作室",
+      "description": "全屏设置驾驶模式配色和氛围灯提醒",
+      "version": "0.1.5",
+      "artifact": {
+        "name": "ambient_studio_full@0.1.5.tgz",
+        "url": "packages/ambient_studio_full@0.1.5.tgz",
+        "size": 957143,
+        "sha256": "87973e4c5c975de11a54db02f4b943517138495215f388745bd0f2af0192ae41"
+      },
+      "requires": {
+        "idrive7-renderd": "2.1.7",
+        "mgu-inputgate": "1.0.0"
+      },
+      "uninstallable": true,
+      "mguHmi": [
+        "ID7"
+      ],
+      "icon": "ambient_studio_full.png",
+      "iconSha256": "c296c5f480b6140ea1fcff60052f96a21a2aa81ee5ad133896941619ef067fd0",
+      "author": "汉化 小白151",
+      "releaseVersion": "0.1.6",
+      "license": "MIT",
+      "source": "https://github.com/alexp50/bmw-apps/pull/3",
+      "attribution": "原项目：https://github.com/alexp50/bmw-apps/pull/3。汉化：小白151（GitHub: JackieZ123430）。应用框架：cauliflowermossgrape。",
+      "cnRequires": {
+        "mgu-inputgate": "1.1.1",
+        "mgu-deploy": "0.8.18",
+        "mgu-render": "0.6.24",
+        "robertn_store": "0.9.47"
+      },
+      "legalNotices": {
+        "LICENSE": "MIT License\n\nCopyright (c) 2026 cauliflowermossgrape\nCopyright (c) 2026 小白151 (GitHub: JackieZ123430), Chinese translation\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n"
+      },
+      "changes": [
+        "新增简体中文应用，接入国内商店更新。",
+        "兼容商店渲染与输入组件，清理界面推广水印。"
+      ]
+    },
+    {
+      "id": "dpf_monitor",
+      "kind": "app",
+      "title": "颗粒捕集器监测",
+      "description": "只读监测柴油颗粒捕集器积碳、再生进度、温度、压差及历史记录",
+      "version": "0.3.2",
+      "artifact": {
+        "name": "dpf_monitor@0.3.2.tgz",
+        "url": "packages/dpf_monitor@0.3.2.tgz",
+        "size": 953680,
+        "sha256": "92edcd5b87d868ad45a878d75b5c1ab1253d4c5f485ba0f3e2ee32921ee2e524"
+      },
+      "requires": {
+        "idrive7-renderd": "2.1.7",
+        "mgu-inputgate": "1.0.0"
+      },
+      "uninstallable": true,
+      "mguHmi": [
+        "ID7"
+      ],
+      "icon": "dpf_monitor.png",
+      "iconSha256": "099d5a112273728088a29750269cb30bf9060c08ea7c3ecaa6b2fb8645847977",
+      "author": "汉化 小白151",
+      "releaseVersion": "0.3.3",
+      "license": "MIT",
+      "source": "https://github.com/alexp50/bmw-apps/pull/3",
+      "attribution": "原项目：https://github.com/alexp50/bmw-apps/pull/3。汉化：小白151（GitHub: JackieZ123430）。应用框架：cauliflowermossgrape。",
+      "cnRequires": {
+        "mgu-inputgate": "1.1.1",
+        "mgu-deploy": "0.8.18",
+        "mgu-render": "0.6.24",
+        "robertn_store": "0.9.47"
+      },
+      "legalNotices": {
+        "LICENSE": "MIT License\n\nCopyright (c) 2026 cauliflowermossgrape\nCopyright (c) 2026 小白151 (GitHub: JackieZ123430), Chinese translation\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n"
+      },
+      "changes": [
+        "新增简体中文应用，接入国内商店更新。",
+        "兼容商店渲染与输入组件，清理界面推广水印。"
+      ]
+    },
+    {
+      "id": "drive_hud_full",
+      "kind": "app",
+      "title": "抬头显示助手",
+      "description": "全屏设置 HUD 转向箭头、运动挡位和转速、换挡提示及发动机暖机信息",
+      "version": "0.1.6",
+      "artifact": {
+        "name": "drive_hud_full@0.1.6.tgz",
+        "url": "packages/drive_hud_full@0.1.6.tgz",
+        "size": 949704,
+        "sha256": "7902d97f63b340a05320315f4898abbd3b5f9d5287431f6a07bcde6d128777fc"
+      },
+      "requires": {
+        "idrive7-renderd": "2.1.7",
+        "mgu-inputgate": "1.0.0",
+        "cluster-render": "0.3.10"
+      },
+      "uninstallable": true,
+      "mguHmi": [
+        "ID7"
+      ],
+      "icon": "drive_hud_full.png",
+      "iconSha256": "0126b1337d6c0c7660a8aaa9bd50aa8e6c9982e27ac3001f018bbcb08cf34c6b",
+      "author": "汉化 小白151",
+      "releaseVersion": "0.1.7",
+      "license": "MIT",
+      "source": "https://github.com/alexp50/bmw-apps/pull/3",
+      "attribution": "原项目：https://github.com/alexp50/bmw-apps/pull/3。汉化：小白151（GitHub: JackieZ123430）。应用框架：cauliflowermossgrape。",
+      "cnRequires": {
+        "mgu-inputgate": "1.1.1",
+        "cluster-render": "0.6.7",
+        "mgu-deploy": "0.8.18",
+        "mgu-render": "0.6.24",
+        "robertn_store": "0.9.47"
+      },
+      "legalNotices": {
+        "LICENSE": "MIT License\n\nCopyright (c) 2026 cauliflowermossgrape\nCopyright (c) 2026 小白151 (GitHub: JackieZ123430), Chinese translation\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n"
+      },
+      "changes": [
+        "新增简体中文应用，接入国内商店更新。",
+        "兼容商店渲染与输入组件，清理界面推广水印。"
+      ]
+    },
+    {
+      "id": "front_camera_cluster",
+      "kind": "app",
+      "title": "仪表夜视",
+      "description": "全屏控制宝马夜视和泊车摄像头在仪表中的显示",
+      "version": "0.2.1",
+      "artifact": {
+        "name": "front_camera_cluster@0.2.1.tgz",
+        "url": "packages/front_camera_cluster@0.2.1.tgz",
+        "size": 946450,
+        "sha256": "6b6e865bd6ecc6aa8192bc71e917c338fbc813da47cce09cbf8ff55784a1a15e"
+      },
+      "requires": {
+        "idrive7-renderd": "2.1.7",
+        "mgu-inputgate": "1.0.0",
+        "front-camera-cluster-helper": "0.2.1"
+      },
+      "uninstallable": true,
+      "mguHmi": [
+        "ID7"
+      ],
+      "icon": "front_camera_cluster.png",
+      "iconSha256": "0e8ce500fa378cfbc9fcd5b86bf73d74fb5fba91ea889887ab1f548938e312e5",
+      "author": "汉化 小白151",
+      "releaseVersion": "0.2.2",
+      "license": "MIT",
+      "source": "https://github.com/alexp50/bmw-apps/pull/3",
+      "attribution": "原项目：https://github.com/alexp50/bmw-apps/pull/3。汉化：小白151（GitHub: JackieZ123430）。应用框架：cauliflowermossgrape。",
+      "cnRequires": {
+        "mgu-inputgate": "1.1.1",
+        "front-camera-cluster-helper": "0.2.2",
+        "mgu-deploy": "0.8.18",
+        "mgu-render": "0.6.24",
+        "robertn_store": "0.9.47"
+      },
+      "legalNotices": {
+        "LICENSE": "MIT License\n\nCopyright (c) 2026 cauliflowermossgrape\nCopyright (c) 2026 小白151 (GitHub: JackieZ123430), Chinese translation\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n"
+      },
+      "changes": [
+        "新增简体中文应用，接入国内商店更新。",
+        "兼容商店渲染与输入组件，清理界面推广水印。",
+        "退出时保留其他应用图层；车速失效或连接中断后停止投射。"
+      ]
+    },
+    {
+      "id": "green_light_alert",
+      "kind": "app",
+      "title": "绿灯起步提醒",
+      "description": "监测 KAFAS 原始红绿灯信号，并以宝马已验证的显示信号作为后备",
+      "version": "0.2.5",
+      "artifact": {
+        "name": "green_light_alert@0.2.5.tgz",
+        "url": "packages/green_light_alert@0.2.5.tgz",
+        "size": 954820,
+        "sha256": "629f175e0af2eb796fb475dd6c8de4ee45fdce18366d3d819ff84ff938ddab9d"
+      },
+      "requires": {
+        "idrive7-renderd": "2.1.7",
+        "mgu-inputgate": "1.0.0"
+      },
+      "uninstallable": true,
+      "mguHmi": [
+        "ID7"
+      ],
+      "icon": "green_light_alert.png",
+      "iconSha256": "74cf497bc02ecd3bfd6cb84bc2ee46efe7d42f4e4d2a4fd16ff569fcc267bb45",
+      "author": "汉化 小白151",
+      "releaseVersion": "0.2.6",
+      "license": "MIT",
+      "source": "https://github.com/alexp50/bmw-apps/pull/3",
+      "attribution": "原项目：https://github.com/alexp50/bmw-apps/pull/3。汉化：小白151（GitHub: JackieZ123430）。应用框架：cauliflowermossgrape。",
+      "cnRequires": {
+        "mgu-inputgate": "1.1.1",
+        "mgu-deploy": "0.8.18",
+        "mgu-render": "0.6.24",
+        "robertn_store": "0.9.47"
+      },
+      "legalNotices": {
+        "LICENSE": "MIT License\n\nCopyright (c) 2026 cauliflowermossgrape\nCopyright (c) 2026 小白151 (GitHub: JackieZ123430), Chinese translation\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n"
+      },
+      "changes": [
+        "新增简体中文应用，接入国内商店更新。",
+        "兼容商店渲染与输入组件，清理界面推广水印。"
+      ]
+    },
+    {
+      "id": "hotspot_studio",
+      "kind": "app",
+      "title": "热点工作室",
+      "description": "通过宝马热点提供华为网络代理，并按需开启单客户端限时 ENET 转发",
+      "version": "0.1.5",
+      "artifact": {
+        "name": "hotspot_studio@0.1.5.tgz",
+        "url": "packages/hotspot_studio@0.1.5.tgz",
+        "size": 967264,
+        "sha256": "a07e0389b9761991d3e259e7594640f7d6c4f635854031acea73a385107e06af"
+      },
+      "requires": {
+        "idrive7-renderd": "2.1.7",
+        "mgu-inputgate": "1.0.0",
+        "hotspot-studio-helper": "0.1.7"
+      },
+      "uninstallable": true,
+      "mguHmi": [
+        "ID7"
+      ],
+      "icon": "hotspot_studio.png",
+      "iconSha256": "47ab652dd92b4ae2aea8d2501b38ebb148d5be9548a5b35635ebed3232e16365",
+      "author": "汉化 小白151",
+      "releaseVersion": "0.1.6",
+      "license": "MIT",
+      "source": "https://github.com/alexp50/bmw-apps/pull/3",
+      "attribution": "原项目：https://github.com/alexp50/bmw-apps/pull/3。汉化：小白151（GitHub: JackieZ123430）。应用框架：cauliflowermossgrape。",
+      "cnRequires": {
+        "mgu-inputgate": "1.1.1",
+        "hotspot-studio-helper": "0.1.8",
+        "mgu-deploy": "0.8.18",
+        "mgu-render": "0.6.24",
+        "robertn_store": "0.9.47"
+      },
+      "legalNotices": {
+        "LICENSE": "MIT License\n\nCopyright (c) 2026 cauliflowermossgrape\nCopyright (c) 2026 小白151 (GitHub: JackieZ123430), Chinese translation\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n"
+      },
+      "changes": [
+        "新增简体中文应用，接入国内商店更新。",
+        "兼容商店渲染与输入组件，清理界面推广水印。"
+      ]
+    },
+    {
+      "id": "parking_clearance",
+      "kind": "app",
+      "title": "泊车距离",
+      "description": "只读显示 PDC 距离、转向轨迹和悬架姿态",
+      "version": "0.1.8",
+      "artifact": {
+        "name": "parking_clearance@0.1.8.tgz",
+        "url": "packages/parking_clearance@0.1.8.tgz",
+        "size": 1176286,
+        "sha256": "7d7e0cc4c5ae8e2bd47f778226202d784a9e7813d73d47cf84a7bef366ae2b08"
+      },
+      "requires": {
+        "idrive7-renderd": "2.1.7",
+        "mgu-inputgate": "1.0.0"
+      },
+      "uninstallable": true,
+      "mguHmi": [
+        "ID7"
+      ],
+      "icon": "parking_clearance.png",
+      "iconSha256": "4debd25a4ff305e2fd7a3bf6944b1ccbe17f50cc0c538d707fe64cfe19da633a",
+      "author": "汉化 小白151",
+      "releaseVersion": "0.1.9",
+      "license": "MIT",
+      "source": "https://github.com/alexp50/bmw-apps/pull/3",
+      "attribution": "原项目：https://github.com/alexp50/bmw-apps/pull/3。汉化：小白151（GitHub: JackieZ123430）。应用框架：cauliflowermossgrape。",
+      "cnRequires": {
+        "mgu-inputgate": "1.1.1",
+        "mgu-deploy": "0.8.18",
+        "mgu-render": "0.6.24",
+        "robertn_store": "0.9.47"
+      },
+      "legalNotices": {
+        "LICENSE": "MIT License\n\nCopyright (c) 2026 cauliflowermossgrape\nCopyright (c) 2026 小白151 (GitHub: JackieZ123430), Chinese translation\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n"
+      },
+      "changes": [
+        "新增简体中文应用，接入国内商店更新。",
+        "兼容商店渲染与输入组件，清理界面推广水印。"
+      ]
+    },
+    {
+      "id": "rear_comfort",
+      "kind": "app",
+      "title": "后排舒适控制",
+      "description": "G12 行政座舱后排空调、舒适座椅、按摩、遮阳帘及娱乐控制",
+      "version": "0.4.4",
+      "artifact": {
+        "name": "rear_comfort@0.4.4.tgz",
+        "url": "packages/rear_comfort@0.4.4.tgz",
+        "size": 5490736,
+        "sha256": "bf1bd20c03b3c78ba055528f81fb35b8a390b74cdb50d537a16fe82a2ed8719f"
+      },
+      "requires": {
+        "idrive7-renderd": "2.1.7",
+        "mgu-inputgate": "1.0.0"
+      },
+      "uninstallable": true,
+      "mguHmi": [
+        "ID7"
+      ],
+      "icon": "rear_comfort.png",
+      "iconSha256": "1e4729deebc48e40735de3ed7ae9c6eea046f1f93a4fc6df1931889c2a2ac1af",
+      "author": "汉化 小白151",
+      "releaseVersion": "0.4.5",
+      "license": "MIT",
+      "source": "https://github.com/alexp50/bmw-apps/pull/3",
+      "attribution": "原项目：https://github.com/alexp50/bmw-apps/pull/3。汉化：小白151（GitHub: JackieZ123430）。应用框架：cauliflowermossgrape。",
+      "cnRequires": {
+        "mgu-inputgate": "1.1.1",
+        "mgu-deploy": "0.8.18",
+        "mgu-render": "0.6.24",
+        "robertn_store": "0.9.47"
+      },
+      "legalNotices": {
+        "LICENSE": "MIT License\n\nCopyright (c) 2026 cauliflowermossgrape\nCopyright (c) 2026 小白151 (GitHub: JackieZ123430), Chinese translation\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n"
+      },
+      "changes": [
+        "新增简体中文应用，接入国内商店更新。",
+        "兼容商店渲染与输入组件，清理界面推广水印。"
+      ]
+    },
+    {
+      "id": "ride_height",
+      "kind": "app",
+      "title": "车身高度工作室",
+      "description": "全屏设置 VDP 预设及前后空气弹簧充放气",
+      "version": "0.6.0",
+      "artifact": {
+        "name": "ride_height@0.6.0.tgz",
+        "url": "packages/ride_height@0.6.0.tgz",
+        "size": 949855,
+        "sha256": "ba236f978c837ec915c878f513cf1c09ceb6ec27a607e903e36ec4e69d57cd96"
+      },
+      "requires": {
+        "idrive7-renderd": "2.1.7",
+        "mgu-inputgate": "1.0.0"
+      },
+      "uninstallable": true,
+      "mguHmi": [
+        "ID7"
+      ],
+      "icon": "ride_height.png",
+      "iconSha256": "732083e3f98a7888e05b598f8f9fe9324255c3cd559a8cf5be4362c5271b7af1",
+      "author": "汉化 小白151",
+      "releaseVersion": "0.6.1",
+      "license": "MIT",
+      "source": "https://github.com/alexp50/bmw-apps/pull/3",
+      "attribution": "原项目：https://github.com/alexp50/bmw-apps/pull/3。汉化：小白151（GitHub: JackieZ123430）。应用框架：cauliflowermossgrape。",
+      "cnRequires": {
+        "mgu-inputgate": "1.1.1",
+        "mgu-deploy": "0.8.18",
+        "mgu-render": "0.6.24",
+        "robertn_store": "0.9.47"
+      },
+      "legalNotices": {
+        "LICENSE": "MIT License\n\nCopyright (c) 2026 cauliflowermossgrape\nCopyright (c) 2026 小白151 (GitHub: JackieZ123430), Chinese translation\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n"
+      },
+      "changes": [
+        "新增简体中文应用，接入国内商店更新。",
+        "兼容商店渲染与输入组件，清理界面推广水印。",
+        "无效车速立即阻止车身高度控制。"
+      ]
+    },
+    {
+      "id": "road_trip_computer",
+      "kind": "app",
+      "title": "行程电脑",
+      "description": "全屏显示行程历史、油耗、油价、费用、续航、车外温度和 GPS 海拔",
+      "version": "1.0.0",
+      "artifact": {
+        "name": "road_trip_computer@1.0.0.tgz",
+        "url": "packages/road_trip_computer@1.0.0.tgz",
+        "size": 1053377,
+        "sha256": "f98156ee7f7654c50254377f2c119c3e8046cb9203af60240f2be570c4f924b2"
+      },
+      "requires": {
+        "idrive7-renderd": "2.1.7",
+        "mgu-inputgate": "1.0.0"
+      },
+      "uninstallable": true,
+      "mguHmi": [
+        "ID7"
+      ],
+      "icon": "road_trip_computer.png",
+      "iconSha256": "6148be6ea376d61b6cc00e6aabcd09abd7d7a840f6948704b42af14af1704eb8",
+      "author": "汉化 小白151",
+      "releaseVersion": "1.0.1",
+      "license": "MIT",
+      "source": "https://github.com/alexp50/bmw-apps/pull/3",
+      "attribution": "原项目：https://github.com/alexp50/bmw-apps/pull/3。汉化：小白151（GitHub: JackieZ123430）。应用框架：cauliflowermossgrape。",
+      "cnRequires": {
+        "mgu-inputgate": "1.1.1",
+        "mgu-deploy": "0.8.18",
+        "mgu-render": "0.6.24",
+        "robertn_store": "0.9.47"
+      },
+      "legalNotices": {
+        "LICENSE": "MIT License\n\nCopyright (c) 2026 cauliflowermossgrape\nCopyright (c) 2026 小白151 (GitHub: JackieZ123430), Chinese translation\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n"
+      },
+      "changes": [
+        "新增简体中文应用，接入国内商店更新。",
+        "兼容商店渲染与输入组件，清理界面推广水印。"
+      ]
+    },
+    {
+      "id": "start_stop_insight",
+      "kind": "app",
+      "title": "自动启停状态",
+      "description": "显示当前及最近十条自动启停抑制状态，以及实时用电负载",
+      "version": "0.1.3",
+      "artifact": {
+        "name": "start_stop_insight@0.1.3.tgz",
+        "url": "packages/start_stop_insight@0.1.3.tgz",
+        "size": 949829,
+        "sha256": "853b3d62685b99dbe3bf54733e8651c21cacc037e8a1bc37e178ca4919d9a888"
+      },
+      "requires": {
+        "idrive7-renderd": "2.1.7",
+        "mgu-inputgate": "1.0.0"
+      },
+      "uninstallable": true,
+      "mguHmi": [
+        "ID7"
+      ],
+      "icon": "start_stop_insight.png",
+      "iconSha256": "064b605ea22d7c81f66a6a1cb3507fa231a83662c79a98e85bc094227dd379d0",
+      "author": "汉化 小白151",
+      "releaseVersion": "0.1.4",
+      "license": "MIT",
+      "source": "https://github.com/alexp50/bmw-apps/pull/3",
+      "attribution": "原项目：https://github.com/alexp50/bmw-apps/pull/3。汉化：小白151（GitHub: JackieZ123430）。应用框架：cauliflowermossgrape。",
+      "cnRequires": {
+        "mgu-inputgate": "1.1.1",
+        "mgu-deploy": "0.8.18",
+        "mgu-render": "0.6.24",
+        "robertn_store": "0.9.47"
+      },
+      "legalNotices": {
+        "LICENSE": "MIT License\n\nCopyright (c) 2026 cauliflowermossgrape\nCopyright (c) 2026 小白151 (GitHub: JackieZ123430), Chinese translation\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n"
+      },
+      "changes": [
+        "新增简体中文应用，接入国内商店更新。",
+        "兼容商店渲染与输入组件，清理界面推广水印。"
+      ]
+    },
+    {
+      "id": "telemetry_studio",
+      "kind": "app",
+      "title": "车辆遥测",
+      "description": "分类全屏显示动力、热管理、底盘、轮胎、空调和电气实时数据",
+      "version": "0.2.0",
+      "artifact": {
+        "name": "telemetry_studio@0.2.0.tgz",
+        "url": "packages/telemetry_studio@0.2.0.tgz",
+        "size": 980981,
+        "sha256": "2411b1f51159a151c6ceebf9ff84e2a1396b3d6ab8380d7c673b5e3b5b65a3e3"
+      },
+      "requires": {
+        "idrive7-renderd": "2.1.7",
+        "mgu-inputgate": "1.0.0"
+      },
+      "uninstallable": true,
+      "mguHmi": [
+        "ID7"
+      ],
+      "icon": "telemetry_studio.png",
+      "iconSha256": "10fe4e83ea4e7a2c7bdc72a649ac56210850c0c3ab5b9a4889229b648f129e08",
+      "author": "汉化 小白151",
+      "releaseVersion": "0.2.1",
+      "license": "MIT",
+      "source": "https://github.com/alexp50/bmw-apps/pull/3",
+      "attribution": "原项目：https://github.com/alexp50/bmw-apps/pull/3。汉化：小白151（GitHub: JackieZ123430）。应用框架：cauliflowermossgrape。",
+      "cnRequires": {
+        "mgu-inputgate": "1.1.1",
+        "mgu-deploy": "0.8.18",
+        "mgu-render": "0.6.24",
+        "robertn_store": "0.9.47"
+      },
+      "legalNotices": {
+        "LICENSE": "MIT License\n\nCopyright (c) 2026 cauliflowermossgrape\nCopyright (c) 2026 小白151 (GitHub: JackieZ123430), Chinese translation\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n"
+      },
+      "changes": [
+        "新增简体中文应用，接入国内商店更新。",
+        "兼容商店渲染与输入组件，清理界面推广水印。"
+      ]
+    },
+    {
+      "id": "vehicle_health",
+      "kind": "app",
+      "title": "车辆健康中心",
+      "description": "只读查看轮胎、油液、温度、保养需求、检查控制、DPF 和当前故障",
+      "version": "0.1.9",
+      "artifact": {
+        "name": "vehicle_health@0.1.9.tgz",
+        "url": "packages/vehicle_health@0.1.9.tgz",
+        "size": 951226,
+        "sha256": "e4e8bad27a20bfe54955fea6f4c1812d2c3cec8eac6a33946177a8ded6b8cb4c"
+      },
+      "requires": {
+        "idrive7-renderd": "2.1.7",
+        "mgu-inputgate": "1.0.0"
+      },
+      "uninstallable": true,
+      "mguHmi": [
+        "ID7"
+      ],
+      "icon": "vehicle_health.png",
+      "iconSha256": "937c1b44f7062fcf39f7312468925b0c97eccb5e8242f60fed6a81f1d779683a",
+      "author": "汉化 小白151",
+      "releaseVersion": "0.1.10",
+      "license": "MIT",
+      "source": "https://github.com/alexp50/bmw-apps/pull/3",
+      "attribution": "原项目：https://github.com/alexp50/bmw-apps/pull/3。汉化：小白151（GitHub: JackieZ123430）。应用框架：cauliflowermossgrape。",
+      "cnRequires": {
+        "mgu-inputgate": "1.1.1",
+        "mgu-deploy": "0.8.18",
+        "mgu-render": "0.6.24",
+        "robertn_store": "0.9.47"
+      },
+      "legalNotices": {
+        "LICENSE": "MIT License\n\nCopyright (c) 2026 cauliflowermossgrape\nCopyright (c) 2026 小白151 (GitHub: JackieZ123430), Chinese translation\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n"
+      },
+      "changes": [
+        "新增简体中文应用，接入国内商店更新。",
+        "兼容商店渲染与输入组件，清理界面推广水印。",
+        "缺少车辆数据时显示等待，避免误报状态正常。"
+      ]
+    },
+    {
+      "id": "vehicle_network",
+      "kind": "app",
+      "title": "车辆网络",
+      "description": "显示 MGU 网络接口、观测到的车辆网络设备和电脑 IPv4 设置",
+      "version": "0.1.3",
+      "artifact": {
+        "name": "vehicle_network@0.1.3.tgz",
+        "url": "packages/vehicle_network@0.1.3.tgz",
+        "size": 954333,
+        "sha256": "b386f413627675ad03e1cf3828052aa02b92b78f437174620a47b394ae97385d"
+      },
+      "requires": {
+        "idrive7-renderd": "2.1.7",
+        "mgu-inputgate": "1.0.0",
+        "vehicle-network-observer": "0.1.2"
+      },
+      "uninstallable": true,
+      "mguHmi": [
+        "ID7"
+      ],
+      "icon": "vehicle_network.png",
+      "iconSha256": "fee355d9e52e81331470c91aaf021c10158b42a03b1bd56be124ec053fb2067a",
+      "author": "汉化 小白151",
+      "releaseVersion": "0.1.4",
+      "license": "MIT",
+      "source": "https://github.com/alexp50/bmw-apps/pull/3",
+      "attribution": "原项目：https://github.com/alexp50/bmw-apps/pull/3。汉化：小白151（GitHub: JackieZ123430）。应用框架：cauliflowermossgrape。",
+      "cnRequires": {
+        "mgu-inputgate": "1.1.1",
+        "vehicle-network-observer": "0.1.3",
+        "mgu-deploy": "0.8.18",
+        "mgu-render": "0.6.24",
+        "robertn_store": "0.9.47"
+      },
+      "legalNotices": {
+        "LICENSE": "MIT License\n\nCopyright (c) 2026 cauliflowermossgrape\nCopyright (c) 2026 小白151 (GitHub: JackieZ123430), Chinese translation\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n"
+      },
+      "changes": [
+        "新增简体中文应用，接入国内商店更新。",
+        "兼容商店渲染与输入组件，清理界面推广水印。"
+      ]
+    },
+    {
+      "id": "xdrive_studio",
+      "kind": "app",
+      "title": "xDrive 动力分配",
+      "description": "只读查看 xDrive 扭矩分配、分动箱扭矩、车轮滑差和底盘动态",
+      "version": "0.1.5",
+      "artifact": {
+        "name": "xdrive_studio@0.1.5.tgz",
+        "url": "packages/xdrive_studio@0.1.5.tgz",
+        "size": 1081667,
+        "sha256": "441281c06346486b0aaa285f200047a532f9111e21327ce3e0f1a93a0bf30278"
+      },
+      "requires": {
+        "idrive7-renderd": "2.1.7",
+        "mgu-inputgate": "1.0.0"
+      },
+      "uninstallable": true,
+      "mguHmi": [
+        "ID7"
+      ],
+      "icon": "xdrive_studio.png",
+      "iconSha256": "c9e4fe60e30aeb0398010bdee628d43a38676d9a22236e6c998fcff04a937185",
+      "author": "汉化 小白151",
+      "releaseVersion": "0.1.6",
+      "license": "MIT",
+      "source": "https://github.com/alexp50/bmw-apps/pull/3",
+      "attribution": "原项目：https://github.com/alexp50/bmw-apps/pull/3。汉化：小白151（GitHub: JackieZ123430）。应用框架：cauliflowermossgrape。",
+      "cnRequires": {
+        "mgu-inputgate": "1.1.1",
+        "mgu-deploy": "0.8.18",
+        "mgu-render": "0.6.24",
+        "robertn_store": "0.9.47"
+      },
+      "legalNotices": {
+        "LICENSE": "MIT License\n\nCopyright (c) 2026 cauliflowermossgrape\nCopyright (c) 2026 小白151 (GitHub: JackieZ123430), Chinese translation\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n"
+      },
+      "changes": [
+        "新增简体中文应用，接入国内商店更新。",
+        "兼容商店渲染与输入组件，清理界面推广水印。"
+      ]
+    },
+    {
+      "id": "spotify",
+      "kind": "app",
+      "title": "Spotify 音乐",
+      "description": "BMW iDrive 7 的 Spotify Connect 播放控制和曲库浏览应用",
+      "version": "1.0.23",
+      "artifact": {
+        "name": "spotify@1.0.23.tgz",
+        "url": "packages/spotify@1.0.23.tgz",
+        "size": 1807894,
+        "sha256": "f3b9a58453a14296e206c0a30b2feef7cd6ff04505fbec4bc94dabbf5a628e50"
+      },
+      "requires": {
+        "idrive7-renderd": "2.1.7",
+        "mgu-inputgate": "1.0.0"
+      },
+      "uninstallable": true,
+      "mguHmi": [
+        "ID7"
+      ],
+      "icon": "spotify.png",
+      "iconSha256": "7e7e06848570f5ae181d497ee276a92e636ec4c7129228b52525503a6a2869c9",
+      "author": "汉化 小白151",
+      "releaseVersion": "1.0.24",
+      "license": "GPL-3.0-or-later",
+      "source": "https://github.com/hexlay/idrive7-custom-apps/pull/3",
+      "attribution": "原项目：https://github.com/hexlay/idrive7-custom-apps/pull/3。汉化：小白151（GitHub: JackieZ123430）。应用框架：cauliflowermossgrape。",
+      "cnRequires": {
+        "mgu-inputgate": "1.1.1",
+        "mgu-deploy": "0.8.18",
+        "mgu-render": "0.6.24",
+        "robertn_store": "0.9.47"
+      },
+      "legalNotices": {},
+      "changes": [
+        "新增简体中文应用，接入国内商店更新。",
+        "兼容商店渲染与输入组件，清理界面推广水印。"
+      ]
+    },
+    {
+      "id": "true_time_cn",
+      "kind": "app",
+      "title": "精准计时",
+      "description": "通过 DSC 加速度信号修正坡度，记录加速和制动测试。",
+      "version": "0.3.1",
+      "artifact": {
+        "name": "true_time_cn@0.3.1.tgz",
+        "url": "packages/true_time_cn@0.3.1.tgz",
+        "size": 920831,
+        "sha256": "1c4f112628f60f57a139b3d5fac7bf8a53d62e600b38af2c69d4be51a2d00624"
+      },
+      "requires": {
+        "idrive7-renderd": "2.1.7",
+        "mgu-inputgate": "1.0.0",
+        "mgu-deploy": "0.8.19"
+      },
+      "uninstallable": true,
+      "mguHmi": [
+        "ID7"
+      ],
+      "icon": "true_time_cn.png",
+      "iconSha256": "6b59b9acd542e7fe1a3c892ac9178a2566c82379b2498bc7f647648fb753f06b",
+      "author": "giuseppesalatino-boop · 汉化 小白151",
+      "releaseVersion": "0.3.2",
+      "license": "MIT",
+      "source": "https://github.com/giuseppesalatino-boop/mgu-apps",
+      "attribution": "原项目：https://github.com/giuseppesalatino-boop/mgu-apps。汉化：小白151（GitHub: JackieZ123430）。应用框架：cauliflowermossgrape。",
+      "cnRequires": {
+        "mgu-inputgate": "1.1.1",
+        "mgu-deploy": "0.8.18",
+        "mgu-render": "0.6.24",
+        "robertn_store": "0.9.47"
+      },
+      "legalNotices": {
+        "LICENSE": "MIT License\n\nCopyright (c) 2026 giuseppesalatino-boop\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n\nThe idrive7-apps kit in vendor/idrive7-apps is cauliflowermossgrape's, under its own\nMIT licence (vendor/idrive7-apps/LICENSE).\n",
+        "LICENSE.kit": "MIT License\n\nCopyright (c) 2026 cauliflowermossgrape\nCopyright (c) 2026 小白151 (GitHub: JackieZ123430), Chinese translation\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n"
+      },
+      "changes": [
+        "新增简体中文应用，接入国内商店更新。",
+        "兼容商店渲染与输入组件，清理界面推广水印。"
+      ]
+    },
+    {
+      "id": "boostline_cn",
+      "kind": "app",
+      "title": "ECU 实时数据",
+      "description": "只读查看发动机实时数据，支持 CSV 记录、道路测功与加速计时。",
+      "version": "1.0.1",
+      "artifact": {
+        "name": "boostline_cn@1.0.1.tgz",
+        "url": "packages/boostline_cn@1.0.1.tgz",
+        "size": 1014042,
+        "sha256": "0ac28730baeee97e522310d0dbb2149ebd22afca3e6338c9fac1d4bcd5781970"
+      },
+      "requires": {
+        "idrive7-renderd": "2.1.7",
+        "mgu-inputgate": "1.0.0",
+        "mgu-deploy": "0.8.19"
+      },
+      "uninstallable": true,
+      "mguHmi": [
+        "ID7"
+      ],
+      "icon": "boostline_cn.png",
+      "iconSha256": "a28363ef5fd88739200f6d7b40e9f5da36421fa0f4db1b279c420bc2f5e8d01d",
+      "author": "giuseppesalatino-boop · 汉化 小白151",
+      "releaseVersion": "1.0.2",
+      "license": "MIT",
+      "source": "https://github.com/giuseppesalatino-boop/mgu-apps",
+      "attribution": "原项目：https://github.com/giuseppesalatino-boop/mgu-apps。汉化：小白151（GitHub: JackieZ123430）。应用框架：cauliflowermossgrape。",
+      "cnRequires": {
+        "mgu-inputgate": "1.1.1",
+        "mgu-deploy": "0.8.18",
+        "mgu-render": "0.6.24",
+        "robertn_store": "0.9.47"
+      },
+      "legalNotices": {
+        "LICENSE": "MIT License\n\nCopyright (c) 2026 giuseppesalatino-boop\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n\nThe idrive7-apps kit in vendor/idrive7-apps is cauliflowermossgrape's, under its own\nMIT licence (vendor/idrive7-apps/LICENSE).\n",
+        "LICENSE.kit": "MIT License\n\nCopyright (c) 2026 cauliflowermossgrape\nCopyright (c) 2026 小白151 (GitHub: JackieZ123430), Chinese translation\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n"
+      },
+      "changes": [
+        "新增简体中文应用，接入国内商店更新。",
+        "兼容商店渲染与输入组件，清理界面推广水印。"
+      ]
+    },
+    {
+      "id": "dpf_id7_cn",
+      "kind": "app",
+      "title": "DPF 监测",
+      "description": "只读查看柴油颗粒捕集器的积炭、灰分、排温、压差和再生记录。",
+      "version": "0.1.1",
+      "artifact": {
+        "name": "dpf_id7_cn@0.1.1.tgz",
+        "url": "packages/dpf_id7_cn@0.1.1.tgz",
+        "size": 905949,
+        "sha256": "4e84cf0ee8785f86523b4bc52352d36e7e4412876795d547d1ca70013bb48ae3"
+      },
+      "requires": {
+        "idrive7-renderd": "2.1.7",
+        "mgu-inputgate": "1.0.0",
+        "mgu-deploy": "0.8.19"
+      },
+      "uninstallable": true,
+      "mguHmi": [
+        "ID7"
+      ],
+      "icon": "dpf_id7_cn.png",
+      "iconSha256": "1b04ede8508990d493ee764333350bd7268aa304af3cbd25faf58a3cc61a0bce",
+      "author": "giuseppesalatino-boop · 汉化 小白151",
+      "releaseVersion": "0.1.2",
+      "license": "MIT",
+      "source": "https://github.com/giuseppesalatino-boop/mgu-apps",
+      "attribution": "原项目：https://github.com/giuseppesalatino-boop/mgu-apps。汉化：小白151（GitHub: JackieZ123430）。应用框架：cauliflowermossgrape。",
+      "cnRequires": {
+        "mgu-inputgate": "1.1.1",
+        "mgu-deploy": "0.8.18",
+        "mgu-render": "0.6.24",
+        "robertn_store": "0.9.47"
+      },
+      "legalNotices": {
+        "LICENSE": "MIT License\n\nCopyright (c) 2026 giuseppesalatino-boop\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n\nThe idrive7-apps kit in vendor/idrive7-apps is cauliflowermossgrape's, under its own\nMIT licence (vendor/idrive7-apps/LICENSE).\n",
+        "LICENSE.kit": "MIT License\n\nCopyright (c) 2026 cauliflowermossgrape\nCopyright (c) 2026 小白151 (GitHub: JackieZ123430), Chinese translation\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n"
+      },
+      "changes": [
+        "新增简体中文应用，接入国内商店更新。",
+        "兼容商店渲染与输入组件，清理界面推广水印。"
+      ]
+    },
+    {
+      "id": "jap_ridetube",
+      "kind": "app",
+      "title": "RideTube 视频",
+      "description": "ID7 非官方 YouTube 客户端，支持搜索、频道、章节及登录后的首页、订阅和稍后观看。通过车机播放声音，默认停车时显示画面。需要 jap-ridetube-d 服务。",
+      "version": "0.3.8",
+      "artifact": {
+        "name": "jap_ridetube@0.3.8.tgz",
+        "url": "packages/jap_ridetube@0.3.8.tgz",
+        "size": 1938655,
+        "sha256": "d60231ab44b6dfadf2d850fdb880b904052ac83b9e903bed3a9f5ef67599ec99"
+      },
+      "requires": {
+        "jap-ridetube-d": "0.3.9",
+        "mgu-render": "0.6.11",
+        "mgu-inputgate": "1.0.0"
+      },
+      "uninstallable": true,
+      "mguHmi": [
+        "ID7"
+      ],
+      "icon": "jap_ridetube.png",
+      "iconSha256": "afbf63c28de964d4f249f062bdbddf853fe1e676cc8d62f59028ea0f1c6a9876",
+      "author": "汉化 小白151",
+      "releaseVersion": "0.3.9",
+      "license": "GPL-3.0-or-later",
+      "source": "https://github.com/JustAnotherPU/ridetube/pull/3",
+      "attribution": "原项目：https://github.com/JustAnotherPU/ridetube/pull/3。中文贡献：小白151（GitHub: JackieZ123430），原有许可和版权声明随包保留。",
+      "changes": [
+        "新增简体中文应用，接入国内商店更新。",
+        "清理界面推广文字，保留作者和许可记录。"
+      ],
+      "cnRequires": {
+        "jap-ridetube-d": "0.3.10",
+        "mgu-render": "0.6.24",
+        "mgu-inputgate": "1.1.1",
+        "mgu-deploy": "0.8.18",
+        "robertn_store": "0.9.47"
+      }
+    },
+    {
+      "id": "mgu_browser",
+      "kind": "app",
+      "title": "网页浏览器",
+      "description": "浏览网页，支持主页、历史记录、书签和 iDrive 旋钮操作。",
+      "version": "0.16.1",
+      "artifact": {
+        "name": "mgu_browser@0.16.1.tgz",
+        "url": "packages/mgu_browser@0.16.1.tgz",
+        "size": 1986642,
+        "sha256": "9253b9baec19ef31d4bbe915063c35048bafeeb71bcfe0f213196bc9ffc2f93f"
+      },
+      "requires": {
+        "mgu-browser": "0.16.1",
+        "mgu-browser-engine": "0.1.0",
+        "mgu-uplink": "0.7.3",
+        "mgu-render": "0.6.11",
+        "mgu-deploy": "0.7.17"
+      },
+      "uninstallable": true,
+      "mguHmi": [
+        "ID7"
+      ],
+      "author": "汉化 小白151",
+      "releaseVersion": "0.16.2",
+      "license": "MIT",
+      "source": "https://github.com/pllanaio/mgu-browser/pull/12",
+      "attribution": "原项目：https://github.com/pllanaio/mgu-browser/pull/12。中文贡献：小白151（GitHub: JackieZ123430），原有许可和版权声明随包保留。",
+      "changes": [
+        "新增简体中文应用，接入国内商店更新。",
+        "清理界面推广文字，保留作者和许可记录。",
+        "默认使用简体中文界面。"
+      ],
+      "cnRequires": {
+        "mgu-browser": "0.16.2",
+        "mgu-browser-engine": "0.1.1",
+        "mgu-uplink": "0.7.3",
+        "mgu-render": "0.6.24",
+        "mgu-deploy": "0.8.18",
+        "mgu-inputgate": "1.1.1",
+        "robertn_store": "0.9.47"
+      }
+    },
+    {
+      "id": "vizualyse_cast",
+      "kind": "app",
+      "title": "仪表投射",
+      "description": "将手机串流投射到仪表、HUD 或中控屏，支持配套的 CarPlay 第二屏设置。",
+      "version": "0.4.100",
+      "artifact": {
+        "name": "vizualyse_cast@0.4.100.tgz",
+        "url": "https://github.com/JackieZ123430/vizualyse-idrive-apps-cn/releases/download/vizualyse-zh-cn.1/vizualyse_cast%400.4.100.tgz",
+        "size": 52878,
+        "sha256": "cdfb9925a3dcb454dcd5a4bc75d02631a8527642bbcd6b6e04e6a219dd6b12cd"
+      },
+      "build": "unit",
+      "requires": {
+        "vizualyse-cast": "0.4.100"
+      },
+      "mguHmi": [
+        "ID7"
+      ],
+      "uninstallable": true,
+      "author": "汉化 小白151",
+      "releaseVersion": "0.4.101",
+      "license": "GPL-3.0-or-later",
+      "source": "https://github.com/JackieZ123430/vizualyse-idrive-apps-cn/tree/332fa51c7d736b006739e510bfdeba304b1622a9",
+      "attribution": "原项目：Vizualyse/idrive-apps。中文贡献：小白151（GitHub: JackieZ123430）。原有版权声明与 GPL 许可证保留。",
+      "changes": [
+        "新增简体中文应用，清理界面推广文字。"
+      ],
+      "cnRequires": {
+        "vizualyse-cast": "0.4.101",
+        "mgu-deploy": "0.8.18",
+        "robertn_store": "0.9.47"
+      },
+      "format": "unit"
+    },
+    {
+      "id": "vizualyse_chromium",
+      "kind": "app",
+      "title": "Chromium 浏览器",
+      "description": "在车机中使用 Chromium 浏览网页，通过手机输入网址和文字。",
+      "version": "0.3.100",
+      "artifact": {
+        "name": "vizualyse_chromium@0.3.100.tgz",
+        "url": "https://github.com/JackieZ123430/vizualyse-idrive-apps-cn/releases/download/vizualyse-zh-cn.1/vizualyse_chromium%400.3.100.tgz",
+        "size": 54792,
+        "sha256": "93f379fd6d483220512beb4bd451ffa343241c51a6471e05dd0e8ad0fb88ae2a"
+      },
+      "build": "unit",
+      "requires": {
+        "vizualyse-chromium": "0.3.100"
+      },
+      "mguHmi": [
+        "ID7"
+      ],
+      "uninstallable": true,
+      "author": "汉化 小白151",
+      "releaseVersion": "0.3.101",
+      "license": "GPL-3.0-or-later",
+      "source": "https://github.com/JackieZ123430/vizualyse-idrive-apps-cn/tree/332fa51c7d736b006739e510bfdeba304b1622a9",
+      "attribution": "原项目：Vizualyse/idrive-apps。中文贡献：小白151（GitHub: JackieZ123430）。原有版权声明与 GPL 许可证保留。",
+      "changes": [
+        "新增简体中文应用，清理界面推广文字。"
+      ],
+      "cnRequires": {
+        "vizualyse-chromium": "0.3.101",
+        "mgu-deploy": "0.8.18",
+        "robertn_store": "0.9.47"
+      },
+      "format": "unit"
+    },
+    {
+      "id": "vizualyse_cluster",
+      "kind": "app",
+      "title": "Vizualyse 仪表主题",
+      "description": "预览及切换仪表主题，可按驾驶模式选用不同外观。",
+      "version": "0.3.100",
+      "artifact": {
+        "name": "vizualyse_cluster@0.3.100.tgz",
+        "url": "https://github.com/JackieZ123430/vizualyse-idrive-apps-cn/releases/download/vizualyse-zh-cn.1/vizualyse_cluster%400.3.100.tgz",
+        "size": 44140,
+        "sha256": "42ae41637d1b8fa9fdad1f99b25d0907d8fe16c8fabb8ef514356e9376af5e0a"
+      },
+      "build": "unit",
+      "requires": {
+        "vizualyse-cluster": "0.4.100"
+      },
+      "mguHmi": [
+        "ID7"
+      ],
+      "uninstallable": true,
+      "author": "汉化 小白151",
+      "releaseVersion": "0.3.101",
+      "license": "GPL-3.0-or-later",
+      "source": "https://github.com/JackieZ123430/vizualyse-idrive-apps-cn/tree/332fa51c7d736b006739e510bfdeba304b1622a9",
+      "attribution": "原项目：Vizualyse/idrive-apps。中文贡献：小白151（GitHub: JackieZ123430）。原有版权声明与 GPL 许可证保留。",
+      "changes": [
+        "新增简体中文应用，清理界面推广文字。"
+      ],
+      "cnRequires": {
+        "vizualyse-cluster": "0.4.101",
+        "mgu-deploy": "0.8.18",
+        "robertn_store": "0.9.47"
+      },
+      "format": "unit"
+    },
+    {
+      "id": "vizualyse_moonlight",
+      "kind": "app",
+      "title": "Moonlight 串流",
+      "description": "连接 Sunshine 主机，将电脑游戏和声音串流到车机。",
+      "version": "0.3.100",
+      "artifact": {
+        "name": "vizualyse_moonlight@0.3.100.tgz",
+        "url": "https://github.com/JackieZ123430/vizualyse-idrive-apps-cn/releases/download/vizualyse-zh-cn.1/vizualyse_moonlight%400.3.100.tgz",
+        "size": 51704,
+        "sha256": "a5607b4b89862a132309c5e81bed5d98d4b14773ea10e41d1fb33af2c2fada33"
+      },
+      "build": "unit",
+      "requires": {
+        "vizualyse-moonlight": "0.3.100"
+      },
+      "mguHmi": [
+        "ID7"
+      ],
+      "uninstallable": true,
+      "author": "汉化 小白151",
+      "releaseVersion": "0.3.101",
+      "license": "GPL-3.0-or-later",
+      "source": "https://github.com/JackieZ123430/vizualyse-idrive-apps-cn/tree/332fa51c7d736b006739e510bfdeba304b1622a9",
+      "attribution": "原项目：Vizualyse/idrive-apps。中文贡献：小白151（GitHub: JackieZ123430）。原有版权声明与 GPL 许可证保留。",
+      "changes": [
+        "新增简体中文应用，清理界面推广文字。"
+      ],
+      "cnRequires": {
+        "vizualyse-moonlight": "0.3.101",
+        "mgu-deploy": "0.8.18",
+        "robertn_store": "0.9.47"
+      },
+      "format": "unit"
+    },
+    {
+      "id": "vizualyse_steam",
+      "kind": "app",
+      "title": "车载 Steam",
+      "description": "在车机运行支持的 Steam 游戏，管理安装位置和画面设置。",
+      "version": "0.2.100",
+      "artifact": {
+        "name": "vizualyse_steam@0.2.100.tgz",
+        "url": "https://github.com/JackieZ123430/vizualyse-idrive-apps-cn/releases/download/vizualyse-zh-cn.1/vizualyse_steam%400.2.100.tgz",
+        "size": 52536,
+        "sha256": "a5dd2f77bfe53677078313b35cd261e86aef44a84d62151865fe445dd5608ddc"
+      },
+      "build": "unit",
+      "requires": {
+        "vizualyse-steam": "0.3.100"
+      },
+      "mguHmi": [
+        "ID7"
+      ],
+      "uninstallable": true,
+      "author": "汉化 小白151",
+      "releaseVersion": "0.2.101",
+      "license": "GPL-3.0-or-later",
+      "source": "https://github.com/JackieZ123430/vizualyse-idrive-apps-cn/tree/332fa51c7d736b006739e510bfdeba304b1622a9",
+      "attribution": "原项目：Vizualyse/idrive-apps。中文贡献：小白151（GitHub: JackieZ123430）。原有版权声明与 GPL 许可证保留。",
+      "changes": [
+        "新增简体中文应用，清理界面推广文字。"
+      ],
+      "cnRequires": {
+        "vizualyse-steam": "0.3.101",
+        "mgu-deploy": "0.8.18",
+        "robertn_store": "0.9.47"
+      },
+      "format": "unit"
+    }
+  ]
+}

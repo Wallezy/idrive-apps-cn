@@ -1,0 +1,10 @@
+[
+  {
+    "version": "0.4.101",
+    "upstreamVersion": "0.4.100",
+    "cnRevision": 1,
+    "changes": [
+      "新增简体中文应用，清理界面推广文字。"
+    ]
+  }
+]

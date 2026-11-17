@@ -1,0 +1,147 @@
+{
+  "id": "green_light_alert",
+  "title": "绿灯起步提醒",
+  "version": "0.2.6",
+  "screens": [
+    {
+      "name": "MAIN",
+      "kind": "canvas",
+      "title": "绿灯起步提醒",
+      "settingsTab": false,
+      "buttons": [
+        [
+          "BTN_PAGE",
+          "下一页"
+        ],
+        [
+          "BTN_ACTION",
+          "执行所选操作"
+        ],
+        [
+          "BTN_SETTINGS",
+          "设置"
+        ]
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "key": "rawRedCode",
+      "label": "KAFAS 原始红灯颜色码",
+      "type": "choice",
+      "default": "1",
+      "reset": 1,
+      "options": [
+        [
+          "0",
+          "0"
+        ],
+        [
+          "1",
+          "1（预期）"
+        ],
+        [
+          "2",
+          "2"
+        ],
+        [
+          "3",
+          "3"
+        ],
+        [
+          "4",
+          "4"
+        ],
+        [
+          "5",
+          "5"
+        ]
+      ]
+    },
+    {
+      "key": "rawGreenCode",
+      "label": "KAFAS 原始绿灯颜色码",
+      "type": "choice",
+      "default": "3",
+      "reset": 1,
+      "options": [
+        [
+          "0",
+          "0"
+        ],
+        [
+          "1",
+          "1"
+        ],
+        [
+          "2",
+          "2"
+        ],
+        [
+          "3",
+          "3（预期）"
+        ],
+        [
+          "4",
+          "4"
+        ],
+        [
+          "5",
+          "5"
+        ]
+      ]
+    },
+    {
+      "key": "demo",
+      "label": "演示数据",
+      "type": "choice",
+      "default": "off",
+      "reset": 1,
+      "options": [
+        [
+          "off",
+          "从不"
+        ],
+        [
+          "on",
+          "始终"
+        ]
+      ]
+    },
+    {
+      "key": "layout",
+      "label": "屏幕布局",
+      "type": "choice",
+      "default": "full",
+      "reset": 2,
+      "options": [
+        [
+          "full",
+          "全屏"
+        ]
+      ]
+    },
+    {
+      "key": "renderer",
+      "label": "渲染器",
+      "type": "choice",
+      "default": "auto",
+      "reset": 2,
+      "options": [
+        [
+          "auto",
+          "GPU 60 帧／秒"
+        ]
+      ]
+    }
+  ],
+  "config": {
+    "fullScreenRequired": true,
+    "nativeSetting": "Configured through iDrive > Traffic light recognition > Drive off reminder"
+  },
+  "startWidget": null,
+  "stateIds": {
+    "MAIN": 1,
+    "SETTINGS": 10
+  }
+}

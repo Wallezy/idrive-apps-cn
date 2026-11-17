@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "id": "spotify",
+  "version": "1.0.24",
+  "tree": "package",
+  "modules": [
+    "src/sdk.js"
+  ],
+  "sdk": [
+    "oap-sdk/src/core/OnlineApp.js",
+    "oap-sdk/src/logging/logging"
+  ],
+  "internet": true
+}

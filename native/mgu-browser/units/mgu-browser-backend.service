@@ -1,0 +1,32 @@
+[Unit]
+Description=Owner native browser backend (prototype)
+RequiresMountsFor=/var/opt
+After=persistency-fs.target mgu-browser-wifi.service
+Wants=persistency-fs.target mgu-browser-wifi.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/node /var/opt/mgu-browser/current/runtime/launch.js
+Restart=always
+RestartSec=3
+StandardOutput=journal
+StandardError=journal
+KillMode=control-group
+TimeoutStopSec=20
+# Let Chromium use available RAM, threads and all CPUs without app-level caps.
+# Regular CPU and best-effort I/O priority favour foreground browser work;
+# the service stays in the normal scheduler rather than a realtime class.
+MemoryAccounting=yes
+MemoryLimit=infinity
+CPUAccounting=yes
+CPUShares=8192
+Nice=-10
+TasksMax=infinity
+IOSchedulingClass=best-effort
+IOSchedulingPriority=0
+OOMScoreAdjust=0
+Environment=HOME=/var/opt/mgu-browser/data
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

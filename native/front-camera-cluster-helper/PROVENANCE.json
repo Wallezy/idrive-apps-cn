@@ -1,0 +1,13 @@
+{
+  "sourceCatalog": "https://gitee.com/xiaobai-151/mgu-cn-xiaobai/raw/main/catalog.json",
+  "sourceArtifact": {
+    "name": "front-camera-cluster-helper@0.2.1.tgz",
+    "size": 4006,
+    "sha256": "394076ef83aa204b6902ee20afe9a839f19f67296a6c8b530885df6ae1e07dd4",
+    "url": "packages/front-camera-cluster-helper@0.2.1.tgz"
+  },
+  "upstreamVersion": "0.2.1",
+  "cnVersion": "0.2.2",
+  "license": "MIT",
+  "notice": "Original source copyright and licence retained in files/LICENSE."
+}

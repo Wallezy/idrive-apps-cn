@@ -1,0 +1,17 @@
+{
+  "catalogUrl": "https://gitee.com/xiaobai-151/mgu-cn-xiaobai/raw/main/catalog.json",
+  "catalogSha256": "75ec5122c7fa286774deaf57b2c447faaf7bfa2d2db0bcc018207f981a70704d",
+  "component": "dpf_monitor",
+  "sourceArtifact": {
+    "name": "dpf_monitor@0.3.2.tgz",
+    "url": "packages/dpf_monitor@0.3.2.tgz",
+    "size": 953680,
+    "sha256": "92edcd5b87d868ad45a878d75b5c1ab1253d4c5f485ba0f3e2ee32921ee2e524"
+  },
+  "upstreamVersion": "0.3.2",
+  "releaseVersion": "0.3.3",
+  "cnRevision": 1,
+  "source": "https://github.com/alexp50/bmw-apps/pull/3",
+  "license": "MIT",
+  "vehicleTested": false
+}

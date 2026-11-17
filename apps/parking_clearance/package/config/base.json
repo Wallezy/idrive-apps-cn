@@ -1,0 +1,9 @@
+{
+  "rhmiLoadingEnabled": true,
+  "entryPointLoadingEnabled": true,
+  "settings": {
+    "parking_clearance": {
+      "fullScreenRequired": true
+    }
+  }
+}

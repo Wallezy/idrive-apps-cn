@@ -1,0 +1,40 @@
+{
+  "id": "ram_mic_calibration",
+  "title": "RAM 麦克风校准",
+  "version": "0.1.2",
+  "screens": [
+    {
+      "name": "MAIN",
+      "kind": "menu",
+      "title": "RAM 麦克风校准",
+      "items": [
+        [
+          "text",
+          "STATUS",
+          "请选择读取 RAM 状态"
+        ],
+        [
+          "text",
+          "CONDITIONS",
+          "校准前请停车、接通点火、保持供电稳定及车内安静"
+        ],
+        [
+          "button",
+          "BTN_READ",
+          "读取 RAM 状态"
+        ],
+        [
+          "button",
+          "BTN_START",
+          "开始校准"
+        ]
+      ]
+    }
+  ],
+  "settings": null,
+  "config": null,
+  "startWidget": null,
+  "stateIds": {
+    "MAIN": 1
+  }
+}

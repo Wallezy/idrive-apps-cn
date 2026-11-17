@@ -1,0 +1,17 @@
+{
+  "catalogUrl": "https://gitee.com/xiaobai-151/mgu-cn-xiaobai/raw/main/catalog.json",
+  "catalogSha256": "75ec5122c7fa286774deaf57b2c447faaf7bfa2d2db0bcc018207f981a70704d",
+  "component": "true_time_cn",
+  "sourceArtifact": {
+    "name": "true_time_cn@0.3.1.tgz",
+    "url": "packages/true_time_cn@0.3.1.tgz",
+    "size": 920831,
+    "sha256": "1c4f112628f60f57a139b3d5fac7bf8a53d62e600b38af2c69d4be51a2d00624"
+  },
+  "upstreamVersion": "0.3.1",
+  "releaseVersion": "0.3.2",
+  "cnRevision": 1,
+  "source": "https://github.com/giuseppesalatino-boop/mgu-apps",
+  "license": "MIT",
+  "vehicleTested": false
+}

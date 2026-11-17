@@ -52,3 +52,5 @@ jobs:
         run: |
           node tools/test_cauliflower.js
           make -C native/mgu-inputgate test
+      - name: Community application controls and offline rendering
+        run: node tools/test_community.js

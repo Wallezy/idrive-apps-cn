@@ -1,0 +1,17 @@
+{
+  "catalogUrl": "https://gitee.com/xiaobai-151/mgu-cn-xiaobai/raw/main/catalog.json",
+  "catalogSha256": "75ec5122c7fa286774deaf57b2c447faaf7bfa2d2db0bcc018207f981a70704d",
+  "component": "ram_mic_calibration",
+  "sourceArtifact": {
+    "name": "ram_mic_calibration@0.1.1.tgz",
+    "url": "packages/ram_mic_calibration@0.1.1.tgz",
+    "size": 762299,
+    "sha256": "207b97122c766c370e9e563a4c3759191737707fdf155184de2bd0cff51308b2"
+  },
+  "upstreamVersion": "0.1.1",
+  "releaseVersion": "0.1.2",
+  "cnRevision": 1,
+  "source": "https://gitee.com/xiaobai-151/mgu-cn-xiaobai/raw/main/packages/ram_mic_calibration@0.1.1.tgz",
+  "license": "MIT",
+  "vehicleTested": false
+}

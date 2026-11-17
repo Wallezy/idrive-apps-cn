@@ -1,0 +1,35 @@
+{
+  "id": "mgu-browser",
+  "artifact": {
+    "name": "mgu-browser@0.16.1.tgz",
+    "size": 406404,
+    "sha256": "dac91634fe5ff877913b66add4205895a86f90800d48e8a9897c6cd75cf157aa",
+    "url": "https://gitee.com/xiaobai-151/mgu-cn-xiaobai/raw/main/packages/mgu-browser@0.16.1.tgz"
+  },
+  "files": [
+    {
+      "path": "audio-bridge",
+      "sha256": "0b69b843353f976bc9a5ff01f8abc207baa74dfa9a6d56b163f0e506fba737e6"
+    },
+    {
+      "path": "backend/codec/libjpeg.so.62",
+      "sha256": "dad87949ccad2be7e40a02986306087fdcfb35ccaadd59aea923a3f96d290eec"
+    },
+    {
+      "path": "backend/jpeg_frame.node",
+      "sha256": "cd7d4618ee7b931bdffa6e1a1db5f2e379749bf567cadd35a7ba825bf55b6e94"
+    },
+    {
+      "path": "backend/peer_uid.node",
+      "sha256": "e551f32fa0e2ebf492cccc96a2012589730f7f5aab06f31af891141300202116"
+    },
+    {
+      "path": "backend-launch",
+      "sha256": "cff016f3b78a6f895b86af0328860fbbefec2be25737d8825475bd8a8565af10"
+    },
+    {
+      "path": "browser-launch",
+      "sha256": "867996e1f39db7853c50f675a667c0735aebb57002e71800371b96b91d97135c"
+    }
+  ]
+}

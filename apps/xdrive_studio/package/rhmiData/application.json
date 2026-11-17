@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "1.3.0",
+  "application": {
+    "uuid": "d8c16a87-4948-58a6-a42b-41d2d849a114",
+    "type": "OnlineApp",
+    "name": "xdrive_studio",
+    "vendor": "alexp50",
+    "version": "0.1.6",
+    "defaultLanguage": "en_GB",
+    "stringBundleUuid": "5f889cc2-3f7a-5c3f-81e7-bb4ca54b6a2c",
+    "resourceBundleUuid": "7293bd3f-af5c-5694-a496-e5d3f562c905",
+    "entryPoints": [
+      {
+        "name": "XDRIVE_STUDIO_ENTRY",
+        "uuid": "0825c5c5-4f8e-5509-bed5-080df9c97ade",
+        "textId": "SID_XDRIVE_STUDIO_TITLE",
+        "icon": "xdrive_studio_icon.png",
+        "insertionStateId": 20974,
+        "insertionFocusId": 2,
+        "insertionMode": "INSERT_BELOW",
+        "insertionOrder": 0,
+        "insertionPriority": 0,
+        "previewType": "NONE",
+        "bookmarkable": true,
+        "private": false,
+        "appearance": "DEFAULT",
+        "isGroupHeader": false,
+        "insertionGroup": 0
+      }
+    ],
+    "uiDescriptions": [
+      {
+        "applicationFilePath": "./uiDescriptions/ID7/application.xml",
+        "uiDescriptionFilePath": "./uiDescriptions/ID7/uiDescription.json",
+        "hmi": [
+          "ID7"
+        ]
+      }
+    ],
+    "variantGroups": [
+      {
+        "stringsPath": "./variantGroups/Common/texts",
+        "resourcesPath": "./variantGroups/Common/images",
+        "hmi": [
+          "ID7"
+        ],
+        "brands": [
+          "BMW"
+        ]
+      }
+    ]
+  }
+}

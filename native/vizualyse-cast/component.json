@@ -1,0 +1,211 @@
+{
+  "id": "vizualyse-cast",
+  "kind": "tool",
+  "version": "0.4.101",
+  "title": "仪表投射（后台组件）",
+  "description": "将手机串流投射到仪表、HUD 或中控屏，支持配套的 CarPlay 第二屏设置。",
+  "files": [
+    {
+      "path": "mqtt_bus.js",
+      "mode": "0644",
+      "from": "files/mqtt_bus.js"
+    },
+    {
+      "path": "server.js",
+      "mode": "0644",
+      "from": "files/server.js"
+    },
+    {
+      "path": "proxy.js",
+      "mode": "0644",
+      "from": "files/proxy.js"
+    },
+    {
+      "path": "firewall.js",
+      "mode": "0644",
+      "from": "files/firewall.js"
+    },
+    {
+      "path": "console_out.js",
+      "mode": "0644",
+      "from": "files/console_out.js"
+    },
+    {
+      "path": "control.js",
+      "mode": "0644",
+      "from": "files/control.js"
+    },
+    {
+      "path": "carplay_screen.js",
+      "mode": "0644",
+      "from": "files/carplay_screen.js"
+    },
+    {
+      "path": "page.html",
+      "mode": "0644",
+      "from": "files/page.html"
+    },
+    {
+      "path": "pcm_play.py",
+      "mode": "0644",
+      "from": "files/pcm_play.py"
+    },
+    {
+      "path": "speakers.js",
+      "mode": "0644",
+      "from": "files/speakers.js"
+    },
+    {
+      "path": "qrcode.js",
+      "mode": "0644",
+      "from": "files/qrcode.js"
+    },
+    {
+      "path": "touch.js",
+      "mode": "0644",
+      "from": "files/touch.js"
+    },
+    {
+      "path": "touch_view.js",
+      "mode": "0644",
+      "from": "files/touch_view.js"
+    },
+    {
+      "path": "touch_reader.py",
+      "mode": "0644",
+      "from": "files/touch_reader.py"
+    },
+    {
+      "path": "ui_canvas.js",
+      "mode": "0644",
+      "from": "files/ui_canvas.js"
+    },
+    {
+      "path": "ui_kit.js",
+      "mode": "0644",
+      "from": "files/ui_kit.js"
+    },
+    {
+      "path": "ui_host.js",
+      "mode": "0644",
+      "from": "files/ui_host.js"
+    },
+    {
+      "path": "ui_png.js",
+      "mode": "0644",
+      "from": "files/ui_png.js"
+    },
+    {
+      "path": "ui.fonts.json",
+      "mode": "0644",
+      "from": "files/ui.fonts.json"
+    },
+    {
+      "path": "ui.f20.font.gz",
+      "mode": "0644",
+      "from": "files/ui.f20.font.gz"
+    },
+    {
+      "path": "ui.f24.font.gz",
+      "mode": "0644",
+      "from": "files/ui.f24.font.gz"
+    },
+    {
+      "path": "ui.f32.font.gz",
+      "mode": "0644",
+      "from": "files/ui.f32.font.gz"
+    },
+    {
+      "path": "ui.f44.font.gz",
+      "mode": "0644",
+      "from": "files/ui.f44.font.gz"
+    },
+    {
+      "path": "cluster_render_client.js",
+      "mode": "0644",
+      "from": "files/cluster_render_client.js"
+    },
+    {
+      "path": "ffmpeg",
+      "mode": "0755",
+      "from": ".payload/ffmpeg"
+    },
+    {
+      "path": "ffmpeg-GPLv3.txt",
+      "mode": "0644",
+      "from": "files/ffmpeg-GPLv3.txt"
+    },
+    {
+      "path": "THIRD-PARTY.md",
+      "mode": "0644",
+      "from": "files/THIRD-PARTY.md"
+    },
+    {
+      "path": "LICENSE",
+      "mode": "0644",
+      "from": "files/LICENSE"
+    },
+    {
+      "path": "i18n.js",
+      "mode": "0644",
+      "from": "files/i18n.js"
+    },
+    {
+      "path": "NOTICE.zh-CN.md",
+      "mode": "0644",
+      "from": "files/NOTICE.zh-CN.md"
+    },
+    {
+      "path": "OFL-NotoSansSC.txt",
+      "mode": "0644",
+      "from": "files/OFL-NotoSansSC.txt"
+    },
+    {
+      "path": "ui.f14.font.gz",
+      "mode": "0644",
+      "from": "files/ui.f14.font.gz"
+    }
+  ],
+  "units": [
+    {
+      "name": "vizualyse-cast.service",
+      "from": "units/vizualyse-cast.service"
+    }
+  ],
+  "enable": [
+    {
+      "unit": "vizualyse-cast.service",
+      "target": "multi-user.target"
+    }
+  ],
+  "recmgr": [
+    "vizualyse-cast"
+  ],
+  "restart": [
+    "vizualyse-cast.service"
+  ],
+  "internet": true,
+  "uids": [
+    12999
+  ],
+  "mguHmi": [
+    "ID7"
+  ],
+  "deactivate": [
+    "node",
+    "firewall.js",
+    "remove"
+  ],
+  "requires": {
+    "mgu-deploy": "0.7.0",
+    "cluster-render": "0.6.7",
+    "mgu-python": "1.0.0",
+    "mgu-uplink": "0.7.0",
+    "vizualyse-bus": "0.1.1"
+  },
+  "uninstallable": true,
+  "build": [
+    "python3",
+    "../../tools/materialize_community_payload.py"
+  ]
+}

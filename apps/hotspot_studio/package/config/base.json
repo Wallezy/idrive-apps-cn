@@ -1,0 +1,10 @@
+{
+  "rhmiLoadingEnabled": true,
+  "entryPointLoadingEnabled": true,
+  "settings": {
+    "hotspot_studio": {
+      "fullScreenRequired": true,
+      "socket": "/run/hotspot-studio/control.sock"
+    }
+  }
+}

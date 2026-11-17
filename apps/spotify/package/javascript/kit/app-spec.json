@@ -1,0 +1,145 @@
+{
+  "id": "spotify",
+  "title": "Spotify",
+  "version": "1.0.24",
+  "screens": [
+    {
+      "name": "MAIN",
+      "kind": "canvas",
+      "title": "Spotify",
+      "buttons": [
+        [
+          "BTN_PAGE",
+          "下一页"
+        ],
+        [
+          "BTN_SETTINGS",
+          "设置"
+        ]
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "key": "theme",
+      "label": "配色主题",
+      "type": "choice",
+      "default": "spotify",
+      "options": [
+        [
+          "spotify",
+          "Spotify 绿"
+        ],
+        [
+          "m_tricolour",
+          "M 三色"
+        ],
+        [
+          "m_red",
+          "M 红"
+        ],
+        [
+          "ice",
+          "冰白"
+        ],
+        [
+          "amber",
+          "夜间琥珀"
+        ]
+      ]
+    },
+    {
+      "key": "demo",
+      "label": "播放模式",
+      "type": "choice",
+      "default": "off",
+      "options": [
+        [
+          "off",
+          "在线模式（默认）"
+        ],
+        [
+          "on",
+          "演示模式（离线）"
+        ]
+      ]
+    },
+    {
+      "key": "screen",
+      "label": "屏幕尺寸",
+      "type": "choice",
+      "default": "auto",
+      "options": [
+        [
+          "auto",
+          "自动"
+        ],
+        [
+          "10.25",
+          "10.25 英寸"
+        ],
+        [
+          "12.3",
+          "12.3 英寸"
+        ],
+        [
+          "8.8",
+          "8.8 英寸"
+        ]
+      ]
+    },
+    {
+      "key": "layout",
+      "label": "屏幕布局",
+      "type": "choice",
+      "default": "full",
+      "options": [
+        [
+          "full",
+          "全屏"
+        ],
+        [
+          "standard",
+          "标准"
+        ]
+      ]
+    },
+    {
+      "key": "renderer",
+      "label": "渲染方式",
+      "type": "choice",
+      "default": "auto",
+      "options": [
+        [
+          "auto",
+          "GPU 60 帧（默认）"
+        ],
+        [
+          "software",
+          "软件渲染"
+        ]
+      ]
+    },
+    {
+      "key": "pollRate",
+      "label": "播放同步频率",
+      "type": "number",
+      "unit": "s",
+      "default": 2,
+      "steps": [
+        1,
+        2,
+        3,
+        5,
+        10
+      ]
+    }
+  ],
+  "config": null,
+  "startWidget": null,
+  "mguInternet": true,
+  "stateIds": {
+    "MAIN": 1,
+    "SETTINGS": 9
+  }
+}

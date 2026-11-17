@@ -1,0 +1,17 @@
+{
+  "catalogUrl": "https://gitee.com/xiaobai-151/mgu-cn-xiaobai/raw/main/catalog.json",
+  "catalogSha256": "75ec5122c7fa286774deaf57b2c447faaf7bfa2d2db0bcc018207f981a70704d",
+  "component": "xdrive_studio",
+  "sourceArtifact": {
+    "name": "xdrive_studio@0.1.5.tgz",
+    "url": "packages/xdrive_studio@0.1.5.tgz",
+    "size": 1081667,
+    "sha256": "441281c06346486b0aaa285f200047a532f9111e21327ce3e0f1a93a0bf30278"
+  },
+  "upstreamVersion": "0.1.5",
+  "releaseVersion": "0.1.6",
+  "cnRevision": 1,
+  "source": "https://github.com/alexp50/bmw-apps/pull/3",
+  "license": "MIT",
+  "vehicleTested": false
+}

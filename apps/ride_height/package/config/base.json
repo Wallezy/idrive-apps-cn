@@ -1,0 +1,9 @@
+{
+  "rhmiLoadingEnabled": true,
+  "entryPointLoadingEnabled": true,
+  "settings": {
+    "ride_height": {
+      "fullScreenRequired": true
+    }
+  }
+}

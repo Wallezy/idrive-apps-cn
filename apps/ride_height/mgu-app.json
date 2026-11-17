@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "ride_height",
+  "version": "0.6.1",
+  "tree": "package",
+  "modules": [
+    "src/sdk.js"
+  ],
+  "sdk": [
+    "oap-sdk/src/core/OnlineApp.js",
+    "oap-sdk/src/logging/logging"
+  ]
+}

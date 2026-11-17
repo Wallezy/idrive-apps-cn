@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<application>
+    <container id="1" type="state" widget="LT_State_Wide">
+        <layoutGroup id="10" name="List">
+            <property id="3" value="1" />
+            <component id="2" type="label" widget="LT_Label_1Row">
+                <property id="2" value="1" />
+                <property id="3" value="0" />
+            </component>
+            <component id="3" type="label" widget="LT_Label_1Row">
+                <property id="2" value="1" />
+                <property id="3" value="0" />
+            </component>
+            <component id="4" type="button" widget="LT_Button_1Row">
+                <property id="2" value="1" />
+                <property id="3" value="2" />
+            </component>
+            <component id="5" type="button" widget="LT_Button_1Row">
+                <property id="2" value="1" />
+                <property id="3" value="2" />
+            </component>
+            </layoutGroup>
+        <layoutGroup id="11" name="Titlebar">
+            <component id="9" type="title" />
+        </layoutGroup>
+    </container>
+</application>

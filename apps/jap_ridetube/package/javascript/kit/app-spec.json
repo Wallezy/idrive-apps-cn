@@ -1,0 +1,315 @@
+{
+  "id": "jap_ridetube",
+  "title": "RideTube",
+  "version": "0.3.9",
+  "screens": [
+    {
+      "name": "VIEW",
+      "kind": "canvas",
+      "title": "RideTube",
+      "hmi": false,
+      "bg": "#0f0f0f",
+      "buttons": [
+        [
+          "BTN_PLAY",
+          "播放"
+        ],
+        [
+          "BTN_RW",
+          "-10 s"
+        ],
+        [
+          "BTN_FF",
+          "+10 s"
+        ],
+        [
+          "BTN_LIST",
+          "播放器"
+        ],
+        [
+          "BTN_FIND",
+          "搜索"
+        ]
+      ]
+    },
+    {
+      "name": "MAIN",
+      "kind": "menu",
+      "title": "RideTube 搜索",
+      "settings": true,
+      "items": [
+        [
+          "button",
+          "BTN_SEARCH",
+          "搜索"
+        ],
+        [
+          "text",
+          "MAIN_INFO",
+          ""
+        ],
+        [
+          "button",
+          "BTN_NOW",
+          "正在播放"
+        ],
+        [
+          "button",
+          "BTN_RESULTS",
+          "搜索结果"
+        ],
+        [
+          "button",
+          "BTN_HOME",
+          "首页"
+        ],
+        [
+          "button",
+          "BTN_SUBS",
+          "订阅"
+        ],
+        [
+          "button",
+          "BTN_WL",
+          "稍后观看"
+        ],
+        [
+          "button",
+          "BTN_S1",
+          ""
+        ],
+        [
+          "button",
+          "BTN_S2",
+          ""
+        ],
+        [
+          "button",
+          "BTN_S3",
+          ""
+        ],
+        [
+          "button",
+          "BTN_S4",
+          ""
+        ],
+        [
+          "button",
+          "BTN_S5",
+          ""
+        ],
+        [
+          "button",
+          "BTN_S6",
+          ""
+        ],
+        [
+          "button",
+          "BTN_ACCOUNT",
+          "登录"
+        ],
+        [
+          "text",
+          "MAIN_SB",
+          "跳过片段数据来自 SponsorBlock（sponsor.ajay.app），CC BY-NC-SA 4.0"
+        ]
+      ]
+    }
+  ],
+  "popups": null,
+  "settings": [
+    {
+      "key": "fill",
+      "label": "填满屏幕（裁剪画面；关闭时保留黑边）",
+      "type": "bool",
+      "default": false,
+      "reset": 2
+    },
+    {
+      "key": "quality",
+      "label": "视频画质",
+      "type": "choice",
+      "default": "auto",
+      "options": [
+        [
+          "auto",
+          "自动（Wi-Fi 720p，移动网络 480p）"
+        ],
+        [
+          "720",
+          "720p"
+        ],
+        [
+          "480",
+          "480p（较省流量）"
+        ],
+        [
+          "360",
+          "360p（最省流量）"
+        ]
+      ]
+    },
+    {
+      "key": "video_driving",
+      "label": "行驶中播放视频（仅供已配置该功能车辆的乘客使用，风险自负；停车后生效）",
+      "type": "bool",
+      "default": false
+    },
+    {
+      "key": "members",
+      "label": "显示会员专享视频",
+      "type": "bool",
+      "default": false
+    },
+    {
+      "key": "sb_sponsor",
+      "label": "SponsorBlock：赞助内容",
+      "type": "choice",
+      "default": "skip",
+      "options": [
+        [
+          "skip",
+          "跳过"
+        ],
+        [
+          "ask",
+          "显示跳过按钮"
+        ],
+        [
+          "off",
+          "关闭"
+        ]
+      ]
+    },
+    {
+      "key": "sb_selfpromo",
+      "label": "SponsorBlock：自我推广",
+      "type": "choice",
+      "default": "skip",
+      "options": [
+        [
+          "skip",
+          "跳过"
+        ],
+        [
+          "ask",
+          "显示跳过按钮"
+        ],
+        [
+          "off",
+          "关闭"
+        ]
+      ]
+    },
+    {
+      "key": "sb_interaction",
+      "label": "SponsorBlock：点赞和订阅提醒",
+      "type": "choice",
+      "default": "skip",
+      "options": [
+        [
+          "skip",
+          "跳过"
+        ],
+        [
+          "ask",
+          "显示跳过按钮"
+        ],
+        [
+          "off",
+          "关闭"
+        ]
+      ]
+    },
+    {
+      "key": "sb_intro",
+      "label": "SponsorBlock：片头",
+      "type": "choice",
+      "default": "skip",
+      "options": [
+        [
+          "skip",
+          "跳过"
+        ],
+        [
+          "ask",
+          "显示跳过按钮"
+        ],
+        [
+          "off",
+          "关闭"
+        ]
+      ]
+    },
+    {
+      "key": "sb_outro",
+      "label": "SponsorBlock：片尾卡片和字幕",
+      "type": "choice",
+      "default": "ask",
+      "options": [
+        [
+          "skip",
+          "跳过"
+        ],
+        [
+          "ask",
+          "显示跳过按钮"
+        ],
+        [
+          "off",
+          "关闭"
+        ]
+      ]
+    },
+    {
+      "key": "sb_music_offtopic",
+      "label": "SponsorBlock：音乐视频中的非音乐片段",
+      "type": "choice",
+      "default": "off",
+      "options": [
+        [
+          "skip",
+          "跳过"
+        ],
+        [
+          "ask",
+          "显示跳过按钮"
+        ],
+        [
+          "off",
+          "关闭"
+        ]
+      ]
+    },
+    {
+      "key": "battery",
+      "label": "停车时 12 V 蓄电池电量低于此值即暂停",
+      "type": "choice",
+      "default": "65",
+      "options": [
+        [
+          "60",
+          "60 %"
+        ],
+        [
+          "65",
+          "65 %"
+        ],
+        [
+          "70",
+          "70 %"
+        ],
+        [
+          "0",
+          "从不暂停"
+        ]
+      ]
+    }
+  ],
+  "config": null,
+  "startWidget": null,
+  "stateIds": {
+    "VIEW": 1,
+    "MAIN": 12
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "rhmiLoadingEnabled": true,
+  "entryPointLoadingEnabled": true,
+  "settings": {
+    "vehicle_network": {
+      "stateFile": "/var/opt/vehicle-network-observer/state.json",
+      "fullScreenRequired": true
+    }
+  }
+}

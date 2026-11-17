@@ -1,0 +1,12 @@
+{
+  "build": "node ../../tools/build_localized.js",
+  "requires": {
+    "vizualyse-cluster": "0.4.101",
+    "mgu-deploy": "0.8.18",
+    "robertn_store": "0.9.47"
+  },
+  "uninstallable": true,
+  "mguHmi": [
+    "ID7"
+  ]
+}

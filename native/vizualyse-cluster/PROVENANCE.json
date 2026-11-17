@@ -1,0 +1,40 @@
+{
+  "sourceArtifact": {
+    "name": "vizualyse-cluster@0.4.100.tgz",
+    "url": "https://github.com/JackieZ123430/vizualyse-idrive-apps-cn/releases/download/vizualyse-zh-cn.1/vizualyse-cluster%400.4.100.tgz",
+    "size": 11562478,
+    "sha256": "90dcae26b4a373e7a275325a46d363cb615e4923e43bc8f037af458d28637210"
+  },
+  "unchangedBinaryPayloads": [],
+  "sourceNotice": "Original LICENSE and THIRD-PARTY notices retained in files/. Original binary payloads are unmodified; this is not a local rebuild of those upstream binaries.",
+  "catalogProvenance": [
+    {
+      "id": "vizualyse_cluster",
+      "version": "0.3.100",
+      "build": "0.3.100-zh.cn.1",
+      "upstream": "https://github.com/Vizualyse/idrive-apps",
+      "upstreamCommit": "9dda7625c5036a8cbc8f25a99f1e34e02d5b8c90",
+      "source": "https://github.com/JackieZ123430/vizualyse-idrive-apps-cn/tree/332fa51c7d736b006739e510bfdeba304b1622a9",
+      "upstreamArtifact": {
+        "name": "vizualyse_cluster@0.3.0.tgz",
+        "size": 33829,
+        "sha256": "7c930a2e5e5400e6e05c420b60053a5b07157c8b0034f6703e2712ce6917d9ea",
+        "url": "https://github.com/Vizualyse/idrive-apps/releases/download/vizualyse_cluster%400.3.0/vizualyse_cluster%400.3.0.tgz"
+      }
+    },
+    {
+      "id": "vizualyse-cluster",
+      "version": "0.4.100",
+      "build": "0.4.100-zh.cn.1",
+      "upstream": "https://github.com/Vizualyse/idrive-apps",
+      "upstreamCommit": "9dda7625c5036a8cbc8f25a99f1e34e02d5b8c90",
+      "source": "https://github.com/JackieZ123430/vizualyse-idrive-apps-cn/tree/332fa51c7d736b006739e510bfdeba304b1622a9",
+      "upstreamArtifact": {
+        "name": "vizualyse-cluster@0.4.0.tgz",
+        "size": 10991930,
+        "sha256": "be137d71bb4fbe892c3b44e647f0be1c2a9d7612abfd2fe27f0a8810bf4421c7",
+        "url": "https://github.com/Vizualyse/idrive-apps/releases/download/vizualyse-cluster%400.4.0/vizualyse-cluster%400.4.0.tgz"
+      }
+    }
+  ]
+}

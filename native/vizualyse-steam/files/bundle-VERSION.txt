@@ -1,0 +1,5 @@
+vizualyse-steam bundle
+proton GE-Proton11-11 (trimmed: WineD3D, Wayland, new WoW64)
+dotnet 10.0.14, DepotDownloader 3.4.0
+glibc 2.41-12+deb13u4
+packages: libasound2t64 libbrotli1 libc6 libcap2 libcom-err2 libdbus-1-3 libdrm2 libexpat1 libffi8 libfontconfig1 libfreetype6 libgcc-s1 libgmp10 libgnutls30t64 libgssapi-krb5-2 libhogweed6t64 libidn2-0 libk5crypto3 libkeyutils1 libkrb5-3 libkrb5support0 libnettle8t64 libnghttp2-14 libp11-kit0 libpng16-16t64 libpsl5t64 libsqlite3-0 libssl3t64 libstdc++6 libsystemd0 libtasn1-6 libudev1 libunistring5 libwayland-client0 libwayland-egl1 libwayland-server0 libxkbcommon0 libzstd1 zlib1g 

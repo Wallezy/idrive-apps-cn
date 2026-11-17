@@ -1,0 +1,128 @@
+{
+  "id": "parking_clearance",
+  "title": "泊车距离",
+  "version": "0.1.9",
+  "screens": [
+    {
+      "name": "MAIN",
+      "kind": "canvas",
+      "title": "泊车距离",
+      "buttons": [
+        [
+          "BTN_PAGE",
+          "下一页"
+        ],
+        [
+          "BTN_REFRESH",
+          "刷新"
+        ],
+        [
+          "BTN_SETTINGS",
+          "设置"
+        ]
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "key": "vehicleLength",
+      "label": "G12 车身长度",
+      "type": "number",
+      "unit": "cm",
+      "default": 526,
+      "steps": [
+        526
+      ]
+    },
+    {
+      "key": "wheelbase",
+      "label": "G12 轴距",
+      "type": "number",
+      "unit": "cm",
+      "default": 321,
+      "steps": [
+        321
+      ]
+    },
+    {
+      "key": "warnDistance",
+      "label": "黄色提示距离",
+      "type": "number",
+      "unit": "cm",
+      "default": 70,
+      "steps": [
+        40,
+        50,
+        60,
+        70,
+        80,
+        100
+      ]
+    },
+    {
+      "key": "criticalDistance",
+      "label": "红色警告距离",
+      "type": "number",
+      "unit": "cm",
+      "default": 35,
+      "steps": [
+        20,
+        25,
+        30,
+        35,
+        40,
+        45
+      ]
+    },
+    {
+      "key": "demo",
+      "label": "演示数据",
+      "type": "choice",
+      "default": "off",
+      "options": [
+        [
+          "off",
+          "从不"
+        ],
+        [
+          "on",
+          "始终"
+        ]
+      ]
+    },
+    {
+      "key": "layout",
+      "label": "屏幕布局",
+      "type": "choice",
+      "default": "full",
+      "reset": 2,
+      "options": [
+        [
+          "full",
+          "全屏"
+        ]
+      ]
+    },
+    {
+      "key": "renderer",
+      "label": "渲染器",
+      "type": "choice",
+      "default": "auto",
+      "reset": 2,
+      "options": [
+        [
+          "auto",
+          "GPU 60 帧／秒"
+        ]
+      ]
+    }
+  ],
+  "config": {
+    "fullScreenRequired": true
+  },
+  "startWidget": null,
+  "stateIds": {
+    "MAIN": 1,
+    "SETTINGS": 10
+  }
+}

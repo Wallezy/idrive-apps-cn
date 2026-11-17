@@ -1,0 +1,42 @@
+{
+  "id": "jap-node22",
+  "kind": "tool",
+  "version": "22.23.5",
+  "title": "Node.js 22",
+  "description": "Node.js 22 LTS (nodejs.org unofficial-builds linux-x64-glibc-217: the unit has glibc 2.27) for the background services of Moonride and RideTube, called by absolute path /var/opt/jap-node22/current/bin/node; BMW's apps keep the system Node 8",
+  "files": [
+    {
+      "path": "bin/node",
+      "mode": "0755",
+      "from": ".payload/bin/node"
+    },
+    {
+      "path": "LICENSE",
+      "mode": "0644",
+      "from": "files/LICENSE"
+    },
+    {
+      "path": "check.sh",
+      "mode": "0755",
+      "from": "files/check.sh"
+    }
+  ],
+  "units": [],
+  "enable": [],
+  "recmgr": [],
+  "restart": [],
+  "mguHmi": [
+    "ID7"
+  ],
+  "check": [
+    "check.sh"
+  ],
+  "requires": {
+    "mgu-deploy": "0.7.0"
+  },
+  "uninstallable": true,
+  "build": [
+    "python3",
+    "../../tools/materialize_community_payload.py"
+  ]
+}

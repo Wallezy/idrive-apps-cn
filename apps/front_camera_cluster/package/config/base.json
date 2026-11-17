@@ -1,0 +1,10 @@
+{
+  "rhmiLoadingEnabled": true,
+  "entryPointLoadingEnabled": true,
+  "settings": {
+    "front_camera_cluster": {
+      "fullScreenRequired": true,
+      "maxProjectionSpeedKmh": 15
+    }
+  }
+}
