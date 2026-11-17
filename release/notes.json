@@ -74,6 +74,15 @@
   ],
   "waze-on-cluster": [
     {
+      "version": "0.10.7",
+      "upstreamVersion": "0.10.7",
+      "cnRevision": 1,
+      "changes": [
+        "恢复兼容的 CarPlay 导航显示区域。",
+        "完善旧补丁升级、中断恢复及回滚兼容。"
+      ]
+    },
+    {
       "version": "0.10.6",
       "changes": [
         "调整 CarPlay 导航提示区域，减少表盘遮挡。",
@@ -127,6 +136,15 @@
     }
   ],
   "robertn_waze_cluster": [
+    {
+      "version": "0.6.18",
+      "upstreamVersion": "0.6.12",
+      "cnRevision": 1,
+      "changes": [
+        "修复部分苹果地图黑屏或只显示转向卡片的问题。",
+        "保留仪表盘全屏及中文设置；旧补丁会提示更新。"
+      ]
+    },
     {
       "version": "0.6.17",
       "changes": [

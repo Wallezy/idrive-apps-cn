@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.6.18
+
+修复部分苹果地图黑屏或只显示转向卡片的问题，保留仪表盘全屏和中文设置。
+
 ## 0.6.17
 
 适配 CarPlay 导航提示可见区域，保留中文界面与仪表全屏。
@@ -45,6 +49,11 @@
 - Check page control IDs before packaging to prevent conflicting controls from breaking app startup.
 
 - The CN app defaults to Simplified Chinese while the HMI language is unavailable and follows explicit display-language selections. Chinese status rows translate known renderer and patch messages, frame counts and transfer limits; unknown diagnostics retain their original detail. Native protocol fields and logs are unchanged.
+## 0.6.12
+
+The cluster's safe area is back to 504x368 at (286, 72); a smaller area made
+Apple Maps show a black or card-only cluster.
+
 ## 0.6.11
 
 Apple Maps and Google Maps keep their arrival time, road names and turn
