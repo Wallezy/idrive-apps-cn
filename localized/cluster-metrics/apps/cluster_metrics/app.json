@@ -1,8 +1,8 @@
 {
   "id": "cluster_metrics",
   "title": "Cluster Metrics",
-  "description": "Real-time efficiency, HV battery %, powertrain temperatures, gear in D, HUD turn-by-turn nav, and hydraulic friction brake indicator on Cluster + HUD for BMW iDrive 7",
-  "version": "0.5.0",
+  "description": "Real-time efficiency, HV battery %, powertrain temperatures, gear in D, right-wing Media/Trip widget, HUD turn-by-turn nav, and live DSC hydraulic brake indicator for BMW iDrive 7",
+  "version": "0.6.0",
   "vendor": "chyiz",
   "repoTitle": "GitHub Repository",
   "repoLink": "github.com/chyiz/mgu-apps",
@@ -123,11 +123,34 @@
       "UnitBN2020": "rs"
     },
     "de.bmw.infotainment.KombiIF": {
-      "_optional": "trip consumption, fuel & electric range, and electrical power distribution",
+      "_optional": "trip consumption, fuel & electric range, BC selection, and electrical power distribution",
       "statusRangeTankStatus": "rs",
       "displayRangeElectricVehicle": "rs",
       "statusBordcomputerAverage": "rs",
+      "statusBordcomputerTravelData": "rs",
+      "statusBordcomputerElectricData": "rs",
+      "statusKombiSelection": "rs",
       "statusDisplayElectricalPowerDistribution": "rs"
+    },
+    "de.bmw.infotainment.hmi.hmimediastate.HmiMediaState": {
+      "_optional": "active media title, artist, playback position, and JPEG/PNG album art across CarPlay/Bluetooth/USB/Radio",
+      "_instances": "HMI_CID",
+      "playerMetadata": "rs",
+      "trackProgress": "rs",
+      "coverArt": "rs"
+    },
+    "de.bmw.infotainment.entertainment.mediaplayer.MediaPlayer": {
+      "_optional": "CarPlay media play/pause state and metadata fallback",
+      "_instances": "CarPlayMedia",
+      "currentItemMetadata": "rs",
+      "currentItemTime": "rs",
+      "playerState": "rs"
+    },
+    "de.bmw.body.Light": {
+      "_optional": "left steering-column stalk BC button & HBA button tap detection",
+      "IndicatorSteeringColumn": "s",
+      "IndicatorSteeringColumnComplete": "s",
+      "StatusFunctionsIndicators": "s"
     },
     "de.bmw.infotainment.vehicle.TPMS": {
       "_optional": "tire pressures, temperatures and targets for smart alerts",
@@ -189,6 +212,11 @@
           "tworow",
           "DIAG_NAV",
           "HUD Navigation & Mini-Map Detector"
+        ],
+        [
+          "tworow",
+          "DIAG_MEDIA",
+          "Right Widget (Media & BC Button)"
         ],
         [
           "tworow",
@@ -254,19 +282,40 @@
       "key": "clusterSlotMode",
       "label": "Cluster display mode",
       "type": "choice",
-      "default": "auto",
+      "default": "panel_only",
+      "reset": 3,
       "options": [
         [
-          "auto",
-          "Auto (Map slot over CarPlay/AA map; Panel on BMW map)"
+          "panel_only",
+          "Full Cluster Panel (all zones + right widget)"
         ],
         [
           "map_only",
-          "Map slot only (keeps right BC widget; shows over CarPlay/AA map)"
+          "Map Slot Only (over CarPlay/AA map; stock BC)"
+        ]
+      ]
+    },
+    {
+      "key": "rightWidgetMode",
+      "label": "Right-side cluster widget",
+      "type": "choice",
+      "default": "cycle",
+      "options": [
+        [
+          "cycle",
+          "Auto Media / Trip (BC button cycles)"
         ],
         [
-          "panel_only",
-          "Full 1920x720 panel (all 5 zones; KOMBI hides right BC widget)"
+          "media",
+          "Media Playback (Album Art + Progress)"
+        ],
+        [
+          "trip",
+          "Trip & Powertrain Summary"
+        ],
+        [
+          "off",
+          "Off"
         ]
       ]
     },

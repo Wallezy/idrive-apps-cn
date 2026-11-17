@@ -83,13 +83,51 @@ function unionOf(e) {
     return { kind: keys[0], body: e[keys[0]] };
 }
 
-function roadOf(b) {
-    const els = b && b.description && Array.isArray(b.description.elements) ? b.description.elements : [];
-    return els.map((x) => (x && typeof x.text === 'string' ? x.text : '')).filter(Boolean).join(' ').trim();
-}
-
 function safeStr(t) {
     return String(t || '').replace(/[\u0000-\u001f\u007f]/g, '').replace(/[\s\u00a0\u2000-\u200b\u202f\u205f\u3000]+/g, ' ').trim();
+}
+
+/**
+ * Extract street/route text AND highway exit badge (`DescriptionElement.icon.text` or leading "Exit 14B")
+ * from `GuidancePanel.description.elements`.
+ */
+function decodeDescription(b, isHighwayExit) {
+    const els = b && b.description && Array.isArray(b.description.elements) ? b.description.elements : [];
+    let exitBadge = null;
+    const parts = [];
+
+    for (let i = 0; i < els.length; i++) {
+        const el = els[i];
+        if (!isObj(el)) continue;
+        if (isObj(el.icon) && typeof el.icon.text === 'string') {
+            const ic = safeStr(el.icon.text);
+            if (!ic) continue;
+            const exMatch = /^(?:EXIT|AUSFAHRT|SORTIE)\s+([0-9]{1,4}[A-Z]?)$/i.exec(ic);
+            if (!exitBadge && exMatch) {
+                exitBadge = exMatch[1].toUpperCase();
+            } else if (!exitBadge && i === 0 && (
+                (isHighwayExit && /^[0-9]{1,4}[A-Z]?$/i.test(ic)) ||
+                /^[0-9]{1,4}[A-Z]$/i.test(ic)
+            )) {
+                exitBadge = ic.toUpperCase();
+            } else if (parts[parts.length - 1] !== ic) {
+                parts.push(ic);
+            }
+        } else if (typeof el.text === 'string') {
+            const tx = safeStr(el.text);
+            if (tx && parts[parts.length - 1] !== tx) parts.push(tx);
+        }
+    }
+
+    let road = parts.join(' ').replace(/\s+/g, ' ').trim();
+    if (!exitBadge && road) {
+        const leadExit = /^(?:EXIT|AUSFAHRT|SORTIE)\s+([0-9]{1,4}[A-Z]?)\b[\s:,\-\/]*(.*)$/i.exec(road);
+        if (leadExit) {
+            exitBadge = leadExit[1].toUpperCase();
+            road = leadExit[2].trim();
+        }
+    }
+    return { road, exitBadge };
 }
 
 function distOf(b) {
@@ -125,22 +163,26 @@ function decodeEvent(e) {
     const b = u.body;
     const d = distOf(b);
     const dtd = Number(b.distanceToDestination);
+    const branchDir = u.kind === 'branch' ? (enumOf('BranchType', b.branchType) || 'NONE') : null;
+    const geom = (u.kind === 'intersection' || u.kind === 'branch') ? enumOf('ManeuverGeometry', b.detailedGeometry) : null;
+    const isHwyExit = u.kind === 'branch' || /^EXIT_/.test(geom || '');
+    const desc = decodeDescription(b, isHwyExit);
     const m = {
         kind: null, dir: null, geom: null, exit: null, exitAngle: null, side: null,
         flag: null, stop: null, dist: d.dist, unit: d.unit, uk: d.uk,
-        road: roadOf(b), unreliable: b.unreliable === true,
+        road: desc.road, exitBadge: desc.exitBadge, unreliable: b.unreliable === true,
         dtd: isFinite(dtd) && dtd >= 0 ? dtd : null,
     };
     switch (u.kind) {
     case 'intersection':
         m.kind = 'turn';
         m.dir = enumOf('TurnDirection', b.direction) || 'NONE';
-        m.geom = enumOf('ManeuverGeometry', b.detailedGeometry);
+        m.geom = geom;
         break;
     case 'branch':
         m.kind = 'branch';
-        m.dir = enumOf('BranchType', b.branchType) || 'NONE';
-        m.geom = enumOf('ManeuverGeometry', b.detailedGeometry);
+        m.dir = branchDir;
+        m.geom = geom;
         break;
     case 'roundabout': {
         m.kind = 'roundabout';
@@ -280,8 +322,8 @@ function parseHudStatusText(txt) {
         const line = lines[i].trim();
         if (line.indexOf('slot 0x3') !== 0) continue;
         slots.push(line.replace(/^slot\s+/, ''));
-        // Match 0x1000200 or 0x1000201 (with optional leading 01000200) when mapped (map 1, 2, or 3)
-        if (/0x0?100020[01]\s+class\s+\d+\s+map\s+[123]\b/i.test(line)) {
+        // Match 0x1000200 or 0x1000201 whenever assigned (status 1, e.g. map 0 parked behind 0x323!) or shown (status 2)
+        if (/^slot\s+0x3[0-9a-f]+\s+(?:status\s+)?[12]\b.*?\b0x0?100020[01]\b/i.test(line)) {
             out.miniMapScene = true;
         }
     }
@@ -697,17 +739,26 @@ class NavTracker {
 
         // First-party BMW HUD Mini-Map / Junction View state via GuidanceRenderedContent (service 64284)
         let rcProxy = null;
+        let rcPolling = false;
+        const knownViewIds = Object.create(null);
         const queriedConfigs = Object.create(null);
+        const pollHudViewContent = (id) => {
+            if (!id || !rcProxy || !ctx.signals.call) return Promise.resolve();
+            return ctx.signals.call(rcProxy, 'getViewContent', { viewId: id }, 900)
+                .then((cntReply) => { this.feedRenderedContent(id, cntReply); })
+                .catch(() => {});
+        };
         const inspectViewId = (vid) => {
             const id = typeof vid === 'string' ? vid : '';
-            if (!id || !rcProxy || !ctx.signals.call || queriedConfigs[id]) return;
+            if (!id) return;
+            knownViewIds[id] = true;
+            if (!rcProxy || !ctx.signals.call || queriedConfigs[id]) return;
             queriedConfigs[id] = true;
             ctx.signals.call(rcProxy, 'getViewConfig', { viewId: id }, 1500)
                 .then((cfgReply) => {
                     this.feedRenderedConfig(id, cfgReply);
-                    if (this.viewTargets[id] === 'HUD') {
-                        return ctx.signals.call(rcProxy, 'getViewContent', { viewId: id }, 1500)
-                            .then((cntReply) => this.feedRenderedContent(id, cntReply));
+                    if (this._isHudView(id, this.viewStates[id])) {
+                        return pollHudViewContent(id);
                     }
                     return null;
                 })
@@ -735,11 +786,21 @@ class NavTracker {
                 this._subs.push(res);
                 if (res.proxy) {
                     rcProxy = res.proxy;
+                    // Flush any registeredViews that arrived synchronously before rcWatch resolved!
+                    Object.keys(knownViewIds).forEach((id) => inspectViewId(id));
                     if (typeof ctx.signals.on === 'function') {
-                        ctx.signals.on(rcProxy, 'viewContentChanged', (ev) => {
-                            const vid = isObj(ev) && typeof ev.viewId === 'string' ? ev.viewId : '';
+                        ctx.signals.on(rcProxy, 'viewContentChanged', (arg0, arg1) => {
+                            let vid = '';
+                            let payload = arg0;
+                            if (typeof arg0 === 'string') {
+                                vid = arg0;
+                                payload = arg1 !== undefined ? arg1 : arg0;
+                            } else if (isObj(arg0)) {
+                                vid = typeof arg0.viewId === 'string' ? arg0.viewId : '';
+                                payload = arg0.viewContent !== undefined ? arg0.viewContent : arg0;
+                            }
                             if (vid) inspectViewId(vid);
-                            this.feedRenderedContent(vid || 'hud', isObj(ev) && ev.viewContent !== undefined ? ev.viewContent : ev);
+                            this.feedRenderedContent(vid || 'hud', payload);
                         }, log);
                     }
                 }
@@ -755,7 +816,20 @@ class NavTracker {
 
         const ask = () => {
             const now = mono();
-            if (this._stopped || asking || !this.routing() || !want()) return;
+            if (this._stopped || !this.routing() || !want()) return;
+            // Also actively poll HUD RenderedContent at 1 Hz while routing so missed broadcasts never leave mini-map stuck!
+            if (rcProxy && !rcPolling && ctx.signals.call) {
+                const vIds = Object.keys(knownViewIds);
+                const hudIds = vIds.filter((id) => !queriedConfigs[id] || this._isHudView(id, this.viewStates[id]));
+                if (hudIds.length) {
+                    rcPolling = true;
+                    Promise.all(hudIds.map((id) => {
+                        if (!queriedConfigs[id]) { inspectViewId(id); return Promise.resolve(); }
+                        return pollHudViewContent(id);
+                    })).then(() => { rcPolling = false; }, () => { rcPolling = false; });
+                }
+            }
+            if (asking) return;
             if (!ctx.signals.proxy || !ctx.signals.call) return;
             if (callFails >= 2 && now - callFailedAt < CALL_BACKOFF_MS) return;
             if (!elProxy && now - proxyFailedAt < PROXY_RETRY_MS) return;

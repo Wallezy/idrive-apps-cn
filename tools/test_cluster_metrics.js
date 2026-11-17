@@ -29,6 +29,34 @@ assert.strictEqual(cn.text('Speed: 42 km/h @ 1800 rpm'), '车速: 42 km/h @ 1800
 assert.strictEqual(cn.text('/tmp/cluster-metrics-probe.log'), '/tmp/cluster-metrics-probe.log');
 assert.strictEqual(cn.text('原有中文'), '原有中文');
 
+// Exercise Chinese media and road names through the shipped raster path.
+const { MediaTracker } = require(path.join(pkg, 'javascript/media_tracker'));
+const { Canvas } = require(path.join(pkg, 'javascript/kit/canvas'));
+const { OverlayRenderer } = require(path.join(pkg, 'javascript/overlay_renderer'));
+const { foldAscii, drawHudRoadBanner } = require(path.join(pkg, 'javascript/hud_nav_renderer'));
+const fonts = require(path.join(pkg, 'javascript/kit/fonts'));
+assert.strictEqual(foldAscii('南京东路 · 晴天'), '南京东路 晴天');
+const media = new MediaTracker();
+media.feedHmiMetadata({ firstLineText: '晴天', secondLineText: '周杰伦', firstLineType: 'TITLE', secondLineType: 'ARTIST' });
+const snap = media.snapshot(1000, false);
+assert.strictEqual(snap.title, '晴天');
+assert.strictEqual(snap.artist, '周杰伦');
+const cv = new Canvas(312, 266), rendered = [];
+const draw = cv.text.bind(cv);
+cv.text = (text, ...args) => { rendered.push(text); return draw(text, ...args); };
+const painter = new OverlayRenderer({ allowPanel: true });
+painter._paintRightMedia(cv, snap);
+assert(rendered.includes('晴天') && rendered.includes('周杰伦'));
+painter._paintRightMedia(cv, null);
+assert(rendered.includes('暂无媒体播放'));
+for (const c of '晴天周杰伦南京东路暂无媒体播放行程与车辆信息') {
+    assert(fonts.get('bold', 21, c).glyphs[c.codePointAt(0)], 'missing glyph: ' + c);
+}
+const road = new Canvas(544, 38);
+assert(drawHudRoadBanner(road, { road: '南京东路', exitBadge: '14B' }));
+assert(road.d.some(x => x !== 0));
+media.stop(); painter.close();
+
 // Exercise the shipped entry with fake telemetry/UI, never with a car transport.
 let launch;
 let cleanupCalled = 0;
@@ -87,7 +115,7 @@ vm.runInNewContext(source, {
     assert.strictEqual(saved[handle.value], '数据显示已暂停');
     assert(!fs.existsSync(path.join(pkg, 'node_modules')), 'No SDK shipped');
     assert(!fs.existsSync(path.join(pkg, 'javascript/app.js')), 'Donor link performed on head unit');
-    for (const name of ['LICENSE', 'KIT-LICENSE', 'MPL-2.0.txt', 'NOTICE', 'provenance.json']) {
+    for (const name of ['LICENSE', 'KIT-LICENSE', 'MPL-2.0.txt', 'APACHE-2.0.txt', 'NOTICE', 'provenance.json']) {
         assert(fs.statSync(path.join(pkg, name)).size > 0);
     }
     const release = read(path.join(root, 'apps/cluster_metrics/release.json'));

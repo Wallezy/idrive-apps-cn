@@ -47,16 +47,17 @@ def main():
                    description='在仪表或抬头显示上查看能耗、温度、电量与挡位，支持导航叠加。简体中文设置；首次使用需手动开启，Beta 待车机验证。',
                    files=['package.json', 'npm-shrinkwrap.json', 'manifest.json', 'permissions.json',
                           'config', 'javascript', 'rhmiData', 'LICENSE', 'KIT-LICENSE', 'MPL-2.0.txt',
-                          'NOTICE', 'NOTICE.zh-CN.md', 'provenance.json', 'CHANGELOG.md'])
+                          'NOTICE', 'APACHE-2.0.txt', 'NOTICE.zh-CN.md', 'provenance.json', 'CHANGELOG.md'])
         write(package / 'package.json', pkg)
-        for name in ['LICENSE', 'NOTICE.zh-CN.md', 'provenance.json']:
+        for name in ['LICENSE', 'APACHE-2.0.txt', 'NOTICE.zh-CN.md', 'provenance.json']:
             shutil.copy2(LOCAL / name, package / name)
         shutil.copy2(LOCAL / 'kit/LICENSE', package / 'KIT-LICENSE')
         shutil.copy2(ROOT / 'LICENSES/MPL-2.0.txt', package / 'MPL-2.0.txt')
         shutil.copy2(LOCAL / 'apps/cluster_metrics/NOTICE', package / 'NOTICE')
-        changes = ['新增组合仪表数据：查看能耗、温度、电量与挡位。',
-                   '设置、状态及诊断提示汉化；支持仪表与抬头显示。',
-                   '默认暂停显示，请选择显示位置后开启；Beta 待车机验证。']
+        changes = ['同步上游 0.6.0：新增媒体封面、播放进度与右侧行程信息，支持 BC 按键切换。',
+                   '改进 HUD 路名与出口显示、制动压力读取及胎压单位处理。',
+                   '修复媒体无封面时的绘制异常；支持常用中文歌名与路名。',
+                   '仪表默认改为完整区域；升级后请检查显示位置，仅 Beta 待验证。']
         (package / 'CHANGELOG.md').write_text(
             '# 组合仪表数据\n\n## Unreleased\n\n## ' + version + '\n\n' +
             '\n'.join('- ' + x for x in changes) + '\n\n上游：' +

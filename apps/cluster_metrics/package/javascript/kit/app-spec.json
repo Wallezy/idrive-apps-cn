@@ -1,7 +1,7 @@
 {
  "id": "cluster_metrics",
  "title": "\u7ec4\u5408\u4eea\u8868\u6570\u636e",
- "version": "0.5.1",
+ "version": "0.6.1",
  "screens": [
   {
    "name": "MAIN",
@@ -45,6 +45,11 @@
      "tworow",
      "DIAG_NAV",
      "\u62ac\u5934\u5bfc\u822a\u4e0e\u8def\u53e3\u5730\u56fe"
+    ],
+    [
+     "tworow",
+     "DIAG_MEDIA",
+     "\u53f3\u4fa7\u4fe1\u606f\uff08\u5a92\u4f53\u4e0e BC \u6309\u952e\uff09"
     ],
     [
      "tworow",
@@ -110,19 +115,40 @@
    "key": "clusterSlotMode",
    "label": "\u4eea\u8868\u663e\u793a\u65b9\u5f0f",
    "type": "choice",
-   "default": "auto",
+   "default": "panel_only",
+   "reset": 3,
    "options": [
     [
-     "auto",
-     "\u81ea\u52a8\uff08\u624b\u673a\u5730\u56fe\u4e0a\u53e0\u52a0\uff0f\u539f\u5382\u5730\u56fe\u65c1\u663e\u793a\uff09"
+     "panel_only",
+     "\u5b8c\u6574\u4eea\u8868\u533a\u57df\uff08\u542b\u53f3\u4fa7\u4fe1\u606f\uff09"
     ],
     [
      "map_only",
-     "\u4ec5\u53e0\u52a0\u624b\u673a\u5730\u56fe\uff08\u4fdd\u7559\u53f3\u4fa7\u884c\u8f66\u4fe1\u606f\uff09"
+     "\u4ec5\u5730\u56fe\u53e0\u52a0\uff08\u4fdd\u7559\u539f\u5382\u884c\u8f66\u4fe1\u606f\uff09"
+    ]
+   ]
+  },
+  {
+   "key": "rightWidgetMode",
+   "label": "\u4eea\u8868\u53f3\u4fa7\u4fe1\u606f",
+   "type": "choice",
+   "default": "cycle",
+   "options": [
+    [
+     "cycle",
+     "\u5a92\u4f53\uff0f\u884c\u7a0b\u5207\u6362\uff08\u6309 BC \u952e\uff09"
     ],
     [
-     "panel_only",
-     "\u5b8c\u6574\u4eea\u8868\u533a\u57df\uff08\u53ef\u80fd\u9690\u85cf\u53f3\u4fa7\u884c\u8f66\u4fe1\u606f\uff09"
+     "media",
+     "\u5a92\u4f53\u64ad\u653e\uff08\u5c01\u9762\u4e0e\u8fdb\u5ea6\uff09"
+    ],
+    [
+     "trip",
+     "\u884c\u7a0b\u4e0e\u8f66\u8f86\u4fe1\u606f"
+    ],
+    [
+     "off",
+     "\u5173\u95ed"
     ]
    ]
   },
@@ -830,6 +856,6 @@
  "startWidget": null,
  "stateIds": {
   "MAIN": 1,
-  "DIAG": 32
+  "DIAG": 33
  }
 }

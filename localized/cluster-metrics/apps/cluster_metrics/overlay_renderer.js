@@ -2,19 +2,23 @@
 /**
  * overlay_renderer.js - manages ClusterRender layers across:
  *   - hud (800x480 on 0x323):
- *       * hud_main (136, 100, 260x98): 3-line configurable upper-left telemetry (y=100..198, strictly above ACC y=202),
- *         with crisp black outline so it also overlays cleanly on top of waze-on-cluster's HUD projection!
- *       * hud_nav  (412, 108, 264x264): Full-height right-side vector turn-by-turn & 6-lane guidance
+ *       * hud_road (132, 100, 544x38) : Full-width top-row road name + green highway exit square [14B],
+ *         matching stock BMW HUD's full-width top street banner so long road names never clip.
+ *       * hud_main (136, 100, 260x100): 3-line configurable upper-left telemetry (y=100..200, strictly above ACC y=202);
+ *         automatically shifts into compact Row-2 layout (y=140..198) whenever `hud_road` occupies Row 1,
+ *         and overlays cleanly on top of waze-on-cluster's HUD projection.
+ *       * hud_nav  (412, 140, 264x232): Right-side vector turn-by-turn & 6-lane guidance
  *         (auto-yielding 0x323 ONLY when BMW HUD switches to an intersection mini-map, or hiding hud_nav over Waze HUD).
- *   - panel (1920x720 on slot 0x203, scene 0x010004f8): 5 real-car calibrated zones
- *       1. below_speed  (392, 429, 214x84) : Aligned under speed digits, clear of center map
- *       2. gear_d       (1463, 650, 74x56) : White shift position 1..8 strictly right of GEAR_WIN (1380..1460)
- *       3. brake_rail   (1280, 609, 296x31): 20-segment right-to-left friction brake force bar (hidden in Park)
- *       4. corner_left  (8, 643, 116x66)   : Large Oil + Coolant temperatures (always visible)
- *       5. corner_right (1816, 643, 98x66) : Large HV Battery % SoC (or Batt Temp / IAT / GBX / 12V)
- *   - map (1088x480 on 0x100, contend: 0): borderless white/blue black-outlined side-bottom readouts
- *       (map_speed + map_left + map_right) over waze-on-cluster with fixed non-shifting anchors and
- *       an unobstructed 312px center route corridor (leaves 0x203 unmapped so KOMBI4's right BC widget works!).
+ *   - panel (1920x720 on slot 0x203, scene 0x010004f8): 5 outer zones + Right-Wing Media / Trip Widget
+ *       1. below_speed  (392, 429, 214x84)  : Aligned under speed digits, clear of center map
+ *       2. gear_d       (1463, 650, 74x56)  : White shift position 1..8 strictly right of GEAR_WIN (1380..1460)
+ *       3. brake_rail   (1280, 609, 296x31) : 20-segment right-to-left DSC hydraulic brake bar (hidden in Park)
+ *       4. corner_left  (8, 643, 116x66)    : Large Oil + Coolant temperatures (always visible)
+ *       5. corner_right (1816, 643, 98x66)  : Large HV Battery % SoC (or Batt Temp / IAT / GBX / 12V)
+ *       6. right_widget (1244, 214, 312x266): Re-implemented Right-Wing Widget (Full-color Album Art + Song +
+ *          Progress Bar & Trip/Powertrain view, cycled with the left-stalk BC button).
+ *   - map (1088x480 on 0x100, contend: 0): optional Map-Slot-Only mode over waze-on-cluster when user prefers
+ *       KOMBI4's stock right-side BC widget.
  *
  * Strict Node 8.16.2 (ES2017): no optional chaining, no ??, no dependencies.
  */
@@ -26,7 +30,10 @@ const { Canvas } = require('./kit/canvas');
 const {
     formatTemp, formatEvEff, formatFuelEff, formatPress, formatPowerKw,
 } = require('./units');
-const { NW: HUD_NAV_W, NH: HUD_NAV_H, drawHudNav, hudNavKey } = require('./hud_nav_renderer');
+const {
+    NW: HUD_NAV_W, NH: HUD_NAV_H, ROAD_W: HUD_ROAD_W, ROAD_H: HUD_ROAD_H,
+    drawHudNav, drawHudRoadBanner, hudNavKey, hudRoadKey,
+} = require('./hud_nav_renderer');
 
 const DEFAULT_CONF_DIR = '/var/opt/cluster-render';
 const DEFAULT_WAZE_STATUS = '/run/waze-on-cluster/status.json';
@@ -38,16 +45,23 @@ const GEAR_D_BASE = { x: 1463, y: 650, w: 74, h: 56 };
 const BRAKE_RAIL_BASE = { x: 1280, y: 609, w: 296, h: 31 };
 const CORNER_LEFT_BASE = { x: 8, y: 643, w: 116, h: 66 };
 const CORNER_RIGHT_BASE = { x: 1816, y: 643, w: 98, h: 66 };
-// Strictly y=100..198 (< 202 Assisted Driving / ACC set-speed & green car keep-out)
-const HUD_BASE = { x: 136, y: 100, w: 260, h: 98 };
-// Full-height right-side HUD turn-by-turn navigation & lane guidance (x=412..676 <= 680, y=108..372 <= 380, right of ACC x<=395)
-const HUD_NAV_BASE = { x: 412, y: 108, w: HUD_NAV_W, h: HUD_NAV_H };
+// Centered at x=1400 inside KOMBI4's right-wing widget pocket (clear of CENTER_MAP<=1200 & Power Gauge bezel>=1560)
+const RIGHT_WIDGET_BASE = { x: 1244, y: 214, w: 312, h: 266 };
+
+// Strictly y=100..200 (<= 202 Assisted Driving / ACC set-speed & green car keep-out)
+const HUD_BASE = { x: 136, y: 100, w: 260, h: 100 };
+// Full-width top-row street & highway exit badge banner (x=132..676 <= 680, y=100..138)
+const HUD_ROAD_BASE = { x: 132, y: 100, w: HUD_ROAD_W, h: HUD_ROAD_H };
+// Right-side HUD turn-by-turn arrow & lane guidance below road banner (x=412..676 <= 680, y=140..372 <= 380)
+const HUD_NAV_BASE = { x: 412, y: 140, w: HUD_NAV_W, h: HUD_NAV_H };
+
 // Slot 0x100 (1088x480 at world 416,120): borderless side-bottom readouts leaving center route x=368..680 100% clear
 const MAP_SPEED_RECT = { x: 16, y: 309, w: 204, h: 84 };
 const MAP_LEFT_RECT = { x: 186, y: 380, w: 182, h: 68 };
 const MAP_RIGHT_RECT = { x: 680, y: 374, w: 228, h: 74 };
 
 const CLUSTER_LAYER_NAMES = ['below_speed', 'gear_d', 'brake_rail', 'corner_left', 'corner_right'];
+const PANEL_ALL_LAYERS = ['below_speed', 'gear_d', 'brake_rail', 'corner_left', 'corner_right', 'right_widget'];
 const MAP_LAYER_NAMES = ['map_speed', 'map_left', 'map_right'];
 
 const COL = {
@@ -66,17 +80,24 @@ const COL = {
     label: '#7fb8f0',
     railDim: [48, 66, 90, 125],
     mapRailDim: [38, 62, 92, 185],
+    progTrack: [36, 58, 84, 200],
+    tileBg: [16, 28, 46, 235],
+    tileRim: [68, 112, 160, 180],
+    divider: [80, 125, 175, 105],
 };
 
 function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
 
+function formatMmSs(sec) {
+    if (typeof sec !== 'number' || !isFinite(sec) || sec < 0) return '--:--';
+    const s = Math.floor(sec);
+    const m = Math.floor(s / 60);
+    const r = s % 60;
+    return m + ':' + (r < 10 ? '0' + r : String(r));
+}
+
 /**
  * Inspect /var/opt/cluster-render/cluster-render.conf + cluster-render.local.conf.
- * Real-car KOMBI4 finding:
- *   - Default `panel_slot = 0x203` (scene `0x010004f8`) is transparent over stock gauges,
- *     Power Gauge needle, Media info, stock map, and waze-on-cluster (`0x100`) simultaneously!
- *   - Overriding `panel_slot = 0x202` (or `0x201`) in `cluster-render.local.conf` hijacks KOMBI4's
- *     right-wing Power Gauge + Media widget slot, blanking the Power Gauge needle and Media display!
  */
 function inspectClusterSlotConfig(confDir) {
     const dir = confDir || process.env.CLUSTER_RENDER_CONF_DIR || DEFAULT_CONF_DIR;
@@ -171,6 +192,98 @@ function drawTextOutline(cv, str, x, y, size, color, opts) {
     return cv.text(str, x, y, size, color, o);
 }
 
+function fitTextLine(cv, str, maxW, sizes) {
+    const clean = String(str || '').replace(/[^\x20-\x7e\u3000-\u9fff\uff00-\uffef]/g, '').trim();
+    if (!clean) return { text: '', size: sizes[0] };
+    for (let i = 0; i < sizes.length; i++) {
+        const sz = sizes[i];
+        if (cv.textWidth(clean, sz, { font: 'bold', literal: true }) <= maxW) {
+            return { text: clean, size: sz };
+        }
+    }
+    const minSz = sizes[sizes.length - 1];
+    let s = clean;
+    while (s.length > 4 && cv.textWidth(s + '...', minSz, { font: 'bold', literal: true }) > maxW) {
+        s = s.slice(0, -1).trim();
+    }
+    return { text: s + '...', size: minSz };
+}
+
+function paintRadialGlow(cv, cx, cy, radius, rgb, peakAlpha) {
+    const r0 = rgb && typeof rgb[0] === 'number' ? rgb[0] : 56;
+    const g0 = rgb && typeof rgb[1] === 'number' ? rgb[1] : 178;
+    const b0 = rgb && typeof rgb[2] === 'number' ? rgb[2] : 246;
+    const x0 = Math.max(0, Math.floor(cx - radius));
+    const x1 = Math.min(cv.w - 1, Math.ceil(cx + radius));
+    const y0 = Math.max(0, Math.floor(cy - radius));
+    const y1 = Math.min(cv.h - 1, Math.ceil(cy + radius));
+    const invR = 1 / Math.max(1, radius);
+    const d = cv.d;
+    for (let y = y0; y <= y1; y++) {
+        const dy = (y - cy) * invR;
+        const dy2 = dy * dy;
+        if (dy2 >= 1) continue;
+        const rowOff = y * cv.w;
+        for (let x = x0; x <= x1; x++) {
+            const dx = (x - cx) * invR;
+            const d2 = dx * dx + dy2;
+            if (d2 >= 1) continue;
+            const fall = 1 - d2;
+            const a = Math.round(peakAlpha * fall * fall);
+            if (a <= 0) continue;
+            const o = (rowOff + x) * 4;
+            d[o] = r0;
+            d[o + 1] = g0;
+            d[o + 2] = b0;
+            d[o + 3] = a;
+        }
+    }
+}
+
+function blitRoundedCover(cv, ox, oy, cover, radius) {
+    const side = cover.w;
+    const src = cover.d;
+    const dst = cv.d;
+    const rad = radius || 10;
+    for (let y = 0; y < side; y++) {
+        const dy = y < rad ? (rad - 0.5 - y) : (y >= side - rad ? (y - (side - rad - 0.5)) : 0);
+        const py = oy + y;
+        if (py < 0 || py >= cv.h) continue;
+        for (let x = 0; x < side; x++) {
+            const dx = x < rad ? (rad - 0.5 - x) : (x >= side - rad ? (x - (side - rad - 0.5)) : 0);
+            let cov = 1;
+            if (dx > 0 && dy > 0) {
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist >= rad + 0.5) continue;
+                if (dist > rad - 0.5) cov = rad + 0.5 - dist;
+            }
+            const px = ox + x;
+            if (px < 0 || px >= cv.w) continue;
+            const so = (y * side + x) * 4;
+            const sa = Math.round(src[so + 3] * cov);
+            if (sa <= 0) continue;
+            const doff = (py * cv.w + px) * 4;
+            if (sa >= 254) {
+                dst[doff] = src[so];
+                dst[doff + 1] = src[so + 1];
+                dst[doff + 2] = src[so + 2];
+                dst[doff + 3] = 255;
+            } else {
+                const inv = 255 - sa;
+                const da = dst[doff + 3];
+                const outA = sa + Math.round((da * inv) / 255);
+                if (outA > 0) {
+                    dst[doff] = Math.round((src[so] * sa + ((dst[doff] * da * inv) / 255)) / outA);
+                    dst[doff + 1] = Math.round((src[so + 1] * sa + ((dst[doff + 1] * da * inv) / 255)) / outA);
+                    dst[doff + 2] = Math.round((src[so + 2] * sa + ((dst[doff + 2] * da * inv) / 255)) / outA);
+                    dst[doff + 3] = outA;
+                }
+            }
+        }
+    }
+    cv.strokeRoundRect(ox, oy, side, side, rad, 1, [255, 255, 255, 52]);
+}
+
 function resolveCornerRightMode(settingVal, profile, t) {
     const mode = settingVal || 'auto';
     if (mode === 'off') return 'off';
@@ -241,6 +354,8 @@ class OverlayRenderer {
         this.slotStatus = inspectClusterSlotConfig(this.confDir);
         this.bytesSent = 0;
         this.lastHudNavKey = '';
+        this.lastHudRoadKey = '';
+        this.lastRightWidgetKey = '';
         this.lastSummary = {};
     }
 
@@ -389,40 +504,25 @@ class OverlayRenderer {
         const t = model.telemetry || {};
         const eff = model.efficiency || {};
 
-        // Cluster target selection:
-        //   - 'auto' (default): when waze-on-cluster holds 0x100, render on 'map' (0x100) and unmap 'panel' (0x203)
-        //     so KOMBI4's right-side BC widget & stalk BC button work 100% natively! Otherwise use 'panel' (0x203).
-        //   - 'map_only': never map 0x203 (always preserves right-side BC widget); render on 'map' whenever wazeOn.
-        //   - 'panel_only': always use 'panel' (0x203) if safe, else 'map' fallback when wazeOn.
-        const clusterSlotMode = s.clusterSlotMode || 'auto';
+        // Consistent Cluster Display Mode ('auto' removed):
+        //   - 'panel_only' (default): always render all 5 outer zones + re-implemented Right-Wing Widget on 0x203
+        //     whether CarPlay/Waze or BMW Map is active (falls back to 'map' only if 0x202 conflict is present).
+        //   - 'map_only': never map 0x203 (leaves KOMBI4's native BC widget active); render on 'map' when wazeOn.
+        const rawSlotMode = s.clusterSlotMode || 'panel_only';
+        const clusterSlotMode = rawSlotMode === 'map_only' ? 'map_only' : 'panel_only';
         const canPanel = this.canUsePanel();
         let panelAllowed = false;
         let showMapOverlay = false;
         if (wantCluster) {
             if (clusterSlotMode === 'map_only') {
                 showMapOverlay = wazeOn;
-            } else if (clusterSlotMode === 'panel_only') {
+            } else {
                 panelAllowed = canPanel;
                 showMapOverlay = !canPanel && s.fallbackMapBar !== false && wazeOn;
-            } else {
-                // 'auto'
-                if (wazeOn) {
-                    showMapOverlay = true;
-                } else {
-                    panelAllowed = canPanel;
-                }
             }
         }
 
         // HUD navigation re-rendering & intersection mini-map auto-yield:
-        //   - 'own_nav_minimap' (default): draw full-height turn-by-turn & lane guidance on the HUD ourselves,
-        //     and ONLY yield 0x323 when BMW HUD switches to an intersection mini-map.
-        //   - When waze-on-cluster projects to the HUD (`wocHudOn`), Waze draws on the SAME `hud` target (0x323)
-        //     at class='content', so `hud_main` (class='overlay', z=12) stays ON over Waze's HUD map while
-        //     `hud_nav` hides (unless the user explicitly selected 'yield_route').
-        //   - 'own_nav_keep': always draw HUD metrics + our HUD nav (never yield).
-        //   - 'yield_lanes': draw HUD nav, yield during lane guidance or mini-map.
-        //   - 'yield_route': hide HUD metrics during the entire active route.
         const hudNavMode = s.hudNavMode || 'own_nav_minimap';
         const hn = t.hudNav || null;
         const wocHudOn = Boolean(hn && hn.wocHudShowing);
@@ -445,6 +545,9 @@ class OverlayRenderer {
         const showHud = wantHud && !hudYieldedToNav;
         const showOwnHudNav = showHud && !wocHudOn && hudNavMode !== 'yield_route' && hudNavMode !== 'keep' &&
             Boolean(hn && hn.show);
+        // Full-width top-row street & highway exit badge banner when active maneuver has a street or exit number
+        const showHudRoad = Boolean(showOwnHudNav && hn && hn.show &&
+            ((hn.show.road && hn.show.road.length > 0) || (hn.show.exitBadge && hn.show.exitBadge.length > 0)));
         const wocHudOverlay = Boolean(showHud && wocHudOn);
 
         const hx = clamp(Number(s.hudNudgeX) || 0, -40, 40);
@@ -456,9 +559,28 @@ class OverlayRenderer {
         const brakeMode = s.brakeIndicator || 'bar_num';
         const cornerLeftMode = s.cornerLeftDisplay || 'oil_cool';
         const cornerRightMode = resolveCornerRightMode(s.cornerRightDisplay, profile, t);
+        const rightWidgetMode = s.rightWidgetMode || 'cycle';
         const hudLine1 = s.hudLine1 || 'efficiency';
         const hudLine2 = s.hudLine2 || 'power_gear';
         const hudLine3 = s.hudLine3 || 'brake';
+
+        // Resolve active Right-Wing Widget page ('media', 'trip', or 'off')
+        const media = t.media || null;
+        let rightWidgetPage = 'off';
+        if (panelAllowed && rightWidgetMode !== 'off') {
+            if (rightWidgetMode === 'media') {
+                rightWidgetPage = 'media';
+            } else if (rightWidgetMode === 'trip') {
+                rightWidgetPage = 'trip';
+            } else {
+                // 'cycle': follows BC button page ('media' -> 'trip' -> 'off'); when on 'media' with no active
+                // audio yet on boot, show 'trip' automatically until music starts!
+                const bcPage = (media && media.page) || 'media';
+                if (bcPage === 'off') rightWidgetPage = 'off';
+                else if (bcPage === 'trip') rightWidgetPage = 'trip';
+                else rightWidgetPage = (media && media.active) ? 'media' : 'trip';
+            }
+        }
 
         const hero = profile.isEv
             ? formatEvEff(eff.evKmPerKwh, units)
@@ -500,16 +622,17 @@ class OverlayRenderer {
         this.lastSummary = {
             hero, heroCol, subText, subCol, inNormalD, dGearText,
             isParked, showBrakeRail, brakeHold,
-            panelAllowed, showHud, showOwnHudNav, wocHudOverlay, hudYieldedToNav, hudYieldReason,
+            panelAllowed, showHud, showOwnHudNav, showHudRoad, wocHudOverlay, hudYieldedToNav, hudYieldReason,
             showFallbackMap: showMapOverlay, showMapOverlay, clusterSlotMode,
+            rightWidgetMode, rightWidgetPage,
             brakeMode, brakeLit, frictionG: fg, brakeBar: t.brakeBar,
             cornerLeftMode, cornerRightMode,
             hudLine1, hudLine2, hudLine3,
         };
 
-        // 1. CLUSTER PANEL LAYERS (slot 0x203; unmapped when using map slot so right-side BC widget works!)
+        // 1. CLUSTER PANEL LAYERS (slot 0x203)
         if (panelAllowed) {
-            // 1a. Zone 1: Below Speed Indicator (392..606, 429..513: aligned under speed digits, clear of map)
+            // 1a. Zone 1: Below Speed Indicator (392..606, 429..513)
             const bsRect = {
                 x: clamp(BELOW_SPEED_BASE.x + cx, 387, 412),
                 y: clamp(BELOW_SPEED_BASE.y + cy, 429, 430),
@@ -539,7 +662,7 @@ class OverlayRenderer {
                 this._setVisible('gear_d', false);
             }
 
-            // 1c. Zone 3: Slim Friction Brake Force Rail (1280..1576, 609..640; hidden in Park; clear of Power % & needle)
+            // 1c. Zone 3: Slim Friction Brake Force Rail (1280..1576, 609..640; hidden in Park)
             const brRect = {
                 x: clamp(BRAKE_RAIL_BASE.x + cx, 1276, 1288),
                 y: clamp(BRAKE_RAIL_BASE.y + cy, 599, 617),
@@ -555,7 +678,7 @@ class OverlayRenderer {
                 this._setVisible('brake_rail', false);
             }
 
-            // 1d. Zone 4: Bottom-Left Oil + Coolant Temperatures (8..124, 643..709; large 22px bold text)
+            // 1d. Zone 4: Bottom-Left Oil + Coolant Temperatures (8..124, 643..709)
             const clRect = {
                 x: clamp(CORNER_LEFT_BASE.x + cx, 6, 9),
                 y: clamp(CORNER_LEFT_BASE.y + cy, 643, 648),
@@ -571,7 +694,7 @@ class OverlayRenderer {
                 this._setVisible('corner_left', false);
             }
 
-            // 1e. Zone 5: Bottom-Right HV Battery % SoC / Vital (1816..1914, 643..709; large 28px number)
+            // 1e. Zone 5: Bottom-Right HV Battery % SoC / Vital (1816..1914, 643..709)
             const crRect = {
                 x: clamp(CORNER_RIGHT_BASE.x + cx, 1815, 1820),
                 y: clamp(CORNER_RIGHT_BASE.y + cy, 643, 648),
@@ -586,16 +709,69 @@ class OverlayRenderer {
             } else {
                 this._setVisible('corner_right', false);
             }
+
+            // 1f. Zone 6: Right-Wing Media / Trip Widget (1244..1556, 214..480)
+            if (rightWidgetPage !== 'off') {
+                const rwRect = {
+                    x: clamp(RIGHT_WIDGET_BASE.x + cx, 1232, 1256),
+                    y: clamp(RIGHT_WIDGET_BASE.y + cy, 202, 226),
+                    w: RIGHT_WIDGET_BASE.w,
+                    h: RIGHT_WIDGET_BASE.h,
+                };
+                const lRw = this._ensureOrLocal('right_widget', Object.assign({ target: 'panel', visible: true, z: 11 }, rwRect));
+                if (rightWidgetPage === 'media') {
+                    const elKey = media && typeof media.elapsedSec === 'number' ? Math.floor(media.elapsedSec) : -1;
+                    const totKey = media && typeof media.totalSec === 'number' ? Math.floor(media.totalSec) : -1;
+                    const rwKey = 'M|' + (media ? [media.active ? 1 : 0, media.playing ? 1 : 0, media.title, media.artist, media.coverRev, elKey, totKey].join('|') : 'none');
+                    if (rwKey !== this.lastRightWidgetKey || !lRw.prevBuf) {
+                        this._paintRightMedia(lRw.cv, media);
+                        this.lastRightWidgetKey = rwKey;
+                    }
+                } else {
+                    const rwKey = 'T|' + [
+                        units.system, units.tempUnit, units.distUnit,
+                        Math.round(t.erangeKm || -1), Math.round(t.frangeKm || -1),
+                        Math.round((t.tripDistKm || -1) * 10), t.tripMinutes || -1,
+                        Math.round(t.gearboxOilC || -99), Math.round(t.battTempC || -99),
+                        Math.round(t.iatC || -99), typeof t.v12 === 'number' ? t.v12.toFixed(1) : '--',
+                        hero.value, hero.unit,
+                    ].join('|');
+                    if (rwKey !== this.lastRightWidgetKey || !lRw.prevBuf) {
+                        this._paintRightTrip(lRw.cv, t, hero, profile, units);
+                        this.lastRightWidgetKey = rwKey;
+                    }
+                }
+                this._setVisible('right_widget', true);
+                this._upload('right_widget');
+            } else {
+                this._setVisible('right_widget', false);
+            }
         } else {
-            CLUSTER_LAYER_NAMES.forEach((n) => this._setVisible(n, false));
+            PANEL_ALL_LAYERS.forEach((n) => this._setVisible(n, false));
         }
 
-        // 2. HUD LAYER (3-line configurable upper-left slot, strictly y=100..201 above Assisted Driving / ACC y=202;
-        //    also overlays cleanly on top of waze-on-cluster's HUD video when wocHudOn === true!)
-        const hudY = clamp(HUD_BASE.y + hy, 100, 103);
+        // 2a. HUD FULL-WIDTH TOP-ROW ROAD + HIGHWAY EXIT BADGE BANNER (544x38 at x=132..676, y=100..138)
+        const hudTopY = clamp(HUD_BASE.y + hy, 100, 102);
+        if (showHudRoad) {
+            const roadX = clamp(HUD_ROAD_BASE.x + hx, 120, 680 - HUD_ROAD_W);
+            const lHudRoad = this._ensureOrLocal('hud_road', {
+                target: 'hud', klass: 'overlay', x: roadX, y: hudTopY, w: HUD_ROAD_W, h: HUD_ROAD_H, visible: true, z: 14,
+            });
+            const rk = hudRoadKey(hn.show);
+            if (rk !== this.lastHudRoadKey || !lHudRoad.prevBuf) {
+                drawHudRoadBanner(lHudRoad.cv, hn.show);
+                this.lastHudRoadKey = rk;
+            }
+            this._setVisible('hud_road', true);
+            this._upload('hud_road');
+        } else {
+            this._setVisible('hud_road', false);
+        }
+
+        // 2b. HUD TELEMETRY LAYER (260x100 at y=100..200 <= 202 ACC; shifts metrics cleanly into Row 2 when showHudRoad is true!)
         const hudX = clamp(HUD_BASE.x + hx, 120, 144);
         const lHud = this._ensureOrLocal('hud_main', {
-            target: 'hud', klass: 'overlay', x: hudX, y: hudY, w: HUD_BASE.w, h: HUD_BASE.h, visible: showHud, z: 12,
+            target: 'hud', klass: 'overlay', x: hudX, y: hudTopY, w: HUD_BASE.w, h: HUD_BASE.h, visible: showHud, z: 12,
         });
         if (showHud) {
             const alertHud = s.smartAlerts !== false ? profile.alert : null;
@@ -604,7 +780,8 @@ class OverlayRenderer {
                 [hudLine1, hudLine2, hudLine3],
                 hero, heroCol, subText, subCol,
                 gearDisplay !== 'off' ? dGearText : '',
-                t, profile, units, fg, brakeLit, brakeHold, alertHud
+                t, profile, units, fg, brakeLit, brakeHold, alertHud,
+                showHudRoad
             );
             this._setVisible('hud_main', true);
             this._upload('hud_main');
@@ -612,16 +789,17 @@ class OverlayRenderer {
             this._setVisible('hud_main', false);
         }
 
-        // 2b. HUD NAVIGATION LAYER (264x264 full-height right-side slot x=412..676, y=108..372; yields for mini-map)
+        // 2c. HUD NAVIGATION LAYER (264x232 right-side slot x=412..676, y=140..372 below road banner; yields for mini-map)
         if (showOwnHudNav) {
             const navX = clamp(HUD_NAV_BASE.x + hx, 406, 680 - HUD_NAV_W);
-            const navY = clamp(HUD_NAV_BASE.y + hy, 100, 380 - HUD_NAV_H);
+            const baseNavY = showHudRoad ? HUD_NAV_BASE.y : 116;
+            const navY = clamp(baseNavY + hy, showHudRoad ? (hudTopY + HUD_ROAD_H + 1) : 100, 380 - HUD_NAV_H);
             const lHudNav = this._ensureOrLocal('hud_nav', {
                 target: 'hud', klass: 'overlay', x: navX, y: navY, w: HUD_NAV_W, h: HUD_NAV_H, visible: true, z: 13,
             });
-            const nk = hudNavKey(hn.show);
+            const nk = hudNavKey(hn.show) + '|hr=' + (showHudRoad ? 1 : 0);
             if (nk !== this.lastHudNavKey || !lHudNav.prevBuf) {
-                drawHudNav(lHudNav.cv, hn.show);
+                drawHudNav(lHudNav.cv, hn.show, { hideRoad: showHudRoad });
                 this.lastHudNavKey = nk;
             }
             this._setVisible('hud_nav', true);
@@ -630,8 +808,7 @@ class OverlayRenderer {
             this._setVisible('hud_nav', false);
         }
 
-        // 3. MAP SLOT SIDE-BOTTOM OVERLAYS (0x100, contend: false — borderless white/blue + black outline,
-        //    zero shifting between P and D, 312px unobstructed center route corridor, right BC widget intact!)
+        // 3. MAP SLOT SIDE-BOTTOM OVERLAYS (0x100, contend: false — optional Map-Slot-Only mode)
         if (showMapOverlay) {
             const msRect = {
                 x: clamp(MAP_SPEED_RECT.x + cx, 8, 32),
@@ -716,12 +893,10 @@ class OverlayRenderer {
 
     _paintBelowSpeed(cv, hero, heroCol, subText, subCol, gearStr, reserveGearSlot, heroRightX) {
         cv.clear(COL.clear);
-        // Hero value right-edge aligns directly under BMW's main speed digits, keeping unit under 'mph'.
         const rx = typeof heroRightX === 'number' ? heroRightX : 108;
         drawTextOutline(cv, hero.value, rx, 43, 44, heroCol, { font: 'num', align: 'right' });
         const unitSize = String(hero.unit || '').length > 6 ? 17 : 21;
         drawTextOutline(cv, hero.unit, rx + 7, 39, unitSize, COL.softBlue, { font: 'bold', align: 'left' });
-        // Fixed anchors so shifting P <-> D never shifts subText horizontally!
         if (reserveGearSlot) {
             drawTextOutline(cv, subText, rx + 22, 75, 22, subCol, { font: 'bold', align: 'right' });
             if (gearStr) {
@@ -734,7 +909,6 @@ class OverlayRenderer {
 
     _paintGearNextToD(cv, digitStr, alertObj) {
         cv.clear(COL.clear);
-        // Baseline cv y=46 => world y=696, matching real-car BMW 'D' (world y=664..696)
         if (digitStr) {
             drawTextOutline(cv, digitStr, 3, 46, 42, COL.white, { font: 'bold', align: 'left' });
         }
@@ -752,8 +926,6 @@ class OverlayRenderer {
         const barX1 = 294;
         const segW = (barX1 - barX0) / SEG_N;
 
-        // Sweep right-to-left along shelf right above bottom bracket line (world y=630..637),
-        // strictly below 'Power %' (y<=627) and left of CHARGE arc/needle (x<=1574).
         for (let i = 0; i < SEG_N; i++) {
             const sx1 = Math.round(barX1 - i * segW) - 1;
             const sx0 = Math.round(barX1 - (i + 1) * segW) + 2;
@@ -764,7 +936,6 @@ class OverlayRenderer {
             cv.fillRect(sx0, 21, Math.max(2, sx1 - sx0), 7, col);
         }
 
-        // Bold hydraulic bar (or g fallback) readout on far left (strictly x < 140 => world x < 1420, clear of 'Power %')
         if (litCount > 0 && showNum) {
             const hasBar = typeof brakeBar === 'number' && isFinite(brakeBar) && brakeBar >= 1.5;
             const valStr = hasBar ? (Math.round(brakeBar) + ' bar') : (fg.toFixed(2) + 'g');
@@ -800,10 +971,142 @@ class OverlayRenderer {
         drawTextOutline(cv, m.valText, cv.w - 4, 53, 28, m.col, { font: 'num', align: 'right' });
     }
 
-    _paintHud(cv, lineModes, hero, heroCol, subText, subCol, gearStr, t, profile, units, fg, brakeLit, brakeHold, alertObj) {
-        cv.clear(COL.clear); // Borderless 3-line black-outlined text (y=100..198, strictly above ACC y=202; crisp over Waze HUD!)
+    /**
+     * Re-implemented OEM-style Right-Wing Media Playback Widget (312x266 centered at world x=1400):
+     *   - Soft ambient radial glow extracted from album cover dominant colors
+     *   - Crisp 124x124 rounded-corner album cover (or sleek vector music-note tile)
+     *   - Black-outlined track title + artist/album
+     *   - Smooth progress bar + elapsed / total duration timestamps
+     */
+    _paintRightMedia(cv, media) {
+        cv.clear(COL.clear);
+        const midX = Math.round(cv.w / 2); // 156 => world x = 1400
+        const coverSide = 124;
+        const coverX = midX - Math.round(coverSide / 2); // 94
+        const coverY = 16;
+
+        const hasMedia = Boolean(media && media.active && media.title);
+        const cover = hasMedia ? media.cover : null;
+        const glowRgb = cover && Array.isArray(cover.accent) ? cover.accent : [56, 178, 246];
+        paintRadialGlow(cv, midX, coverY + 66, 114, glowRgb, hasMedia ? 52 : 28);
+
+        if (cover && cover.d && cover.w === coverSide && cover.h === coverSide) {
+            blitRoundedCover(cv, coverX, coverY, cover, 10);
+        } else {
+            cv.roundRect(coverX, coverY, coverSide, coverSide, 10, COL.tileBg);
+            cv.strokeRoundRect(coverX, coverY, coverSide, coverSide, 10, 2, COL.tileRim);
+            // Vector eighth-note icon
+            cv.circle(midX - 13, coverY + 80, 10, COL.icyBlue);
+            cv.circle(midX + 15, coverY + 74, 10, COL.icyBlue);
+            cv.fillRect(midX - 6, coverY + 38, 4, 42, COL.icyBlue);
+            cv.fillRect(midX + 22, coverY + 32, 4, 42, COL.icyBlue);
+            cv.line(midX - 4, coverY + 39, midX + 24, coverY + 33, 6, COL.icyBlue);
+        }
+
+        if (!hasMedia) {
+            drawTextOutline(cv, '暂无媒体播放', midX, 176, 20, COL.softBlue, { font: 'bold', align: 'center' });
+            drawTextOutline(cv, '按 BC 键查看行程', midX, 204, 15, COL.tagBlue, { font: 'bold', align: 'center' });
+            return;
+        }
+
+        const tFit = fitTextLine(cv, media.title, cv.w - 16, [21, 19, 17]);
+        drawTextOutline(cv, tFit.text, midX, 172, tFit.size, COL.white, { font: 'bold', align: 'center' });
+
+        const subRaw = media.artist || media.source || '';
+        if (subRaw) {
+            const aFit = fitTextLine(cv, subRaw, cv.w - 20, [16, 15, 14]);
+            drawTextOutline(cv, aFit.text, midX, 198, aFit.size, COL.softBlue, { font: 'bold', align: 'center' });
+        }
+
+        if (typeof media.totalSec === 'number' && media.totalSec > 0 && typeof media.elapsedSec === 'number') {
+            const barX = 36;
+            const barW = cv.w - 72; // 240
+            const barY = 215;
+            const frac = clamp(media.frac || 0, 0, 1);
+            cv.fillRect(barX - 1, barY - 1, barW + 2, 8, COL.outline);
+            cv.fillRect(barX, barY, barW, 6, COL.progTrack);
+            const fillW = Math.max(4, Math.round(barW * frac));
+            cv.fillRect(barX, barY, fillW, 6, media.playing === false ? COL.amber : COL.cyan);
+
+            drawTextOutline(cv, formatMmSs(media.elapsedSec), barX, 240, 14, COL.tagBlue, { font: 'bold', align: 'left' });
+            if (media.playing === false) {
+                drawTextOutline(cv, '已暂停', midX, 240, 13, COL.amber, { font: 'bold', align: 'center' });
+            }
+            drawTextOutline(cv, formatMmSs(media.totalSec), barX + barW, 240, 14, COL.tagBlue, { font: 'bold', align: 'right' });
+        } else {
+            const liveTag = media.playing === false ? '已暂停' : (media.source || '实时音频');
+            drawTextOutline(cv, liveTag, midX, 228, 15, media.playing === false ? COL.amber : COL.tagBlue, { font: 'bold', align: 'center' });
+        }
+    }
+
+    /**
+     * Right-Wing Trip & Powertrain Summary Widget (312x266, BC-cycled Page 2):
+     * Borderless white/blue black-outlined 2x3 grid matching BMW Live Cockpit typography.
+     */
+    _paintRightTrip(cv, t, hero, profile, units) {
+        cv.clear(COL.clear);
+        const midX = Math.round(cv.w / 2);
+        const isMi = units.distUnit === 'mi';
+        const dUnit = isMi ? ' mi' : ' km';
+        const dScale = isMi ? 0.621371 : 1;
+
+        drawTextOutline(cv, '行程与车辆信息', midX, 24, 15, COL.tagBlue, { font: 'bold', align: 'center' });
+        cv.fillRect(28, 34, cv.w - 56, 2, COL.divider);
+
+        // Row 1 (y = 58 / 88): EV Range (or Instant Efficiency on ICE) + Fuel Range
+        if (profile && profile.vehicleType === 'phev') {
+            const evStr = (typeof t.erangeKm === 'number' && isFinite(t.erangeKm))
+                ? (Math.round(t.erangeKm * dScale) + dUnit) : ('--' + dUnit);
+            drawTextOutline(cv, '纯电续航', 22, 58, 14, COL.tagBlue, { font: 'bold', align: 'left' });
+            drawTextOutline(cv, evStr, 22, 88, 26, COL.cyan, { font: 'num', align: 'left' });
+        } else {
+            drawTextOutline(cv, '实时能耗', 22, 58, 14, COL.tagBlue, { font: 'bold', align: 'left' });
+            drawTextOutline(cv, hero.value + ' ' + hero.unit, 22, 88, 22, COL.white, { font: 'bold', align: 'left' });
+        }
+
+        const fuelStr = (typeof t.frangeKm === 'number' && isFinite(t.frangeKm))
+            ? (Math.round(t.frangeKm * dScale) + dUnit) : ('--' + dUnit);
+        drawTextOutline(cv, '燃油续航', cv.w - 22, 58, 14, COL.tagBlue, { font: 'bold', align: 'right' });
+        drawTextOutline(cv, fuelStr, cv.w - 22, 88, 26, COL.white, { font: 'num', align: 'right' });
+
+        // Row 2 (y = 128 / 158): Trip Distance / Duration + Gearbox Oil Temp
+        let tripStr = '--';
+        if (typeof t.tripDistKm === 'number' && isFinite(t.tripDistKm)) {
+            tripStr = (t.tripDistKm * dScale).toFixed(1) + dUnit;
+        } else if (typeof t.tripMinutes === 'number' && t.tripMinutes >= 0) {
+            tripStr = Math.floor(t.tripMinutes / 60) + 'h ' + (t.tripMinutes % 60) + 'm';
+        }
+        drawTextOutline(cv, '行程距离', 22, 128, 14, COL.tagBlue, { font: 'bold', align: 'left' });
+        drawTextOutline(cv, tripStr, 22, 158, 25, COL.white, { font: 'num', align: 'left' });
+
+        const gbxStr = formatTemp(t.gearboxOilC, units).text;
+        const gbxCol = (typeof t.gearboxOilC === 'number' && t.gearboxOilC >= 105) ? COL.amber : COL.white;
+        drawTextOutline(cv, '变速箱', cv.w - 22, 128, 14, COL.tagBlue, { font: 'bold', align: 'right' });
+        drawTextOutline(cv, gbxStr, cv.w - 22, 158, 25, gbxCol, { font: 'num', align: 'right' });
+
+        // Row 3 (y = 198 / 228): HV Batt Temp (or IAT) + 12V Aux Battery
+        if (profile && profile.vehicleType === 'phev') {
+            const btStr = formatTemp(t.battTempC, units).text;
+            drawTextOutline(cv, '动力电池', 22, 198, 14, COL.tagBlue, { font: 'bold', align: 'left' });
+            drawTextOutline(cv, btStr, 22, 228, 25, COL.white, { font: 'num', align: 'left' });
+        } else {
+            const iatStr = formatTemp(t.iatC, units).text;
+            drawTextOutline(cv, '进气温度', 22, 198, 14, COL.tagBlue, { font: 'bold', align: 'left' });
+            drawTextOutline(cv, iatStr, 22, 228, 25, COL.white, { font: 'num', align: 'left' });
+        }
+
+        const v12Str = (typeof t.v12 === 'number' && isFinite(t.v12)) ? (t.v12.toFixed(1) + 'V') : '--';
+        const v12Col = (typeof t.v12 === 'number' && t.v12 < 12.1) ? COL.amber : COL.white;
+        drawTextOutline(cv, '12V 电池', cv.w - 22, 198, 14, COL.tagBlue, { font: 'bold', align: 'right' });
+        drawTextOutline(cv, v12Str, cv.w - 22, 228, 25, v12Col, { font: 'num', align: 'right' });
+    }
+
+    _paintHud(cv, lineModes, hero, heroCol, subText, subCol, gearStr, t, profile, units, fg, brakeLit, brakeHold, alertObj, compactBelowRoad) {
+        cv.clear(COL.clear); // Borderless 3-line black-outlined text (strictly y=100..200 <= 202 ACC)
+        const compact = Boolean(compactBelowRoad);
         const modes = Array.isArray(lineModes) ? lineModes.slice(0, 3) : ['efficiency', 'power_gear', 'brake'];
-        const baselines = [35, 65, 90];
+        // When `hud_road` occupies Row 1 (py=0..38), shift compact metrics into Row 2 (py=57, 77, 95) while staying <= py=99!
+        const baselines = compact ? [57, 77, 95] : [35, 65, 92];
         const socStr = (typeof t.soc === 'number' && isFinite(t.soc)) ? ('SOC ' + Math.round(t.soc) + '%') : 'SOC --%';
         const socCol = (typeof t.soc === 'number' && t.soc <= 10) ? COL.red : ((typeof t.soc === 'number' && t.soc <= 20) ? COL.amber : COL.white);
         const oilStr = 'OIL ' + formatTemp(t.oilTempC, units).text;
@@ -812,67 +1115,65 @@ class OverlayRenderer {
 
         for (let idx = 0; idx < 3; idx++) {
             const by = baselines[idx];
-            if (idx === 2 && alertObj && alertObj.label) {
+            const m = modes[idx] || 'off';
+            // Never let a passive alert overwrite Line 3 while the driver is actively pressing the brake!
+            if (idx === 2 && alertObj && alertObj.label && !(m === 'brake' && brakeLit > 0)) {
                 const aCol = alertObj.severity === 'red' ? COL.red : COL.amber;
-                drawTextOutline(cv, alertObj.label, 6, by, 19, aCol, { font: 'bold', align: 'left' });
+                drawTextOutline(cv, alertObj.label, 6, by, compact ? 16 : 19, aCol, { font: 'bold', align: 'left' });
                 continue;
             }
-            const m = modes[idx] || 'off';
             if (m === 'off') continue;
             if (m === 'efficiency') {
-                const nSize = idx === 0 ? 40 : 24;
-                const uSize = idx === 0 ? 19 : 16;
+                const nSize = compact ? (idx === 0 ? 24 : 18) : (idx === 0 ? 40 : 24);
+                const uSize = compact ? 14 : (idx === 0 ? 19 : 16);
                 const valW = drawTextOutline(cv, hero.value, 6, by, nSize, heroCol, { font: 'num', align: 'left' });
-                drawTextOutline(cv, hero.unit, 12 + valW, by - 1, uSize, COL.softBlue, { font: 'bold', align: 'left' });
+                drawTextOutline(cv, hero.unit, 10 + valW, by - 1, uSize, COL.softBlue, { font: 'bold', align: 'left' });
             } else if (m === 'power_gear') {
-                const sz = idx === 0 ? 26 : (idx === 1 ? 22 : 19);
+                const sz = compact ? (idx === 0 ? 19 : 17) : (idx === 0 ? 26 : (idx === 1 ? 22 : 19));
                 const subW = drawTextOutline(cv, subText, 6, by, sz, subCol, { font: 'bold', align: 'left' });
                 if (gearStr) {
-                    const gx = Math.min(cv.w - 52, Math.max(122, Math.round(18 + subW)));
+                    const gx = Math.min(cv.w - 48, Math.max(compact ? 104 : 122, Math.round(16 + subW)));
                     drawTextOutline(cv, gearStr, gx, by, sz, COL.white, { font: 'bold', align: 'left' });
                 }
             } else if (m === 'power') {
-                const sz = idx === 0 ? 26 : (idx === 1 ? 22 : 19);
+                const sz = compact ? (idx === 0 ? 19 : 17) : (idx === 0 ? 26 : (idx === 1 ? 22 : 19));
                 drawTextOutline(cv, subText, 6, by, sz, subCol, { font: 'bold', align: 'left' });
             } else if (m === 'gear') {
                 if (gearStr) {
-                    const sz = idx === 0 ? 34 : (idx === 1 ? 24 : 20);
+                    const sz = compact ? (idx === 0 ? 22 : 18) : (idx === 0 ? 34 : (idx === 1 ? 24 : 20));
                     drawTextOutline(cv, gearStr, 6, by, sz, COL.white, { font: 'bold', align: 'left' });
                 }
             } else if (m === 'soc') {
-                const sz = idx === 0 ? 28 : (idx === 1 ? 22 : 19);
+                const sz = compact ? (idx === 0 ? 20 : 17) : (idx === 0 ? 28 : (idx === 1 ? 22 : 19));
                 drawTextOutline(cv, socStr, 6, by, sz, socCol, { font: 'bold', align: 'left' });
             } else if (m === 'soc_oil') {
-                const sz = idx === 0 ? 22 : 19;
-                drawTextOutline(cv, socStr + '   ' + oilStr, 6, by, sz, COL.softBlue, { font: 'bold', align: 'left' });
+                const sz = compact ? 16 : (idx === 0 ? 22 : 19);
+                drawTextOutline(cv, socStr + '  ' + oilStr, 6, by, sz, COL.softBlue, { font: 'bold', align: 'left' });
             } else if (m === 'temps') {
-                const sz = idx === 0 ? 22 : 19;
-                drawTextOutline(cv, oilStr + '   ' + coolStr, 6, by, sz, tempCol, { font: 'bold', align: 'left' });
+                const sz = compact ? 16 : (idx === 0 ? 22 : 19);
+                drawTextOutline(cv, oilStr + '  ' + coolStr, 6, by, sz, tempCol, { font: 'bold', align: 'left' });
             } else if (m === 'brake') {
                 if (brakeLit > 0) {
                     const hSegs = 12;
                     const hLit = brakeHold ? 1 : clamp(Math.round((fg / 0.55) * hSegs), 1, hSegs);
-                    const segY = by - 11;
+                    const segH = compact ? 5 : 6;
+                    const segY = compact ? (by - 8) : (by - 11);
                     for (let i = 0; i < hSegs; i++) {
                         const sx = 6 + i * 14;
                         const sc = i < hLit ? (i >= 8 ? COL.red : (i >= 4 ? COL.orange : COL.amber)) : COL.mapRailDim;
-                        cv.fillRect(sx - 1, segY - 1, 13, 8, COL.outline);
-                        cv.fillRect(sx, segY, 11, 6, sc);
+                        cv.fillRect(sx - 1, segY - 1, 13, segH + 2, COL.outline);
+                        cv.fillRect(sx, segY, 11, segH, sc);
                     }
                     if (!brakeHold && fg > 0.02) {
                         const hasBar = typeof t.brakeBar === 'number' && isFinite(t.brakeBar) && t.brakeBar >= 1.5;
                         const bStr = hasBar ? (Math.round(t.brakeBar) + ' bar') : (fg.toFixed(2) + 'g');
-                        drawTextOutline(cv, bStr, 178, by - 3, 15, fg >= 0.36 ? COL.red : COL.amber, { font: 'bold', align: 'left' });
+                        drawTextOutline(cv, bStr, 178, compact ? (by - 1) : (by - 3), compact ? 14 : 15, fg >= 0.36 ? COL.red : COL.amber, { font: 'bold', align: 'left' });
                     }
                 }
             }
         }
     }
 
-    /**
-     * Borderless bottom-left map readout (map x=186..368, y=380..448):
-     * White/blue text with 2px black outline, fixed column anchors so numbers never shift.
-     */
     _paintMapLeft(cv, t, units, mode, coldOilC) {
         cv.clear(COL.clear);
         const oil = formatTemp(t.oilTempC, units);
@@ -895,16 +1196,10 @@ class OverlayRenderer {
         }
     }
 
-    /**
-     * Borderless bottom-right map readout (map x=680..908, y=374..448):
-     *   - Top row (y=10..18): 14 dark-outlined friction brake segments (hidden in Park without shifting bottom row!)
-     *   - Bottom row (y=60): Fixed left slot for D1..D8 (x<=82) + fixed right-anchored SOC % / Vital (x=222).
-     *     Appearing/disappearing D1..D8 never shifts SOC % by even a single pixel!
-     */
     _paintMapRight(cv, gearStr, t, units, cornerRightMode, showBrakeRail, showBrakeNum, fg, litCount, absActive, alertObj) {
         cv.clear(COL.clear);
 
-        if (alertObj && alertObj.label) {
+        if (alertObj && alertObj.label && !(showBrakeRail && litCount > 0)) {
             const aCol = alertObj.severity === 'red' ? COL.red : COL.amber;
             drawTextOutline(cv, alertObj.label, cv.w - 6, 21, 18, aCol, { font: 'bold', align: 'right' });
         } else if (showBrakeRail) {
@@ -948,6 +1243,8 @@ class OverlayRenderer {
         this.connected = false;
         this.ready = false;
         this.lastHudNavKey = '';
+        this.lastHudRoadKey = '';
+        this.lastRightWidgetKey = '';
         this.layers = {};
     }
 }
@@ -962,12 +1259,15 @@ module.exports = {
     BRAKE_RAIL_BASE,
     CORNER_LEFT_BASE,
     CORNER_RIGHT_BASE,
+    RIGHT_WIDGET_BASE,
     HUD_BASE,
+    HUD_ROAD_BASE,
     HUD_NAV_BASE,
     MAP_SPEED_RECT,
     MAP_LEFT_RECT,
     MAP_RIGHT_RECT,
     MAP_FALLBACK_RECT: MAP_RIGHT_RECT,
     CLUSTER_LAYER_NAMES,
+    PANEL_ALL_LAYERS,
     MAP_LAYER_NAMES,
 };

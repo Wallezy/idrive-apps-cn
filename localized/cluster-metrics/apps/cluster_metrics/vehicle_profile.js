@@ -29,7 +29,7 @@ function detectAnomaly(telemetry, units, state, nowMs) {
         return (units && units.pressUnit === 'bar') ? (bar.toFixed(1) + 'b') : (Math.round(bar * 14.5038) + 'psi');
     };
 
-    // 1. TPMS corner under-pressure (>= 0.21 bar / ~3.0 psi below target, or < 1.8 bar) or hot tire (>= 85°C)
+    // 1. TPMS corner under-pressure (>= 0.28 bar / ~4.1 psi below target, or < 1.72 bar) or hot tire (>= 85°C)
     if (t.tpms && typeof t.tpms === 'object') {
         const corners = ['FL', 'FR', 'RL', 'RR'];
         let worstTpms = null;
@@ -40,11 +40,11 @@ function detectAnomaly(telemetry, units, state, nowMs) {
             const p = item.pressureBar;
             const target = item.targetBar;
             const tempC = item.tempC;
-            if (typeof p === 'number' && isFinite(p) && p > 0.2) {
-                const deficit = (typeof target === 'number' && isFinite(target) && target > 0.5)
-                    ? (target - p) : (p < 1.8 ? 1.8 - p : 0);
-                if (deficit >= 0.21) {
-                    const sev = (deficit >= 0.45 || p < 1.55) ? 'red' : 'amber';
+            if (typeof p === 'number' && isFinite(p) && p > 0.2 && p <= 6.5) {
+                const deficit = (typeof target === 'number' && isFinite(target) && target > 0.5 && target <= 6.5)
+                    ? (target - p) : (p < 1.72 ? 1.72 - p : 0);
+                if (deficit >= 0.28) {
+                    const sev = (deficit >= 0.50 || p < 1.50) ? 'red' : 'amber';
                     if (!worstTpms || (sev === 'red' && worstTpms.severity !== 'red')) {
                         worstTpms = { id: 'tpms', severity: sev, label: c + ' ' + fmtPress(p) };
                     }

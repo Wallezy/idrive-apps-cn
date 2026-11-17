@@ -16,6 +16,7 @@ const { ReadOnlyDiag } = require('./kit/readonly-diag');
 const { DidReader } = require('./kit/dids');
 const { decodeCarUnits, resolveUnits } = require('./units');
 const { NavTracker } = require('./nav_tracker');
+const { MediaTracker } = require('./media_tracker');
 
 const IPC_STALE_MS = 3000;
 const IPC_DIR_DEFAULT = '/dev/shm/cluster-info';
@@ -385,13 +386,32 @@ class DemoGenerator {
     }
 
     demoHudNav(cycle) {
+        if (cycle >= 24 && cycle < 38) {
+            return {
+                routeActive: true,
+                guide: 'BMW',
+                show: {
+                    kind: 'branch', dir: 'HIGHWAY_OUT_RIGHT', geom: 'EXIT_RIGHT_TAKE_RIGHT', exit: null, exitAngle: null, side: null,
+                    dist: '0.4', unit: 'mi', uk: false,
+                    exitBadge: '14B',
+                    road: 'I-280 North - San Francisco / Cupertino Ave',
+                    lanes: null, then: null,
+                },
+                hasLanes: false,
+                miniMapActive: false,
+                miniMapReason: '',
+                wocHudShowing: false,
+                hudSlots: '',
+                summary: 'BMW: branch HIGHWAY_OUT_RIGHT [Exit 14B] 0.4mi (demo)',
+            };
+        }
         if (cycle >= 38 && cycle < 44) {
             return {
                 routeActive: true,
                 guide: 'BMW',
                 show: {
                     kind: 'roundabout', dir: null, geom: null, exit: 2, exitAngle: 180, side: 'right',
-                    dist: '450', unit: 'ft', uk: false, road: 'N First St', lanes: null, then: null,
+                    dist: '450', unit: 'ft', uk: false, exitBadge: null, road: 'N First St', lanes: null, then: null,
                 },
                 hasLanes: false,
                 miniMapActive: false,
@@ -407,7 +427,8 @@ class DemoGenerator {
             show: {
                 kind: 'turn', dir: 'RIGHT', geom: null, exit: null, exitAngle: null, side: null,
                 dist: cycle < 18 ? '0.3' : '400', unit: cycle < 18 ? 'mi' : 'ft', uk: false,
-                road: 'Stevens Creek Blvd',
+                exitBadge: null,
+                road: 'Stevens Creek Blvd / Valley Fair',
                 lanes: {
                     lanes: [
                         { follow: 'NONE', follows: [], others: ['LEFT'], hi: false, info: 'NONE' },
@@ -568,12 +589,14 @@ class SignalHub {
         this.guess = new GearGuess();
         this.fastKw = new FastKw();
         this.navTracker = new NavTracker(this.opts);
+        this.mediaTracker = new MediaTracker();
         this.live = { tpms: {}, brakeRestVal: null, rawBraking: null };
+        this.tpmsRaw = { p: {}, target: {}, temp: {}, psiSeen: false };
         this.dsc = {
             sgbd: null, pressDid: null, probed: false, wheelSensorSeen: false,
             caliperBar: null, k1Bar: null, k2Bar: null, ch4Bar: null, ch8Bar: null,
             wegIstMm: null, wegLeerMm: null, regenSollNm: null, regenIstNm: null,
-            lastHex: '', nrc: '', t: 0,
+            lastHex: '', nrc: '', t: 0, silentSince: 0,
         };
         this.probe = { untilMs: 0, timer: null, lines: 0, savedPath: '' };
         this.carUnitsRaw = {};
@@ -842,6 +865,7 @@ class SignalHub {
         watch('de.bmw.infotainment.vehicle.Vehicle', {
             statusNewCurrentUnitsStatusExt: (v) => {
                 this.carUnitsRaw.ext = v;
+                this._recomputeTpms();
                 markReal();
             },
         });
@@ -853,6 +877,7 @@ class SignalHub {
             },
             UnitBN2020: (v) => {
                 this.carUnitsRaw.bn = v;
+                this._recomputeTpms();
                 markReal();
             },
         });
@@ -872,10 +897,34 @@ class SignalHub {
             statusBordcomputerAverage: (v) => {
                 if (!v || typeof v !== 'object') return;
                 this.carUnitsRaw.bc = v;
-                if (typeof v.consumptionAverage1BC1 === 'number' && v.consumptionAverage1BC1 < 65532) {
+                if (typeof v.consumptionAverage1BC1 === 'number' && v.consumptionAverage1BC1 < 4095) {
                     const l100 = bcToL100(v.consumptionAverage1BC1 * 0.1, v.statusUnitOfMeasurementConsumptionBC);
                     if (l100 !== null) this.live.bcFuelLPer100km = l100;
                 }
+                if (typeof v.speedAverage1BC1 === 'number' && v.speedAverage1BC1 < 4095) {
+                    const isMph = /MPH/i.test(String(v.statusUnitOfMeasurementSpeedBC || ''));
+                    this.live.bcAvgSpeedKmh = (v.speedAverage1BC1 * 0.1) * (isMph ? 1.609344 : 1);
+                }
+            },
+            statusBordcomputerTravelData: (v) => {
+                if (!v || typeof v !== 'object') return;
+                if (typeof v.wayPassed === 'number' && v.wayPassed < 65535) {
+                    const inMiles = this.resolvedUnits().distUnit === 'mi';
+                    this.live.tripDistKm = inMiles ? v.wayPassed * 1.609344 : v.wayPassed;
+                }
+                if (typeof v.rideDurationHours === 'number' && v.rideDurationHours < 4095 &&
+                    typeof v.rideDurationMinutes === 'number' && v.rideDurationMinutes < 60) {
+                    this.live.tripMinutes = v.rideDurationHours * 60 + v.rideDurationMinutes;
+                }
+            },
+            statusBordcomputerElectricData: (v) => {
+                if (!v || typeof v !== 'object') return;
+                if (typeof v.consumptionAverageElectricBC1 === 'number' && v.consumptionAverageElectricBC1 < 4095) {
+                    this.live.bcEvRaw = v.consumptionAverageElectricBC1;
+                }
+            },
+            statusKombiSelection: (v) => {
+                this.mediaTracker.feedKombiSelection(v, Date.now());
             },
         });
 
@@ -883,7 +932,7 @@ class SignalHub {
             statusTyrePressure: (v) => this._updateTpms('pressure', v),
             statusTyreTemperature: (v) => this._updateTpms('temp', v),
             statusTargetTyrePressure: (v) => this._updateTpms('target', v),
-        });
+        }, { pollMs: 10000 });
 
         watch('de.bmw.chassis.VehicleStabilizationManagement', {
             StabilizationManagement: (v) => {
@@ -932,6 +981,9 @@ class SignalHub {
             const mode = this.ctx.settings.get('hudNavMode') || 'own_nav_minimap';
             return en && (tgt === 'both' || tgt === 'hud') && mode !== 'yield_route';
         });
+
+        // Live head-unit Media Playback (album art + position) & BC stalk button tracker
+        this.mediaTracker.start(this.ctx, this.log);
 
         // Poll /dev/shm/cluster-info every 500 ms and cooperatively signal /tmp/mgu-edrive-wanted.json
         const ipcTimer = setInterval(() => {
@@ -1065,6 +1117,57 @@ class SignalHub {
         return step();
     }
 
+    _tpmsRawToBar(raw) {
+        if (typeof raw !== 'number' || !isFinite(raw) || raw <= 0 || raw >= 65532) return null;
+        const v = raw * 0.1;
+        // BMW TPMS sends raw * 0.1 in the car's configured air-pressure unit (BAR: 0.5..6.5, PSI: 7..65, KPA: 65..600).
+        // The physical ranges are strictly disjoint for passenger tires, preventing 33.0 psi (raw=330) from ever reading as 33.0 bar (479 psi)!
+        const det = this.detectedUnits();
+        if (det && det.pressUnit === 'psi' && v >= 6.5 && v < 80) {
+            this.tpmsRaw.psiSeen = true;
+            return v / 14.5038;
+        }
+        if (det && det.pressUnit === 'bar' && v >= 0.4 && v <= 6.5) {
+            return v;
+        }
+        if (v >= 0.5 && v <= 6.5) return v;
+        if (v >= 7.0 && v < 65.0) {
+            this.tpmsRaw.psiSeen = true;
+            return v / 14.5038;
+        }
+        if (v >= 65.0 && v <= 600.0) return v / 100;
+        return null;
+    }
+
+    _tpmsRawToTempC(raw) {
+        if (typeof raw !== 'number' || !isFinite(raw) || raw >= 65532) return null;
+        const v = raw - 40;
+        const det = this.detectedUnits();
+        const isF = (det && det.tempUnit === 'F') ? true : (det && det.tempUnit === 'C' ? false : this.tpmsRaw.psiSeen);
+        const c = isF ? ((v - 32) * 5 / 9) : v;
+        return (c >= -45 && c <= 160) ? c : null;
+    }
+
+    _recomputeTpms() {
+        const corners = ['FL', 'FR', 'RL', 'RR'];
+        for (let i = 0; i < corners.length; i++) {
+            const c = corners[i];
+            const entry = this.live.tpms[c] || (this.live.tpms[c] = {});
+            if (this.tpmsRaw.p[c] !== undefined) {
+                const pb = this._tpmsRawToBar(this.tpmsRaw.p[c]);
+                entry.pressureBar = pb !== null ? pb : undefined;
+            }
+            if (this.tpmsRaw.target[c] !== undefined) {
+                const tb = this._tpmsRawToBar(this.tpmsRaw.target[c]);
+                entry.targetBar = tb !== null ? tb : undefined;
+            }
+            if (this.tpmsRaw.temp[c] !== undefined) {
+                const tc = this._tpmsRawToTempC(this.tpmsRaw.temp[c]);
+                entry.tempC = tc !== null ? tc : undefined;
+            }
+        }
+    }
+
     _updateTpms(kind, v) {
         if (!v || typeof v !== 'object') return;
         const map = [
@@ -1075,18 +1178,11 @@ class SignalHub {
         ];
         for (let i = 0; i < map.length; i++) {
             const [corner, pf, tf, tgf] = map[i];
-            const entry = this.live.tpms[corner] || (this.live.tpms[corner] = {});
-            if (kind === 'pressure') {
-                const raw = v[pf];
-                if (typeof raw === 'number' && raw < 65532) entry.pressureBar = raw * 0.1;
-            } else if (kind === 'target') {
-                const raw = v[tgf];
-                if (typeof raw === 'number' && raw < 65532) entry.targetBar = raw * 0.1;
-            } else if (kind === 'temp') {
-                const raw = v[tf];
-                if (typeof raw === 'number' && raw < 65532) entry.tempC = raw - 40;
-            }
+            if (kind === 'pressure' && typeof v[pf] === 'number') this.tpmsRaw.p[corner] = v[pf];
+            else if (kind === 'target' && typeof v[tgf] === 'number') this.tpmsRaw.target[corner] = v[tgf];
+            else if (kind === 'temp' && typeof v[tf] === 'number') this.tpmsRaw.temp[corner] = v[tf];
         }
+        this._recomputeTpms();
     }
 
     _scanIpc() {
@@ -1310,18 +1406,34 @@ class SignalHub {
             this.dsc.probed = true;
         };
 
+        const checkDscSilence = () => {
+            if (!link.silent(DSC_ECU)) {
+                this.dsc.silentSince = 0;
+                return false;
+            }
+            const now = Date.now();
+            if (!this.dsc.silentSince) this.dsc.silentSince = now;
+            const cooldownMs = this.dsc.pressDid ? 5000 : 25000;
+            if (!this.live.carLocked && now - this.dsc.silentSince >= cooldownMs) {
+                if (typeof link.wake === 'function') link.wake(DSC_ECU);
+                this.dsc.silentSince = 0;
+                return false;
+            }
+            return true;
+        };
+
         const readDscPressureFast = () => exclusive(async () => {
-            if (link.silent(DSC_ECU)) return;
+            if (checkDscSilence()) return;
             if (!this.dsc.probed) {
                 await probeDscOnce();
                 return;
             }
             if (!this.dsc.pressDid) return;
-            const u = await readDscDid(this.dsc.pressDid, 550);
+            const u = await readDscDid(this.dsc.pressDid, 480);
             if (isPositiveDid(u, this.dsc.pressDid)) {
                 applyDscPressure(decodeDscPressure(this.dsc.pressDid, u));
             }
-        }, false);
+        }, true);
 
         this._probeStepFn = () => exclusive(async () => {
             if (link.silent(DSC_ECU) && typeof link.wake === 'function') link.wake(DSC_ECU);
@@ -1378,32 +1490,40 @@ class SignalHub {
         const isEnabled = () => !this.ctx.settings || this.ctx.settings.get('enabled') !== false;
         let dscBusy = false;
 
-        // Fast SME HV voltage/current + braking-gated DSC 0x29 hydraulic pressure loop (~420 ms)
+        // Dedicated real-time DSC 0x29 hydraulic caliper pressure loop (260 ms, ~3.8 Hz):
+        // Never relies on event-only StabilizationManagement.statusBrakingDriver (which stays false during normal
+        // braking on G30!). Polls DSC 0xDBE5/0xDB29 directly whenever not in Park and foot is off throttle (< 4%),
+        // matching the exact responsive caliper pressure seen during the 30s Brake Probe, with zero UDS traffic while on gas!
+        const dscTimer = setInterval(() => {
+            if (this.stopped || !isEnabled() || this.isDemoActive() || this.live.carLocked) return;
+            if (this.probe.untilMs > Date.now()) return;
+            const stg = this.live.stage || null;
+            if (stg === 'P') {
+                if (this.dsc.caliperBar !== null && this.dsc.caliperBar !== 0) {
+                    this.dsc.caliperBar = 0;
+                    this.dsc.t = Date.now();
+                }
+                return;
+            }
+            const ped = this.live.pedalPct;
+            const onThrottle = typeof ped === 'number' && ped >= 4.0 && !this.live.absActive;
+            if (onThrottle) {
+                if (this.dsc.caliperBar !== null) {
+                    this.dsc.caliperBar = 0;
+                    this.dsc.t = Date.now();
+                }
+                return;
+            }
+            if (!dscBusy && this.dsc.pressDid !== 0) {
+                dscBusy = true;
+                readDscPressureFast().catch(() => {}).then(() => { dscBusy = false; });
+            }
+        }, 260);
+        this.timers.push(dscTimer);
+
+        // Fast SME HV voltage/current loop (~420 ms)
         const fastTimer = setInterval(async () => {
             if (this.stopped || !isEnabled() || this.isDemoActive() || this.live.carLocked) return;
-
-            // 1. DSC 0x29 hydraulic caliper pressure: zero UDS overhead while cruising on throttle;
-            //    polled immediately whenever braking, decelerating, or stopped in gear!
-            const probeOn = this.probe.untilMs > Date.now();
-            const spd = this.live.speedKmh !== undefined ? this.live.speedKmh : null;
-            const stg = this.live.stage || null;
-            const cruisingOffBrake = this.live.driverBraking === false && !this.live.absActive &&
-                (this.live.gLong === undefined || this.live.gLong >= -0.02) &&
-                (spd !== null && spd >= 3.0);
-            if (!probeOn && cruisingOffBrake) {
-                if (this.dsc.caliperBar !== null) this.dsc.caliperBar = 0;
-            } else if (!probeOn && !dscBusy && this.dsc.pressDid !== 0 && !link.silent(DSC_ECU)) {
-                const wantBrakeRead = this.live.driverBraking === true ||
-                    this.live.absActive === true ||
-                    (this.live.driverBraking !== false && (this.live.gLong || 0) < -0.03) ||
-                    ((spd === null || spd < 2.5) && stg && stg !== 'P');
-                if (wantBrakeRead) {
-                    dscBusy = true;
-                    readDscPressureFast().catch(() => {}).then(() => { dscBusy = false; });
-                }
-            }
-
-            // 2. SME 0x07 HV battery power
             if (fastBusy || (this.ipc.active && typeof this.ipc.kw === 'number')) return;
             if (checkSmeSilence()) return;
             fastBusy = true;
@@ -1505,6 +1625,9 @@ class SignalHub {
             d.probeRemainingSec = probeRemainingSec;
             d.probeSavedPath = this.probe.savedPath;
             d.dscBrake = null;
+            d.media = this.mediaTracker.snapshot(now, true);
+            d.tripDistKm = 42.6;
+            d.tripMinutes = 54;
             return d;
         }
 
@@ -1524,8 +1647,10 @@ class SignalHub {
         const speedKmh = l.speedKmh !== undefined ? l.speedKmh : null;
         const gLong = l.gLong !== undefined ? l.gLong : null;
         const dscFresh = typeof this.dsc.caliperBar === 'number' && (now - (this.dsc.t || 0) < 4000 || this.dsc.caliperBar === 0);
-        const brakeBar = (ipcFresh && typeof this.ipc.brakeBar === 'number') ? this.ipc.brakeBar
-            : (dscFresh ? this.dsc.caliperBar : null);
+        const onThrottle = typeof l.pedalPct === 'number' && l.pedalPct >= 4.0 && !l.absActive && l.driverBraking !== true;
+        const brakeBar = onThrottle ? 0
+            : ((ipcFresh && typeof this.ipc.brakeBar === 'number') ? this.ipc.brakeBar
+                : (dscFresh ? this.dsc.caliperBar : null));
         const recupPct = (l.recupNeedlePct !== undefined && now - (l.needleT || 0) < 2500) ? l.recupNeedlePct : 0;
         const fb = computeFrictionBrake({
             speedKmh,
@@ -1593,6 +1718,10 @@ class SignalHub {
             hudNav,
             navRouteActive,
             navHasLanes,
+            media: this.mediaTracker.snapshot(now, false),
+            tripDistKm: l.tripDistKm !== undefined ? l.tripDistKm : null,
+            tripMinutes: l.tripMinutes !== undefined ? l.tripMinutes : null,
+            bcAvgSpeedKmh: l.bcAvgSpeedKmh !== undefined ? l.bcAvgSpeedKmh : null,
             probeRemainingSec,
             probeSavedPath: this.probe.savedPath,
             driveMode: l.driveMode || 'comfort',
@@ -1615,6 +1744,7 @@ class SignalHub {
             this.probe.timer = null;
         }
         this.navTracker.stop();
+        this.mediaTracker.stop();
         if (this.diag) this.diag.cancel();
         for (let i = 0; i < this.timers.length; i++) clearInterval(this.timers[i]);
         this.timers = [];

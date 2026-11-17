@@ -258,7 +258,34 @@
         "statusRangeTankStatus": "rs",
         "displayRangeElectricVehicle": "rs",
         "statusBordcomputerAverage": "rs",
+        "statusBordcomputerTravelData": "rs",
+        "statusBordcomputerElectricData": "rs",
+        "statusKombiSelection": "rs",
         "statusDisplayElectricalPowerDistribution": "rs"
+      }
+    },
+    "de.bmw.infotainment.hmi.hmimediastate.HmiMediaState": {
+      "instances": "HMI_CID",
+      "attributes": {
+        "playerMetadata": "rs",
+        "trackProgress": "rs",
+        "coverArt": "rs"
+      }
+    },
+    "de.bmw.infotainment.entertainment.mediaplayer.MediaPlayer": {
+      "instances": "CarPlayMedia",
+      "attributes": {
+        "currentItemMetadata": "rs",
+        "currentItemTime": "rs",
+        "playerState": "rs"
+      }
+    },
+    "de.bmw.body.Light": {
+      "instances": "1",
+      "attributes": {
+        "IndicatorSteeringColumn": "s",
+        "IndicatorSteeringColumnComplete": "s",
+        "StatusFunctionsIndicators": "s"
       }
     },
     "de.bmw.infotainment.vehicle.TPMS": {

@@ -23,16 +23,21 @@ Built for a **BMW G30 530e PHEV** (only tested on iDrive 7 G30; includes automat
 3. **Shift Position (`1`–`8`) Next to Stock `D` (`gear_d`, `x: 1463..1537, y: 650..706`)**:
    - Placed strictly right of KOMBI4's native PRNDL window (`GEAR_WIN` `x: 1380..1460`) and aligned 1:1 with `D`'s real-car baseline (`y = 696`), preventing both glyph clipping and KOMBI4's safety black-box blanking over the Media display.
 4. **Hydraulic Friction Brake Indicator (`brake_rail`, `x: 1280..1576, y: 609..640`)**:
-   - Reads live hydraulic brake pressure (`bar`) from the G30 Brake ECU (`DSC 0x29` Read-Only UDS `0x22`: `0xDBE5` / `0xDB29`, with longitudinal force-balance fallback) so pure EV brake-pedal recuperation stays at `0/20` until physical friction brake pads actually clamp (`>= 1.5 bar`), while pressing the brake firmly when stopped fills all `20/20` segments.
+   - Dedicated `260 ms` live Read-Only UDS (`0x22`) poller on G30 Brake ECU (`DSC 0x29`: `0xDBE5` / `0xDB29`, active whenever not in Park and off throttle `< 4%` without relying on event-only `statusBrakingDriver`) reads wheel caliper hydraulic pressure (`bar`) directly so pure EV brake-pedal recuperation stays at `0/20` until physical brake pads actually clamp (`>= 1.5 bar`), while pressing the brake firmly when stopped fills all `20/20` segments.
    - Positioned above the bottom bracket line (`y = 630..637`), clear of `Power %` and the `CHARGE` Power Gauge needle, and **hidden automatically when in Park**.
-5. **Bottom-Left Corner Temps (`corner_left`, `x: 8..124, y: 643..709`)**:
+5. **Re-Implemented Right-Wing Cluster Widget (`right_widget`, `x: 1244..1556, y: 214..480`) + BC Stalk Button Cycling**:
+   - **Media Playback Page**: Full-color `124×124` JPEG/PNG album art (`HmiMediaState.coverArt` across CarPlay, Bluetooth, USB, Spotify & Radio) with dominant-color ambient radial glow, track title, artist/album, and live playback progress bar (`1:42 / 4:03`).
+   - **Trip & Powertrain Page**: Borderless 2×3 OEM readout (`EV Range`, `Fuel Range`, `Trip Distance`, `Gearbox Oil`, `HV Battery Temp` / `IAT`, `12V Aux`).
+   - **BC Button Cycling (`KombiIF.statusKombiSelection` + `Light.IndicatorSteeringColumn`)**: Cycles `Media -> Trip -> Off` directly on `panel` (`0x203`).
+6. **Bottom-Left Corner Temps (`corner_left`, `x: 8..124, y: 643..709`)**:
    - Large `22 px` bold **`OIL`** and **`CL`** temperatures displayed at all times in both EV and Gas modes.
-6. **Bottom-Right Corner Charge / Vital (`corner_right`, `x: 1816..1914, y: 643..709`)**:
+7. **Bottom-Right Corner Charge / Vital (`corner_right`, `x: 1816..1914, y: 643..709`)**:
    - Defaults to large `28 px` **`SOC` (`HV Battery %`)** on PHEVs (`IAT` on pure ICE cars; configurable to `HV Battery temp`, `Gearbox oil temp`, `12V voltage`, `Intake air temp`, or `Off`).
-7. **3-Line Configurable Windshield HUD + Full-Height Vector HUD Navigation (`800×480` on `0x323`)**:
-   - **3-Line HUD (`y: 100..198`)**: Compact 3-line upper-left layout (`HUD Line 1–3` configurable in Settings; `SOC & OIL` omitted by default) with crisp black text outlines, staying strictly above BMW's Assisted Driving / Adaptive Cruise Control display (`y >= 202`). When **Maps on Cluster** (`waze-on-cluster`) projects its map to the HUD (`0x323`), `hud_main` stays overlaid cleanly on top of Waze's HUD map!
-   - **Full-Height HUD Navigation Re-Renderer + Intersection Mini-Map Auto-Yield (`hudNavMode`)**: Spans the full right-side HUD height (`264×264` at `x: 412..676, y: 108..372`) matching stock BMW HUD proportions — top street/exit banner, giant hero maneuver glyphs (turns, highway exits/forks, roundabouts with exit numbers, U-turns, checkered flags), `"then"` secondary maneuvers, large distance/unit aligned across from BMW's speed readout, and full-width 6-lane guidance cells with eDrive blue lane highlights. Automatically yields `0x323` **only** when BMW HUD switches to an intersection mini-map (detected directly from `GuidanceRenderedContent` `HIGH_GUIDING` / `JUNCTION_VIEW` / `CITY_HIGHWAY_MAP` and live DCSM2 HUD scene `0x01000200`/`0x01000201` — never arbitrary distance thresholds).
-   - **Borderless Side-Bottom Cluster Map Layout (`clusterSlotMode`)**: When **Maps on Cluster** (`waze-on-cluster`) holds `map` (`0x100`), `Auto` unmaps `panel` (`0x203`) so KOMBI4's right-side BC/Media widget and stalk BC button stay 100% functional, and renders borderless OEM white/blue readouts with crisp 2px black outlines at the bottom-left (`OIL` / `CL`) and bottom-right (`D1–D8` + `SOC %` + 14-segment friction brake bar) of the map area — with **zero background box**, **zero metric shifting between Park (`P`) and Drive (`D`)**, and a **312 px unobstructed center navigation corridor**.
+8. **Full-Width Top Road Banner + Highway Exit Green Badge + 3-Line Windshield HUD (`800×480` on `0x323`)**:
+   - **Full-Width Top Road & Highway Exit Banner (`hud_road`, `544×38` at `x: 132..676, y: 100..138`)**: Uses the entire top row of the HUD to render long street names without clipping, plus authentic Highway Green (`#15803d`) rounded-square exit number badges (`[14B]` from `DescriptionElement.icon.text`).
+   - **3-Line HUD (`hud_main`, `y: 100..200`)**: Automatically shifts into a compact Row-2 layout (`y: 140..198`) beneath the top road banner during active turns while staying strictly above BMW's Assisted Driving / Adaptive Cruise Control display (`y >= 202`), and overlays cleanly on top of Waze's HUD map when **Maps on Cluster** projects to HUD.
+   - **HUD Navigation Re-Renderer + Intersection Mini-Map Auto-Yield (`hudNavMode`)**: Right-side maneuver & 6-lane guidance (`264×232` at `x: 412..676, y: 140..372`) that yields `0x323` **only** when BMW HUD switches to an intersection mini-map (detecting both `GuidanceRenderedContent` `HIGH_GUIDING` / `JUNCTION_VIEW` / `CITY_HIGHWAY_MAP` and parked `status 1 ... map 0` DCSM2 HUD scene `0x01000200`/`0x01000201`).
+   - **Consistent Cluster Display Mode (`clusterSlotMode`)**: Defaults to **Full Cluster Panel (`panel_only`)** for a consistent multi-zone + Right-Wing Media/Trip layout regardless of whether BMW Map or CarPlay/Waze is active (with optional **Map Slot Only (`map_only`)** if you prefer KOMBI4's native BC widget).
 
 ---
 
@@ -54,5 +59,5 @@ node bench/server.js
 
 ```sh
 python3 kit/tools/build.py --omit-sdk cluster_metrics
-../mgu-store/deploy/hu install --artifact dist/cluster_metrics@0.5.0.tgz --yes
+../mgu-store/deploy/hu install --artifact dist/cluster_metrics@0.6.0.tgz --yes
 ```

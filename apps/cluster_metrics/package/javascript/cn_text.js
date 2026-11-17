@@ -1,6 +1,10 @@
 'use strict';
 // Apply only to RHMI text, never to protocol values or the Latin glyph atlas.
 const words = {
+    'Right Widget': '右侧信息', 'Page': '页面', 'BC clicks': 'BC 按键次数',
+    'No active media': '暂无媒体播放', 'Art OK': '封面已就绪', 'No Art': '暂无封面',
+    'RoadBanner+Nav': '路名与导航', 'FullNav': '完整导航',
+    'MEDIA': '媒体', 'TRIP': '行程',
     'Metrics Paused': '数据显示已暂停，请选择显示位置后开启',
     'Metrics Active': '数据显示已开启',
     'Waiting for cluster-render': '等待仪表显示服务就绪',

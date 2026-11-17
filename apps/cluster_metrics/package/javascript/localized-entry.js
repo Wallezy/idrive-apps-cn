@@ -122,10 +122,10 @@ mgu.run({
             const clusterModeNote = renderer.slotStatus.conflictSlot
                 ? (renderer.slotStatus.panelSlot + ' (BLOCKS POWER GAUGE - revert local.conf!)')
                 : (sum.showMapOverlay ? 'map 0x100 (BC widget OK)'
-                    : (sum.panelAllowed ? ('panel ' + renderer.slotStatus.panelSlot) : 'cluster idle'));
+                    : (sum.panelAllowed ? ('panel ' + renderer.slotStatus.panelSlot + ' [RW:' + (sum.rightWidgetPage || 'off') + ']') : 'cluster idle'));
             const hudNote = sum.hudYieldedToNav ? ('HUD yielded (' + (sum.hudYieldReason || 'nav') + ')')
                 : (sum.wocHudOverlay ? 'HUD 3-line over Waze'
-                    : (sum.showOwnHudNav ? 'HUD 3-line + Full Nav' : (sum.showHud ? 'HUD 3-line' : 'HUD off')));
+                    : (sum.showOwnHudNav ? ('HUD ' + (sum.showHudRoad ? 'RoadBanner+Nav' : 'FullNav')) : (sum.showHud ? 'HUD 3-line' : 'HUD off')));
             const refusedNote = renderer.refused.length ? (' | Refused: ' + renderer.refused[renderer.refused.length - 1]) : '';
             setTwoRow(
                 'DIAG_RENDER',
@@ -143,6 +143,21 @@ mgu.run({
                 'DIAG_NAV',
                 'HUD Navigation & Mini-Map Detector',
                 navDetail
+            );
+
+            const md = t.media || {};
+            const rwPage = sum.rightWidgetPage || 'off';
+            const mdTrack = md.active
+                ? (md.title + (md.artist ? (' - ' + md.artist) : '') + (md.cover ? ' [Art OK]' : ' [No Art]'))
+                : 'No active media';
+            const bcInfo = 'Page: ' + rwPage.toUpperCase() + ' (BC clicks: ' + (md.bcClicks || 0) +
+                (md.lastBcSource ? ' via ' + md.lastBcSource : '') +
+                ', stalk=' + (md.rawStalk !== null && md.rawStalk !== undefined ? md.rawStalk : '--') +
+                ', sel=' + (md.rawKombiSel || '--') + ')';
+            setTwoRow(
+                'DIAG_MEDIA',
+                'Right Widget (' + bcInfo + ')',
+                mdTrack
             );
 
             const dsc = t.dscBrake || {};

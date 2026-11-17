@@ -1,0 +1,26 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width">
+<title>仪表与 HUD 管理 · 离线原型</title>
+<style>body{background:#101827;color:#e5eefc;font:16px system-ui;max-width:1000px;margin:40px auto;padding:0 24px}h1{font-size:28px}p{color:#adbed5;line-height:1.7}section{background:#1b2940;padding:24px;border-radius:16px;margin:20px 0}button,select{font:inherit;border:1px solid #657a96;border-radius:8px;padding:10px;background:#273d5d;color:white;margin:4px}pre{white-space:pre-wrap;font:14px monospace;line-height:1.6}strong{color:#7bdac7}label{display:inline-block;margin:8px}</style>
+<h1>仪表与抬头显示</h1><p>接口实验 · 完全离线，不连接车辆，不改动商店或显示设置。应用默认互斥；兼容叠加需另行验证。</p>
+<section><h2>仪表主画面</h2><select id="cluster"><option value="">原厂显示</option><option value="metrics">组合仪表数据</option><option value="themes">仪表主题</option></select><pre id="clusterStatus"></pre></section>
+<section><h2>抬头显示</h2><select id="hud"><option value="">原厂显示</option><option value="metrics">组合仪表数据</option><option value="redline">换挡提示</option></select><pre id="hudStatus"></pre></section>
+<section><strong>模拟条件</strong><br><label><input type="checkbox" id="safety">原厂告警（两个区域）</label><label><input type="checkbox" id="legacy">旧应用占用 HUD</label><label><input type="checkbox" id="stall">模拟渲染服务不确认释放</label><br><button id="ack">确认旧图层已隐藏</button><button id="disconnect">断开组合仪表数据</button><button id="restore">恢复原厂显示</button></section>
+<section><strong>调度事件</strong><pre id="events"></pre></section>
+<script src="broker.js"></script><script>
+const names={metrics:'组合仪表数据',themes:'仪表主题',redline:'换挡提示'};
+const reasons={'stock':'原厂显示','granted':'已授权显示','releasing':'等待旧图层隐藏','release-timeout':'释放超时，暂停切换','oem-safety':'原厂告警优先','legacy-unmanaged':'存在未纳管的旧应用','waiting-for-app':'等待所选应用申请'};
+const registry={metrics:['cluster.primary','hud.primary'],themes:['cluster.primary'],redline:['hud.primary']};
+const broker=new DisplayFocus(registry,()=>performance.now());let sessions={};let log=[];
+for(const id of Object.keys(registry)){sessions[id]=broker.connect(id);for(const zone of registry[id])broker.request(sessions[id],zone)}
+const el=id=>document.getElementById(id);
+function render(){let events=broker.drain();for(const e of events){log.unshift(JSON.stringify(e));if(e.event==='hide'&&!el('stall').checked)broker.hidden(e.zone,e.epoch)}if(events.length&&broker.events.length){render();return}
+for(const [id,zone]of [['cluster','cluster.primary'],['hud','hud.primary']]){const s=broker.status(zone);el(id+'Status').textContent='选择：'+(names[s.selected]||'原厂')+'\n状态：'+reasons[s.reason]+'\n授权：'+(s.active?s.active.session+' / '+s.active.lease:'无')}
+el('events').textContent=log.slice(0,12).join('\n')}
+for(const [id,zone]of [['cluster','cluster.primary'],['hud','hud.primary']])el(id).onchange=()=>{broker.select(zone,el(id).value||null);render()};
+el('safety').onchange=()=>{for(const zone of Object.keys(broker.zones))broker.safety(zone,el('safety').checked);render()};
+el('legacy').onchange=()=>{broker.legacy('hud.primary',el('legacy').checked);render()};
+el('ack').onclick=()=>{for(const zone of Object.keys(broker.zones)){const p=broker.status(zone).pending;if(p)broker.hidden(zone,p.epoch)}render()};
+el('disconnect').onclick=()=>{if(sessions.metrics){broker.disconnect(sessions.metrics);delete sessions.metrics;el('disconnect').textContent='重新连接组合仪表数据'}else{sessions.metrics=broker.connect('metrics');for(const zone of registry.metrics)broker.request(sessions.metrics,zone);el('disconnect').textContent='断开组合仪表数据'}render()};
+el('restore').onclick=()=>{broker.restoreStock();el('cluster').value='';el('hud').value='';render()};
+setInterval(()=>{for(const id of Object.keys(sessions)){try{broker.heartbeat(sessions[id])}catch(e){broker.disconnect(sessions[id]);sessions[id]=broker.connect(id);for(const zone of registry[id])broker.request(sessions[id],zone)}}broker.tick();render()},1000);render();
+</script></html>

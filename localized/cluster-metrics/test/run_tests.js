@@ -37,7 +37,12 @@ const {
     SignalHub, FastKw, computeFrictionBrake, decodeDscPressure, decodeDscPedal, decodeDscRegen, flagActive,
 } = require(path.join(APP_DIR, 'signals'));
 const { NavTracker, parseHudStatusText, parseWazeHudShowing } = require(path.join(APP_DIR, 'nav_tracker'));
-const { NW: HUD_NAV_W, NH: HUD_NAV_H, drawHudNav, hudNavKey } = require(path.join(APP_DIR, 'hud_nav_renderer'));
+const {
+     NW: HUD_NAV_W, NH: HUD_NAV_H, ROAD_W: HUD_ROAD_W, ROAD_H: HUD_ROAD_H,
+    drawHudNav, drawHudRoadBanner, hudNavKey, hudRoadKey,
+} = require(path.join(APP_DIR, 'hud_nav_renderer'));
+const { MediaTracker } = require(path.join(APP_DIR, 'media_tracker'));
+const { decodeCoverThumb } = require(path.join(APP_DIR, 'image_decode'));
 const { Canvas } = require(path.join(KIT_RT, 'canvas'));
 const { check: diagCheck } = require(path.join(KIT_RT, 'readonly-diag'));
 const { headUnit } = require(path.join(ROOT, 'kit', 'tools', 'hu-stub.js'));
@@ -365,6 +370,26 @@ function inBox(x, y, box) {
                 }
             });
 
+            // Also verify right_widget stays inside KOMBI4's right-wing pocket, clear of HOOD, CENTER_MAP, telltales & gauges
+            const rwL = r.layers.right_widget;
+            assert(rwL && rwL.visible, scenarios[si].name + ' expected right_widget visible');
+            const rwKeepouts = keepoutBoxes.filter((kb) => kb[0] !== 'MEDIA_WIDGET' && kb[0] !== 'BLACK_BOX');
+            let rwPainted = 0;
+            for (let py = 0; py < rwL.rect.h; py++) {
+                const wy = rwL.rect.y + py;
+                for (let px = 0; px < rwL.rect.w; px++) {
+                    if (rwL.cv.d[(py * rwL.rect.w + px) * 4 + 3] === 0) continue;
+                    rwPainted++;
+                    const wx = rwL.rect.x + px;
+                    assert(wy > visible.hoodY(wx) + 4, 'right_widget pixel under HOOD at (' + wx + ',' + wy + ')');
+                    for (let ki = 0; ki < rwKeepouts.length; ki++) {
+                        assert(!inBox(wx, wy, rwKeepouts[ki][1]),
+                            'right_widget hits ' + rwKeepouts[ki][0] + ' at (' + wx + ',' + wy + ')');
+                    }
+                }
+            }
+            assert(rwPainted > 500, 'right_widget must paint rich content');
+
             const hudL = r.layers.hud_main;
             const win = visible.HUD_WINDOW;
             assert(hudL.rect.x >= win.x && hudL.rect.y >= win.y &&
@@ -621,7 +646,7 @@ function inBox(x, y, box) {
             telemetry: { speedKmh: 70, rpm: 0, hvKw: 14.2, soc: 68, battTempC: 23, stage: 'D', program: 'D', gear: 5, navRouteActive: false, navHasLanes: false },
         };
 
-        // Phase A1: BMW built-in cluster map (waze idle) -> default 'auto' activates all 5 panel (0x203) zones + 3-line HUD!
+        // Phase A1: Default 'panel_only' activates all 5 outer zones + right_widget (6 panel layers) + 3-line HUD!
         assert.strictEqual(inspectClusterSlotConfig(confDir).safe, true);
         assert.strictEqual(inspectClusterSlotConfig(confDir).conflictSlot, false);
         const rDefault = new OverlayRenderer({ ClusterRender: CustomCR, socketPath: sockPath, confDir, wazeStatusPath: wazeFile, allowPanel: false });
@@ -630,9 +655,9 @@ function inBox(x, y, box) {
         rDefault.render(modelA, { enabled: true, gearDisplay: 'next_to_d' }, 5000);
         await wait(60);
 
-        assert.strictEqual(recorded.layers.filter((l) => l.target === 'panel').length, 5, 'default 0x203 must activate all 5 transparent panel zones when waze is idle');
-        assert(rDefault.layerCount() <= 9);
-        assert(rDefault.pixelBytesTotal() < 2 * 1024 * 1024);
+        assert.strictEqual(recorded.layers.filter((l) => l.target === 'panel').length, 6, 'default panel_only must activate all 5 outer zones + right_widget');
+        assert(rDefault.layerCount() <= 11);
+        assert(rDefault.pixelBytesTotal() < 2.5 * 1024 * 1024);
 
         const firstFrames = recorded.frames.length;
         rDefault.render(modelA, { enabled: true, gearDisplay: 'next_to_d' }, 5250);
@@ -644,18 +669,24 @@ function inBox(x, y, box) {
         await wait(40);
         assert.strictEqual(recorded.frames.length, firstFrames + 2);
 
-        // Phase A2: Maps on Cluster active (waze showing on 0x100) -> 'auto' switches from panel (0x203) to
-        // borderless side-bottom map layers (map_speed, map_left, map_right) with zero shifting between P and D!
+        // Legacy 'auto' setting gracefully normalizes to consistent 'panel_only' even when waze-on-cluster holds 0x100!
         fs.writeFileSync(wazeFile, JSON.stringify({ state: 'showing', target: 'map' }));
+        rDefault.render(modelA, { enabled: true, clusterSlotMode: 'auto', gearDisplay: 'next_to_d' }, 5800);
+        await wait(30);
+        assert.strictEqual(rDefault.lastSummary.clusterSlotMode, 'panel_only');
+        assert.strictEqual(rDefault.lastSummary.panelAllowed, true, 'panel_only must stay consistently on 0x203');
+
+        // Phase A2: Explicit 'map_only' mode unmaps 0x203 and activates borderless side-bottom map layers with zero shifting!
         modelA.telemetry.oilTempC = 78;
         modelA.telemetry.coolantTempC = 86;
         modelA.telemetry.stage = 'P';
         modelA.telemetry.gear = null;
-        rDefault.render(modelA, { enabled: true, clusterSlotMode: 'auto', gearDisplay: 'next_to_d' }, 6100);
+        rDefault.render(modelA, { enabled: true, clusterSlotMode: 'map_only', gearDisplay: 'next_to_d' }, 6100);
         await wait(40);
-        assert.strictEqual(rDefault.lastSummary.panelAllowed, false, 'auto must unmap 0x203 when waze-on-cluster holds 0x100');
-        assert.strictEqual(rDefault.lastSummary.showMapOverlay, true, 'auto must activate map_speed + map_left + map_right on 0x100');
+        assert.strictEqual(rDefault.lastSummary.panelAllowed, false, 'map_only must unmap 0x203');
+        assert.strictEqual(rDefault.lastSummary.showMapOverlay, true, 'map_only must activate map_speed + map_left + map_right on 0x100');
         assert.strictEqual(rDefault.layers.below_speed.visible, false);
+        assert.strictEqual(rDefault.layers.right_widget.visible, false);
         assert.strictEqual(rDefault.layers.map_speed.visible, true);
         assert.strictEqual(rDefault.layers.map_left.visible, true);
         assert.strictEqual(rDefault.layers.map_right.visible, true);
@@ -681,7 +712,7 @@ function inBox(x, y, box) {
 
         modelA.telemetry.stage = 'D';
         modelA.telemetry.gear = 5;
-        rDefault.render(modelA, { enabled: true, clusterSlotMode: 'auto', gearDisplay: 'next_to_d' }, 6200);
+        rDefault.render(modelA, { enabled: true, clusterSlotMode: 'map_only', gearDisplay: 'next_to_d' }, 6200);
         await wait(30);
         assert.strictEqual(Buffer.compare(parkedLeftBuf, Buffer.from(rDefault.layers.map_left.cv.d)), 0,
             'map_left OIL/CL must NOT shift by a single pixel between Park and D5');
@@ -786,8 +817,15 @@ function inBox(x, y, box) {
             hu.ui.comp('SET_CLUSTERSLOTMODE').emit('action', { row: 1 }); // 'map_only'
             await wait(15);
             assert.strictEqual(hu.settings.get('clusterSlotMode'), 'map_only');
-            hu.ui.comp('SET_CLUSTERSLOTMODE').emit('action', { row: 0 }); // 'auto'
+            hu.ui.comp('SET_CLUSTERSLOTMODE').emit('action', { row: 0 }); // 'panel_only'
             await wait(15);
+            assert.strictEqual(hu.settings.get('clusterSlotMode'), 'panel_only');
+            hu.ui.comp('SET_RIGHTWIDGETMODE').emit('action', { row: 1 }); // 'media'
+            await wait(15);
+            assert.strictEqual(hu.settings.get('rightWidgetMode'), 'media');
+            hu.ui.comp('SET_RIGHTWIDGETMODE').emit('action', { row: 0 }); // 'cycle'
+            await wait(15);
+            assert.strictEqual(hu.settings.get('rightWidgetMode'), 'cycle');
             hu.ui.comp('SET_HUDNAVMODE').emit('action', { row: 1 }); // 'own_nav_keep'
             await wait(15);
             assert.strictEqual(hu.settings.get('hudNavMode'), 'own_nav_keep');
@@ -805,7 +843,7 @@ function inBox(x, y, box) {
             hu.ui.comp('BTN_DIAG').emit('action', {});
             await wait(80);
             assert(hu.stack.includes('DIAG'), 'BTN_DIAG must open native DIAG screen');
-            ['DIAG_RENDER', 'DIAG_NAV', 'DIAG_BRAKE_ECU', 'DIAG_POWERTRAIN', 'DIAG_BATTERY', 'DIAG_TEMPS', 'DIAG_CHASSIS', 'DIAG_UDS'].forEach((k) => {
+            ['DIAG_RENDER', 'DIAG_NAV', 'DIAG_MEDIA', 'DIAG_BRAKE_ECU', 'DIAG_POWERTRAIN', 'DIAG_BATTERY', 'DIAG_TEMPS', 'DIAG_CHASSIS', 'DIAG_UDS'].forEach((k) => {
                 assert(cellsUpdated[k] && cellsUpdated[k].Text2ndRow, 'DIAG must populate ' + k);
             });
 
@@ -853,6 +891,7 @@ function inBox(x, y, box) {
             'de.bmw.infrastructure.EnvironmentalInformation': ['ExteriorTemperature'],
             'de.bmw.infotainment.lsc.LSCDataSink': ['statusHighVoltageStorage'],
             'de.bmw.infrastructure.VehicleCondition': ['VehicleCondition'],
+            'de.bmw.body.Light': ['IndicatorSteeringColumn', 'IndicatorSteeringColumnComplete', 'StatusFunctionsIndicators'],
         };
         Object.keys(EVENT_ONLY).forEach((iface) => {
             const group = sigs[iface] || {};
@@ -913,41 +952,60 @@ function inBox(x, y, box) {
 
         assert.strictEqual(parseHudStatusText('slot 0x300 status 2: 0x1000210 class 0 map 1\n').miniMapScene, false);
         assert.strictEqual(parseHudStatusText('slot 0x300 status 2: 0x1000200 class 0 map 1\n').miniMapScene, true);
+        // Critical real-car fix: while 0x323 is shown on KOMBI4, BMW's HUD mini-map slot sits parked in status 1 ... map 0!
+        assert.strictEqual(parseHudStatusText('slot 0x300 status 1: 0x01000200 class 0 map 0\nslot 0x323 status 2: 0x010004f9 class 1 map 2\n').miniMapScene, true,
+            'parked status 1 map 0 mini-map scene behind 0x323 must yield immediately without needing master switch toggle');
         assert.strictEqual(parseHudStatusText('slot 0x330 status 2: 0x01000201 class 0 map 3\n').miniMapScene, true);
         assert.strictEqual(parseWazeHudShowing(JSON.stringify({ state: 'showing', target: 'hud' })), true);
         assert.strictEqual(parseWazeHudShowing(JSON.stringify({ state: 'showing', target: 'map', hud: 1, hud_state: 'showing' })), true);
         assert.strictEqual(parseWazeHudShowing(JSON.stringify({ state: 'idle', target: 'map', hud: 1, hud_state: 'idle' })), false);
         assert.strictEqual(parseWazeHudShowing(JSON.stringify({ state: 'showing', target: 'map' })), false);
         assert.strictEqual(HUD_NAV_W, 264);
-        assert.strictEqual(HUD_NAV_H, 264);
+        assert.strictEqual(HUD_NAV_H, 232);
+        assert.strictEqual(HUD_ROAD_W, 544);
+        assert.strictEqual(HUD_ROAD_H, 38);
 
-        // Verify full-height 264x264 vector rasterization of turn, highway fork, roundabout, and destination flag
+        // Verify 544x38 full-width top road banner + Highway Green [14B] exit square + 264x232 maneuver/lane card
+        const roadCv = new Canvas(HUD_ROAD_W, HUD_ROAD_H);
+        assert.strictEqual(drawHudRoadBanner(roadCv, { exitBadge: '14B', road: 'San Tomas Expressway Northbound toward US-101' }), true);
+        let greenExitPixels = 0, rightHalfRoadPixels = 0;
+        for (let py = 0; py < HUD_ROAD_H; py++) {
+            for (let px = 0; px < HUD_ROAD_W; px++) {
+                const o = (py * HUD_ROAD_W + px) * 4;
+                if (roadCv.d[o + 3] === 0) continue;
+                if (px < 80 && roadCv.d[o + 1] > 110 && roadCv.d[o + 1] > roadCv.d[o] + 50 && roadCv.d[o + 1] > roadCv.d[o + 2] + 35) {
+                    greenExitPixels++;
+                }
+                if (px > 300) rightHalfRoadPixels++;
+            }
+        }
+        assert(greenExitPixels > 250, 'highway exit badge must paint authentic green square (#15803d), got ' + greenExitPixels);
+        assert(rightHalfRoadPixels > 200, 'long road name must span across full 544px top row');
+
         const navCv = new Canvas(HUD_NAV_W, HUD_NAV_H);
         const samples = [
             { kind: 'turn', dir: 'LEFT', dist: '350', unit: 'ft', road: 'El Camino Real', lanes: { lanes: [{ follow: 'LEFT', follows: ['LEFT'], others: [], hi: true, info: 'NONE' }, { follow: 'NONE', follows: [], others: ['STRAIGHT_ON'], hi: false, info: 'NONE' }], rec: 0, markers: ['SOLID', 'DASHED', 'SOLID'] } },
-            { kind: 'branch', dir: 'HIGHWAY_OUT_RIGHT', geom: 'EXIT_RIGHT_TWO_WAY_FORK_TAKE_RIGHT_LEFT', dist: '0.4', unit: 'mi', road: 'CA-85 North', then: { kind: 'turn', dir: 'RIGHT', gap: 90 } },
+            { kind: 'branch', dir: 'HIGHWAY_OUT_RIGHT', exitBadge: '14B', geom: 'EXIT_RIGHT_TWO_WAY_FORK_TAKE_RIGHT_LEFT', dist: '0.4', unit: 'mi', road: 'CA-85 North', then: { kind: 'turn', dir: 'RIGHT', gap: 90 } },
             { kind: 'roundabout', exit: 3, exitAngle: 270, side: 'right', dist: '120', unit: 'm', road: 'Civic Ring' },
             { kind: 'destination', dir: 'RIGHT', flag: true, dist: '50', unit: 'ft', road: 'Destination' },
         ];
         samples.forEach((m) => {
-            assert.strictEqual(drawHudNav(navCv, m), true);
-            assert(hudNavKey(m).length > 5);
-            let topBand = 0, midBand = 0, botBand = 0;
+            assert.strictEqual(drawHudNav(navCv, m, { hideRoad: true }), true);
+            assert(hudNavKey(m).length > 5 && hudRoadKey(m).length >= 3);
+            let midBand = 0, botBand = 0;
             for (let py = 0; py < HUD_NAV_H; py++) {
                 for (let px = 0; px < HUD_NAV_W; px++) {
                     if (navCv.d[(py * HUD_NAV_W + px) * 4 + 3] > 0) {
-                        if (py < 60) topBand++;
-                        else if (py < 190) midBand++;
+                        if (py < 145) midBand++;
                         else botBand++;
                     }
                 }
             }
-            assert(topBand > 80 && midBand > 400 && botBand > 200,
-                'full-height HUD nav must paint top street, middle hero glyph, and bottom distance/lanes for ' + m.kind);
+            assert(midBand > 400 && botBand > 200,
+                'HUD nav card must paint hero glyph and bottom distance/lanes for ' + m.kind);
         });
 
-        // Trace NavTracker lifecycle: normal turn (even at 30 ft!) keeps HUD & hud_nav ON;
-        // lane-guidance-to-minimap transition yields 0x323; completing turn restores HUD immediately!
+        // Trace NavTracker lifecycle (including DescriptionIcon highway exit extraction):
         const nt = new NavTracker({ crStatusPath: crFile, wazeStatusPath: wazeFile });
         let mNow = 10000, wNow = 50000;
         nt.feedField('guidance', 'guidanceState', 'ACTIVE', mNow);
@@ -956,12 +1014,12 @@ function inBox(x, y, box) {
             GuidanceEventListError: 'NO_ERROR',
             viewContent: [{
                 eventsInView: [{
-                    intersection: {
+                    branch: {
                         uid: '10',
                         distanceToDestination: 1200,
-                        direction: 'RIGHT',
+                        branchType: 'HIGHWAY_OUT_RIGHT',
                         formattedDistance: { distance: '40', unit: 'FEET' }, // Very close distance alone must NOT trigger hide!
-                        description: { elements: [{ text: 'De Anza Blvd' }] },
+                        description: { elements: [{ icon: { text: '14B', iconHandle: 1 } }, { text: 'De Anza Blvd / Sunnyvale Saratoga Rd' }] },
                     },
                 }],
             }],
@@ -974,11 +1032,28 @@ function inBox(x, y, box) {
             efficiency: { evKmPerKwh: 6.1, fuelLPer100km: null, isDfco: false },
             telemetry: { speedKmh: 45, rpm: 0, hvKw: 10.2, soc: 70, stage: 'D', program: 'D', gear: 4, hudNav: nt.snapshot(wNow, mNow) },
         };
+        assert.strictEqual(baseModel.telemetry.hudNav.show.exitBadge, '14B', 'DescriptionElement.icon.text must extract highway exit number 14B');
         r.render(baseModel, { enabled: true, hudNavMode: 'own_nav_minimap' }, wNow);
         assert.strictEqual(r.lastSummary.hudYieldedToNav, false, '40 ft turn without mini-map must NOT hide HUD');
+        assert.strictEqual(r.lastSummary.showHudRoad, true, 'active road + exitBadge must enable full-width top hud_road banner');
+        assert.strictEqual(r.layers.hud_road.visible, true);
         assert.strictEqual(r.layers.hud_main.visible, true);
         assert.strictEqual(r.layers.hud_nav.visible, true);
-        assert(r.layers.hud_nav.rect.h >= 250, 'hud_nav must span full vertical HUD height');
+        assert.strictEqual(r.layers.hud_road.rect.w, 544);
+        // Verify hud_main shifts compact metrics strictly into Row 2 (py >= 38) below hud_road AND strictly <= 202 ACC!
+        let hudMainRow1Pixels = 0, hudMainRow2Pixels = 0;
+        for (let py = 0; py < r.layers.hud_main.rect.h; py++) {
+            for (let px = 0; px < r.layers.hud_main.rect.w; px++) {
+                if (r.layers.hud_main.cv.d[(py * r.layers.hud_main.rect.w + px) * 4 + 3] > 0) {
+                    if (py < 38) hudMainRow1Pixels++;
+                    else hudMainRow2Pixels++;
+                }
+            }
+        }
+        assert.strictEqual(hudMainRow1Pixels, 0, 'hud_main top 38px must stay clear for full-width hud_road banner');
+        assert(hudMainRow2Pixels > 250, 'hud_main Row 2 must render compact telemetry metrics');
+        assert(r.layers.hud_main.rect.y + r.layers.hud_main.rect.h <= visible.HUD_ACC_ASSIST[1], 'hud_main must stay above Assisted Driving / ACC');
+        assert(r.layers.hud_nav.rect.y > r.layers.hud_road.rect.y + r.layers.hud_road.rect.h - 1, 'hud_nav sits cleanly below hud_road');
         assert(r.layers.hud_nav.rect.x >= visible.HUD_WINDOW.x &&
             r.layers.hud_nav.rect.y >= visible.HUD_WINDOW.y &&
             r.layers.hud_nav.rect.x + r.layers.hud_nav.rect.w <= visible.HUD_WINDOW.x + visible.HUD_WINDOW.w &&
@@ -1189,21 +1264,31 @@ function inBox(x, y, box) {
         hub.live.speedKmh = 55;
         hub.live.gear = 4;
         currentDbe5 = regenOnlyFrame;
-        await hub.startProbe(1200);
+        await hub.startProbe(180);
+        await new Promise((res) => setTimeout(res, 220));
         const snapPurePedalRegen = hub.snapshot(Date.now());
+        assert.strictEqual(snapPurePedalRegen.probeRemainingSec, 0, 'probe must be finished before Step 3');
         assert.strictEqual(snapPurePedalRegen.brakeBar, 0, 'decoupled wheel caliper 0 bar during pedal EV regen must report 0 bar');
         assert.strictEqual(snapPurePedalRegen.frictionG, 0, 'pure brake-pedal EV regen must keep frictionG = 0');
         assert.strictEqual(snapPurePedalRegen.pureRegen, true);
         r.render({ units: unitsMod.US_PRESET, profile: prof, efficiency: eff, telemetry: snapPurePedalRegen }, { enabled: true, brakeIndicator: 'bar_num' }, Date.now());
         assert.strictEqual(r.lastSummary.brakeLit, 0, 'pure brake-pedal EV regen must light 0 friction segments');
 
-        // Step 3: Pressing deeper past regen limit (VA = 18.0 bar = 0x00B4) -> lights friction segments immediately!
+        // Step 3: Pressing deeper past regen limit at 55 km/h WITH driverBraking=false & NO probe running ->
+        // dedicated 260ms dscTimer reads VA = 18.0 bar = 0x00B4 automatically and lights friction segments!
+        hub.live.driverBraking = false;
+        hub.live.pedalPct = 0;
         currentDbe5 = [0x62, 0xDB, 0xE5, 0x00, 0xDC, 0x00, 0xDC, 0x00, 0xB4, 0x00, 0x00, 0x00, 0x78, 0x00, 0x00];
-        await hub.pollNow();
+        await new Promise((res) => setTimeout(res, 380));
         const snapBlend = hub.snapshot(Date.now());
-        assert.strictEqual(snapBlend.brakeBar, 18.0);
+        assert.strictEqual(snapBlend.brakeBar, 18.0, 'dedicated 260ms dscTimer must update brakeBar at 55 km/h even when driverBraking=false');
         r.render({ units: unitsMod.US_PRESET, profile: prof, efficiency: eff, telemetry: snapBlend }, { enabled: true, brakeIndicator: 'bar_num' }, Date.now());
         assert(r.lastSummary.brakeLit >= 7 && r.lastSummary.brakeLit <= 9, '18 bar blended braking expected ~8/20 segments, got ' + r.lastSummary.brakeLit);
+
+        // Step 4: Stepping back onto accelerator pedal (pedalPct = 12%) immediately clears caliperBar to 0!
+        hub.live.pedalPct = 12;
+        await new Promise((res) => setTimeout(res, 300));
+        assert.strictEqual(hub.snapshot(Date.now()).brakeBar, 0, 'accelerating must zero caliperBar immediately');
 
         // Verify probe log file was written to both /tmp path and dataDir/brake-probe.log
         const logTxt = fs.readFileSync(probeFile, 'utf8');
@@ -1212,6 +1297,97 @@ function inBox(x, y, box) {
 
         hub.stop();
         fs.rmSync(tmpDir, { recursive: true, force: true });
+    });
+
+    /* 15. TPMS Display-Unit Scaling (No "FL 479psi"), Pure-JS PNG Cover Art, Right-Wing Media Widget & BC Stalk Cycling */
+    await test('TPMS PSI raw 330/360 decodes to ~2.28/2.48 bar (never 479psi), PNG cover art decodes, and BC stalk cycles right_widget', async () => {
+        const appSpec = JSON.parse(fs.readFileSync(path.join(APP_DIR, 'app.json'), 'utf8'));
+        const hub = new SignalHub({
+            log: { info: () => {}, warn: () => {}, error: () => {} },
+            spec: appSpec,
+            settings: { values: { demo: 'off', unitSystem: 'us' }, get: (k) => (k === 'demo' ? 'off' : 'us') },
+            signals: null,
+        }, { diagLink: { available: false, stats: {} }, ipcDir: path.join(os.tmpdir(), 'no-ipc-' + process.pid) });
+
+        // Simulate G30 US car reporting TPMS raw 330 (33.0 psi) & target 360 (36.0 psi)
+        hub._updateTpms('pressure', {
+            actualValuePressureTyreFLH: 330, actualValuePressureTyreFRH: 340,
+            actualValuePressureTyreRLH: 350, actualValuePressureTyreRRH: 350,
+        });
+        hub._updateTpms('target', {
+            targetPressureTyreFLH: 360, targetPressureTyreFRH: 360,
+            targetPressureTyreRLH: 380, targetPressureTyreRRH: 380,
+        });
+        hub._updateTpms('temp', { actualValueTemperatureTyreFLH: 78 + 40 }); // 78F -> ~25.6C
+        const fl = hub.live.tpms.FL;
+        assert(fl.pressureBar > 2.20 && fl.pressureBar < 2.35, '330 raw in PSI mode must decode to ~2.28 bar, got ' + fl.pressureBar);
+        assert(fl.targetBar > 2.42 && fl.targetBar < 2.55, '360 raw in PSI mode must decode to ~2.48 bar, got ' + fl.targetBar);
+        assert(fl.tempC > 22 && fl.tempC < 29, '78F tire temp must convert to ~25.6C, got ' + fl.tempC);
+        const ast = { _v12LowSince: 0 };
+        assert.strictEqual(detectAnomaly({ tpms: hub.live.tpms }, unitsMod.US_PRESET, ast, 1000), null,
+            '33 psi vs 36 psi target (3 psi diff) must NEVER trigger false "FL 479psi" red alert');
+
+        // Verify pure-JS PNG decoder + multi-chunk HmiMediaState.coverArt + BC button page cycling
+        const iconPng = fs.readFileSync(path.join(APP_DIR, 'icon.png'));
+        const thumb = decodeCoverThumb(iconPng, 124);
+        assert(thumb && thumb.w === 124 && thumb.h === 124 && thumb.d.length === 124 * 124 * 4, 'PNG cover must decode to 124x124 RGBA');
+
+        const mt = new MediaTracker();
+        mt.feedHmiMetadata({ firstLineText: 'Starboy', secondLineText: 'The Weeknd', firstLineType: 'TITLE', secondLineType: 'ARTIST' });
+        mt.feedHmiProgress({ elapsed: 84000, total: 230000, hasProgress: true }, 10000);
+        // Split PNG into 2 chunks to exercise multi-chunk CoverArt reassembly
+        const half = Math.floor(iconPng.length / 2);
+        assert.strictEqual(mt.feedHmiCoverArt({ coverArtId: 77, totalSize: iconPng.length, offset: 0, coverArt: iconPng.slice(0, half) }, true), false);
+        assert.strictEqual(mt.feedHmiCoverArt({ coverArtId: 77, totalSize: iconPng.length, offset: half, coverArt: iconPng.slice(half) }, true), true);
+
+        let mSnap = mt.snapshot(12000, false);
+        assert.strictEqual(mSnap.active, true);
+        assert.strictEqual(mSnap.title, 'Starboy');
+        assert.strictEqual(mSnap.artist, 'The Weeknd');
+        assert(mSnap.cover && mSnap.cover.w === 124);
+        assert.strictEqual(mSnap.page, 'media');
+
+        const r = new OverlayRenderer({ allowPanel: true });
+        const model = {
+            units: unitsMod.US_PRESET,
+            profile: { vehicleType: 'phev', engineOn: false, mode: 'ev_drive', isEv: true, isCold: false, coldCeilingRpm: null, alert: { id: 'tpms', severity: 'amber', label: 'FL 25psi' } },
+            efficiency: { evKmPerKwh: 6.1, fuelLPer100km: null, isDfco: false },
+            telemetry: { speedKmh: 60, rpm: 0, hvKw: 12.4, soc: 76, erangeKm: 28, frangeKm: 310, tripDistKm: 19.4, gearboxOilC: 84, battTempC: 25, v12: 14.1, stage: 'D', program: 'D', gear: 5, frictionG: 0.24, brakeBar: 20, media: mSnap },
+        };
+        r.render(model, { enabled: true, rightWidgetMode: 'cycle', hudLine3: 'brake' }, 12000);
+        assert.strictEqual(r.lastSummary.rightWidgetPage, 'media');
+        assert.strictEqual(r.layers.right_widget.visible, true);
+
+        // Cycle 1: KombiIF.statusKombiSelection change -> flips page 'media' -> 'trip'
+        mt.feedKombiSelection({ statusActivationInstrumentPackContent: 1, statusActivationInstrumentPackBC: 10 }, 12000); // baseline
+        assert.strictEqual(mt.feedKombiSelection({ statusActivationInstrumentPackContent: 2, statusActivationInstrumentPackBC: 11 }, 12500), true);
+        mSnap = mt.snapshot(12500, false);
+        assert.strictEqual(mSnap.page, 'trip');
+        model.telemetry.media = mSnap;
+        r.render(model, { enabled: true, rightWidgetMode: 'cycle' }, 12500);
+        assert.strictEqual(r.lastSummary.rightWidgetPage, 'trip');
+        assert.strictEqual(r.layers.right_widget.visible, true);
+
+        // Cycle 2: Left-stalk momentary button pulse (operationColumnStalks 0 -> 4 -> 0) -> flips 'trip' -> 'off'
+        mt.feedStalk({ operationColumnStalks: 0 }, 13000); // baseline rest
+        mt.feedStalk({ operationColumnStalks: 4 }, 13100); // press
+        assert.strictEqual(mt.feedStalk({ operationColumnStalks: 0 }, 13220), true); // release
+        mSnap = mt.snapshot(13220, false);
+        assert.strictEqual(mSnap.page, 'off');
+        model.telemetry.media = mSnap;
+        r.render(model, { enabled: true, rightWidgetMode: 'cycle' }, 13220);
+        assert.strictEqual(r.lastSummary.rightWidgetPage, 'off');
+        assert.strictEqual(r.layers.right_widget.visible, false);
+
+        // Cycle 3: Quick double-tap of left-stalk HBA button -> flips 'off' -> 'media'
+        mt.feedStalk({ operationColumnStalks: 0, statusPushButtonMainBeamAssistant: 'TASTER_GEDRUECKT' }, 14000);
+        mt.feedStalk({ operationColumnStalks: 0, statusPushButtonMainBeamAssistant: 'KEINE_BETAETIGUNG' }, 14080);
+        mt.feedStalk({ operationColumnStalks: 0, statusPushButtonMainBeamAssistant: 'TASTER_GEDRUECKT' }, 14200);
+        mt.feedStalk({ operationColumnStalks: 0, statusPushButtonMainBeamAssistant: 'KEINE_BETAETIGUNG' }, 14280);
+        await new Promise((res) => setTimeout(res, 700));
+        mSnap = mt.snapshot(15100, false);
+        assert.strictEqual(mSnap.page, 'media', 'double-tap HBA button must cycle right_widget back to media');
+        mt.stop();
     });
 
     console.log('\nAll ' + passed + ' tests passed.');

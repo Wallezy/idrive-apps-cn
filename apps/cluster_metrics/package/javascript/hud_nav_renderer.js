@@ -18,7 +18,9 @@
 const { withAlpha, mix, rgba } = require('./kit/canvas');
 
 const NW = 264;
-const NH = 264;
+const NH = 232;
+const ROAD_W = 544;
+const ROAD_H = 38;
 const isNum = (x) => typeof x === 'number' && isFinite(x);
 const clamp01 = (x) => (x < 0 ? 0 : x > 1 ? 1 : x);
 
@@ -421,7 +423,7 @@ function foldAscii(s) {
     t = t.replace(/[\u0300-\u036f]/g, '')
         .replace(/[\u2013\u2014]/g, '-')
         .replace(/\u2026/g, '...')
-        .replace(/[^\x20-\x7e]/g, (ch) => FOLD[ch] || '');
+        .replace(/[^\x20-\x7e\u3000-\u9fff\uff00-\uffef]/g, (ch) => FOLD[ch] || '');
     return t.replace(/\s+/g, ' ').trim();
 }
 
@@ -462,6 +464,8 @@ const COPTS = { font: 'bold', align: 'center', literal: true };
 const OUTLINE = [2, 6, 12, 238];
 const ACCENT_BLUE = [56, 199, 255, 255];
 const SOFT_BLUE = [158, 197, 235, 255];
+const EXIT_GREEN = [21, 128, 61, 255];
+const EXIT_BORDER = [220, 252, 231, 245];
 
 function textOutline(cv, str, x, y, size, col, opts) {
     const r = size >= 26 ? 2 : 1;
@@ -476,6 +480,64 @@ function textOutline(cv, str, x, y, size, col, opts) {
     return cv.text(str, x, y, size, col, opts);
 }
 
+function measureExitBadge(cv, badge, fontSz) {
+    const sz = fontSz || 19;
+    return Math.max(32, Math.round(cv.textWidth(badge, sz, ROPTS) + 16));
+}
+
+function drawExitBadge(cv, badge, x, y, h, fontSz) {
+    const sz = fontSz || 19;
+    const bw = measureExitBadge(cv, badge, sz);
+    cv.roundRect(x - 1, y - 1, bw + 2, h + 2, 7, OUTLINE);
+    cv.roundRect(x, y, bw, h, 6, EXIT_GREEN);
+    cv.strokeRoundRect(x + 1, y + 1, bw - 2, h - 2, 5, 1.5, EXIT_BORDER);
+    cv.text(badge, Math.round(x + bw / 2), Math.round(y + h - 7), sz, [248, 252, 250, 255], COPTS);
+    return bw;
+}
+
+/**
+ * Full-width top-row HUD road & highway exit banner (544x38 across HUD x=132..676, y=100..138).
+ * Short street names center naturally over the right-side maneuver column (x=412 in banner => HUD x=544),
+ * while long road names & highway exits expand leftward across the entire 544px width without cutting off!
+ */
+function drawHudRoadBanner(cv, m) {
+    cv.clear([0, 0, 0, 0]);
+    if (!m) return false;
+    const badge = m.exitBadge ? foldAscii(m.exitBadge) : '';
+    const road = m.road ? foldAscii(m.road) : '';
+    if (!badge && !road) return false;
+
+    const col = [242, 245, 250, 255];
+    const badgeW = badge ? measureExitBadge(cv, badge, 19) : 0;
+    const gap = (badge && road) ? 10 : 0;
+    const maxTextW = Math.max(40, cv.w - 12 - badgeW - gap);
+
+    let rSz = 25;
+    let rStr = road;
+    if (rStr && cv.textWidth(rStr, rSz, ROPTS) > maxTextW) {
+        rSz = 22;
+        if (cv.textWidth(rStr, rSz, ROPTS) > maxTextW) {
+            rSz = 19;
+            rStr = fitAscii(cv, rStr, rSz, maxTextW, ROPTS);
+        }
+    }
+    const textW = rStr ? cv.textWidth(rStr, rSz, ROPTS) : 0;
+    const totW = badgeW + gap + textW;
+    const navColCenter = Math.min(cv.w - 80, 412);
+    const idealX = Math.round(navColCenter - totW / 2);
+    let curX = Math.max(6, Math.min(cv.w - 6 - Math.round(totW), idealX));
+
+    if (badge) {
+        drawExitBadge(cv, badge, curX, 4, 30, 19);
+        curX += badgeW + gap;
+    }
+    if (rStr) {
+        const baseY = rSz >= 24 ? 28 : (rSz >= 21 ? 27 : 26);
+        textOutline(cv, rStr, curX, baseY, rSz, col, ROPTS);
+    }
+    return true;
+}
+
 function gapText(gap, unit, uk) {
     if (gap === null || gap === undefined || !isFinite(gap)) return '';
     if (uk || unit === 'yd') return Math.max(10, Math.round(gap / 0.9144 / 10) * 10) + ' yd';
@@ -487,9 +549,10 @@ function gapText(gap, unit, uk) {
 function drawHudNav(cv, m, opts) {
     cv.clear([0, 0, 0, 0]);
     if (!m) return null;
-    const col = opts && Array.isArray(opts.color) ? [opts.color[0], opts.color[1], opts.color[2], 255] : [242, 245, 250, 255];
-    const dim = opts && Array.isArray(opts.color) ? mix('#000000', col, 0.46) : [94, 122, 154, 235];
-    const unitCol = opts && Array.isArray(opts.color) ? withAlpha(col, 0.85) : SOFT_BLUE;
+    const o = opts || {};
+    const col = Array.isArray(o.color) ? [o.color[0], o.color[1], o.color[2], 255] : [242, 245, 250, 255];
+    const dim = Array.isArray(o.color) ? mix('#000000', col, 0.46) : [94, 122, 154, 235];
+    const unitCol = Array.isArray(o.color) ? withAlpha(col, 0.85) : SOFT_BLUE;
 
     const midX = Math.round(cv.w / 2);
     const maxRoadW = cv.w - 12;
@@ -499,27 +562,42 @@ function drawHudNav(cv, m, opts) {
     const th = m.then || null;
     const thGap = th ? gapText(th.gap, unit, m.uk) : '';
 
-    // 1. Top Street / Exit Banner (always kept visible, 1-2 lines across full 252px width)
-    const roadS = m.road ? foldAscii(m.road) : '';
-    const roadSingleSz = nL ? 24 : 26;
-    const roadWrapSz = nL ? 20 : 21;
-    const singleFits = Boolean(roadS) && cv.textWidth(roadS, roadSingleSz, ROPTS) <= maxRoadW;
-    const roadLines = !roadS ? [] : (singleFits ? [roadS] : wrapAscii(cv, roadS, roadWrapSz, maxRoadW, ROPTS, 2));
-    if (roadLines.length === 1) {
-        textOutline(cv, roadLines[0], midX, nL ? 30 : 34, roadSingleSz, col, COPTS);
-    } else if (roadLines.length >= 2) {
-        textOutline(cv, roadLines[0], midX, nL ? 23 : 26, roadWrapSz, col, COPTS);
-        textOutline(cv, roadLines[1], midX, nL ? 46 : 50, roadWrapSz, withAlpha(col, 0.92), COPTS);
+    // 1. Optional inline road/exit header (used when drawHudNav is rendered standalone without hud_road)
+    const hideRoad = Boolean(o.hideRoad);
+    const badge = !hideRoad && m.exitBadge ? foldAscii(m.exitBadge) : '';
+    const roadS = !hideRoad && m.road ? foldAscii(m.road) : '';
+    const roadSingleSz = nL ? 22 : 24;
+    const roadWrapSz = 19;
+    const badgeW = badge ? measureExitBadge(cv, badge, 17) : 0;
+    const line1Avail = maxRoadW - (badge ? badgeW + 8 : 0);
+    const singleFits = Boolean(roadS) && cv.textWidth(roadS, roadSingleSz, ROPTS) <= line1Avail;
+    const roadLines = !roadS ? [] : (singleFits ? [roadS] : wrapAscii(cv, roadS, roadWrapSz, line1Avail, ROPTS, 2));
+    const hasInlineHeader = Boolean(badge || roadLines.length > 0);
+    if (hasInlineHeader) {
+        if (roadLines.length <= 1) {
+            const txt = roadLines[0] || '';
+            const tw = txt ? cv.textWidth(txt, roadSingleSz, ROPTS) : 0;
+            const tot = badgeW + (badge && txt ? 8 : 0) + tw;
+            let sx = Math.max(6, Math.round(midX - tot / 2));
+            if (badge) { drawExitBadge(cv, badge, sx, 4, 26, 17); sx += badgeW + 8; }
+            if (txt) textOutline(cv, txt, sx, 25, roadSingleSz, col, ROPTS);
+        } else {
+            let sx = 6;
+            if (badge) { drawExitBadge(cv, badge, sx, 4, 26, 17); sx += badgeW + 8; }
+            textOutline(cv, roadLines[0], sx, 21, roadWrapSz, col, ROPTS);
+            textOutline(cv, roadLines[1], midX, 43, roadWrapSz, withAlpha(col, 0.92), COPTS);
+        }
     }
 
-    // 2. Layout Branches:
-    //    - With Lane Guidance (nL > 0): Hero glyph + Distance/"then" in middle, 6-lane guidance strip at bottom
-    //    - Without Lanes (nL === 0): Full-height stock BMW vertical stack (Giant Hero Glyph in middle + Huge Distance at bottom)
+    // 2. Layout Branches across cv.h (232px below hud_road, or standalone):
+    const botY = cv.h - 14;
     if (nL > 0) {
-        const hasRoad = roadLines.length > 0;
+        const laneCy = cv.h - 38;
+        const heroTop = hasInlineHeader ? 50 : 8;
+        const heroBot = laneCy - 30;
         const arrowCx = 62;
-        const arrowCy = hasRoad ? 124 : 108;
-        const arrowScale = hasRoad ? 1.44 : 1.56;
+        const arrowCy = Math.round((heroTop + heroBot) / 2);
+        const arrowScale = hasInlineHeader ? 1.28 : 1.48;
         drawArrow(cv, m, arrowCx, arrowCy, arrowScale, col, dim);
 
         const rx = 126;
@@ -535,19 +613,19 @@ function drawHudNav(cv, m, opts) {
             }
             const inlineFits = dW + (uW ? 6 + uW : 0) <= rMax;
             if (inlineFits) {
-                const dy = th ? (hasRoad ? 114 : 100) : (hasRoad ? 138 : 122);
+                const dy = th ? (arrowCy - 8) : (arrowCy + 14);
                 const drawnW = textOutline(cv, rawDist, rx, dy, dSz, col, DOPTS);
                 if (unit) textOutline(cv, unit, rx + drawnW + 6, dy - 2, uSz, unitCol, UOPTS);
             } else {
                 const dFit = fitAscii(cv, rawDist, 42, rMax, DOPTS);
-                const dyTop = th ? (hasRoad ? 104 : 92) : (hasRoad ? 122 : 108);
+                const dyTop = th ? (arrowCy - 18) : (arrowCy - 2);
                 textOutline(cv, dFit, rx, dyTop, 42, col, DOPTS);
                 if (unit) textOutline(cv, unit, rx, dyTop + 26, 22, unitCol, UOPTS);
             }
         }
 
         if (th) {
-            const ty = hasRoad ? 166 : 154;
+            const ty = arrowCy + 40;
             const thenW = textOutline(cv, 'then', rx, ty, 19, unitCol, ROPTS);
             const ax = rx + thenW + 20;
             drawArrow(cv, th, ax, ty - 7, 0.44, col, dim);
@@ -559,21 +637,22 @@ function drawHudNav(cv, m, opts) {
 
         const lw = laneW(nL, cv.w - 16);
         const lx = Math.round((cv.w - nL * lw) / 2);
-        drawLanes(cv, m.lanes, lx, 224, lw, col, dim, ACCENT_BLUE);
+        drawLanes(cv, m.lanes, lx, laneCy, lw, col, dim, ACCENT_BLUE);
     } else {
-        const hasRoad = roadLines.length > 0;
-        const heroCy = hasRoad ? 130 : 112;
+        const heroTop = hasInlineHeader ? 50 : 8;
+        const heroBot = botY - 46;
+        const heroCy = Math.round((heroTop + heroBot) / 2);
         if (th) {
-            drawArrow(cv, m, 82, heroCy, 1.56, col, dim);
+            drawArrow(cv, m, 82, heroCy, hasInlineHeader ? 1.38 : 1.56, col, dim);
             const tCx = 198;
-            textOutline(cv, 'then', tCx, heroCy - 36, 20, unitCol, COPTS);
-            drawArrow(cv, th, tCx, heroCy + 2, 0.68, col, dim);
+            textOutline(cv, 'then', tCx, heroCy - 34, 20, unitCol, COPTS);
+            drawArrow(cv, th, tCx, heroCy + 2, 0.66, col, dim);
             if (thGap) {
                 const gFit = fitAscii(cv, thGap, 20, 118, ROPTS);
-                if (gFit) textOutline(cv, gFit, tCx, heroCy + 48, 20, col, COPTS);
+                if (gFit) textOutline(cv, gFit, tCx, heroCy + 46, 20, col, COPTS);
             }
         } else {
-            drawArrow(cv, m, midX, heroCy, hasRoad ? 1.68 : 1.82, col, dim);
+            drawArrow(cv, m, midX, heroCy, hasInlineHeader ? 1.48 : 1.72, col, dim);
         }
 
         if (rawDist) {
@@ -590,12 +669,16 @@ function drawHudNav(cv, m, opts) {
             }
             const totalW = dW + (uW ? 8 + uW : 0);
             const dx = Math.max(6, Math.round((cv.w - totalW) / 2));
-            const dy = hasRoad ? 248 : 242;
-            const drawnW = textOutline(cv, dStr, dx, dy, dSz, col, DOPTS);
-            if (unit) textOutline(cv, unit, dx + drawnW + 8, dy - 2, uSz, unitCol, UOPTS);
+            const drawnW = textOutline(cv, dStr, dx, botY, dSz, col, DOPTS);
+            if (unit) textOutline(cv, unit, dx + drawnW + 8, botY - 2, uSz, unitCol, UOPTS);
         }
     }
     return true;
+}
+
+function hudRoadKey(m) {
+    if (!m) return '';
+    return (m.exitBadge || '') + '|' + (m.road || '');
 }
 
 function hudNavKey(m) {
@@ -607,13 +690,18 @@ function hudNavKey(m) {
     const T = m.then
         ? [m.then.kind, m.then.dir, m.then.geom, m.then.exit, m.then.exitAngle, m.then.side, m.then.flag, m.then.stop, gapText(m.then.gap, m.unit, m.uk)].join('/')
         : '';
-    return [m.kind, m.dir, m.geom, m.exit, m.exitAngle, m.side, m.flag, m.stop, m.dist, m.unit, m.road, L, T].join('|');
+    return [m.kind, m.dir, m.geom, m.exit, m.exitAngle, m.side, m.flag, m.stop, m.dist, m.unit, m.exitBadge, m.road, L, T].join('|');
 }
 
 module.exports = {
     NW,
     NH,
+    ROAD_W,
+    ROAD_H,
+    drawHudRoadBanner,
+    drawExitBadge,
     drawHudNav,
+    hudRoadKey,
     hudNavKey,
     foldAscii,
     shapeOf,

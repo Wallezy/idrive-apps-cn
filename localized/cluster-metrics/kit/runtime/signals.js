@@ -107,7 +107,12 @@ function set(p, field, value, timeoutMs) {
 
 /** Subscribe to a broadcast/event or field on a proxy from proxy(). */
 function on(p, name, fn, log) {
-    return nativeTick(() => p.subscribe({ name, onReceive: (v) => { try { fn(v); } catch (e) { if (log) log.warn(name + ': ' + e); } } }));
+    return nativeTick(() => p.subscribe({
+        name,
+        onReceive: function () {
+            try { fn.apply(null, arguments); } catch (e) { if (log) log.warn(name + ': ' + e); }
+        },
+    }));
 }
 
 /** Availability of a proxy's provider; fn(bool) on every change. */
