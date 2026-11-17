@@ -108,6 +108,7 @@ function stop(reason) {
 }
 
 function createProjection(target) {
+    if (Date.now() >= leaseUntil) throw new Error('Vehicle safety signal lease expired');
     ivi(['layer', target.layer, 'destroy'], true);
     ivi(['layer', target.layer, 'create', '1920', '720']);
     ivi(['layer', target.layer, 'srcrect'].concat(sourceCrop.map(String)));
@@ -127,6 +128,7 @@ function projectionAttached(target) {
 }
 
 function ensureProjection() {
+    if (Date.now() >= leaseUntil) throw new Error('Vehicle safety signal lease expired');
     if (TARGETS.every(projectionAttached)) { projected = true; return true; }
     removeProjection();
     TARGETS.forEach(createProjection);
@@ -153,14 +155,18 @@ function start(requestedSource, speed) {
         : 'Projection ready - press the physical ' + (sourceName === 'night' ? 'Night Vision' : 'parking-camera') + ' button';
     monitor = setInterval(() => {
         if (Date.now() >= leaseUntil) { stop('Vehicle safety signal lease expired'); return; }
-        const visible = cameraVisible();
-        if (visible && !projected) ensureProjection();
-        else if (!visible && projected) removeProjection();
-        const next = visible && projected ? 'running' : 'waiting';
-        if (next !== state) {
-            state = next;
-            detail = visible ? label + ' is live in the cluster' : label + ' closed - waiting for its native feed';
-            log(detail);
+        try {
+            const visible = cameraVisible();
+            if (visible && !projected) ensureProjection();
+            else if (!visible && projected) removeProjection();
+            const next = visible && projected ? 'running' : 'waiting';
+            if (next !== state) {
+                state = next;
+                detail = visible ? label + ' is live in the cluster' : label + ' closed - waiting for its native feed';
+                log(detail);
+            }
+        } catch (e) {
+            stop('Native camera projection error: ' + e.message);
         }
     }, 100);
     timeout = setTimeout(() => stop(label + ' projection stopped after 10 minutes'), 10 * 60 * 1000);
