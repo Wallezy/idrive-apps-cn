@@ -1,6 +1,15 @@
 {
   "cluster-render": [
     {
+      "version": "0.6.7",
+      "changes": [
+        "改善车门或告警提示结束后的地图恢复。",
+        "保留全屏显示、防花屏和映射故障保护。"
+      ],
+      "upstreamVersion": "0.6.6",
+      "cnRevision": 1
+    },
+    {
       "version": "0.6.6",
       "changes": [
         "记住仪表适用的地图传输速率，减少重启后反复掉图。",
@@ -65,6 +74,15 @@
   ],
   "waze-on-cluster": [
     {
+      "version": "0.10.6",
+      "changes": [
+        "调整 CarPlay 导航提示区域，减少表盘遮挡。",
+        "完善地图显示参数更新后的自动回退保护。"
+      ],
+      "upstreamVersion": "0.10.6",
+      "cnRevision": 1
+    },
+    {
       "version": "0.10.5",
       "changes": [
         "修正兼容 CarPlay 地图的到达时间显示请求。",
@@ -109,6 +127,15 @@
     }
   ],
   "robertn_waze_cluster": [
+    {
+      "version": "0.6.17",
+      "changes": [
+        "适配新的 CarPlay 导航提示区域。",
+        "保留中文界面与仪表全屏设置。"
+      ],
+      "upstreamVersion": "0.6.11",
+      "cnRevision": 1
+    },
     {
       "version": "0.6.16",
       "changes": [

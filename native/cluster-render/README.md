@@ -117,6 +117,17 @@ Every client's layers on a target are drawn in that target's scene.
     into the locked slot is answered `E_DCSM_OK` and never shown. Once it
     is free again, the first to ask is shown: the HMI's map, which stays
     fetched through the lock and only needs mapping, is there before ours.
+- **Warnings** (iDrive 7). During a warning or with a door open, the cluster
+  locks a group of slots (the middle, the right side or the HUD), takes
+  everything in it off screen and keeps what it has loaded. A shown target
+  taken off by a lock (or a parked `contend` one) keeps its scene loaded
+  and stops drawing; nothing is asked for while the slot is locked. When
+  the slot unlocks, the scene is put back at once, so it can show before
+  the stock HMI's, and drawing resumes once it shows. If the cluster
+  refuses that or has dropped the scene, it is asked for in full. So is a
+  scene locked out for over 3 minutes, or when the cluster stops answering
+  heartbeats. If the stock map still shows first, `map` takes over from it
+  at once, then on its usual steps.
 - **Parked.** A target the KOMBI parks stays mapped and fetched, with no
   timeout, and is `parked` (behind the holder the table names) until the
   KOMBI shows it. A parked target stages and flushes nothing. Nobody
@@ -498,7 +509,8 @@ within one budget (`src/governor.h`, `kit/upload_pacer.h`):
   conf is the ceiling, and the remembered one is not used.
 - **What the log keeps.** One `INCIDENT` line each time a shown target is
   lost (why, the cap and ceiling, how long it was shown) and when it is
-  back. On a removal, the 30 s before it second by second: KB written,
+  back (put back after a lock, asked for in full, or shown again by the
+  cluster). On a removal, the 30 s before it second by second: KB written,
   budget holds, offer-to-flush time and the deepest TCP send queue on the
   head unit with its peer; once a minute, a summary of the same. In the car
   logs none of these rose reliably before a removal, so none steers the
