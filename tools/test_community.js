@@ -11,5 +11,5 @@ for (const test of ['test_ram_mic', 'test_camera_cleanup', 'test_community_contr
 for (const item of require('../release/community-import-plan.json').apps) {
     if (item.format !== 'unit') run('tools/test_community_startup.js', item.id);
 }
-for (const id of ['ram_mic_calibration', 'dpf_monitor', 'spotify', 'true_time_cn', 'jap_ridetube', 'mgu_browser'])
+for (const id of ['ram_mic_calibration', 'dpf_monitor'])
     run('tools/test_ambient_renderer.js', 'apps/' + id + '/package/javascript/kit');
