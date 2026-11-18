@@ -516,7 +516,8 @@ void Server::op_layer(Client &c, const cr::Json &j, int64_t now_ms)
             {"fps", 0, 60, (double)vp.fps},           {"level_bits", 0, 3, (double)vp.level_bits},
             {"dirty_threshold", 0, 64, (double)vp.dirty_threshold},
             {"settle_ms", 0, 3600000, (double)vp.dirty_settle_ms},
-            {"pan_blocks", 0, 1, vp.pan_blocks ? 1.0 : 0.0}, {"stall_ms", 1000, 600000, (double)vp.stall_ms}};
+            {"pan_blocks", 0, 1, vp.pan_blocks ? 1.0 : 0.0}, {"stall_ms", 1000, 600000, (double)vp.stall_ms},
+            {"always_packed", 0, 1, vp.always_packed ? 1.0 : 0.0}};
         for (auto &e : k)
             if (!num(j, e.key, e.lo, e.hi, &e.cur, &err)) {
                 error(c, "layer", ref, err);
@@ -540,6 +541,7 @@ void Server::op_layer(Client &c, const cr::Json &j, int64_t now_ms)
             error(c, "layer", ref, "gauge_mask requires ID7");
             return;
         }
+        vp.always_packed = k[8].cur != 0;
         id = comp_->add_video(c.id, target, lp, vp, now_ms, &err);
     } else if (kind == "image") {
         double iw = lp.rect.w, ih = lp.rect.h, fps = 30;
@@ -614,7 +616,8 @@ void Server::on_json(Client &c, const std::string &body, int64_t now_ms)
                                  {"targets", cr::json_quote(targets)},
                                  {"features", cr::json_quote(backend_ == "id7" || backend_ == "host" || backend_ == "fake"
                                                                 ? "video_gauge_mask_v1" : "")},
-                                 {"repeat", "1"}}));
+                                 {"repeat", "1"},
+                                 {"always_packed", "1"}}));
         c.target_sent.clear();
         c.host_sent.clear();
         c.host_gen = 0;

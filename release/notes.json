@@ -1,6 +1,12 @@
 {
   "cluster-render": [
     {
+      "version": "0.6.10",
+      "upstreamVersion": "0.6.9",
+      "cnRevision": 1,
+      "changes": ["启动时优先等待原厂仪表就绪，地图请求卡住后自动重试。"]
+    },
+    {
       "version": "0.6.7",
       "changes": [
         "改善车门或告警提示结束后的地图恢复。",
@@ -73,6 +79,12 @@
     }
   ],
   "waze-on-cluster": [
+    {
+      "version": "0.10.10",
+      "upstreamVersion": "0.10.9",
+      "cnRevision": 1,
+      "changes": ["主题内地图新增可选传输优化，默认关闭；保留现有全屏和 HUD 显示。"]
+    },
     {
       "version": "0.10.7",
       "upstreamVersion": "0.10.7",
