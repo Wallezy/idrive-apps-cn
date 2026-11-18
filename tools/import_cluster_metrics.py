@@ -90,9 +90,9 @@ def main():
     for path in (ROOT / 'release/texts').glob('*.json'):
         texts = json.loads(path.read_text())
         texts['cluster_metrics'] = {
-            'title': '组合仪表数据 (Cluster Metrics)' if path.stem == 'zh-CN' else 'Cluster Metrics (简体中文)',
-            'description': pkg['description'] if path.stem == 'zh-CN' else
-            'Cluster and HUD telemetry with Chinese controls. Enable manually after choosing a display. Beta: vehicle integration pending.',
+            'title': '组合仪表数据',
+            'description': '在仪表或抬头显示上查看能耗、温度、电量与挡位，支持导航叠加。简体中文设置；首次使用需手动开启。' if path.stem == 'zh-CN' else
+            'Cluster and HUD telemetry with Chinese controls. Enable manually after choosing a display.',
         }
         write(path, texts)
 

@@ -60,7 +60,7 @@
     "description": "自定义氛围灯颜色、亮度与动画，按驾驶模式切换。 简体中文界面，支持在线更新。"
   },
   "cluster_themes": {
-    "title": "仪表主题 (Cluster Themes)",
+    "title": "仪表主题",
     "description": "12 套仪表主题，支持驾驶模式切换、自定义数据及 Waze 地图。中控操作简体中文，保留原版仪表风格。"
   },
   "zf8hp": {
@@ -80,8 +80,8 @@
     "description": "供应用使用 iDrive 旋钮；保留返回和菜单键，下次车机正常启动后生效。"
   },
   "cluster_metrics": {
-    "title": "组合仪表数据 (Cluster Metrics)",
-    "description": "在仪表或抬头显示上查看能耗、温度、电量与挡位，支持导航叠加。简体中文设置；首次使用需手动开启，Beta 待车机验证。"
+    "title": "组合仪表数据",
+    "description": "在仪表或抬头显示上查看能耗、温度、电量与挡位，支持导航叠加。简体中文设置；首次使用需手动开启。"
   },
   "ram_mic_calibration": {
     "title": "RAM 麦克风校准",

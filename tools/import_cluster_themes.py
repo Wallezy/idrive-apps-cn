@@ -89,7 +89,7 @@ def main():
     for path in (ROOT / 'release/texts').glob('*.json'):
         texts = json.loads(path.read_text())
         texts['cluster_themes'] = {
-            'title': '仪表主题 (Cluster Themes)' if path.stem == 'zh-CN' else 'Cluster Themes (简体中文)',
+            'title': '仪表主题',
             'description': pkg['description'] if path.stem == 'zh-CN' else
             '12 instrument cluster themes with Chinese centre-screen controls. Original theme names and instrument styling preserved.',
         }

@@ -60,7 +60,7 @@
     "description": "Simplified Chinese edition. Ambient config with Chinese menus and status text."
   },
   "cluster_themes": {
-    "title": "Cluster Themes (简体中文)",
+    "title": "仪表主题",
     "description": "12 instrument cluster themes with Chinese centre-screen controls. Original theme names and instrument styling preserved."
   },
   "zf8hp": {
@@ -80,8 +80,8 @@
     "description": "Controller routing for ported apps; keeps BACK and MENU. Loads at the next normal head-unit start."
   },
   "cluster_metrics": {
-    "title": "Cluster Metrics (简体中文)",
-    "description": "Cluster and HUD telemetry with Chinese controls. Enable manually after choosing a display. Beta: vehicle integration pending."
+    "title": "组合仪表数据",
+    "description": "Cluster and HUD telemetry with Chinese controls. Enable manually after choosing a display."
   },
   "ram_mic_calibration": {
     "title": "RAM 麦克风校准",
