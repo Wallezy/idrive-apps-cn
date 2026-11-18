@@ -1,6 +1,6 @@
 {
   "name": "ram_mic_calibration",
-  "version": "0.1.2",
+  "version": "0.1.5",
   "description": "在 ID7 车机读取 RAM01 麦克风校准状态，并在停车后二次确认启动校准。",
   "main": "javascript/localized-entry.js",
   "private": false,

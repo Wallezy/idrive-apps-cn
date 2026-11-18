@@ -104,6 +104,72 @@
               }
             }
           ]
+        },
+        "6": {
+          "type": "label",
+          "name": "COND1",
+          "properties": {
+            "Visible": {
+              "value": 1,
+              "type": "UInt"
+            },
+            "Focusable": {
+              "value": 0,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "SID_RAM_MIC_CALIBRATION_COND1",
+                "type": "StringId"
+              }
+            }
+          ]
+        },
+        "7": {
+          "type": "label",
+          "name": "COND2",
+          "properties": {
+            "Visible": {
+              "value": 1,
+              "type": "UInt"
+            },
+            "Focusable": {
+              "value": 0,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "SID_RAM_MIC_CALIBRATION_COND2",
+                "type": "StringId"
+              }
+            }
+          ]
+        },
+        "8": {
+          "type": "label",
+          "name": "COND3",
+          "properties": {
+            "Visible": {
+              "value": 1,
+              "type": "UInt"
+            },
+            "Focusable": {
+              "value": 0,
+              "type": "UInt"
+            }
+          },
+          "rows": [
+            {
+              "Text": {
+                "value": "SID_RAM_MIC_CALIBRATION_COND3",
+                "type": "StringId"
+              }
+            }
+          ]
         }
       }
     }

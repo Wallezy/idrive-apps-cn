@@ -24,7 +24,7 @@
     "live_data": "1.0.14",
     "mgu-inputgate": "1.1.1",
     "cluster_metrics": "0.6.1",
-    "ram_mic_calibration": "0.1.2",
+    "ram_mic_calibration": "0.1.5",
     "dpf_monitor": "0.3.3",
     "green_light_alert": "0.2.6",
     "parking_clearance": "0.1.9",
