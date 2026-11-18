@@ -46,23 +46,30 @@ async function rejected(fn, text) {
     try { await fn(); } catch (e) { error = e; }
     assert(error && error.message.includes(text), 'Expected rejection: ' + text);
 }
-async function ui() {
+async function ui(onTick, beforeStart) {
     const callbacks = {}, logs = [], flags = { visible: true, focus: true };
-    let clock = 10000, hooks, speed, starts = 0, reads = 0;
+    let clock = 10000, hooks, speed, unavailable, starts = 0, reads = 0, tick = 0;
+    const zero = () => speed({ speedVehicleCentreOfGravity: 0 });
+    const controls = { zero, move: () => speed({ speedVehicleCentreOfGravity: 64 }),
+        disconnect: () => unavailable(), click: () => callbacks.BTN_START(),
+        leave: () => callbacks.focus('MAIN', false), skip: (ms) => { clock += ms; } };
     class FakeDate extends Date { static now() { return clock; } }
     class Diag { constructor() { this.available = true; } init() {} }
     const fakeRam = {
         identify: async () => {},
         readStatus: async () => { reads++; return { text: '完成，无错误' }; },
-        calibrate: async (d, assertParked) => { assertParked(); starts++; return '校准成功'; },
+        calibrate: async (d, assertParked) => { if (beforeStart) beforeStart(controls); assertParked(); starts++; return '校准成功'; },
     };
     load('localized-entry.js', {
         './app.js': {}, './kit/mgu': { run: (h) => { hooks = h; } },
         './kit/diag': { Diag }, './ram': fakeRam,
-    }, { Date: FakeDate });
+    }, { Date: FakeDate, setTimeout: (fn, ms) => {
+        assert.strictEqual(ms, 1000);
+        return setImmediate(() => { clock += ms; tick++; if (onTick) onTick(tick, controls); else zero(); fn(); });
+    } });
     await hooks.start({
         log: { info: (s) => logs.push(s), warn: (s) => logs.push(s) },
-        signals: { watch: (s, v, handlers) => { speed = handlers.statusCarSpeed2; return Promise.resolve(); } },
+        signals: { watch: (s, v, handlers, log, opts) => { speed = handlers.statusCarSpeed2; unavailable = opts.onUnavailable; return Promise.resolve(); } },
         ui: { text: async () => {}, isVisible: () => flags.visible, hasFocus: () => flags.focus,
             onClick: (name, cb) => { callbacks[name] = cb; },
             onVisible: (cb) => { callbacks.visible = cb; }, onFocus: (cb) => { callbacks.focus = cb; } },
@@ -70,7 +77,7 @@ async function ui() {
     return {
         click: () => callbacks.BTN_START(), read: () => callbacks.BTN_READ(),
         advance: (ms) => { clock += ms; }, speed: (v) => speed(v), flags, callbacks, logs,
-        starts: () => starts, reads: () => reads,
+        starts: () => starts, reads: () => reads, ticks: () => tick,
     };
 }
 (async () => {
@@ -145,6 +152,25 @@ async function ui() {
         const u = await ui(); u.speed({ speedVehicleCentreOfGravity: 0 });
         await u.click(); assert.strictEqual(u.starts(), 0);
         u.advance(1500); await u.click(); assert.strictEqual(u.starts(), 1);
+        assert.strictEqual(u.ticks(), 20);
+    });
+    for (const [name, interrupt] of [
+        ['movement then rest', c => { c.move(); c.zero(); }],
+        ['lost signal then recovery', c => { c.disconnect(); c.zero(); }],
+        ['stale signal then recovery', c => { c.skip(6000); c.zero(); }],
+        ['page blur', c => c.leave()], ['cancel button', c => c.click()],
+    ]) await test(name + ' cancels the countdown and requires new confirmation', async () => {
+        const u = await ui((n, c) => { c.zero(); if (n === 20) interrupt(c); });
+        u.speed({ speedVehicleCentreOfGravity: 0 }); await u.click(); u.advance(1500); await u.click();
+        assert.strictEqual(u.starts(), 0); await u.click(); assert.strictEqual(u.starts(), 0);
+    });
+    await test('silence cancels the countdown', async () => {
+        const u = await ui(() => {}); u.speed({ speedVehicleCentreOfGravity: 0 });
+        await u.click(); u.advance(1500); await u.click(); assert.strictEqual(u.starts(), 0);
+    });
+    await test('movement during final module check also blocks start', async () => {
+        const u = await ui(null, c => { c.move(); c.zero(); }); u.speed({ speedVehicleCentreOfGravity: 0 });
+        await u.click(); u.advance(1500); await u.click(); assert.strictEqual(u.starts(), 0);
     });
     await test('rapid double click is insufficient', async () => {
         const u = await ui(); u.speed({ speedVehicleCentreOfGravity: 0 });

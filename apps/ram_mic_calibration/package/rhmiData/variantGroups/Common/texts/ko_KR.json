@@ -1,7 +1,7 @@
 {
   "SID_RAM_MIC_CALIBRATION_TITLE": "RAM 麦克风校准",
   "SID_RAM_MIC_CALIBRATION_STATUS": "请选择读取 RAM 状态",
-  "SID_RAM_MIC_CALIBRATION_CONDITIONS": "校准前请停车、接通点火、保持供电稳定及车内安静",
+  "SID_RAM_MIC_CALIBRATION_CONDITIONS": "Before calibration, all three are required:",
   "SID_RAM_MIC_CALIBRATION_BTN_READ": "读取 RAM 状态",
   "SID_RAM_MIC_CALIBRATION_BTN_START": "开始校准",
   "SID_RAM_MIC_CALIBRATION_MAIN_TITLE": "RAM 麦克风校准",
@@ -260,5 +260,8 @@
   "SID_CN_DYNAMIC_0252": "",
   "SID_CN_DYNAMIC_0253": "",
   "SID_CN_DYNAMIC_0254": "",
-  "SID_CN_DYNAMIC_0255": ""
+  "SID_CN_DYNAMIC_0255": "",
+  "SID_RAM_MIC_CALIBRATION_COND1": "1. Clear loose items from the seats and around the speakers",
+  "SID_RAM_MIC_CALIBRATION_COND2": "2. Parked, engine off, ignition on (engine noise interferes)",
+  "SID_RAM_MIC_CALIBRATION_COND3": "3. Everyone out of the car, all doors and windows closed"
 }

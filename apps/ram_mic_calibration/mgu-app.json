@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "id": "ram_mic_calibration",
-  "version": "0.1.2",
+  "version": "0.1.5",
   "tree": "package",
   "modules": [
     "src/sdk.js"
