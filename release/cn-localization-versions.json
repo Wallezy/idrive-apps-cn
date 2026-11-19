@@ -4,8 +4,8 @@
   "sourceCommit": "beffe76911bcf83df00a4b29332dc313bd574a65",
   "components": {
     "cluster-render": "0.6.10",
-    "waze-on-cluster": "0.10.10",
-    "robertn_waze_cluster": "0.6.18",
+    "waze-on-cluster": "0.10.12",
+    "robertn_waze_cluster": "0.6.19",
     "brake_test": "1.5.21",
     "car_vitals": "2.27.5",
     "doom": "1.7.22",
@@ -22,7 +22,7 @@
     "zf8hp": "1.5.8",
     "live_adjustments": "0.9.7",
     "live_data": "1.0.14",
-    "mgu-inputgate": "1.1.1",
+    "mgu-inputgate": "1.2.2",
     "cluster_metrics": "0.6.1",
     "ram_mic_calibration": "0.1.5",
     "dpf_monitor": "0.3.3",
@@ -32,7 +32,8 @@
     "ride_height": "0.6.1",
     "road_trip_computer": "1.0.1",
     "start_stop_insight": "0.1.4",
-    "xdrive_studio": "0.1.6"
+    "xdrive_studio": "0.1.6",
+    "sys_monitor": "1.0.9"
   },
   "applicationSourceCommit": "b2880634eb214e29f008422b970cf22ea2de280f"
 }

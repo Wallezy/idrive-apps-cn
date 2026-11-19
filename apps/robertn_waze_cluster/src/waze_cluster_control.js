@@ -857,7 +857,8 @@ class WazeClusterControl extends EventEmitter {
             return aa.pending === 'revert' ? t('Removed after restart') : t('Patched after restart');
         }
         if (aa.recovered && aa.state !== 'patched' && !headUnitRefused(aa.conflict)) {
-            return t('Removed — head unit kept restarting');
+            return aa.recoveredWhy === 'crash' ? t('Removed — Android Auto crashed')
+                : t('Removed — head unit kept restarting');
         }
         /* A conflict patchd refuses changes for is named also while patched,
          * since it greys Zoom and the turn card. */

@@ -60,3 +60,8 @@ jobs:
           node localized/cluster-metrics/test/run_tests.js
       - name: Community application controls and offline rendering
         run: node tools/test_community.js
+      - name: System monitor sampling, lifecycle and Chinese layouts
+        run: |
+          node tools/test_system_monitor.js
+          node localized/system-monitor/tests/test_sys_monitor.js
+          node localized/system-monitor/tests/test_sys_monitor_layout.js

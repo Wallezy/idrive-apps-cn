@@ -1,0 +1,12 @@
+{
+  "repository": "hexlay/idrive7-system-monitor",
+  "commit": "100f86fc954c5bc472f0ccb8346bd588f69e45aa",
+  "upstreamVersion": "1.0.8",
+  "cnRevision": 1,
+  "releaseVersion": "1.0.9",
+  "license": "GPL-3.0-or-later",
+  "sharedRuntime": "localized/cauliflower/kit",
+  "changes": [
+    "简体中文界面；适配国内版mgu-render与输入组件；保留只读、前台采集和原始进程名。"
+  ]
+}

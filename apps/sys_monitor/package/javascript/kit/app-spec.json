@@ -1,0 +1,78 @@
+{
+ "id": "sys_monitor",
+ "title": "\u7cfb\u7edf\u76d1\u63a7",
+ "version": "1.0.9",
+ "screens": [
+  {
+   "name": "MAIN",
+   "kind": "canvas",
+   "title": "\u7cfb\u7edf\u76d1\u63a7",
+   "buttons": [
+    [
+     "BTN_PAGE",
+     "\u4e0b\u4e00\u9875"
+    ],
+    [
+     "BTN_SETTINGS",
+     "\u8bbe\u7f6e"
+    ]
+   ]
+  }
+ ],
+ "settings": [
+  {
+   "key": "theme",
+   "label": "\u914d\u8272",
+   "type": "choice",
+   "default": "m_tricolour",
+   "aliases": {
+    "idrive": "m_tricolour",
+    "idrive_red": "m_tricolour"
+   },
+   "options": [
+    [
+     "m_red",
+     "M \u7ea2\u8272"
+    ],
+    [
+     "m_tricolour",
+     "M \u4e09\u8272"
+    ],
+    [
+     "ice",
+     "\u51b0\u767d"
+    ],
+    [
+     "amber",
+     "\u591c\u95f4\u7425\u73c0"
+    ]
+   ]
+  },
+  {
+   "key": "group",
+   "label": "\u6309\u5e94\u7528\u5408\u5e76\u8fdb\u7a0b",
+   "type": "bool",
+   "default": true
+  },
+  {
+   "key": "interval",
+   "label": "\u5237\u65b0\u95f4\u9694",
+   "type": "number",
+   "unit": "s",
+   "default": 2,
+   "markDefault": true,
+   "steps": [
+    1,
+    2,
+    5,
+    10
+   ]
+  }
+ ],
+ "config": null,
+ "startWidget": null,
+ "stateIds": {
+  "MAIN": 1,
+  "SETTINGS": 9
+ }
+}

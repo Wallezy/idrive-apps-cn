@@ -36,5 +36,24 @@ int main() {
     assert(position(released) == 100 && released->value->bytes[3] == 1);
     auto next = event(111); filter(next); assert(position(next) == 101);
     unlink(name);
+    auto setter = event(0);
+    setter->method = SET_ROTARY_CONTROL;
+    setter->value->bytes = {0, 0};
+    recentre(setter); assert(g_offset == 10);
+    setter->value->bytes = {0, 1};
+    recentre(setter); assert(g_offset == 0 && g_hmi_pos == KNOB_MID);
+    auto afterWake = event(KNOB_MID + 1); filter(afterWake);
+    assert(position(afterWake) == KNOB_MID + 1);
+    g_offset = 5; g_hmi_pos = 100;
+    auto overflow = event(106); overflow->value->bytes.push_back(1); filter(overflow);
+    assert(position(overflow) == 101 && g_hmi_pos == KNOB_MID && g_offset == 0);
+    auto overflowStill = event(KNOB_MID); overflowStill->value->bytes.push_back(1);
+    filter(overflowStill); assert(g_hmi_pos == KNOB_MID);
+    g_offset = 5; g_hmi_pos = 0;
+    auto low = event(4); filter(low); assert(position(low) == 0);
+    g_offset = 5; g_hmi_pos = 0xfffe;
+    auto high = event(4); filter(high); assert(position(high) == 0xfffe);
+    auto invalid = event(0xffff); filter(invalid); assert(position(invalid) == 0xffff);
+    std::cout << "PASS recenter setter, overflow, edge clamp and invalid position\n";
     std::cout << "PASS controller filter, BACK/MENU, unrelated/short events, stale release and no focus jump\n";
 }

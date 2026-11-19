@@ -1,10 +1,12 @@
 {
   "repository": "cauliflowermossgrape/idrive7-apps",
   "commit": "b2880634eb214e29f008422b970cf22ea2de280f",
-  "upstreamVersion": "1.1.0",
+  "upstreamVersion": "1.2.1",
   "cnRevision": 1,
-  "releaseVersion": "1.1.1",
+  "releaseVersion": "1.2.2",
   "changes": [
-    "Build from source; ID7 distribution only; no HMI restart on install"
-  ]
+    "Build from source; ID7 distribution only; no HMI restart on install",
+    "Recenter and clamp knob positions; retain CN gate protocol, guard and source builds."
+  ],
+  "upstreamFixCommit": "4be3e52061562d894ac4bd25eaf46c47c5cbbb41"
 }

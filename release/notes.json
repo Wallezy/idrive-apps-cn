@@ -4,7 +4,9 @@
       "version": "0.6.10",
       "upstreamVersion": "0.6.9",
       "cnRevision": 1,
-      "changes": ["启动时优先等待原厂仪表就绪，地图请求卡住后自动重试。"]
+      "changes": [
+        "启动时优先等待原厂仪表就绪，地图请求卡住后自动重试。"
+      ]
     },
     {
       "version": "0.6.7",
@@ -80,10 +82,21 @@
   ],
   "waze-on-cluster": [
     {
+      "version": "0.10.12",
+      "upstreamVersion": "0.10.11",
+      "cnRevision": 1,
+      "changes": [
+        "修复 Android Auto 显示未就绪时异常退出，并完善自动恢复。",
+        "保留全屏、显示位置和 HUD 设置，补充故障诊断信息。"
+      ]
+    },
+    {
       "version": "0.10.10",
       "upstreamVersion": "0.10.9",
       "cnRevision": 1,
-      "changes": ["主题内地图新增可选传输优化，默认关闭；保留现有全屏和 HUD 显示。"]
+      "changes": [
+        "主题内地图新增可选传输优化，默认关闭；保留现有全屏和 HUD 显示。"
+      ]
     },
     {
       "version": "0.10.7",
@@ -148,6 +161,14 @@
     }
   ],
   "robertn_waze_cluster": [
+    {
+      "version": "0.6.19",
+      "upstreamVersion": "0.6.12",
+      "cnRevision": 2,
+      "changes": [
+        "准确区分 Android Auto 异常退出与主机重启后的补丁恢复提示。"
+      ]
+    },
     {
       "version": "0.6.18",
       "upstreamVersion": "0.6.12",
@@ -296,6 +317,29 @@
       ],
       "upstreamVersion": "0.1.5",
       "cnRevision": 1
+    }
+  ],
+  "sys_monitor": [
+    {
+      "version": "1.0.9",
+      "upstreamVersion": "1.0.8",
+      "cnRevision": 1,
+      "changes": [
+        "新增系统监控：查看车机内存、处理器、温度和进程占用。",
+        "支持排序、进程详情和近三分钟趋势，离开应用后停止采集。",
+        "简体中文界面，兼容国内版渲染和旋钮输入。"
+      ]
+    }
+  ],
+  "mgu-inputgate": [
+    {
+      "version": "1.2.2",
+      "upstreamVersion": "1.2.1",
+      "cnRevision": 1,
+      "changes": [
+        "修复唤醒或切换界面后旋钮偶发跳动。",
+        "保留退出应用及异常时的原厂输入恢复。"
+      ]
     }
   ]
 }

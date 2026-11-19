@@ -39,7 +39,8 @@ namespace {
 
 const char *GATE_FILE = "/run/mgu-renderd/inputgate";
 const long GATE_MS = 700;           // file older than this: gate open (HMI has the controller)
-const uint16_t SVC_CCU = 0xb508, EVT_ROTARY = 0x8002;
+const uint16_t SVC_CCU = 0xb508, EVT_ROTARY = 0x8002, SET_ROTARY_CONTROL = 3;
+const uint16_t KNOB_MID = 0x7fff;
 
 typedef void (*handle_proxy_receive_t)(void *self, const std::shared_ptr<vsomeip::message> &);
 handle_proxy_receive_t g_real;
@@ -88,6 +89,14 @@ std::mutex g_mu;
 uint16_t g_offset, g_hmi_pos;
 bool g_have_pos, g_was_closed;
 
+// Match the HMI's new origin after a setter or a moving overflow event.
+void recentred()
+{
+    g_offset = 0;
+    g_hmi_pos = KNOB_MID;
+    g_have_pos = true;
+}
+
 void filter(const std::shared_ptr<vsomeip::message> &msg)
 {
     if (!msg || msg->get_service() != SVC_CCU || msg->get_method() != EVT_ROTARY) return;
@@ -100,28 +109,66 @@ void filter(const std::shared_ptr<vsomeip::message> &msg)
     uint16_t pos = uint16_t(d[1] << 8 | d[2]);
     bool closed = gate_closed();
     std::lock_guard<std::mutex> lk(g_mu);
-    if (pos == 0xffff) {                        // "invalid": pass on as it is, unless closed
-        if (!closed) return;
-    } else if (!closed) {
+    uint16_t hmi_was = g_hmi_pos;
+    bool had_pos = g_have_pos;
+    if (pos != 0xffff && !closed) {
         if (g_was_closed && g_have_pos) g_offset = uint16_t(pos - g_hmi_pos);   // carry on
         g_was_closed = false;
-        g_hmi_pos = uint16_t(pos - g_offset);
+        uint16_t hmi = uint16_t(pos - g_offset);
+        if (g_offset && g_have_pos) {
+            int v = g_hmi_pos + int16_t(uint16_t(hmi - g_hmi_pos));
+            if (v < 0 || v > 0xfffe) {
+                v = v < 0 ? 0 : 0xfffe;
+                g_offset = uint16_t(pos - v);
+            }
+            hmi = uint16_t(v);
+        }
+        g_hmi_pos = hmi;
         g_have_pos = true;
-        if (!g_offset) return;                  // nothing to change
-        d[1] = uint8_t(g_hmi_pos >> 8); d[2] = uint8_t(g_hmi_pos);
-        pl->set_data(d, n);
-        return;
     }
-    // closed: the app gets the real event; the HMI: knob still, not pressed, centred
-    forward(d, n);
-    g_was_closed = true;
-    if (g_have_pos) { d[1] = uint8_t(g_hmi_pos >> 8); d[2] = uint8_t(g_hmi_pos); }
-    d[3] = 0;                                   // not pressed
-    d[4] = 0;                                   // centre
-    pl->set_data(d, n);
+    if (!closed) {
+        if (pos != 0xffff && g_offset) {
+            d[1] = uint8_t(g_hmi_pos >> 8); d[2] = uint8_t(g_hmi_pos);
+            pl->set_data(d, n);
+        }
+    } else {
+        forward(d, n);
+        g_was_closed = true;
+        if (g_have_pos) { d[1] = uint8_t(g_hmi_pos >> 8); d[2] = uint8_t(g_hmi_pos); }
+        d[3] = 0;
+        d[4] = 0;
+        pl->set_data(d, n);
+    }
+    if (n > 5 && d[5] == 1 && pos != 0xffff && had_pos && g_hmi_pos != hmi_was) recentred();
 }
 
+void recentre(const std::shared_ptr<vsomeip::message> &msg)
+{
+    if (!msg || msg->get_service() != SVC_CCU || msg->get_method() != SET_ROTARY_CONTROL) return;
+    auto pl = msg->get_payload();
+    if (!pl || pl->get_length() < 2 || pl->get_data()[1] != 1) return;
+    std::lock_guard<std::mutex> lk(g_mu);
+    recentred();
+}
+
+// CommonAPI's Message contains the vsomeip shared pointer; the by-value
+// unique_ptr handler is forwarded through the caller-owned ABI storage.
+typedef bool (*send_async_t)(const void *, const void *, void *, const void *);
+send_async_t g_real_send;
+const char SEND_ASYNC[] = "_ZNK9CommonAPI6SomeIP10Connection25sendMessageWithReplyAsyncERKNS0_7MessageESt10unique_ptr"
+    "INS0_15ProxyConnection24MessageReplyAsyncHandlerESt14default_deleteIS7_EEPKNS_8CallInfoE";
+
 }  // namespace
+
+extern "C" bool _ZNK9CommonAPI6SomeIP10Connection25sendMessageWithReplyAsyncERKNS0_7MessageESt10unique_ptrINS0_15ProxyConnection24MessageReplyAsyncHandlerESt14default_deleteIS7_EEPKNS_8CallInfoE(
+    const void *self, const void *message, void *handler, const void *info)
+{
+    if (!g_real_send) g_real_send = reinterpret_cast<send_async_t>(dlsym(RTLD_NEXT, SEND_ASYNC));
+    try {
+        if (message) recentre(*static_cast<const std::shared_ptr<vsomeip::message> *>(message));
+    } catch (...) { /* never break the HMI */ }
+    return g_real_send ? g_real_send(self, message, handler, info) : false;
+}
 
 extern "C" void _ZN9CommonAPI6SomeIP10Connection18handleProxyReceiveERKSt10shared_ptrIN7vsomeip7messageEE(
     void *self, const std::shared_ptr<vsomeip::message> &msg)
@@ -135,6 +182,7 @@ extern "C" void _ZN9CommonAPI6SomeIP10Connection18handleProxyReceiveERKSt10share
 
 __attribute__((constructor)) static void init()
 {
+    g_real_send = reinterpret_cast<send_async_t>(dlsym(RTLD_NEXT, SEND_ASYNC));
     g_real = reinterpret_cast<handle_proxy_receive_t>(dlsym(RTLD_NEXT,
         "_ZN9CommonAPI6SomeIP10Connection18handleProxyReceiveERKSt10shared_ptrIN7vsomeip7messageEE"));
 }

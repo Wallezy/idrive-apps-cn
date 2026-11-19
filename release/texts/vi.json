@@ -118,5 +118,9 @@
   "xdrive_studio": {
     "title": "xDrive 动力分配",
     "description": "只读查看 xDrive 扭矩分配、分动箱扭矩、车轮滑差和底盘动态"
+  },
+  "sys_monitor": {
+    "title": "系统监控",
+    "description": "查看车机内存、处理器、温度和进程占用，支持排序与趋势图；只读监控。"
   }
 }

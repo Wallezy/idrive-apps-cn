@@ -25,7 +25,8 @@ try {
         assert.strictEqual(pkg.version, manifest.version);
         assert.strictEqual(pkg.mguLocalOnly, true);
         assert.deepStrictEqual(release.mguHmi, ['ID7']);
-        assert.strictEqual(release.requires['mgu-deploy'], id === 'cluster_metrics' ? '0.8.23' : '0.8.18');
+        assert.strictEqual(release.requires['mgu-deploy'], id === 'sys_monitor' ? '0.8.25' :
+            id === 'cluster_metrics' ? '0.8.23' : '0.8.18');
         if (linkedUnits.has(id)) {
             assert(['javascript/app.js', 'javascript/runner.js'].includes(pkg.main));
             assert(manifest.modules.length > 0);
@@ -41,7 +42,8 @@ try {
         assert(first.equals(fs.readFileSync(path.join(tmp, id + '.tgz'))), 'deterministic source package');
         assert(zlib.gunzipSync(first).length > 0);
         const kit = path.join(tree, 'javascript/kit');
-        const suite = community.has(id) ? 'tools/test_community_locale.js' : id === 'ambient_config' ? 'tools/test_ambient.js' :
+        const suite = id === 'sys_monitor' ? 'tools/test_system_monitor.js' :
+            community.has(id) ? 'tools/test_community_locale.js' : id === 'ambient_config' ? 'tools/test_ambient.js' :
             id === 'cluster_themes' ? 'tools/test_cluster_themes.js' : id === 'cluster_metrics' ? 'tools/test_cluster_metrics.js' : 'localized/kit/tools/test_zh.js';
         const result = cp.spawnSync(process.execPath, [path.join(root, suite), community.has(id) ? app : kit],
             { encoding: 'utf8', timeout: 30000 });

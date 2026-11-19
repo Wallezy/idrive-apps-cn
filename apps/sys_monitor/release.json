@@ -1,0 +1,13 @@
+{
+  "build": "node ../../tools/build_localized.js",
+  "requires": {
+    "mgu-deploy": "0.8.25",
+    "mgu-render": "0.6.26",
+    "mgu-inputgate": "1.2.2",
+    "robertn_store": "0.9.47"
+  },
+  "uninstallable": true,
+  "mguHmi": [
+    "ID7"
+  ]
+}

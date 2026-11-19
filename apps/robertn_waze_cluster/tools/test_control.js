@@ -805,6 +805,10 @@ test('a patch boot recovery removed says so until its Patch button applies it ag
     patch.announce('patched', 'high', null);
     await until('aa removed', () => c.aaStatusText() === 'Status: Removed — head unit kept restarting');
     assert.strictEqual(c.canEnableAa(), true);
+    patch.aa.recoveredWhy = 'crash';
+    patch.announce('patched', 'high', null);
+    await until('aa crash restored', () => c.aaStatusText() === 'Status: Removed — Android Auto crashed');
+    assert.strictEqual(c.canEnableAa(), true);
     patch.aa = { state: 'patched', dpi: 180, density: 180, densities: [150, 400, 10] };
     patch.announce('patched', 'high', null);
     await until('aa patched', () => c.aaStatusText() === 'Status: Patched');
