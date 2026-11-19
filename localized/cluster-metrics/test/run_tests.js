@@ -865,7 +865,13 @@ function inBox(x, y, box) {
             hu.feed('de.bmw.infotainment.vehicle.CDS', 'statusEngineSpeed2', { actualValueRPMEngineCrankshaft: 0 });
             hu.feed('de.bmw.infrastructure.VehicleInformation', 'statusGearboxDrive', { statusActualGearDrive: 'G5', statusActualStageDrive: 'D' });
             hu.feed('de.bmw.infotainment.vehicle.CDS', 'statusEngineTemperature', { temperatureEngineDrive: 74 + 48, temperatureEngineOilDrive: 52 + 48 });
-            await wait(620);
+            // IPC sampling runs every 500 ms; the UI has its own 250 ms tick.
+            // Wait for the observed value across both clocks, with a hard deadline.
+            const batteryDeadline = Date.now() + 3000;
+            while (cellsUpdated.DIAG_BATTERY.Text2ndRow.indexOf('74.0%') < 0 &&
+                    Date.now() < batteryDeadline) {
+                await wait(25);
+            }
             assert(cellsUpdated.DIAG_BATTERY.Text2ndRow.indexOf('74.0%') >= 0, 'DIAG_BATTERY must show live 74.0% SoC');
             assert.strictEqual(errors.length, 0, 'runtime interactions must produce zero errors: ' + errors.join('; '));
         } finally {
