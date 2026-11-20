@@ -79,6 +79,7 @@
       "_optional": "S or M next to the gear; controlDisplayMSystems: an M car's drive mode (issue #8)"
     },
     "de.bmw.infotainment.hmi.hmimediastate.HmiMediaState": {
+      "_instances": "*",
       "playerMetadata": "rs",
       "trackProgress": "rs",
       "_optional": "now playing (title, artist, progress) in the Vector theme's music panel"

@@ -55,7 +55,11 @@ async function watch(iface, instance, handlers, log, opts) {
     if (!someip) { res.error = 'someip native module not available'; return res; }
     try {
         const cfg = loadConfig(iface);
-        const p = await nativeTick(() => someip.buildProxy(cfg, String(instance)).then((px) => px.init().then(() => px)));
+        const selected = Array.isArray(instance)
+            ? instance.find((name) => Object.prototype.hasOwnProperty.call(cfg.instances || {}, name))
+            : String(instance);
+        if (selected === undefined) throw new Error('no supported instance for ' + iface);
+        const p = await nativeTick(() => someip.buildProxy(cfg, selected).then((px) => px.init().then(() => px)));
         res.proxy = p;
         res.shutdown = () => Promise.resolve().then(() => p.shutdown && p.shutdown()).catch(() => {});
         const fields = Object.keys(handlers || {});

@@ -61,9 +61,9 @@ def main():
         shutil.copy2(LOCAL / 'apps/cluster_themes/NOTICE', package / 'NOTICE')
         (package / 'CHANGELOG.md').write_text(
             '# 仪表主题\n\n## Unreleased\n\n## ' + version + '\n\n'
-            '- 新增 Vector、M View 布局，改进全屏排列与音乐显示。\n'
+            '- 修复部分车机因媒体服务实例名称不同而无法更新仪表主题。\n'
             '- 保留原版主题名称、仪表风格和单位，支持国内源在线更新。\n\n'
-            '上游版本：' + provenance['upstreamVersion'] + '；CN 修订：1。\n')
+            '上游版本：' + provenance['upstreamVersion'] + '；CN 修订：' + str(provenance['cnRevision']) + '。\n')
         (app / 'src').mkdir(exist_ok=True)
         shutil.copy2(ROOT / 'apps/warmup/src/sdk.js', app / 'src/sdk.js')
         write(app / 'mgu-app.json', {'schema': 1, 'id': 'cluster_themes', 'version': version,
@@ -75,8 +75,7 @@ def main():
         write(app / 'release-notes.json', [{
             'version': version, 'upstreamVersion': provenance['upstreamVersion'],
             'cnRevision': provenance['cnRevision'],
-            'changes': ['新增 Vector、M View 布局，改进全屏排列与音乐显示。',
-                        '保留原版主题名称、仪表风格和单位，支持国内源在线更新。'],
+            'changes': ['修复部分车机因媒体服务实例名称不同而无法更新仪表主题。'],
         }])
     path = ROOT / 'release/repo.json'
     repo = json.loads(path.read_text())

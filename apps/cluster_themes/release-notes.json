@@ -1,11 +1,10 @@
 [
   {
-    "version": "0.19.1",
+    "version": "0.19.2",
     "upstreamVersion": "0.19.0",
-    "cnRevision": 1,
+    "cnRevision": 2,
     "changes": [
-      "新增 Vector、M View 布局，改进全屏排列与音乐显示。",
-      "保留原版主题名称、仪表风格和单位，支持国内源在线更新。"
+      "修复部分车机因媒体服务实例名称不同而无法更新仪表主题。"
     ]
   }
 ]

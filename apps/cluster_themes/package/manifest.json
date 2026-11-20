@@ -181,7 +181,7 @@
       }
     },
     "de.bmw.infotainment.hmi.hmimediastate.HmiMediaState": {
-      "instances": "1",
+      "instances": "*",
       "attributes": {
         "playerMetadata": "rs",
         "trackProgress": "rs"

@@ -1,7 +1,7 @@
 {
  "id": "cluster_themes",
  "title": "\u4eea\u8868\u4e3b\u9898",
- "version": "0.19.1",
+ "version": "0.19.2",
  "screens": [
   {
    "name": "MAIN",
