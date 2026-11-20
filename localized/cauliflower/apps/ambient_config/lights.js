@@ -29,6 +29,7 @@ const HOLD_S = 60, RENEW_MS = 40000, MOVE_HOLD_S = 5, MOVE_RENEW_MS = 3000;
 const PAUSE_MS = 10000, FAILS = 4, RELEASE_TRIES = 3;
 const ALL = 0;                 // NAD 0: every light of the bus
 const CHECK_MS = 1500;         // a still colour's read-back, this long after its last write
+const BUSY_TRIES = 6, BUSY_MS = 400; // bounded retry for a read answered NRC 0x21
 const HOLD_WAIT_MS = 3000;     // hold(): the longest it waits for a write (or read-back) of ours under way
 
 const echo = (sid, did) => (u) => (u[0] === sid + 0x40 && u[1] === did[0] && u[2] === did[1]) || (u[0] === 0x7f && u[1] === sid);
@@ -38,6 +39,7 @@ class Lights extends EventEmitter {
     constructor(o) {
         super();
         this.diag = o.diag; this.log = o.log; this.now = o.now || Date.now; this.checkMs = o.checkMs;
+        this.sleep = o.sleep || ((ms) => new Promise((resolve) => setTimeout(resolve, ms)));
         this.lights = [];
         this.state = 'finding';
         this.error = null;
@@ -65,7 +67,16 @@ class Lights extends EventEmitter {
         for (let bus = 0; bus < BUSES.length; bus++) {
             const did = BUSES[bus].read;
             let reply = null;
-            try { reply = await this.diag.physical(BDC, 0x22, did, 15000, echo(0x22, did), { pendingTimeoutMs: 15000 }); } catch (e) { this.error = String(e && e.message || e); }
+            // Only the module's explicit busy-repeat response retries a read. Writes and ambiguous timeouts do not.
+            for (let tries = 0; !this._stopped; tries++) {
+                reply = null;
+                try { reply = await this.diag.physical(BDC, 0x22, did, 15000, echo(0x22, did), { pendingTimeoutMs: 15000 }); } catch (e) { this.error = String(e && e.message || e); }
+                if (!(reply && reply[0] === 0x7f && reply[1] === 0x22 && reply[2] === 0x21) || tries >= BUSY_TRIES) break;
+                this.log.info('lights: bus ' + (bus + 1) + ' busy; retry ' + (tries + 1));
+                await this.sleep(BUSY_MS * (tries + 1));
+            }
+            if (this._stopped) return this.lights;
+            if (!reply) this.log.info('lights: bus ' + (bus + 1) + ' no answer' + (this.error ? ': ' + this.error : ''));
             const got = reply ? parseStatus(bus, reply) : null;
             if (got) found.push.apply(found, got);
             else if (reply) this.log.info('lights: bus ' + (bus + 1) + ' refused (' + reply.map((x) => x.toString(16)).join(' ') + ')');

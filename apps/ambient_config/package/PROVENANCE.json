@@ -10,19 +10,26 @@
   ],
   "component": "ambient_config",
   "upstreamVersion": "2.5.0",
-  "releaseVersion": "2.5.1",
-  "cnRevision": 1,
+  "releaseVersion": "2.5.2",
+  "cnRevision": 2,
   "adaptedSourceFilesSha256": {
     "apps/ambient_config/ambient.js": "040dcf39c8011fdd22247406eacc1a5f08ca935da14859968265b4bf907b5e7f",
     "apps/ambient_config/app.json": "1bc36df188cc36b2c1dc5495dbb84174e2dcad8db4b09c3acb2b58db9d421d17",
     "apps/ambient_config/cabin.js": "4a5303b9dddd167c5b142469523721c5e9fc5f37e396d7fc27f315c23b9a8aeb",
     "apps/ambient_config/control.js": "e0d2babc77d01af97e35b7395db35582ebde556fe7f1b9ace4fe01bb42be4139",
     "apps/ambient_config/icon.png": "046f958dadf3ce68ab125af79222db291c6f3a419f1de1805df2922941bb0d16",
-    "apps/ambient_config/lights.js": "678adf23ca2d5b547a97b88a0cb3e413d5cd2aa38e944e36d8eef2e798acd6ec",
+    "apps/ambient_config/lights.js": "443faf5db9005a9c7a329659a331e6c1076f72877aae1beb06bca0ebae7e2637",
     "apps/ambient_config/lin.js": "bacd3963ab536e38a858c86e40156e0ddfe4ad9ed77a64c7ccbf5f0f8397d9de",
     "apps/ambient_config/main.js": "a8a49b15409fd94bc185fd8e6d6a0bfbe00f5d56d432faf106d0873cb948b951",
     "apps/ambient_config/others.js": "bc681efac983a616a1400296b2e62fdc54208f67525579f3017ed621795defac",
     "apps/ambient_config/scenes.js": "53885f89440c6787d2e38dd8b754340d332394556a9bbc32f24a4592a263b47f",
     "apps/ambient_config/strobe.js": "f8dd7e6dfbbf10f659f3820bf65a6f6ba3d2d0c91ceee948cd8af3fa38556cd0"
-  }
+  },
+  "selectiveUpstreamFixes": [
+    {
+      "repository": "cauliflowermossgrape/idrive7-apps",
+      "commit": "35bca28bc82b30482d73782877ebaf92c69dcb8c",
+      "change": "Bounded NRC 0x21 retries for light discovery only; preserves CN write and rendering paths."
+    }
+  ]
 }

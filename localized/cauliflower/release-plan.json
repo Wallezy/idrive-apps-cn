@@ -1,14 +1,13 @@
 {
   "ambient_config": {
     "upstreamVersion": "2.5.0",
-    "releaseVersion": "2.5.1",
-    "cnRevision": 1,
+    "releaseVersion": "2.5.2",
+    "cnRevision": 2,
     "title": "氛围灯设置",
     "description": "自定义氛围灯颜色、亮度与动画，按驾驶模式切换。 简体中文界面，支持在线更新。",
     "englishDescription": "Ambient config with Chinese menus and status text.",
     "changes": [
-      "同步新版灯光控制与模式设置。",
-      "完善简体中文显示，保留无水印界面。"
+      "车身模块暂忙时自动重试读取，减少无法自定义颜色的情况。"
     ]
   },
   "brake_test": {
