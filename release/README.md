@@ -1,5 +1,17 @@
 # Releases
 
+CN release preparation uses the successful exact-main-commit `Test` workflow's
+`cn-release-<sha>-a` artifact. The workflow builds on two independent runners and
+compares package hashes. Its retained archive includes `catalog.json`, packages,
+icons and `online-build.json`; retention is seven days.
+`python3 release/online_build.py fetch --repository Wallezy/idrive-apps-cn
+--commit <full-sha> --out <new-directory>` checks the trusted workflow result,
+run attempt, GitHub archive digest and all package/catalog hashes. Use the
+verified directory as the CN snapshot preparation input. Authenticated `gh` can
+download it, or pass the exact run's downloaded ZIP with `--archive`.
+Failed or expired online outputs do not trigger a local VM build automatically.
+Publishing the CN channels remains the separate reviewed snapshot transaction.
+
 ## CN distribution
 
 The GitHub publish target is `Wallezy/idrive-apps-cn`; `publish.js` refuses a

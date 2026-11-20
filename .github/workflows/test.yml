@@ -192,6 +192,18 @@ jobs:
       # a changed component's CHANGELOG says what changed under ## Unreleased
       - if: github.event_name == 'pull_request'
         run: node release/release.js versions HEAD^1
+      - name: Bind release output to this workflow run
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: python3 release/online_build.py seal --repository "$GITHUB_REPOSITORY" --commit "$GITHUB_SHA" --out release/out
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        with:
+          name: cn-release-${{ github.sha }}-a
+          path: release/out/
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
+          overwrite: true
 
   release-b:
     needs: changes

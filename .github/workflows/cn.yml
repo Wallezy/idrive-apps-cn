@@ -21,6 +21,8 @@ jobs:
           node-version: 22.12.0
       - name: Publication policy
         run: node release/test/cn_distribution_test.js
+      - name: Online release artifact verification
+        run: python3 -m unittest discover -s release/test -p test_online_build.py -v
       - name: Chinese catalog and version consistency
         run: node release/test/cn_localization_test.js
       - name: Localization

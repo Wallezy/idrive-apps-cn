@@ -3,6 +3,11 @@
 Tools and apps for the iDrive 7 head unit (MGU) of a BMW, installed from the
 mgu Store. Versions and CHANGELOG rules: `CONTRIBUTING.md`.
 
+Maintainer releases prefer verified exact-commit online build artifacts using
+`release/online_build.py` and the procedure in `release/README.md`. Reuse successful
+outputs and unchanged published packages. Do not start a local build VM as an
+automatic fallback for failed or inaccessible online builds.
+
 ## Pull requests by AI agents
 
 A pull request opened, or mostly written, by an AI agent says in its
