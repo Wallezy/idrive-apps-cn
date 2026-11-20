@@ -1,12 +1,12 @@
 {
   "schema": 1,
   "repository": "chyiz/idrive7-cluster-metrics",
-  "commit": "ff5c83e96133c0e165f1e00167c4dc918dd0f373",
-  "upstreamVersion": "0.6.0",
-  "releaseVersion": "0.6.1",
+  "commit": "baf5b88a91706e0285a0663d03f91f4659d542ff",
+  "upstreamVersion": "0.8.0",
+  "releaseVersion": "0.8.1",
   "cnRevision": 1,
-  "channel": "beta",
-  "authorization": "Owner reports permission from the author; upstream code is MIT licensed.",
+  "channel": "beta-and-stable",
+  "authorization": "Owner reports author permission; current upstream application source is GPL-3.0-only.",
   "changes": [
     "Chinese controls and diagnostics, right-widget labels and CJK media/navigation glyphs",
     "Display disabled initially; HUD yields during navigation by default",

@@ -101,7 +101,10 @@
     "de.bmw.infotainment.vehicle.Vehicle": {
       "instances": "1",
       "attributes": {
-        "statusNewCurrentUnitsStatusExt": "rs"
+        "statusNewCurrentUnitsStatusExt": "rs",
+        "chargingStatus2": "rs",
+        "displayChargingCurrentLimit2": "rs",
+        "lastStateCallCharging": "s"
       }
     },
     "de.bmw.infrastructure.EnvironmentalInformation": {
@@ -127,7 +130,8 @@
       "instances": "1",
       "attributes": {
         "statusEngineSpeed2": "rs",
-        "statusEngineTemperature": "rs"
+        "statusEngineTemperature": "rs",
+        "statusBattery2": "rs"
       }
     },
     "de.bmw.infotainment.vehicle.CDS2": {
@@ -136,6 +140,14 @@
         "statusLongitudinalAccelerationMassCenter": "rs",
         "statusLateralAccelerationMassCenter": "rs",
         "statusInjectionVolume": "rs"
+      }
+    },
+    "de.bmw.infotainment.vehicle.Charging": {
+      "instances": "1",
+      "attributes": {
+        "statusChargingCable": "rs",
+        "displayChargingStatus": "s",
+        "lastStateCallCharging": "s"
       }
     },
     "de.bmw.infotainment.vehicle.Vehicle2": {
@@ -268,6 +280,7 @@
       "instances": "HMI_CID",
       "attributes": {
         "playerMetadata": "rs",
+        "mainMenuMetadata": "rs",
         "trackProgress": "rs",
         "coverArt": "rs"
       }
@@ -294,6 +307,20 @@
         "statusTyreTemperature": "rs",
         "statusTyrePressure": "rs",
         "statusTargetTyrePressure": "rs"
+      }
+    },
+    "de.bmw.infotainment.climate.Climate2": {
+      "instances": "1",
+      "attributes": {
+        "statusTemperatureInside": "rs"
+      }
+    },
+    "de.bmw.dass.GapVehicleAhead": {
+      "instances": "1",
+      "attributes": {
+        "GapVehicleDrivingAhead": "s",
+        "DataFrontVehicle": "s",
+        "DataFrontVehicleExtended": "s"
       }
     },
     "com.harman.infotainment.systemfunctions.tasu.tasu.InternalTasu": {

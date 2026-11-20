@@ -12,7 +12,7 @@ const plan = require(path.join(vendor, 'release-plan.json'));
 for (const id of Object.keys(plan)) {
     const pkg = path.join(root, 'apps', id, 'package');
     const provenance = require(path.join(pkg, 'PROVENANCE.json'));
-    assert.strictEqual(provenance.commit, 'b2880634eb214e29f008422b970cf22ea2de280f');
+    assert.strictEqual(provenance.commit, '35bca28bc82b30482d73782877ebaf92c69dcb8c');
     assert.strictEqual(provenance.upstreamVersion, plan[id].upstreamVersion);
     for (const name of Object.keys(provenance.adaptedSourceFilesSha256)) {
         assert.strictEqual(crypto.createHash('sha256').update(fs.readFileSync(path.join(vendor, name))).digest('hex'),

@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/cauliflowermossgrape/idrive7-apps",
-  "commit": "b2880634eb214e29f008422b970cf22ea2de280f",
+  "commit": "35bca28bc82b30482d73782877ebaf92c69dcb8c",
   "language": "zh-CN",
   "sdk": "Excluded; donor-linked by mgu-deploy",
   "adaptations": [
@@ -9,27 +9,21 @@
     "Numeric three-part CN versions"
   ],
   "component": "ambient_config",
-  "upstreamVersion": "2.5.0",
-  "releaseVersion": "2.5.2",
-  "cnRevision": 2,
+  "upstreamVersion": "2.7.13",
+  "releaseVersion": "2.7.14",
+  "cnRevision": 1,
   "adaptedSourceFilesSha256": {
     "apps/ambient_config/ambient.js": "040dcf39c8011fdd22247406eacc1a5f08ca935da14859968265b4bf907b5e7f",
-    "apps/ambient_config/app.json": "1bc36df188cc36b2c1dc5495dbb84174e2dcad8db4b09c3acb2b58db9d421d17",
+    "apps/ambient_config/app.json": "525986c518136a471915bbc53ac7d9e2777d231573925adc581b15cb18d9cc11",
     "apps/ambient_config/cabin.js": "4a5303b9dddd167c5b142469523721c5e9fc5f37e396d7fc27f315c23b9a8aeb",
-    "apps/ambient_config/control.js": "e0d2babc77d01af97e35b7395db35582ebde556fe7f1b9ace4fe01bb42be4139",
+    "apps/ambient_config/control.js": "bd0af70591fcaefe87540443740fd59ca64ecbe5e00293815c6662c919802863",
     "apps/ambient_config/icon.png": "046f958dadf3ce68ab125af79222db291c6f3a419f1de1805df2922941bb0d16",
-    "apps/ambient_config/lights.js": "443faf5db9005a9c7a329659a331e6c1076f72877aae1beb06bca0ebae7e2637",
-    "apps/ambient_config/lin.js": "bacd3963ab536e38a858c86e40156e0ddfe4ad9ed77a64c7ccbf5f0f8397d9de",
-    "apps/ambient_config/main.js": "a8a49b15409fd94bc185fd8e6d6a0bfbe00f5d56d432faf106d0873cb948b951",
-    "apps/ambient_config/others.js": "bc681efac983a616a1400296b2e62fdc54208f67525579f3017ed621795defac",
+    "apps/ambient_config/lever.js": "8913d21c5d0751fcf9eb3ba65025c018c3e8c3965953f74bab4a314319a8a5ad",
+    "apps/ambient_config/lights.js": "6802e4272f833c84c24e8d0b6cb5c0f025dc0168a1d0de8e3d5520c6056635f0",
+    "apps/ambient_config/lin.js": "bf236fd483f3e49e711cfb9415b9ae56af8c35335bc20f73949142aafd7de353",
+    "apps/ambient_config/main.js": "7cc31ced70760bed672cfe9730df6a079d2546bff2e2d738349992576bd2fce4",
+    "apps/ambient_config/others.js": "a5a243eaead4f8b058664a41c78a781bee920c46fbff78500e56910d85caf49c",
     "apps/ambient_config/scenes.js": "53885f89440c6787d2e38dd8b754340d332394556a9bbc32f24a4592a263b47f",
     "apps/ambient_config/strobe.js": "f8dd7e6dfbbf10f659f3820bf65a6f6ba3d2d0c91ceee948cd8af3fa38556cd0"
-  },
-  "selectiveUpstreamFixes": [
-    {
-      "repository": "cauliflowermossgrape/idrive7-apps",
-      "commit": "35bca28bc82b30482d73782877ebaf92c69dcb8c",
-      "change": "Bounded NRC 0x21 retries for light discovery only; preserves CN write and rendering paths."
-    }
-  ]
+  }
 }

@@ -12,8 +12,8 @@ It must contain validated CN artifacts and dependencies, never a relabelled
 upstream mirror. Application/component IDs remain upstream's for compatible
 migration; the CN Store owns source selection and migration.
 
-CN OSS publication uses the CN Store's `prepare_cn.py`, `promote_cn.py` and
-`publish_cn.py`. Reviewed upstream synchronization and its CN compatibility
+CN self-hosted publication uses the CN Store's `prepare_cn.py`, `promote_cn.py` and
+`publish_cn.py`. Reviewed upstream synchronization, including feature updates without individual vehicle trials, and its CN compatibility
 adaptations publish identical payloads to Beta and Stable after source review,
 reproducibility and exact-commit CI. Runtime integration is explicitly pending
 when not tested, and does not block this route. A separately requested

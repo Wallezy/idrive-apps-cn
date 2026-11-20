@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/cauliflowermossgrape/idrive7-apps",
-  "commit": "b2880634eb214e29f008422b970cf22ea2de280f",
+  "commit": "35bca28bc82b30482d73782877ebaf92c69dcb8c",
   "language": "zh-CN",
   "sdk": "Excluded; donor-linked by mgu-deploy",
   "adaptations": [
@@ -9,11 +9,11 @@
     "Numeric three-part CN versions"
   ],
   "component": "dtc_scanner",
-  "upstreamVersion": "2.9.7",
-  "releaseVersion": "2.9.9",
-  "cnRevision": 2,
+  "upstreamVersion": "2.9.8",
+  "releaseVersion": "2.9.10",
+  "cnRevision": 1,
   "adaptedSourceFilesSha256": {
-    "apps/dtc_scanner/app.json": "88d0b3ecb0685ae00fc69889c45d68e92a228dbcb72c1dd411148c46a3a6af62",
+    "apps/dtc_scanner/app.json": "4071fef05d1b9ae76ebaf42cb043d8bdd9008f0662eb630c04e776a8c1cb97a4",
     "apps/dtc_scanner/demo.js": "379ae4d0c1c508b17cb6fd2a1ec8b8af6cb04246901cbdbec43bd6daae699e22",
     "apps/dtc_scanner/diagnostic-text.js": "dae4a84c12f4f4aec23780726b502246e3695d3ec2bdf35a22dd78f8b656849d",
     "apps/dtc_scanner/dtc_db.pack": "206da522f83c48539eb9ac0ee02d7c859a7080b0b1c50cf76df05451a3930c55",

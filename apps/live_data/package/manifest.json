@@ -115,10 +115,10 @@
       ]
     },
     "de.bmw.infotainment.vehicle.Vehicle": {
+      "instances": "1",
       "attributes": {
         "statusNewCurrentUnitsStatusExt": "rs"
-      },
-      "instances": "1"
+      }
     },
     "de.bmw.infrastructure.EnvironmentalInformation": {
       "instances": "1",

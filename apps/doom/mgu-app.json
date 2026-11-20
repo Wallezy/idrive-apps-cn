@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "id": "doom",
-  "version": "1.7.22",
+  "version": "1.7.23",
   "tree": "package",
   "modules": [
     "src/sdk.js"

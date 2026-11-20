@@ -1,5 +1,13 @@
 [
   {
+    "version": "0.9.11",
+    "upstreamVersion": "0.9.10",
+    "cnRevision": 1,
+    "changes": [
+      "改进控制模块重新识别与连接恢复。"
+    ]
+  },
+  {
     "version": "0.9.7",
     "upstreamVersion": "0.9.6",
     "cnRevision": 1,

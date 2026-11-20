@@ -423,22 +423,24 @@ class Canvas {
         const f = fonts.get(opts.font || 'label', size, s);
         if (!f) return 0;
         c = rgba(c);
-        const scale = size / f.size;
-        const w = fonts.measure(f, s) * scale + (opts.spacing || 0) * Math.max(0, s.length - 1);
+        const spacing = opts.spacing || 0;
+        const w = fonts.measureMixed(f, size, s, spacing);
         let pen = opts.align === 'center' ? x - w / 2 : opts.align === 'right' ? x - w : x;
         for (const ch of s) {
-            const g = f.glyphs[ch.codePointAt(0)] || f.glyphs[63];
-            if (!g) continue;
-            const [gx, gy, gw, gh, ox, oy, adv] = g;
-            if (gw && gh) this._blit(f, gx, gy, gw, gh, pen + ox * scale, y + oy * scale, scale, c);
-            pen += adv * scale + (opts.spacing || 0);
+            const rg = fonts.resolveGlyph(f, ch.codePointAt(0));
+            if (!rg || !rg.g) continue;
+            const rf = rg.font;
+            const gScale = size / rf.size;
+            const [gx, gy, gw, gh, ox, oy, adv] = rg.g;
+            if (gw && gh) this._blit(rf, gx, gy, gw, gh, pen + ox * gScale, y + oy * gScale, gScale, c);
+            pen += adv * gScale + spacing;
         }
         return w;
     }
 
     textWidth(str, size, opts) {
         const s = opts && opts.literal ? String(str) : t(str), f = fonts.get((opts && opts.font) || 'label', size, s);
-        return f ? fonts.measure(f, s) * (size / f.size) + ((opts && opts.spacing) || 0) * Math.max(0, s.length - 1) : 0;
+        return f ? fonts.measureMixed(f, size, s, (opts && opts.spacing) || 0) : 0;
     }
 
     /** Blit an alpha glyph from the atlas, scaled (bilinear) and tinted. */

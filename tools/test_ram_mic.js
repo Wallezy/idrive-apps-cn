@@ -87,6 +87,20 @@ async function ui(onTick, beforeStart) {
         assert.strictEqual((await ram.readStatus(d)).text, '完成，无错误');
         assert.strictEqual(d.listenerCount('frame'), 0);
     });
+    await test('active audio faults prevent start, historical and unrelated faults do not', async () => {
+        for (const code of [0x031D01, 0x031DB7, 0x031E80, 0xB7F4BB]) {
+            const d = ecu([ident, [0x59, 2, 0xFF, code >> 16, (code >> 8) & 255, code & 255, 1]]);
+            await rejected(() => ram.calibrate(d, () => {}, () => {}, async () => {}), '音频故障');
+            assert.strictEqual(countStarts(d), 0);
+            assert.strictEqual(d.calls[1].join(','), '25,2,13');
+        }
+        for (const frame of [[0x59, 2, 0xFF, 3, 0x1D, 1, 8], [0x59, 2, 0xFF, 1, 2, 3, 1]]) {
+            await ram.checkFaults(ecu([frame]));
+        }
+        for (const frame of [[0x59, 2], [0x59, 2, 0xFE], [0x59, 2, 0xFF, 3]]) {
+            await rejected(() => ram.checkFaults(ecu([frame])), '当前状态');
+        }
+    });
     await test('wrong ECU identity cannot start calibration', async () => {
         const d = ecu([[0x62, 0xF1, 0x50, 1, 2, 3]]);
         await rejected(() => ram.calibrate(d, () => {}, () => {}, async () => {}), '未识别');
@@ -100,43 +114,43 @@ async function ui(onTick, beforeStart) {
         assert.strictEqual((await ram.readStatus(d)).code, 2);
     });
     await test('calibration starts once and polls until complete', async () => {
-        const d = ecu([ident, status(0), accepted, status(1), status(2)]);
+        const d = ecu([ident, [0x59, 0x02, 0xFF], status(0), accepted, status(1), status(2)]);
         let checks = 0;
         assert((await ram.calibrate(d, () => { checks++; }, () => {}, async () => {})).includes('校准成功'));
         assert.strictEqual(countStarts(d), 1); assert.strictEqual(checks, 1);
     });
     await test('already-running routine is not started again', async () => {
-        const d = ecu([ident, status(1)]);
+        const d = ecu([ident, [0x59, 0x02, 0xFF], status(1)]);
         await rejected(() => ram.calibrate(d, () => {}, () => {}, async () => {}), '已在校准');
         assert.strictEqual(countStarts(d), 0);
     });
     await test('NRC 24 permits first run without a previous result', async () => {
-        const d = ecu([ident, [0x7F, 0x31, 0x24], accepted, status(2)]);
+        const d = ecu([ident, [0x59, 0x02, 0xFF], [0x7F, 0x31, 0x24], accepted, status(2)]);
         await ram.calibrate(d, () => {}, () => {}, async () => {});
         assert.strictEqual(countStarts(d), 1);
     });
     await test('other negative responses prevent a start', async () => {
-        const d = ecu([ident, [0x7F, 0x31, 0x22]]);
+        const d = ecu([ident, [0x59, 0x02, 0xFF], [0x7F, 0x31, 0x22]]);
         await rejected(() => ram.calibrate(d, () => {}, () => {}, async () => {}), 'NRC');
         assert.strictEqual(countStarts(d), 0);
     });
     await test('movement during identification prevents the final write', async () => {
-        const d = ecu([ident, status(0)]);
+        const d = ecu([ident, [0x59, 0x02, 0xFF], status(0)]);
         await rejected(() => ram.calibrate(d, () => { throw Error('moving'); }, () => {}, async () => {}), 'moving');
         assert.strictEqual(countStarts(d), 0);
     });
     await test('ambiguous timeout never retries the start', async () => {
-        const d = ecu([ident, status(0), null]);
+        const d = ecu([ident, [0x59, 0x02, 0xFF], status(0), null]);
         await rejected(() => ram.calibrate(d, () => {}, () => {}, async () => {}), '请先读取 RAM 状态');
         assert.strictEqual(countStarts(d), 1); assert.strictEqual(d.listenerCount('frame'), 0);
     });
     await test('transport failure never retries the start', async () => {
-        const d = ecu([ident, status(0), new Error('transport failed')]);
+        const d = ecu([ident, [0x59, 0x02, 0xFF], status(0), new Error('transport failed')]);
         await rejected(() => ram.calibrate(d, () => {}, () => {}, async () => {}), '请先读取 RAM 状态');
         assert.strictEqual(countStarts(d), 1); assert.strictEqual(d.listenerCount('frame'), 0);
     });
     await test('ECU-reported failure is not reported as success', async () => {
-        const d = ecu([ident, status(0), accepted, status(3)]);
+        const d = ecu([ident, [0x59, 0x02, 0xFF], status(0), accepted, status(3)]);
         assert((await ram.calibrate(d, () => {}, () => {}, async () => {})).includes('有错误'));
     });
     await test('disconnected diagnostics do not send requests', async () => {

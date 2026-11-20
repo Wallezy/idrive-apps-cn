@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/cauliflowermossgrape/idrive7-apps",
-  "commit": "b2880634eb214e29f008422b970cf22ea2de280f",
+  "commit": "35bca28bc82b30482d73782877ebaf92c69dcb8c",
   "language": "zh-CN",
   "sdk": "Excluded; donor-linked by mgu-deploy",
   "adaptations": [
@@ -9,17 +9,17 @@
     "Numeric three-part CN versions"
   ],
   "component": "zf8hp",
-  "upstreamVersion": "1.5.6",
-  "releaseVersion": "1.5.8",
-  "cnRevision": 2,
+  "upstreamVersion": "1.5.8",
+  "releaseVersion": "1.5.9",
+  "cnRevision": 1,
   "adaptedSourceFilesSha256": {
-    "apps/zf8hp/README.md": "47091d40176552db1e5a91027f88feae0ff24463ea6b943fc5b004aa45e423c5",
-    "apps/zf8hp/app.json": "7632a4fa42765e4a58bba5c665f57cb274671ddddedb7766366252811f8c0074",
+    "apps/zf8hp/README.md": "1f23143b1fc2dd0703315b8bf7062277e69fe3fa22cc2e5d4d19c1e7390cbbf5",
+    "apps/zf8hp/app.json": "b32dc72a791f647eb234bc8511d825b5100f1cb09448993081832f94efc0672d",
     "apps/zf8hp/catalog.js": "bd7b3d01094089191ad4be4edc99daf9f8b534945f7505332d5309623a54daaa",
     "apps/zf8hp/demo.js": "b0cdd6f137ce3bf65a4766b7f374222e2e62550647ab0b6c38841d0dc77b7075",
-    "apps/zf8hp/egs.js": "c8664b23ebd7ddbf426386b959ffff5430185e9924acfd4f13a98ae9c9da8f4f",
+    "apps/zf8hp/egs.js": "1ae6f74dd87d19dc9c7e4c3fae3665dbaef2f6470154a4bdf1a7f92184b3a59a",
     "apps/zf8hp/icon.png": "5bdfb5f5579ee5f14be0120e06e9c8feafd0db6a3940421bf7ab44d0005aa1b0",
-    "apps/zf8hp/main.js": "00e0cd806febd093d0ba8b6eed49f5425eea20022cb8ce530d601c7a0d6a2ff7",
-    "apps/zf8hp/reader.js": "87427d260d9bb4754d60278b66617d6ce6c74dcef43751fdb73327b325f0daa9"
+    "apps/zf8hp/main.js": "c1801500ff66a884b700c11198810d3dde8b2e284fc70ed5e4c8ec736a0be11d",
+    "apps/zf8hp/reader.js": "abe542e7d1f32b8cc5393f6e1b8a6f04cdaed17265f6ebe1d4c4c55516cea10d"
   }
 }

@@ -50,7 +50,8 @@ assert(rendered.includes('晴天') && rendered.includes('周杰伦'));
 painter._paintRightMedia(cv, null);
 assert(rendered.includes('暂无媒体播放'));
 for (const c of '晴天周杰伦南京东路暂无媒体播放行程与车辆信息') {
-    assert(fonts.get('bold', 21, c).glyphs[c.codePointAt(0)], 'missing glyph: ' + c);
+    const resolved = fonts.resolveGlyph(fonts.get('bold', 21, c), c.codePointAt(0));
+    assert(resolved && resolved.font.glyphs[c.codePointAt(0)], 'missing glyph: ' + c);
 }
 const road = new Canvas(544, 38);
 assert(drawHudRoadBanner(road, { road: '南京东路', exitBadge: '14B' }));
@@ -64,11 +65,12 @@ const rows = [], buttons = [];
 const ui = {
     cells: (name, row, value) => { rows.push(value); },
     text: (name, value) => { buttons.push(value); },
-    onClick() {}, onVisible() {}, open() {},
+    onClick() {}, onVisible() {}, open() {}, enabled() {}, checked() {},
 };
 class Hub {
     constructor() { this.uds = { stats: {} }; }
     start() {}
+    syncDemand() {}
     stop() { cleanupCalled++; }
     snapshot() { return { rpm: 800, stage: 'P', gear: null, hudNav: {}, dscBrake: {} }; }
     resolvedUnits() { return { system: 'metric', tempUnit: 'C', distUnit: 'km', speedUnit: 'km/h' }; }

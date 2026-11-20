@@ -50,7 +50,7 @@ def main():
         runtime.write_text(runtime.read_text().replace("require('oap-sdk')", 'global.__mguLocalizedSdk'))
         pkg = json.loads((package / 'package.json').read_text())
         pkg.update(main='javascript/localized-entry.js', mguLocalOnly=True, license='MIT',
-                   description='12 套仪表主题，支持驾驶模式切换、自定义数据及 Waze 地图。中控操作简体中文，保留原版仪表风格。',
+                   description='多套仪表主题，支持驾驶模式切换、自定义数据及 Waze 地图。中控操作简体中文，保留原版仪表风格。',
                    files=['package.json', 'npm-shrinkwrap.json', 'manifest.json', 'permissions.json',
                           'config', 'javascript', 'rhmiData', 'LICENSE', 'MPL-2.0.txt', 'NOTICE', 'NOTICE.zh-CN.md',
                           'provenance.json', 'CHANGELOG.md'])
@@ -61,7 +61,7 @@ def main():
         shutil.copy2(LOCAL / 'apps/cluster_themes/NOTICE', package / 'NOTICE')
         (package / 'CHANGELOG.md').write_text(
             '# 仪表主题\n\n## Unreleased\n\n## ' + version + '\n\n'
-            '- 新增 12 套仪表主题，中控设置与操作提示适度汉化。\n'
+            '- 新增 Vector、M View 布局，改进全屏排列与音乐显示。\n'
             '- 保留原版主题名称、仪表风格和单位，支持国内源在线更新。\n\n'
             '上游版本：' + provenance['upstreamVersion'] + '；CN 修订：1。\n')
         (app / 'src').mkdir(exist_ok=True)
@@ -75,7 +75,7 @@ def main():
         write(app / 'release-notes.json', [{
             'version': version, 'upstreamVersion': provenance['upstreamVersion'],
             'cnRevision': provenance['cnRevision'],
-            'changes': ['新增 12 套仪表主题，中控设置与操作提示适度汉化。',
+            'changes': ['新增 Vector、M View 布局，改进全屏排列与音乐显示。',
                         '保留原版主题名称、仪表风格和单位，支持国内源在线更新。'],
         }])
     path = ROOT / 'release/repo.json'
@@ -91,7 +91,7 @@ def main():
         texts['cluster_themes'] = {
             'title': '仪表主题',
             'description': pkg['description'] if path.stem == 'zh-CN' else
-            '12 instrument cluster themes with Chinese centre-screen controls. Original theme names and instrument styling preserved.',
+            'Instrument cluster themes with Chinese centre-screen controls. Original theme names and instrument styling preserved.',
         }
         write(path, texts)
 

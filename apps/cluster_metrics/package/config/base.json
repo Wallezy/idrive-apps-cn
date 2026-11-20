@@ -39,6 +39,11 @@
           "offset": -40,
           "invalid": 255
         },
+        "cabin": {
+          "factor": 0.5,
+          "offset": -40,
+          "invalid": 255
+        },
         "pedal": {
           "factor": 0.025,
           "offset": 0,

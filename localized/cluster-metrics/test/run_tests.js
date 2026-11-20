@@ -14,13 +14,23 @@ const vm = require('vm');
 
 const ROOT = path.resolve(__dirname, '..');
 const APP_DIR = path.join(ROOT, 'apps', 'cluster_metrics');
+const VENDOR = path.join(ROOT, 'vendor', 'cauliflowermossgrape-idrive7-apps');
 const KIT_RT = path.join(ROOT, 'kit', 'runtime');
+const VENDOR_FILES = {
+    './cluster_render_client': path.join(APP_DIR, 'cluster_render_client.js'),
+    './redline_hud_nav': path.join(APP_DIR, 'redline_hud_nav.js'),
+    './redline_nav': path.join(APP_DIR, 'redline_nav.js'),
+    './jpeg_decoder': path.join(APP_DIR, 'jpeg_decoder.js'),
+};
 
-// Map ./kit/* as build.py copies kit/runtime/* into source/javascript/kit/*
+// Map ./kit/* and build-time vendor/npm modules just as kit/tools/build.py packages them
 const origLoad = Module._load;
 Module._load = function (req, parent, isMain) {
     if (req.startsWith('./kit/')) {
         return origLoad.call(this, path.join(KIT_RT, req.slice(6)), parent, isMain);
+    }
+    if (Object.prototype.hasOwnProperty.call(VENDOR_FILES, req)) {
+        return origLoad.call(this, VENDOR_FILES[req], parent, isMain);
     }
     return origLoad.call(this, req, parent, isMain);
 };
@@ -30,19 +40,20 @@ const unitsMod = require(path.join(APP_DIR, 'units'));
 const { EfficiencyTracker } = require(path.join(APP_DIR, 'efficiency'));
 const { VehicleProfile, coldRevCeilingRpm, detectAnomaly } = require(path.join(APP_DIR, 'vehicle_profile'));
 const {
-    OverlayRenderer, inspectClusterSlotConfig, resolveCornerRightMode, CLUSTER_LAYER_NAMES,
+    OverlayRenderer, inspectClusterSlotConfig, resolveCornerRightMode, formatLeadHeadwayParts, CLUSTER_LAYER_NAMES,
 } = require(path.join(APP_DIR, 'overlay_renderer'));
-const { ClusterRender } = require(path.join(APP_DIR, 'cluster_render_client'));
+const { ClusterRender } = require(VENDOR_FILES['./cluster_render_client']);
 const {
-    SignalHub, FastKw, computeFrictionBrake, decodeDscPressure, decodeDscPedal, decodeDscRegen, flagActive,
+    SignalHub, FastKw, LeadVehicleTracker, decodeStatusBattery2, decodeCabinTemp,
+    computeFrictionBrake, computeChargingState, decodeDscPressure, decodeDscPedal, decodeDscRegen, flagActive,
 } = require(path.join(APP_DIR, 'signals'));
 const { NavTracker, parseHudStatusText, parseWazeHudShowing } = require(path.join(APP_DIR, 'nav_tracker'));
 const {
-     NW: HUD_NAV_W, NH: HUD_NAV_H, ROAD_W: HUD_ROAD_W, ROAD_H: HUD_ROAD_H,
+    NW: HUD_NAV_W, NH: HUD_NAV_H, ROAD_W: HUD_ROAD_W, ROAD_H: HUD_ROAD_H,
     drawHudNav, drawHudRoadBanner, hudNavKey, hudRoadKey,
 } = require(path.join(APP_DIR, 'hud_nav_renderer'));
-const { MediaTracker } = require(path.join(APP_DIR, 'media_tracker'));
-const { decodeCoverThumb } = require(path.join(APP_DIR, 'image_decode'));
+const { MediaTracker, parseHmiPlayerMetadata, paginateTitle } = require(path.join(APP_DIR, 'media_tracker'));
+const { decodeCoverThumb, buildStockBackdrop } = require(path.join(APP_DIR, 'image_decode'));
 const { Canvas } = require(path.join(KIT_RT, 'canvas'));
 const { check: diagCheck } = require(path.join(KIT_RT, 'readonly-diag'));
 const { headUnit } = require(path.join(ROOT, 'kit', 'tools', 'hu-stub.js'));
@@ -189,32 +200,39 @@ function inBox(x, y, box) {
         assert.strictEqual(p.engineOn, false);
         assert.strictEqual(p.mode, 'ev_drive');
 
-        const ast = { _v12LowSince: 0 };
-        assert.strictEqual(detectAnomaly({ tpms: { FL: { pressureBar: 2.4, targetBar: 2.4 } }, gearboxOilC: 85, v12: 14.1 }, unitsMod.US_PRESET, ast, 1000), null);
+        const ast = { _v12LowSince: 0, _soc12LowSince: 0 };
+        assert.strictEqual(detectAnomaly({ tpms: { FL: { pressureBar: 2.4, targetBar: 2.4 } }, gearboxOilC: 85, v12: 14.1, soc12: 84 }, unitsMod.US_PRESET, ast, 1000), null);
         const lowTire = detectAnomaly({ tpms: { FL: { pressureBar: 1.9, targetBar: 2.4 } } }, unitsMod.US_PRESET, ast, 2000);
         assert(lowTire && lowTire.id === 'tpms' && lowTire.label.indexOf('FL') === 0);
         const hotGbx = detectAnomaly({ gearboxOilC: 110 }, unitsMod.US_PRESET, ast, 3000);
         assert(hotGbx && hotGbx.id === 'gbox');
-        assert.strictEqual(detectAnomaly({ v12: 11.9 }, unitsMod.US_PRESET, ast, 4000), null);
-        const lowV12 = detectAnomaly({ v12: 11.9 }, unitsMod.US_PRESET, ast, 10000);
+        assert.strictEqual(detectAnomaly({ soc12: 48 }, unitsMod.US_PRESET, ast, 3200), null);
+        const lowSoc12 = detectAnomaly({ soc12: 48 }, unitsMod.US_PRESET, ast, 8500);
+        assert(lowSoc12 && lowSoc12.id === 'soc12' && lowSoc12.severity === 'amber' && lowSoc12.label === '12V 48%');
+        const critSoc12 = detectAnomaly({ soc12: 35 }, unitsMod.US_PRESET, ast, 9000);
+        assert(critSoc12 && critSoc12.id === 'soc12' && critSoc12.severity === 'red');
+        assert.strictEqual(detectAnomaly({ soc12: 82, v12: 11.9 }, unitsMod.US_PRESET, ast, 10000), null);
+        const lowV12 = detectAnomaly({ soc12: 82, v12: 11.9 }, unitsMod.US_PRESET, ast, 16000);
         assert(lowV12 && lowV12.id === 'v12');
     });
 
-    /* 6. Gear Digit Next to D: Clear of KOMBI4 GEAR_WIN (1380..1460) & Baseline Aligned (664..698) */
-    await test('Gear digit next to D clears KOMBI4 GEAR_WIN (1380..1460) at all nudges, aligns to D (y=664..698), and hides in S/M/P/R/N', () => {
+    /* 6. Gear Digit Snugly Next to D: Clear of KOMBI4 GEAR_WIN (1380..1426) & Baseline Aligned (664..698) */
+    await test('Gear digit sits snugly next to D (1427..1459), clears GEAR_WIN (1380..1426) & cabin_temp at all nudges, and hides in S/M/P/R/N', () => {
         const r = new OverlayRenderer({ allowPanel: true });
         const modelBase = {
             units: unitsMod.US_PRESET,
             profile: { vehicleType: 'phev', engineOn: false, mode: 'ev_drive', isEv: true, isCold: false, coldCeilingRpm: null, alert: null },
             efficiency: { evKmPerKwh: 6.1, fuelLPer100km: null, isDfco: false },
-            telemetry: { speedKmh: 72, rpm: 0, hvKw: 14.2, soc: 68, battTempC: 23.5, oilTempC: 48, coolantTempC: 73, stage: 'D', program: 'D', gear: 2 },
+            telemetry: { speedKmh: 72, rpm: 0, hvKw: 14.2, soc: 68, soc12: 86, cabinTempC: 22.0, battTempC: 23.5, oilTempC: 48, coolantTempC: 73, stage: 'D', program: 'D', gear: 2 },
         };
 
         [-12, 0, 12].forEach((nudgeX) => {
             r.render(modelBase, { enabled: true, gearDisplay: 'next_to_d', clusterNudgeX: nudgeX }, 1000);
             assert.strictEqual(r.layers.gear_d.visible, true);
             const gd = r.layers.gear_d;
-            assert(gd.rect.x >= 1461, 'gear_d layer rect must stay strictly right of GEAR_WIN (1380..1460), got x=' + gd.rect.x);
+            assert(gd.rect.x >= 1427 && gd.rect.x <= 1435, 'gear_d layer rect must sit snugly next to D (1427..1435), got x=' + gd.rect.x);
+            assert(gd.rect.x + gd.rect.w <= r.layers.cabin_temp.rect.x || !r.layers.cabin_temp.visible || gd.rect.x < r.layers.cabin_temp.rect.x,
+                'gear_d must sit strictly left of cabin_temp');
             const gdd = gd.cv.d;
             let maxR = 0, maxG = 0, maxB = 0, minWy = 999, maxWy = 0;
             for (let py = 0; py < gd.rect.h; py++) {
@@ -228,14 +246,14 @@ function inBox(x, y, box) {
                     if (gg > maxG) maxG = gg;
                     if (bb > maxB) maxB = bb;
                     const wx = gd.rect.x + px, wy = gd.rect.y + py;
-                    assert(wx >= 1461 && wx < 1540, 'gear_d pixel outside safe pocket between GEAR_WIN & AMBIENT at wx=' + wx);
+                    assert(wx >= 1427 && wx < 1460, 'gear_d pixel outside snug pocket next to D at wx=' + wx);
                     if (wy < minWy) minWy = wy;
                     if (wy > maxWy) maxWy = wy;
                 }
             }
             assert(maxR > 200 && maxG > 200 && maxB > 200, 'gear_d expected bright white text pixels');
-            assert(minWy >= 660 && minWy <= 672, 'gear_d top should align with BMW D (~665), got minWy=' + minWy);
-            assert(maxWy >= 693 && maxWy <= 700, 'gear_d bottom should align with BMW D (~696), got maxWy=' + maxWy);
+            assert(minWy >= 660 && minWy <= 674, 'gear_d top should align with BMW D (~666), got minWy=' + minWy);
+            assert(maxWy >= 692 && maxWy <= 700, 'gear_d bottom should align with BMW D (~696), got maxWy=' + maxWy);
         });
 
         modelBase.telemetry.program = 'S';
@@ -273,27 +291,27 @@ function inBox(x, y, box) {
     await test('Pixel-level hardware clearance check against HOOD, GEAR_WIN, BLACK_BOX, telltales, sub-gauges & full album art', () => {
         const scenarios = [
             {
-                name: 'EV drive D5 (idle dim brake rail + large OIL/CL + large SOC %)',
+                name: 'EV drive D5 (idle dim brake rail + large OIL/CL + HV gauge SoC + 12V % + Cabin Temp)',
                 profile: { vehicleType: 'phev', engineOn: false, mode: 'ev_drive', isEv: true, isCold: false, coldCeilingRpm: null, alert: null },
-                telemetry: { speedKmh: 108, rpm: 0, hvKw: 14.2, soc: 72, battTempC: 24, oilTempC: 48, coolantTempC: 73, stage: 'D', program: 'D', gear: 5, frictionG: 0, pureRegen: false },
+                telemetry: { speedKmh: 108, rpm: 0, hvKw: 14.2, soc: 72, soc12: 86, cabinTempC: 22.0, battTempC: 24, oilTempC: 48, coolantTempC: 73, stage: 'D', program: 'D', gear: 5, frictionG: 0, pureRegen: false },
                 efficiency: { evKmPerKwh: 6.1, fuelLPer100km: null, isDfco: false },
             },
             {
                 name: 'EV pure regen D4 (100% SoC width check + dim brake rail)',
                 profile: { vehicleType: 'phev', engineOn: false, mode: 'ev_regen', isEv: true, isCold: false, coldCeilingRpm: null, alert: null },
-                telemetry: { speedKmh: 54, rpm: 0, hvKw: -26, soc: 100, battTempC: 3, oilTempC: 46, coolantTempC: 70, stage: 'D', program: 'D', gear: 4, frictionG: 0, pureRegen: true },
+                telemetry: { speedKmh: 54, rpm: 0, hvKw: -26, soc: 100, soc12: 100, cabinTempC: 20.0, battTempC: 3, oilTempC: 46, coolantTempC: 70, stage: 'D', program: 'D', gear: 4, frictionG: 0, pureRegen: true },
                 efficiency: { evKmPerKwh: 6.1, fuelLPer100km: null, isDfco: false },
             },
             {
                 name: 'EV blended brake D3 + ABS (low SoC amber + active friction brake segments + g)',
                 profile: { vehicleType: 'phev', engineOn: false, mode: 'ev_drive', isEv: true, isCold: false, coldCeilingRpm: null, alert: null },
-                telemetry: { speedKmh: 36, rpm: 0, hvKw: -22, soc: 15, battTempC: 42, oilTempC: 54, coolantTempC: 76, stage: 'D', program: 'D', gear: 3, frictionG: 0.42, pureRegen: false, absActive: true },
+                telemetry: { speedKmh: 36, rpm: 0, hvKw: -22, soc: 15, soc12: 49, cabinTempC: 24.5, battTempC: 42, oilTempC: 54, coolantTempC: 76, stage: 'D', program: 'D', gear: 3, frictionG: 0.42, pureRegen: false, absActive: true },
                 efficiency: { evKmPerKwh: 6.1, fuelLPer100km: null, isDfco: false },
             },
             {
-                name: 'Gas cold D6 + TPMS alert (triple-digit °F OIL/CL + SOC %)',
+                name: 'Gas cold D6 + TPMS alert (triple-digit °F OIL/CL + 12V %)',
                 profile: { vehicleType: 'phev', engineOn: true, mode: 'gas_cold', isEv: false, isCold: true, coldCeilingRpm: 3800, alert: { id: 'tpms', severity: 'amber', label: 'FL 28psi' } },
-                telemetry: { speedKmh: 98, rpm: 2400, soc: 8, oilTempC: 98, coolantTempC: 96, battTempC: 25, boostBar: 0.4, stage: 'D', program: 'D', gear: 6, frictionG: 0.18, pureRegen: false },
+                telemetry: { speedKmh: 98, rpm: 2400, soc: 8, soc12: 78, cabinTempC: -8.0, oilTempC: 98, coolantTempC: 96, battTempC: 25, boostBar: 0.4, stage: 'D', program: 'D', gear: 6, frictionG: 0.18, pureRegen: false },
                 efficiency: { evKmPerKwh: 6.1, fuelLPer100km: 7.2, isDfco: false },
             },
         ];
@@ -333,8 +351,28 @@ function inBox(x, y, box) {
                 efficiency: scenarios[si].efficiency,
             }, { enabled: true, gearDisplay: 'next_to_d' }, 3000);
 
-            assert.strictEqual(r.lastSummary.cornerRightMode, 'soc', 'PHEV corner_right must default to soc (%)');
+            assert.strictEqual(r.lastSummary.cornerRightMode, 'soc12', 'corner_right must auto-select 12V % now that PHEV HV SoC overlays the HV battery gauge');
+            assert.strictEqual(r.layers.hv_soc_gauge.visible, true, 'PHEV must display hv_soc_gauge over the bottom-right HV battery gauge');
+            assert.strictEqual(r.layers.cabin_temp.visible, true, 'cabin_temp car-box badge must render left of ambient temp');
+            // Verify cabin_temp clears every keepout box (GEAR_WIN, AMBIENT_TEMP, BOTTOM_BRACKET_LINE)
+            const ctL = r.layers.cabin_temp;
+            let ctPainted = 0;
+            for (let py = 0; py < ctL.rect.h; py++) {
+                const wy = ctL.rect.y + py;
+                for (let px = 0; px < ctL.rect.w; px++) {
+                    if (ctL.cv.d[(py * ctL.rect.w + px) * 4 + 3] === 0) continue;
+                    ctPainted++;
+                    const wx = ctL.rect.x + px;
+                    for (let ki = 0; ki < keepoutBoxes.length; ki++) {
+                        assert(!inBox(wx, wy, keepoutBoxes[ki][1]),
+                            scenarios[si].name + ' cabin_temp hits ' + keepoutBoxes[ki][0] + ' at (' + wx + ',' + wy + ')');
+                    }
+                }
+            }
+            assert(ctPainted > 250, 'cabin_temp car-silhouette badge must paint frame + digits');
             assert.strictEqual(r.layers.below_speed.rect.x, 392, 'below_speed must sit shifted left at x=392 under main speed digits');
+            assert.strictEqual(r.layers.below_speed.rect.y, 445, 'below_speed must sit shifted down at y=445 for balanced clearance under speed & above traffic light sign');
+            assert.strictEqual(r.layers.corner_right.rect.y, 646, 'corner_right must sit shifted 3px down at y=646 away from battery icon');
             assert.strictEqual(CLUSTER_LAYER_NAMES.length, 5);
             CLUSTER_LAYER_NAMES.forEach((name) => {
                 const l = r.layers[name];
@@ -344,13 +382,19 @@ function inBox(x, y, box) {
                 let paintedCount = 0;
                 let topHalfPixels = 0;
                 let bottomHalfPixels = 0;
+                let maxTagBlueness = -1;
                 for (let py = 0; py < h; py++) {
                     const wy = oy + py;
                     for (let px = 0; px < w; px++) {
-                        const a = d[(py * w + px) * 4 + 3];
+                        const off = (py * w + px) * 4;
+                        const a = d[off + 3];
                         if (a === 0) continue;
                         paintedCount++;
                         if (py < h / 2) topHalfPixels++; else bottomHalfPixels++;
+                        if (name === 'corner_right' && py < 26 && a > 180) {
+                            const blueness = d[off + 2] - d[off];
+                            if (blueness > maxTagBlueness) maxTagBlueness = blueness;
+                        }
                         const wx = ox + px;
                         assert(wy > visible.hoodY(wx) + 4, scenarios[si].name + ' ' + name + ' pixel under HOOD at (' + wx + ',' + wy + ')');
                         for (let ki = 0; ki < keepoutBoxes.length; ki++) {
@@ -358,6 +402,9 @@ function inBox(x, y, box) {
                                 scenarios[si].name + ' ' + name + ' hits ' + keepoutBoxes[ki][0] + ' at (' + wx + ',' + wy + ')');
                         }
                     }
+                }
+                if (name === 'corner_right') {
+                    assert(maxTagBlueness <= 22, 'corner_right SOC label must stay neutral gray matching battery icon (not blue), got B-R=' + maxTagBlueness);
                 }
                 assert(paintedCount > 30, scenarios[si].name + ' ' + name + ' expected painted pixels');
                 if (name === 'corner_left' || name === 'corner_right') {
@@ -468,10 +515,14 @@ function inBox(x, y, box) {
         }
         assert.strictEqual(holdTopPx, 0, 'stationary brakeHold must not show fake g text');
 
-        assert.strictEqual(resolveCornerRightMode('auto', { vehicleType: 'phev' }, {}), 'soc');
+        assert.strictEqual(resolveCornerRightMode('auto', { vehicleType: 'phev' }, { soc12: 86, soc: 68 }, true), 'soc12');
+        assert.strictEqual(resolveCornerRightMode('auto', { vehicleType: 'phev' }, { v12: 14.1, soc: 68 }, true), 'v12');
+        assert.strictEqual(resolveCornerRightMode('auto', { vehicleType: 'phev' }, { soc: 68 }, false), 'soc');
+        assert.strictEqual(resolveCornerRightMode('soc12', { vehicleType: 'ice' }, {}), 'soc12');
         assert.strictEqual(resolveCornerRightMode('soc', { vehicleType: 'phev' }, {}), 'soc');
         assert.strictEqual(resolveCornerRightMode('batt', { vehicleType: 'phev' }, {}), 'batt');
         assert.strictEqual(resolveCornerRightMode('auto', { vehicleType: 'ice' }, { iatC: 28 }), 'iat');
+        assert.strictEqual(resolveCornerRightMode('auto', { vehicleType: 'ice' }, { soc12: 82, iatC: 28 }), 'soc12');
     });
 
     /* 9. Real DidReader + SignalHub UDS Byte-Frame + FastKw + Self-Healing SME Wake Test */
@@ -655,9 +706,9 @@ function inBox(x, y, box) {
         rDefault.render(modelA, { enabled: true, gearDisplay: 'next_to_d' }, 5000);
         await wait(60);
 
-        assert.strictEqual(recorded.layers.filter((l) => l.target === 'panel').length, 6, 'default panel_only must activate all 5 outer zones + right_widget');
-        assert(rDefault.layerCount() <= 11);
-        assert(rDefault.pixelBytesTotal() < 2.5 * 1024 * 1024);
+        assert.strictEqual(recorded.layers.filter((l) => l.target === 'panel').length, 7, 'default PHEV panel_only must activate 5 outer zones + hv_soc_gauge + right_widget');
+        assert(rDefault.layerCount() <= 16);
+        assert(rDefault.pixelBytesTotal() < 3.5 * 1024 * 1024);
 
         const firstFrames = recorded.frames.length;
         rDefault.render(modelA, { enabled: true, gearDisplay: 'next_to_d' }, 5250);
@@ -755,19 +806,26 @@ function inBox(x, y, box) {
         fs.rmSync(tmpDir, { recursive: true, force: true });
     });
 
-    /* 11. End-to-End Built App Runtime in hu-stub.js (Native Full-Width Switches + Diagnostics Screen) */
-    await test('End-to-end built app runtime in hu-stub.js (Native LT_State_Wide switches + DIAG screen)', async () => {
+    /* 11. End-to-End Built App Runtime in hu-stub.js (3-Tab Native Settings + Widget Checkboxes + DIAG) */
+    await test('End-to-end built app runtime in hu-stub.js (3-tab General/Cluster/HUD + DIAG screen)', async () => {
         const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cluster-metrics-hu-'));
         const dataDir = path.join(tmpDir, 'data');
         const ipcDir = path.join(tmpDir, 'ipc');
         fs.mkdirSync(dataDir, { recursive: true });
         fs.mkdirSync(ipcDir, { recursive: true });
 
-        // Verify built uiDescription.json uses BMW's native full-width LT_State_Wide for MAIN and DIAG
+        // Verify built uiDescription.json uses BMW's native full-width LT_State_Wide across all 5 screens
         const uiXml = fs.readFileSync(path.join(ROOT, 'dist', 'cluster_metrics', 'rhmiData', 'uiDescription', 'application.xml'), 'utf8');
         const wideMatches = uiXml.match(/widget="LT_State_Wide"/g) || [];
-        assert(wideMatches.length >= 2, 'MAIN and DIAG must both use native full-width LT_State_Wide');
-        assert(uiXml.indexOf('widget="LT_CheckBox_1Row"') >= 0, 'MAIN must include native BMW checkbox switches');
+        assert(wideMatches.length >= 5, 'MAIN, GENERAL, CLUSTER, HUD, and DIAG must all use native LT_State_Wide');
+        assert(uiXml.indexOf('widget="LT_CheckBox_1Row"') >= 0, 'CLUSTER/GENERAL must include native BMW checkbox switches');
+        const uiDesc = JSON.parse(fs.readFileSync(path.join(ROOT, 'dist', 'cluster_metrics', 'rhmiData', 'uiDescription', 'uiDescription.json'), 'utf8'));
+        assert(uiDesc.containers && Object.values(uiDesc.containers).some((c) => c.name === 'GENERAL'));
+        assert(uiDesc.containers && Object.values(uiDesc.containers).some((c) => c.name === 'CLUSTER'));
+        assert(uiDesc.containers && Object.values(uiDesc.containers).some((c) => c.name === 'HUD'));
+        const clusterCont = Object.values(uiDesc.containers).find((c) => c.name === 'CLUSTER');
+        const chgComp = Object.values(clusterCont.components).find((c) => c.name === 'WIDGET_CHARGING');
+        assert(chgComp && chgComp.type === 'checkBox', 'CLUSTER must include WIDGET_CHARGING checkbox');
 
         const enStrings = fs.readFileSync(path.join(ROOT, 'dist', 'cluster_metrics', 'rhmiData', 'strings', 'en_GB.json'), 'utf8');
         assert(enStrings.indexOf('github.com/chyiz/mgu-apps') >= 0, 'Settings footer must link to github.com/chyiz/mgu-apps');
@@ -796,8 +854,12 @@ function inBox(x, y, box) {
             await wait(120);
             assert.strictEqual(errors.length, 0, 'startup must produce zero errors: ' + errors.join('; '));
             assert(cellsUpdated.STATUS_SUMMARY, 'STATUS_SUMMARY native row must populate on MAIN');
+            assert(cellsUpdated.TAB_GENERAL && cellsUpdated.TAB_CLUSTER && cellsUpdated.TAB_HUD, 'MAIN 3 setting category tabs must populate');
 
-            // CN Beta starts paused; first click enables, second pauses.
+            // Navigate across General, Cluster, and HUD screens and exercise switches/checkboxes/dropdowns
+            hu.ui.comp('TAB_GENERAL').emit('action', {});
+            await wait(20);
+            assert(hu.stack.includes('GENERAL'), 'TAB_GENERAL must open GENERAL page');
             assert.strictEqual(hu.settings.get('enabled'), false);
             hu.ui.comp('SET_ENABLED').emit('action', {});
             await wait(15);
@@ -805,9 +867,10 @@ function inBox(x, y, box) {
             hu.ui.comp('SET_ENABLED').emit('action', {});
             await wait(15);
             assert.strictEqual(hu.settings.get('enabled'), false);
-            hu.ui.comp('SET_ENABLED').emit('action', {});
-            await wait(15);
-            assert.strictEqual(hu.settings.get('enabled'), true);
+
+            hu.ui.comp('TAB_CLUSTER').emit('action', {});
+            await wait(20);
+            assert(hu.stack.includes('CLUSTER'), 'TAB_CLUSTER must open CLUSTER page');
             hu.ui.comp('SET_CORNERRIGHTDISPLAY').emit('action', { row: 2 }); // 'batt'
             await wait(15);
             assert.strictEqual(hu.settings.get('cornerRightDisplay'), 'batt');
@@ -820,12 +883,22 @@ function inBox(x, y, box) {
             hu.ui.comp('SET_CLUSTERSLOTMODE').emit('action', { row: 0 }); // 'panel_only'
             await wait(15);
             assert.strictEqual(hu.settings.get('clusterSlotMode'), 'panel_only');
-            hu.ui.comp('SET_RIGHTWIDGETMODE').emit('action', { row: 1 }); // 'media'
+            hu.ui.comp('SET_WIDGETTRIP').emit('action', {});
             await wait(15);
-            assert.strictEqual(hu.settings.get('rightWidgetMode'), 'media');
-            hu.ui.comp('SET_RIGHTWIDGETMODE').emit('action', { row: 0 }); // 'cycle'
+            assert.strictEqual(hu.settings.get('widgetTrip'), false);
+            hu.ui.comp('SET_WIDGETTRIP').emit('action', {});
             await wait(15);
-            assert.strictEqual(hu.settings.get('rightWidgetMode'), 'cycle');
+            assert.strictEqual(hu.settings.get('widgetTrip'), true);
+            hu.ui.comp('SET_WIDGETMEDIA').emit('action', {});
+            await wait(15);
+            assert.strictEqual(hu.settings.get('widgetMedia'), false);
+            hu.ui.comp('SET_WIDGETMEDIA').emit('action', {});
+            await wait(15);
+            assert.strictEqual(hu.settings.get('widgetMedia'), true);
+
+            hu.ui.comp('TAB_HUD').emit('action', {});
+            await wait(20);
+            assert(hu.stack.includes('HUD'), 'TAB_HUD must open HUD page');
             hu.ui.comp('SET_HUDNAVMODE').emit('action', { row: 1 }); // 'own_nav_keep'
             await wait(15);
             assert.strictEqual(hu.settings.get('hudNavMode'), 'own_nav_keep');
@@ -839,11 +912,11 @@ function inBox(x, y, box) {
             await wait(15);
             assert.strictEqual(hu.settings.get('hudLine3'), 'soc');
 
-            // Open native DIAG screen via BTN_DIAG and verify all diagnostic rows populate
+            // Open native DIAG screen via BTN_DIAG and verify all diagnostic rows populate including DIAG_HEADWAY & DIAG_CHARGING
             hu.ui.comp('BTN_DIAG').emit('action', {});
             await wait(80);
             assert(hu.stack.includes('DIAG'), 'BTN_DIAG must open native DIAG screen');
-            ['DIAG_RENDER', 'DIAG_NAV', 'DIAG_MEDIA', 'DIAG_BRAKE_ECU', 'DIAG_POWERTRAIN', 'DIAG_BATTERY', 'DIAG_TEMPS', 'DIAG_CHASSIS', 'DIAG_UDS'].forEach((k) => {
+            ['DIAG_RENDER', 'DIAG_NAV', 'DIAG_HEADWAY', 'DIAG_MEDIA', 'DIAG_CHARGING', 'DIAG_BRAKE_ECU', 'DIAG_POWERTRAIN', 'DIAG_BATTERY', 'DIAG_TEMPS', 'DIAG_CHASSIS', 'DIAG_UDS'].forEach((k) => {
                 assert(cellsUpdated[k] && cellsUpdated[k].Text2ndRow, 'DIAG must populate ' + k);
             });
 
@@ -898,6 +971,7 @@ function inBox(x, y, box) {
             'de.bmw.infotainment.lsc.LSCDataSink': ['statusHighVoltageStorage'],
             'de.bmw.infrastructure.VehicleCondition': ['VehicleCondition'],
             'de.bmw.body.Light': ['IndicatorSteeringColumn', 'IndicatorSteeringColumnComplete', 'StatusFunctionsIndicators'],
+            'de.bmw.dass.GapVehicleAhead': ['GapVehicleDrivingAhead', 'DataFrontVehicle', 'DataFrontVehicleExtended'],
         };
         Object.keys(EVENT_ONLY).forEach((iface) => {
             const group = sigs[iface] || {};
@@ -957,11 +1031,39 @@ function inBox(x, y, box) {
         fs.writeFileSync(wazeFile, JSON.stringify({ state: 'idle', target: 'map' }));
 
         assert.strictEqual(parseHudStatusText('slot 0x300 status 2: 0x1000210 class 0 map 1\n').miniMapScene, false);
+        // Critical real-car fix #1: cached unmapped `0x1000200 ... map 0` beside active arrow `0x1000210 ... map 1` must NEVER trigger yield!
+        assert.strictEqual(parseHudStatusText('slot 0x300 status 2: 0x1000210 class 1024 map 1, 0x1000200 class 1024 map 0\n').miniMapScene, false,
+            'unmapped map 0 0x1000200 row alongside active arrow must NOT false-trigger dcsm_0x1000200');
+        assert.strictEqual(parseHudStatusText('slot 0x300 status 0: 0x1000211 class 1024 map 0, 0x1000200 class 1024 map 0\n').miniMapScene, false);
         assert.strictEqual(parseHudStatusText('slot 0x300 status 2: 0x1000200 class 0 map 1\n').miniMapScene, true);
-        // Critical real-car fix: while 0x323 is shown on KOMBI4, BMW's HUD mini-map slot sits parked in status 1 ... map 0!
-        assert.strictEqual(parseHudStatusText('slot 0x300 status 1: 0x01000200 class 0 map 0\nslot 0x323 status 2: 0x010004f9 class 1 map 2\n').miniMapScene, true,
-            'parked status 1 map 0 mini-map scene behind 0x323 must yield immediately without needing master switch toggle');
+        // While 0x323 is shown on KOMBI4, parked mini-map scene with `map 3` (parked/invisible) DOES trigger yield!
+        assert.strictEqual(parseHudStatusText('slot 0x300 status 1: 0x01000200 class 0 map 3\nslot 0x323 status 2: 0x010004f9 class 1 map 1\n').miniMapScene, true,
+            'parked map 3 mini-map scene behind 0x323 must yield immediately');
         assert.strictEqual(parseHudStatusText('slot 0x330 status 2: 0x01000201 class 0 map 3\n').miniMapScene, true);
+
+        // Verify startup order where conclusiveDart arrives before guidingProvider settles into 'BMW' preserves dart (no "waiting for turn")
+        // AND passiveManeuver/nextIntersection decode cleanly, plus 5s noTurnFallback triggers if a BMW route truly lacks maneuver data!
+        const ntBmw = new NavTracker({ crStatusPath: crFile, wazeStatusPath: wazeFile });
+        ntBmw.feedField('guidance', 'guidanceState', 'ACTIVE', 1000);
+        ntBmw.feedField('guidance', 'conclusiveDart', { maneuver: { intersection: { direction: 'SLIGHT_RIGHT', formattedDistance: { distance: '500', unit: 'FEET' } } } }, 1050);
+        ntBmw.feedField('guidance', 'guidingProvider', 'CAR_PLAY', 1100);
+        ntBmw.feedField('guidance', 'guidingProvider', 'NONE', 1150);
+        const snapPreserved = ntBmw.snapshot(20000, 1200);
+        assert(snapPreserved.show && snapPreserved.show.dir === 'SLIGHT_RIGHT', 'conclusiveDart must survive guidingProvider settling to BMW');
+
+        const ntFallback = new NavTracker({ crStatusPath: crFile, wazeStatusPath: wazeFile });
+        ntFallback.feedField('guidance', 'guidanceState', 'ACTIVE', 1000);
+        ntFallback.feedField('guidance', 'guidingProvider', 'NONE', 1050);
+        ntFallback.feedEvents({
+            GuidanceEventListError: 'NO_ERROR',
+            viewContent: [{ eventsInView: [{ passiveManeuver: { passiveManeuverType: 'JUNCTION', formattedDistance: { distance: '1.4', unit: 'MILE_US' }, description: { elements: [{ text: 'I-280 South' }] } } }] }],
+        }, 1200, 1180);
+        const snapPassive = ntFallback.snapshot(20000, 1250);
+        assert(snapPassive.show && snapPassive.show.dir === 'STRAIGHT_ON' && snapPassive.show.road === 'I-280 South', 'passiveManeuver on highway must draw straight guidance instead of waiting');
+
+        // Empty route on BMW for >=5s triggers bmw_nav_fallback so stock HUD arrow takes over cleanly
+        ntFallback.feedEvents({ GuidanceEventListError: 'NO_ERROR', viewContent: [{ eventsInView: [] }] }, 1500, 1480);
+        assert.strictEqual(ntFallback.snapshot(25000, 7000).noTurnFallback, true, 'empty BMW turn list after 5s must trigger bmw_nav_fallback');
         assert.strictEqual(parseWazeHudShowing(JSON.stringify({ state: 'showing', target: 'hud' })), true);
         assert.strictEqual(parseWazeHudShowing(JSON.stringify({ state: 'showing', target: 'map', hud: 1, hud_state: 'showing' })), true);
         assert.strictEqual(parseWazeHudShowing(JSON.stringify({ state: 'idle', target: 'map', hud: 1, hud_state: 'idle' })), false);
@@ -1333,13 +1435,38 @@ function inBox(x, y, box) {
         assert.strictEqual(detectAnomaly({ tpms: hub.live.tpms }, unitsMod.US_PRESET, ast, 1000), null,
             '33 psi vs 36 psi target (3 psi diff) must NEVER trigger false "FL 479psi" red alert');
 
-        // Verify pure-JS PNG decoder + multi-chunk HmiMediaState.coverArt + BC button page cycling
+        // Verify pure-JS PNG decoder + full-wing gauge-edge backdrop + multi-chunk HmiMediaState.coverArt + 3-row title + pagination
         const iconPng = fs.readFileSync(path.join(APP_DIR, 'icon.png'));
-        const thumb = decodeCoverThumb(iconPng, 124);
-        assert(thumb && thumb.w === 124 && thumb.h === 124 && thumb.d.length === 124 * 124 * 4, 'PNG cover must decode to 124x124 RGBA');
+        const thumb = decodeCoverThumb(iconPng, 144);
+        assert(thumb && thumb.w === 144 && thumb.h === 144 && thumb.d.length === 144 * 144 * 4, 'PNG cover must decode to 144x144 RGBA');
+        const bg = buildStockBackdrop(thumb, 536, 516, { ox: 1252, oy: 88, vx: 186, vy: 224 });
+        assert(bg && bg.length === 536 * 516 * 4, 'stock gauge-edge backdrop must render across 536x516 widget canvas');
+        assert.strictEqual(buildStockBackdrop(thumb, 536, 516, { ox: 1252, oy: 88, vx: 186, vy: 224 }), bg, 'backdrop must be cached per track');
+        // Verify backdrop reaches right-wing outer bezel (world 1700, 355 -> local 448, 267) at uniform translucency without darkened border!
+        const wingSampleOff = (267 * 536 + 448) * 4;
+        assert(bg[wingSampleOff + 3] >= 65, 'right-wing cover backdrop must extend smoothly to outer gauge edge, got alpha=' + bg[wingSampleOff + 3]);
+
+        // BMW 3-row podcast/song PlayerMetadata: firstLineType=ARTIST, secondLineType=ALBUM, threeRowText=Episode Title
+        const parsedPodcast = parseHmiPlayerMetadata({
+            firstLineText: 'Freakonomics Radio',
+            firstLineType: 1, // ARTIST
+            secondLineText: 'October 16',
+            secondLineType: 2, // ALBUM
+            threeRowText: 'Freakonomics Radio\nOctober 16\n691. Is This What a Healthy Economy Looks Like?',
+            uiType: 2,
+        });
+        assert.strictEqual(parsedPodcast.title, '691. Is This What a Healthy Economy Looks Like?');
+        assert.strictEqual(parsedPodcast.artist, 'Freakonomics Radio');
+        assert.strictEqual(parsedPodcast.explicitTitle, true);
 
         const mt = new MediaTracker();
-        mt.feedHmiMetadata({ firstLineText: 'Starboy', secondLineText: 'The Weeknd', firstLineType: 'TITLE', secondLineType: 'ARTIST' });
+        // When HmiMediaState omits threeRowText (ARTIST + ALBUM only) while CarPlayMedia has TITLE, snapshot must pick CarPlay TITLE!
+        mt.feedMediaPlayerState('PLAYER_STATE_PLAY', 9900);
+        mt.feedMediaPlayerMetadata([
+            { key: 3, value: { stringValue: '691. Is This What a Healthy Economy Looks Like?' } },
+            { key: 5, value: { stringValue: 'Freakonomics Radio' } },
+        ], 9950);
+        mt.feedHmiMetadata({ firstLineText: 'Freakonomics Radio', secondLineText: 'October 16', firstLineType: 1, secondLineType: 2 }, 10000);
         mt.feedHmiProgress({ elapsed: 84000, total: 230000, hasProgress: true }, 10000);
         // Split PNG into 2 chunks to exercise multi-chunk CoverArt reassembly
         const half = Math.floor(iconPng.length / 2);
@@ -1348,10 +1475,18 @@ function inBox(x, y, box) {
 
         let mSnap = mt.snapshot(12000, false);
         assert.strictEqual(mSnap.active, true);
-        assert.strictEqual(mSnap.title, 'Starboy');
-        assert.strictEqual(mSnap.artist, 'The Weeknd');
-        assert(mSnap.cover && mSnap.cover.w === 124);
+        assert.strictEqual(mSnap.title, '691. Is This What a Healthy Economy Looks Like?');
+        assert.strictEqual(mSnap.artist, 'Freakonomics Radio');
+        assert(mSnap.cover && mSnap.cover.w === 144);
         assert.strictEqual(mSnap.page, 'media');
+
+        // Verify long title shrinks to 22px min and paginates smoothly over time (never truncating permanently)
+        const testCv = new Canvas(456, 396);
+        const pg0 = paginateTitle(testCv, mSnap.title, 336, [30, 27, 24, 22], 22, 500);
+        const pg1 = paginateTitle(testCv, mSnap.title, 336, [30, 27, 24, 22], 22, 4200);
+        assert.strictEqual(pg0.size, 22);
+        assert(pg0.pages >= 2 && pg0.page === 0 && pg1.page === 1, 'long title must paginate cleanly across segments');
+        assert(pg0.text !== pg1.text && pg1.text.indexOf('Looks') >= 0);
 
         const r = new OverlayRenderer({ allowPanel: true });
         const model = {
@@ -1360,9 +1495,34 @@ function inBox(x, y, box) {
             efficiency: { evKmPerKwh: 6.1, fuelLPer100km: null, isDfco: false },
             telemetry: { speedKmh: 60, rpm: 0, hvKw: 12.4, soc: 76, erangeKm: 28, frangeKm: 310, tripDistKm: 19.4, gearboxOilC: 84, battTempC: 25, v12: 14.1, stage: 'D', program: 'D', gear: 5, frictionG: 0.24, brakeBar: 20, media: mSnap },
         };
-        r.render(model, { enabled: true, rightWidgetMode: 'cycle', hudLine3: 'brake' }, 12000);
+        r.render(model, { enabled: true, rightWidgetMode: 'cycle', hudLine1: 'efficiency_gear', hudLine2: 'power', hudLine3: 'brake' }, 12000);
         assert.strictEqual(r.lastSummary.rightWidgetPage, 'media');
         assert.strictEqual(r.layers.right_widget.visible, true);
+
+        // Verify non-shifting HUD Line 1 Efficiency + Gear alignment:
+        //   - Changing efficiency value ("3.8" -> "34.6" -> "--") keeps Gear "D5" pixel slice (x=162..220) identical!
+        //   - Changing Stage P (no gear) <-> D5 keeps Efficiency pixel slice (x=0..145) identical!
+        const grabHudSlice = (cv, x0, x1) => {
+            const chunks = [];
+            for (let y = 0; y < 44; y++) chunks.push(Buffer.from(cv.d.slice((y * cv.w + x0) * 4, (y * cv.w + x1) * 4)));
+            return Buffer.concat(chunks);
+        };
+        const gearSliceA = grabHudSlice(r.layers.hud_main.cv, 162, 220);
+        const effSliceA = grabHudSlice(r.layers.hud_main.cv, 0, 145);
+
+        model.efficiency.evKmPerKwh = 21.5; // "13.4 mi/kWh" (wider digits)
+        r.render(model, { enabled: true, hudLine1: 'efficiency_gear', hudLine2: 'power', hudLine3: 'brake' }, 12050);
+        assert.strictEqual(Buffer.compare(gearSliceA, grabHudSlice(r.layers.hud_main.cv, 162, 220)), 0,
+            'Gear D5 on HUD Row 1 must NOT shift when efficiency changes width');
+
+        model.efficiency.evKmPerKwh = 6.1;
+        model.telemetry.stage = 'P';
+        model.telemetry.gear = null;
+        r.render(model, { enabled: true, hudLine1: 'efficiency_gear', hudLine2: 'power', hudLine3: 'brake' }, 12100);
+        assert.strictEqual(Buffer.compare(effSliceA, grabHudSlice(r.layers.hud_main.cv, 0, 145)), 0,
+            'Efficiency on HUD Row 1 must NOT shift when Gear disappears in Park');
+        model.telemetry.stage = 'D';
+        model.telemetry.gear = 5;
 
         // Cycle 1: KombiIF.statusKombiSelection change -> flips page 'media' -> 'trip'
         mt.feedKombiSelection({ statusActivationInstrumentPackContent: 1, statusActivationInstrumentPackBC: 10 }, 12000); // baseline
@@ -1385,15 +1545,290 @@ function inBox(x, y, box) {
         assert.strictEqual(r.lastSummary.rightWidgetPage, 'off');
         assert.strictEqual(r.layers.right_widget.visible, false);
 
-        // Cycle 3: Quick double-tap of left-stalk HBA button -> flips 'off' -> 'media'
+        // Cycle 3: Quick double-tap of left-stalk HBA button must NOT cycle right_widget; genuine BC click cycles back to 'media'
         mt.feedStalk({ operationColumnStalks: 0, statusPushButtonMainBeamAssistant: 'TASTER_GEDRUECKT' }, 14000);
         mt.feedStalk({ operationColumnStalks: 0, statusPushButtonMainBeamAssistant: 'KEINE_BETAETIGUNG' }, 14080);
         mt.feedStalk({ operationColumnStalks: 0, statusPushButtonMainBeamAssistant: 'TASTER_GEDRUECKT' }, 14200);
         mt.feedStalk({ operationColumnStalks: 0, statusPushButtonMainBeamAssistant: 'KEINE_BETAETIGUNG' }, 14280);
         await new Promise((res) => setTimeout(res, 700));
         mSnap = mt.snapshot(15100, false);
-        assert.strictEqual(mSnap.page, 'media', 'double-tap HBA button must cycle right_widget back to media');
+        assert.strictEqual(mSnap.page, 'off', 'double-tap HBA button fallback must be removed');
+        assert.strictEqual(mt.feedKombiSelection({ statusActivationInstrumentPackContent: 3, statusActivationInstrumentPackBC: 12 }, 15150), true);
+        mSnap = mt.snapshot(15150, false);
+        assert.strictEqual(mSnap.page, 'media', '3rd genuine BC click must cycle right_widget back to media');
+
+        // Fallback rendering when audio source has no cover art or is inactive
+        model.telemetry.media = { active: true, title: 'FM 88.5 KQED', artist: 'Live Radio', cover: null, playing: true, page: 'media', bcStep: 0 };
+        r.render(model, { enabled: true, rightWidgetMode: 'media' }, 15200);
+        assert.strictEqual(r.layers.right_widget.visible, true, 'right_widget visible for no-cover active media');
+        model.telemetry.media = { active: false, page: 'media', bcStep: 0 };
+        r.render(model, { enabled: true, rightWidgetMode: 'media' }, 15300);
+        assert.strictEqual(r.layers.right_widget.visible, true, 'right_widget visible for inactive media standby');
         mt.stop();
+    });
+
+    /* 16. v0.7.1: Int64 CoverArt Update (Never Stuck), CJK Title/Artist Rendering, Widget Checkboxes & Charging Finish Time + Power Meter */
+    await test('v0.7.1: Int64 coverArt updates across tracks, Chinese/Japanese titles render cleanly, and Charging locks finish-time + kW meter', () => {
+        // A. Cover art must NEVER stick when BMW sends Int64 object coverArtId ({ high: 0, low: 1 }) or reuses IDs!
+        const mt = new MediaTracker();
+        const cvBlue = new Canvas(64, 64);
+        cvBlue.clear('#1d4ed8');
+        const pngBlue = cvBlue.png();
+        const cvRed = new Canvas(64, 64);
+        cvRed.clear('#dc2626');
+        const pngRed = cvRed.png();
+
+        mt.feedHmiMetadata({ firstLineText: 'Blue Track', firstLineType: 3, secondLineText: 'Artist A', secondLineType: 1 }, 1000);
+        assert.strictEqual(mt.feedHmiCoverArt({ coverArtId: { high: 0, low: 1 }, totalSize: pngBlue.length, offset: 0, coverArt: pngBlue }, true), true);
+        let snap1 = mt.snapshot(1050, false);
+        assert(snap1.cover && snap1.cover.d[2] > snap1.cover.d[0], 'first cover must be blue');
+
+        mt.feedHmiMetadata({ firstLineText: 'Red Track', firstLineType: 3, secondLineText: 'Artist B', secondLineType: 1 }, 2000);
+        assert.strictEqual(mt.feedHmiCoverArt({ coverArtId: { high: 0, low: 1 }, totalSize: pngRed.length, offset: 0, coverArt: pngRed }, true), true);
+        let snap2 = mt.snapshot(2050, false);
+        assert(snap2.coverRev > snap1.coverRev && snap2.cover.id !== snap1.cover.id, 'second track cover must invalidate Int64 collision cache');
+        assert(snap2.cover.d[0] > snap2.cover.d[2], 'second cover must update to red artwork');
+
+        // B. Chinese & Japanese title/artist preservation (never "[Track]") + Canvas glyph rendering + CJK pagination
+        const jpTitle = '\u591c\u306b\u99c6\u3051\u308b'; // "Yoru ni Kakeru"
+        const cnTitle = '\u4e03\u91cc\u9999'; // "Qilixiang"
+        const cnArtist = '\u5468\u6770\u502b'; // "Jay Chou" (TC)
+        mt.feedHmiMetadata({ firstLineText: jpTitle, firstLineType: 3, secondLineText: 'YOASOBI', secondLineType: 1 }, 3000);
+        const jpSnap = mt.snapshot(3050, false);
+        assert.strictEqual(jpSnap.title, jpTitle, 'Japanese Hiragana/Kanji title must be preserved');
+        assert.strictEqual(jpSnap.artist, 'YOASOBI');
+
+        mt.feedHmiMetadata({ firstLineText: cnTitle + ' - ' + cnArtist, firstLineType: 3, secondLineText: cnArtist, secondLineType: 1 }, 4000);
+        const cnSnap = mt.snapshot(4050, false);
+        assert(cnSnap.title.indexOf(cnTitle) >= 0 && cnSnap.title.indexOf('[Track]') === -1, 'Chinese SC+TC title must never degrade to [Track]');
+        assert.strictEqual(cnSnap.artist, cnArtist);
+
+        const cjkTestCv = new Canvas(536, 516);
+        const longJp = '\u3053\u308c\u306f\u3068\u3066\u3082\u9577\u3044\u65e5\u672c\u8a9e\u306e\u66f2\u540d\u30c6\u30b9\u30c8\u3067\u3059\u5168\u90e8\u8868\u793a\u3055\u308c\u307e\u3059';
+        const cjkPg0 = paginateTitle(cjkTestCv, longJp, 332, [30, 27, 24, 22], 22, 500);
+        const cjkPg1 = paginateTitle(cjkTestCv, longJp, 332, [30, 27, 24, 22], 22, 4200);
+        assert(cjkPg0.pages >= 2 && cjkPg0.text !== cjkPg1.text, 'long CJK title must paginate cleanly across character boundaries');
+
+        // Render Chinese/Japanese track onto right_widget and verify non-empty painted glyph pixels in title & artist rows!
+        const r = new OverlayRenderer({ allowPanel: true });
+        const model = {
+            units: unitsMod.US_PRESET,
+            profile: { vehicleType: 'phev', engineOn: false, mode: 'ev_drive', isEv: true, isCold: false, coldCeilingRpm: null, alert: null },
+            efficiency: { evKmPerKwh: 6.1, fuelLPer100km: null, isDfco: false },
+            telemetry: {
+                speedKmh: 0, rpm: 0, hvKw: 0.4, soc: 68, erangeKm: 26, frangeKm: 390,
+                stage: 'P', program: 'D', gear: 0, frictionG: 0, brakeBar: 0,
+                media: Object.assign({}, snap2, { title: jpTitle + ' (' + cnTitle + ')', artist: cnArtist + ' / YOASOBI' }),
+                charging: { active: false, plugConnected: false },
+            },
+        };
+        r.render(model, { enabled: true, widgetMedia: true, widgetTrip: true }, 4100);
+        assert.strictEqual(r.layers.right_widget.rect.x, 1252, 'right_widget shifted right to x=1252 (foreground cx=1438)');
+        let titleGlyphPixels = 0;
+        let artistGlyphPixels = 0;
+        const rwCv = r.layers.right_widget.cv;
+        for (let y = 260; y <= 292; y++) {
+            for (let x = 90; x <= 282; x++) {
+                const o = (y * rwCv.w + x) * 4;
+                if (rwCv.d[o] > 210 && rwCv.d[o + 1] > 210 && rwCv.d[o + 2] > 210 && rwCv.d[o + 3] > 200) titleGlyphPixels++;
+            }
+        }
+        for (let y = 298; y <= 328; y++) {
+            for (let x = 90; x <= 282; x++) {
+                const o = (y * rwCv.w + x) * 4;
+                if (rwCv.d[o] > 165 && rwCv.d[o + 1] > 170 && rwCv.d[o + 3] > 200) artistGlyphPixels++;
+            }
+        }
+        assert(titleGlyphPixels > 120 && artistGlyphPixels > 80,
+            'Chinese & Japanese glyphs must draw crisp bright pixels (title=' + titleGlyphPixels + ', artist=' + artistGlyphPixels + ')');
+
+        // C. Checkbox cycling + Charge detection + Charging widget lock + Charging speed hero meter
+        r.render(model, { enabled: true, widgetMedia: false, widgetTrip: false }, 4200);
+        assert.strictEqual(r.lastSummary.rightWidgetPage, 'off', 'both checkboxes unchecked -> right_widget off when not charging');
+        assert.strictEqual(r.layers.right_widget.visible, false);
+
+        const chgRaw = {
+            wirePlugged: true, lscStatus: 'active',
+            endHour: 23, endMin: 45, residualMin: 95, maxAmps: 16, targetSoc: 100, _shorePowerSince: 0,
+        };
+        const chgOn = computeChargingState(chgRaw, { speedKmh: 0, rpm: 0, hvKw: -3.5, soc: 68, stage: 'P' }, 5000);
+        assert.strictEqual(chgOn.active, true);
+        assert.strictEqual(chgOn.finishTimeText, '23:45');
+        assert.strictEqual(chgOn.remainText, '1h 35m');
+        assert.strictEqual(chgOn.chargeKw, 3.5);
+
+        model.telemetry.hvKw = -3.5;
+        model.telemetry.charging = chgOn;
+        // Even with BOTH widgetMedia=false and widgetTrip=false, charging forces rightWidgetPage='charging'!
+        r.render(model, { enabled: true, widgetMedia: false, widgetTrip: false }, 5100);
+        assert.strictEqual(r.lastSummary.isCharging, true);
+        assert.strictEqual(r.lastSummary.rightWidgetPage, 'charging', 'charging widget must auto-activate and cannot be turned off while charging');
+        assert.strictEqual(r.layers.right_widget.visible, true);
+        assert.strictEqual(r.lastSummary.hero.value, '3.5', 'below_speed must replace -- mi/kWh with charging speed kW');
+        assert.strictEqual(r.lastSummary.hero.unit, 'kW');
+        assert.strictEqual(r.lastSummary.subText, 'CHARGING 16A');
+
+        // When car finishes/unplugs (not charging), charging widget automatically disables
+        const chgOff = computeChargingState({ wirePlugged: false, lscStatus: 'done', _shorePowerSince: 0 }, { speedKmh: 0, rpm: 0, hvKw: 0.1, soc: 100, stage: 'P' }, 6000);
+        assert.strictEqual(chgOff.active, false);
+        model.telemetry.charging = chgOff;
+        model.telemetry.hvKw = 0.2;
+        r.render(model, { enabled: true, widgetMedia: false, widgetTrip: false }, 6100);
+        assert.strictEqual(r.lastSummary.isCharging, false);
+        assert.strictEqual(r.lastSummary.rightWidgetPage, 'off', 'charging widget must disable automatically when not charging');
+        mt.stop();
+    });
+
+    /* 17. Lead-Car Headway HUD, 12V Battery SoC %, PHEV-Only HV Gauge SoC, Cabin Temp Car-Box & On-Demand Signal Gating */
+    await test('Lead-car headway HUD, 12V SoC %, PHEV-only HV gauge SoC, cabin temp car-box, and dynamic on-demand signal teardown', async () => {
+        // A. Pure signal decoders: 12V SoC %, Cabin Temp, and LeadVehicleTracker
+        assert.strictEqual(decodeStatusBattery2({ conditionBatteryChargingCondition: 86 }), 86);
+        assert.strictEqual(decodeStatusBattery2({ conditionBatteryChargingCondition: 0 }), 0);
+        assert.strictEqual(decodeStatusBattery2({ conditionBatteryChargingCondition: 255 }), null, '255 invalid must return null');
+
+        assert.strictEqual(decodeCabinTemp({ temperatureInside: 124 }), 22.0); // 124 * 0.5 - 40 = 22.0C (72F)
+        assert.strictEqual(decodeCabinTemp({ temperatureInside: 80 }), 0.0);
+        assert.strictEqual(decodeCabinTemp({ temperatureInside: 255 }), null, '255 invalid must return null');
+
+        const lt = new LeadVehicleTracker();
+        assert.strictEqual(lt.snapshot(100, 1000).active, false);
+        // Feed DataFrontVehicle: 576 * 0.0625 = 36.0m at 72 km/h (20 m/s) -> 1.80s headway
+        lt.feedDataFront({ frontVehicleObjectID: 7, frontVehicleGapX: 576, qualifierEventDataFunctionFrontVehicle: 0 }, 1000);
+        let lSnap = lt.snapshot(72, 1050);
+        assert.strictEqual(lSnap.active, true);
+        assert(Math.abs(lSnap.gapM - 36.0) < 0.01);
+        assert(Math.abs(lSnap.headwaySec - 1.8) < 0.02);
+
+        // 500ms later, gap closes from 36.0m -> 31.0m (-5.0m in 0.5s = -10 m/s = -36 km/h closing)
+        lt.feedDataFront({ frontVehicleObjectID: 7, frontVehicleGapX: 496, qualifierEventDataFunctionFrontVehicle: 0 }, 1500);
+        lSnap = lt.snapshot(72, 1520);
+        assert(lSnap.relSpeedKmh < -20, 'closing gap must yield negative relSpeedKmh, got ' + lSnap.relSpeedKmh);
+        const hwFmt = formatLeadHeadwayParts(lSnap, unitsMod.US_PRESET, 'full');
+        assert.strictEqual(hwFmt.primaryStr, '1.6s');
+        assert(hwFmt.secDistStr.indexOf('ft') > 0);
+        assert(hwFmt.deltaStr.indexOf('-') === 0 && hwFmt.deltaStr.indexOf('mph') > 0, 'closing speed must format in mph');
+
+        // Below 12 km/h creep: headwaySec is null so primary readout shows distance cleanly instead of 9.9s noise
+        const creepSnap = lt.snapshot(5, 1600);
+        assert.strictEqual(creepSnap.headwaySec, null);
+        const creepFmt = formatLeadHeadwayParts(creepSnap, unitsMod.METRIC_PRESET, 'compact');
+        assert.strictEqual(creepFmt.primaryStr, '31 m');
+        assert.strictEqual(creepFmt.secDistStr, '');
+        assert.strictEqual(creepFmt.deltaStr, '');
+
+        // Staleness > 2.5s or explicit EVENT_DATA_NOT_AVAILABLE clears lead vehicle immediately
+        assert.strictEqual(lt.snapshot(72, 4200).active, false, 'stale radar data >2.5s must auto-hide');
+        lt.feedDataFront({ frontVehicleObjectID: 7, frontVehicleGapX: 400, qualifierEventDataFunctionFrontVehicle: 0 }, 4500);
+        assert.strictEqual(lt.snapshot(72, 4550).active, true);
+        lt.feedDataFront({ frontVehicleObjectID: 255, frontVehicleGapX: 4095, qualifierEventDataFunctionFrontVehicle: 2 }, 4600);
+        assert.strictEqual(lt.snapshot(72, 4620).active, false, 'EVENT_DATA_NOT_AVAILABLE must clear lead vehicle immediately');
+
+        // B. OverlayRenderer: PHEV-only hv_soc_gauge, cabin_temp toggle, and hud_headway geometry across nudges
+        const r = new OverlayRenderer({ allowPanel: true });
+        const phevModel = {
+            units: unitsMod.US_PRESET,
+            profile: { vehicleType: 'phev', engineOn: false, mode: 'ev_drive', isEv: true, isCold: false, coldCeilingRpm: null, alert: null },
+            efficiency: { evKmPerKwh: 6.1, fuelLPer100km: null, isDfco: false },
+            telemetry: {
+                speedKmh: 96, rpm: 0, hvKw: 14.0, soc: 68, soc12: 86, v12: 14.0, cabinTempC: 22.0,
+                stage: 'D', program: 'D', gear: 6,
+                leadVehicle: { active: true, gapM: 32.0, headwaySec: 1.2, relSpeedKmh: -11.0, status: 'ok' },
+            },
+        };
+
+        [-40, 0, 40].forEach((nudge) => {
+            r.render(phevModel, { enabled: true, hudHeadway: 'full', hudNudgeX: nudge, hudNudgeY: nudge }, 5000);
+            const hwL = r.layers.hud_headway;
+            assert(hwL && hwL.visible, 'hud_headway must be visible when leadVehicle.active=true');
+            const hudIssues = visible.check([{ id: 'hud_headway', x: hwL.rect.x, y: hwL.rect.y, w: hwL.rect.w, h: hwL.rect.h }], 'hud');
+            assert.strictEqual(hudIssues.length, 0, 'hud_headway must pass visible.check at nudge=' + nudge + ': ' + hudIssues.join(', '));
+            assert(hwL.rect.y + hwL.rect.h <= visible.HUD_ACC_ASSIST[1], 'hud_headway must stay strictly above ACC y=202');
+            assert(hwL.rect.x + hwL.rect.w < visible.HUD_STOCK_NAV[0], 'hud_headway must stay strictly left of HUD nav x=405');
+        });
+
+        // Turning off hudHeadway or having no lead car hides hud_headway
+        r.render(phevModel, { enabled: true, hudHeadway: 'off' }, 5100);
+        assert.strictEqual(r.layers.hud_headway.visible, false, 'hudHeadway=off must hide hud_headway');
+
+        // PHEV vs ICE: hv_soc_gauge MUST be hidden on ICE cars even if soc were present!
+        assert.strictEqual(r.layers.hv_soc_gauge.visible, true, 'PHEV must show hv_soc_gauge');
+        const iceModel = Object.assign({}, phevModel, {
+            profile: { vehicleType: 'ice', engineOn: true, mode: 'gas_warm', isEv: false, isCold: false, coldCeilingRpm: null, alert: null },
+        });
+        r.render(iceModel, { enabled: true, hvSocGauge: true }, 5200);
+        assert.strictEqual(r.layers.hv_soc_gauge.visible, false, 'ICE cars must NEVER render hv_soc_gauge over their oil-temp gauge');
+
+        // Turning off cabinTempDisplay hides cabin_temp
+        r.render(phevModel, { enabled: true, cabinTempDisplay: false, hvSocGauge: false }, 5300);
+        assert.strictEqual(r.layers.cabin_temp.visible, false, 'cabinTempDisplay=false must hide cabin_temp');
+        assert.strictEqual(r.layers.hv_soc_gauge.visible, false, 'hvSocGauge=false must hide hv_soc_gauge');
+
+        // C. Strict On-Demand Subscription Gating (`SignalHub.syncDemand` tears down disabled SOME/IP watchers)
+        const watched = {};
+        const shutdownCounts = {};
+        const appSpec = JSON.parse(fs.readFileSync(path.join(APP_DIR, 'app.json'), 'utf8'));
+        const fakeSignals = {
+            watch(iface) {
+                watched[iface] = (watched[iface] || 0) + 1;
+                return Promise.resolve({
+                    iface,
+                    available: true,
+                    shutdown() {
+                        shutdownCounts[iface] = (shutdownCounts[iface] || 0) + 1;
+                        return Promise.resolve();
+                    },
+                });
+            },
+        };
+        const settingsValues = {
+            enabled: true,
+            demo: 'off',
+            displayTarget: 'both',
+            hudHeadway: 'full',
+            cabinTempDisplay: true,
+            widgetMedia: true,
+            widgetTrip: true,
+        };
+        const demandHub = new SignalHub({
+            log: { info: () => {}, warn: () => {}, error: () => {} },
+            spec: appSpec,
+            settings: { values: settingsValues, get: (k) => settingsValues[k] },
+            signals: fakeSignals,
+        }, { noDiag: true, ipcDir: path.join(os.tmpdir(), 'no-ipc-demand-' + process.pid) });
+
+        demandHub.start();
+        await new Promise((res) => setTimeout(res, 25));
+        assert.strictEqual(demandHub.activeWatchers().gapAhead, true);
+        assert.strictEqual(demandHub.activeWatchers().climate, true);
+        assert.strictEqual(demandHub.activeWatchers().media, true);
+        assert.strictEqual(watched['de.bmw.dass.GapVehicleAhead'], 1);
+        assert.strictEqual(watched['de.bmw.infotainment.climate.Climate2'], 1);
+
+        // Turn OFF hudHeadway, cabinTempDisplay, and right-wing widgets -> proxies MUST shut down!
+        settingsValues.hudHeadway = 'off';
+        settingsValues.cabinTempDisplay = false;
+        settingsValues.widgetMedia = false;
+        settingsValues.widgetTrip = false;
+        demandHub.syncDemand(settingsValues, { diagVisible: false });
+        await new Promise((res) => setTimeout(res, 25));
+        assert.strictEqual(demandHub.activeWatchers().gapAhead, false);
+        assert.strictEqual(demandHub.activeWatchers().climate, false);
+        assert.strictEqual(demandHub.activeWatchers().media, false);
+        assert.strictEqual(shutdownCounts['de.bmw.dass.GapVehicleAhead'], 1, 'GapVehicleAhead proxy must be shut down when hudHeadway=off');
+        assert.strictEqual(shutdownCounts['de.bmw.infotainment.climate.Climate2'], 1, 'Climate2 proxy must be shut down when cabinTempDisplay=false');
+        assert.strictEqual(shutdownCounts['de.bmw.infotainment.hmi.hmimediastate.HmiMediaState'], 1, 'HmiMediaState proxy must be shut down when right widgets are off');
+
+        // Re-enabling hudHeadway & cabinTempDisplay cleanly re-subscribes
+        settingsValues.hudHeadway = 'compact';
+        settingsValues.cabinTempDisplay = true;
+        demandHub.syncDemand(settingsValues, { diagVisible: false });
+        await new Promise((res) => setTimeout(res, 25));
+        assert.strictEqual(demandHub.activeWatchers().gapAhead, true);
+        assert.strictEqual(demandHub.activeWatchers().climate, true);
+        assert.strictEqual(watched['de.bmw.dass.GapVehicleAhead'], 2);
+        assert.strictEqual(watched['de.bmw.infotainment.climate.Climate2'], 2);
+
+        demandHub.stop();
     });
 
     console.log('\nAll ' + passed + ' tests passed.');

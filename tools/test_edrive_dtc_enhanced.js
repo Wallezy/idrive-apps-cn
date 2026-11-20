@@ -54,7 +54,7 @@ async function main() {
         assert.strictEqual(pkg.main, 'javascript/localized-entry.js');
         assert.strictEqual(pkg.license, 'MIT');
         const provenance = JSON.parse(fs.readFileSync(path.join(packageDir, 'PROVENANCE.json')));
-        assert.strictEqual(provenance.commit, 'b2880634eb214e29f008422b970cf22ea2de280f');
+        assert.strictEqual(provenance.commit, '35bca28bc82b30482d73782877ebaf92c69dcb8c');
         assert.strictEqual(pkg.license, 'MIT', 'License follows verified public source, not generated export metadata');
         assert(!fs.existsSync(path.join(packageDir, 'node_modules')));
         assert(!fs.existsSync(path.join(packageDir, 'javascript/app.js')));

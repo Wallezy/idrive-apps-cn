@@ -1,5 +1,13 @@
 [
   {
+    "version": "1.0.19",
+    "upstreamVersion": "1.0.18",
+    "cnRevision": 1,
+    "changes": [
+      "完善双控制模块数据与常用指标显示。"
+    ]
+  },
+  {
     "version": "1.0.14",
     "upstreamVersion": "1.0.13",
     "cnRevision": 1,

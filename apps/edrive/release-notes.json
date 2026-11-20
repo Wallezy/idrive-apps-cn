@@ -1,5 +1,13 @@
 [
   {
+    "version": "2.11.1",
+    "upstreamVersion": "2.11.0",
+    "cnRevision": 1,
+    "changes": [
+      "完善纯电与混动车型电量、续航及电池数据显示。"
+    ]
+  },
+  {
     "version": "2.9.4",
     "upstreamVersion": "2.9.2",
     "cnRevision": 2,

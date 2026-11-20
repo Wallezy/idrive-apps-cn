@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/cauliflowermossgrape/idrive7-apps",
-  "commit": "b2880634eb214e29f008422b970cf22ea2de280f",
+  "commit": "35bca28bc82b30482d73782877ebaf92c69dcb8c",
   "language": "zh-CN",
   "sdk": "Excluded; donor-linked by mgu-deploy",
   "adaptations": [
@@ -9,11 +9,11 @@
     "Numeric three-part CN versions"
   ],
   "component": "dyno",
-  "upstreamVersion": "1.6.2",
-  "releaseVersion": "1.6.3",
+  "upstreamVersion": "1.6.3",
+  "releaseVersion": "1.6.4",
   "cnRevision": 1,
   "adaptedSourceFilesSha256": {
-    "apps/dyno/app.json": "35da2428a02951fa5c3643f2f00fa67a27d250dbb93119350fdbbdee87528bcb",
+    "apps/dyno/app.json": "fe749f39312b9d5c6001f2d2ff1ceb3aa19693d240c0db5dd157801fd8a14562",
     "apps/dyno/icon.png": "18ba9e4356b444f2362ce1dc137cec038cfcfeb17f099f203acc4106401f74eb",
     "apps/dyno/main.js": "09de8c788ed26a0ffc89bfae6c049a21291a2d625f4ac2afdb9b514ea3609a0a"
   }

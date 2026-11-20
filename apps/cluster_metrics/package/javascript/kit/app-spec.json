@@ -1,18 +1,34 @@
 {
  "id": "cluster_metrics",
  "title": "\u7ec4\u5408\u4eea\u8868\u6570\u636e",
- "version": "0.6.1",
+ "version": "0.8.1",
  "screens": [
   {
    "name": "MAIN",
    "kind": "menu",
    "title": "\u7ec4\u5408\u4eea\u8868\u6570\u636e",
-   "settings": true,
+   "settings": false,
+   "repoLink": false,
    "items": [
     [
      "tworow",
      "STATUS_SUMMARY",
      "\u7ec4\u5408\u4eea\u8868\u72b6\u6001"
+    ],
+    [
+     "tworow",
+     "TAB_GENERAL",
+     "\u901a\u7528"
+    ],
+    [
+     "tworow",
+     "TAB_CLUSTER",
+     "\u4eea\u8868\u76d8"
+    ],
+    [
+     "tworow",
+     "TAB_HUD",
+     "\u62ac\u5934\u663e\u793a"
     ],
     [
      "button",
@@ -22,9 +38,71 @@
    ]
   },
   {
+   "name": "GENERAL",
+   "kind": "menu",
+   "title": "\u901a\u7528",
+   "repoLink": true,
+   "settings": [
+    "enabled",
+    "displayTarget",
+    "smartAlerts",
+    "unitSystem",
+    "tempUnit",
+    "evEffUnit",
+    "fuelEffUnit",
+    "pressUnit",
+    "coldOilC",
+    "vehicle",
+    "demo"
+   ]
+  },
+  {
+   "name": "CLUSTER",
+   "kind": "menu",
+   "title": "\u4eea\u8868\u76d8",
+   "repoLink": false,
+   "settings": [
+    "clusterSlotMode",
+    "widgetMedia",
+    "widgetTrip",
+    [
+     "checkbox",
+     "WIDGET_CHARGING",
+     "Right widget: Charging finish time (auto)",
+     {
+      "1": 0
+     }
+    ],
+    "gearDisplay",
+    "cabinTempDisplay",
+    "hvSocGauge",
+    "brakeIndicator",
+    "cornerRightDisplay",
+    "cornerLeftDisplay",
+    "clusterNudgeX",
+    "clusterNudgeY"
+   ]
+  },
+  {
+   "name": "HUD",
+   "kind": "menu",
+   "title": "\u62ac\u5934\u663e\u793a",
+   "repoLink": false,
+   "settings": [
+    "hudNavMode",
+    "hudHeadway",
+    "hudLine1",
+    "hudLine2",
+    "hudLine3",
+    "hudNudgeX",
+    "hudNudgeY"
+   ]
+  },
+  {
    "name": "DIAG",
    "kind": "menu",
    "title": "\u5b9e\u65f6\u6570\u636e\u4e0e\u8bca\u65ad",
+   "repoLink": false,
    "items": [
     [
      "button",
@@ -48,8 +126,18 @@
     ],
     [
      "tworow",
+     "DIAG_HEADWAY",
+     "\u62ac\u5934\u663e\u793a\u8ddf\u8f66\u8ddd\u79bb"
+    ],
+    [
+     "tworow",
      "DIAG_MEDIA",
      "\u53f3\u4fa7\u4fe1\u606f\uff08\u5a92\u4f53\u4e0e BC \u6309\u952e\uff09"
+    ],
+    [
+     "tworow",
+     "DIAG_CHARGING",
+     "\u5145\u7535\u4e0e\u9884\u8ba1\u5b8c\u6210\u65f6\u95f4"
     ],
     [
      "tworow",
@@ -129,28 +217,16 @@
    ]
   },
   {
-   "key": "rightWidgetMode",
-   "label": "\u4eea\u8868\u53f3\u4fa7\u4fe1\u606f",
-   "type": "choice",
-   "default": "cycle",
-   "options": [
-    [
-     "cycle",
-     "\u5a92\u4f53\uff0f\u884c\u7a0b\u5207\u6362\uff08\u6309 BC \u952e\uff09"
-    ],
-    [
-     "media",
-     "\u5a92\u4f53\u64ad\u653e\uff08\u5c01\u9762\u4e0e\u8fdb\u5ea6\uff09"
-    ],
-    [
-     "trip",
-     "\u884c\u7a0b\u4e0e\u8f66\u8f86\u4fe1\u606f"
-    ],
-    [
-     "off",
-     "\u5173\u95ed"
-    ]
-   ]
+   "key": "widgetMedia",
+   "label": "\u53f3\u4fa7\u4fe1\u606f\uff1a\u5a92\u4f53\u64ad\u653e",
+   "type": "bool",
+   "default": true
+  },
+  {
+   "key": "widgetTrip",
+   "label": "\u53f3\u4fa7\u4fe1\u606f\uff1a\u884c\u7a0b\u4e0e\u8f66\u8f86",
+   "type": "bool",
+   "default": true
   },
   {
    "key": "hudNavMode",
@@ -178,11 +254,36 @@
    ]
   },
   {
+   "key": "hudHeadway",
+   "label": "\u8ddf\u8f66\u8ddd\u79bb\uff08\u62ac\u5934\u663e\u793a\uff09",
+   "type": "choice",
+   "default": "full",
+   "options": [
+    [
+     "full",
+     "\u65f6\u8ddd\u3001\u8ddd\u79bb\u4e0e\u63a5\u8fd1\u901f\u5ea6"
+    ],
+    [
+     "compact",
+     "\u4ec5\u65f6\u8ddd\u4e0e\u8ddd\u79bb"
+    ],
+    [
+     "off",
+     "\u5173\u95ed"
+    ]
+   ]
+  },
+  {
    "key": "hudLine1",
    "label": "\u62ac\u5934\u663e\u793a\u7b2c\u4e00\u884c",
    "type": "choice",
-   "default": "efficiency",
+   "default": "efficiency_gear",
+   "reset": 2,
    "options": [
+    [
+     "efficiency_gear",
+     "\u80fd\u8017\u4e0e\u6321\u4f4d\uff08\u56fa\u5b9a\u4f4d\u7f6e\uff09"
+    ],
     [
      "efficiency",
      "\u5b9e\u65f6\u80fd\u8017\uff08\u8ddf\u968f\u6240\u9009\u5355\u4f4d\uff09"
@@ -200,6 +301,14 @@
      "\u52a8\u529b\u7535\u6c60\u7535\u91cf"
     ],
     [
+     "soc12",
+     "12V \u7535\u6c60\u7535\u91cf"
+    ],
+    [
+     "headway",
+     "\u8ddf\u8f66\u8ddd\u79bb"
+    ],
+    [
      "temps",
      "\u673a\u6cb9\u4e0e\u51b7\u5374\u6db2\u6e29\u5ea6"
     ],
@@ -213,15 +322,16 @@
    "key": "hudLine2",
    "label": "\u62ac\u5934\u663e\u793a\u7b2c\u4e8c\u884c",
    "type": "choice",
-   "default": "power_gear",
+   "default": "power",
+   "reset": 2,
    "options": [
-    [
-     "power_gear",
-     "\u529f\u7387\uff0f\u589e\u538b\u4e0e\u6321\u4f4d"
-    ],
     [
      "power",
      "\u4ec5\u529f\u7387\uff0f\u589e\u538b"
+    ],
+    [
+     "power_gear",
+     "\u529f\u7387\uff0f\u589e\u538b\u4e0e\u6321\u4f4d"
     ],
     [
      "gear",
@@ -232,8 +342,16 @@
      "\u52a8\u529b\u7535\u6c60\u7535\u91cf"
     ],
     [
+     "soc12",
+     "12V \u7535\u6c60\u7535\u91cf"
+    ],
+    [
      "soc_oil",
      "\u52a8\u529b\u7535\u6c60\u7535\u91cf\u4e0e\u6cb9\u6e29"
+    ],
+    [
+     "headway",
+     "\u8ddf\u8f66\u8ddd\u79bb"
     ],
     [
      "temps",
@@ -268,6 +386,14 @@
      "\u52a8\u529b\u7535\u6c60\u7535\u91cf\u4e0e\u6cb9\u6e29"
     ],
     [
+     "soc12",
+     "12V \u7535\u6c60\u7535\u91cf"
+    ],
+    [
+     "headway",
+     "\u8ddf\u8f66\u8ddd\u79bb"
+    ],
+    [
      "gear",
      "\u5f53\u524d\u6321\u4f4d\uff08D1\u2013D8\uff09"
     ],
@@ -278,6 +404,18 @@
    ]
   },
   {
+   "key": "cabinTempDisplay",
+   "label": "\u8f66\u5185\u6e29\u5ea6\uff08\u5916\u6e29\u5de6\u4fa7\uff09",
+   "type": "bool",
+   "default": true
+  },
+  {
+   "key": "hvSocGauge",
+   "label": "\u9ad8\u538b\u7535\u6c60\u7535\u91cf\u8868\uff08\u63d2\u6df7\uff09",
+   "type": "bool",
+   "default": true
+  },
+  {
    "key": "cornerRightDisplay",
    "label": "\u53f3\u4e0b\u89d2\u6570\u636e",
    "type": "choice",
@@ -286,15 +424,15 @@
    "options": [
     [
      "auto",
-     "\u7535\u91cf\uff08\u71c3\u6cb9\u8f66\u663e\u793a\u8fdb\u6c14\u6e29\u5ea6\uff09"
+     "\u81ea\u52a8\uff0812V \u7535\u91cf\uff0f\u7535\u538b\uff0f\u8fdb\u6c14\u6e29\u5ea6\uff09"
     ],
     [
-     "soc",
-     "\u52a8\u529b\u7535\u6c60\u7535\u91cf"
+     "soc12",
+     "12V \u7535\u6c60\u7535\u91cf"
     ],
     [
      "batt",
-     "\u52a8\u529b\u7535\u6c60\u6e29\u5ea6"
+     "\u9ad8\u538b\u7535\u6c60\u6e29\u5ea6"
     ],
     [
      "gbx",
@@ -307,6 +445,10 @@
     [
      "iat",
      "\u8fdb\u6c14\u6e29\u5ea6"
+    ],
+    [
+     "soc",
+     "\u9ad8\u538b\u7535\u6c60\u7535\u91cf\uff08\u5e95\u89d2\uff09"
     ],
     [
      "off",
@@ -613,6 +755,10 @@
      "\u63d2\u6df7\u6f14\u793a\uff08530e\uff09"
     ],
     [
+     "charging",
+     "\u6f14\u793a\u63d2\u6df7\u5145\u7535"
+    ],
+    [
      "ice",
      "\u71c3\u6cb9\u8f66\u6f14\u793a\uff08B48\uff0fB58\uff09"
     ],
@@ -656,6 +802,11 @@
     "invalid": 255
    },
    "ambient": {
+    "factor": 0.5,
+    "offset": -40,
+    "invalid": 255
+   },
+   "cabin": {
     "factor": 0.5,
     "offset": -40,
     "invalid": 255
@@ -856,6 +1007,9 @@
  "startWidget": null,
  "stateIds": {
   "MAIN": 1,
-  "DIAG": 33
+  "GENERAL": 10,
+  "CLUSTER": 26,
+  "HUD": 42,
+  "DIAG": 53
  }
 }

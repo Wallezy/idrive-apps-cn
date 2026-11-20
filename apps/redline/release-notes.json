@@ -1,5 +1,13 @@
 [
   {
+    "version": "2.0.46",
+    "upstreamVersion": "2.0.45",
+    "cnRevision": 1,
+    "changes": [
+      "改进燃油、爆震与电气数据兼容。"
+    ]
+  },
+  {
     "version": "2.0.43",
     "upstreamVersion": "2.0.42",
     "cnRevision": 1,

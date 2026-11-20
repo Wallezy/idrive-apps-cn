@@ -1,9 +1,21 @@
 {
   "id": "cluster_metrics",
   "title": "Cluster Metrics",
-  "description": "Real-time efficiency, HV battery %, powertrain temperatures, gear in D, right-wing Media/Trip widget, HUD turn-by-turn nav, and live DSC hydraulic brake indicator for BMW iDrive 7",
-  "version": "0.6.0",
+  "description": "Real-time efficiency, HV battery %, powertrain temperatures, gear in D, full-wing Right-Wing Media/Charging/Trip widget, HUD turn-by-turn nav, and live DSC hydraulic brake indicator for BMW iDrive 7",
+  "version": "0.8.0",
+  "license": "GPL-3.0-only",
   "vendor": "chyiz",
+  "bundleNotices": [
+    "Cluster Metrics - GNU General Public License v3.0 (GPL-3.0, see LICENSE).",
+    "Copyright (c) 2026 chyiz (https://github.com/chyiz)",
+    "",
+    "Bundled runtime dependencies retain their upstream licenses:",
+    "- kit/*, redline_hud_nav.js, redline_nav.js: MIT License (cauliflowermossgrape/idrive7-apps)",
+    "- cluster_render_client.js: MPL-2.0, Copyright (C) 2026 Robert Nisipeanu",
+    "- jpeg_decoder.js (jpeg-js 0.4.4): Apache-2.0 / BSD-3-Clause",
+    "- kit/fonts/{bold,gear,label,light,num}.json: Ubuntu Font Licence 1.0 (LICENSE-UbuntuFont.txt)",
+    "- kit/fonts/cjk.json: SIL Open Font License 1.1 (LICENSE-NotoSansCJK.txt)"
+  ],
   "repoTitle": "GitHub Repository",
   "repoLink": "github.com/chyiz/mgu-apps",
   "loggingId": "OA7E",
@@ -17,7 +29,8 @@
   "signals": {
     "de.bmw.infotainment.vehicle.CDS": {
       "statusEngineSpeed2": "rs",
-      "statusEngineTemperature": "rs"
+      "statusEngineTemperature": "rs",
+      "statusBattery2": "rs"
     },
     "de.bmw.infotainment.vehicle.CDS2": {
       "_optional": "g-force, fuel injection rate and alternate engine oil temp",
@@ -26,8 +39,17 @@
       "statusInjectionVolume": "rs"
     },
     "de.bmw.infotainment.vehicle.Vehicle": {
-      "_optional": "BMW display unit configuration (temperature, distance, fuel/EV consumption, tire pressure)",
-      "statusNewCurrentUnitsStatusExt": "rs"
+      "_optional": "BMW display unit configuration and plug-in charging time/current prognosis",
+      "statusNewCurrentUnitsStatusExt": "rs",
+      "chargingStatus2": "rs",
+      "displayChargingCurrentLimit2": "rs",
+      "lastStateCallCharging": "s"
+    },
+    "de.bmw.infotainment.vehicle.Charging": {
+      "_optional": "plug-in charging cable state, target SoC, and charging session status",
+      "statusChargingCable": "rs",
+      "displayChargingStatus": "s",
+      "lastStateCallCharging": "s"
     },
     "de.bmw.infotainment.vehicle.Vehicle2": {
       "statusCarSpeed2": "rs",
@@ -136,6 +158,7 @@
       "_optional": "active media title, artist, playback position, and JPEG/PNG album art across CarPlay/Bluetooth/USB/Radio",
       "_instances": "HMI_CID",
       "playerMetadata": "rs",
+      "mainMenuMetadata": "rs",
       "trackProgress": "rs",
       "coverArt": "rs"
     },
@@ -147,7 +170,7 @@
       "playerState": "rs"
     },
     "de.bmw.body.Light": {
-      "_optional": "left steering-column stalk BC button & HBA button tap detection",
+      "_optional": "left steering-column stalk BC button click detection",
       "IndicatorSteeringColumn": "s",
       "IndicatorSteeringColumnComplete": "s",
       "StatusFunctionsIndicators": "s"
@@ -157,6 +180,16 @@
       "statusTyreTemperature": "rs",
       "statusTyrePressure": "rs",
       "statusTargetTyrePressure": "rs"
+    },
+    "de.bmw.infotainment.climate.Climate2": {
+      "_optional": "interior cabin temperature",
+      "statusTemperatureInside": "rs"
+    },
+    "de.bmw.dass.GapVehicleAhead": {
+      "_optional": "radar/camera lead vehicle distance, headway, and relative speed",
+      "GapVehicleDrivingAhead": "s",
+      "DataFrontVehicle": "s",
+      "DataFrontVehicleExtended": "s"
     },
     "com.harman.infotainment.systemfunctions.tasu.tasu.InternalTasu": {
       "_optional": "read-only UDS telemetry (HV battery kW/SoC, DME fuel rate, 12V battery, IAT)",
@@ -174,12 +207,28 @@
       "name": "MAIN",
       "kind": "menu",
       "title": "Cluster Metrics",
-      "settings": true,
+      "settings": false,
+      "repoLink": false,
       "items": [
         [
           "tworow",
           "STATUS_SUMMARY",
           "Cluster Metrics Status"
+        ],
+        [
+          "tworow",
+          "TAB_GENERAL",
+          "General"
+        ],
+        [
+          "tworow",
+          "TAB_CLUSTER",
+          "Cluster"
+        ],
+        [
+          "tworow",
+          "TAB_HUD",
+          "HUD"
         ],
         [
           "button",
@@ -189,9 +238,71 @@
       ]
     },
     {
+      "name": "GENERAL",
+      "kind": "menu",
+      "title": "General",
+      "repoLink": true,
+      "settings": [
+        "enabled",
+        "displayTarget",
+        "smartAlerts",
+        "unitSystem",
+        "tempUnit",
+        "evEffUnit",
+        "fuelEffUnit",
+        "pressUnit",
+        "coldOilC",
+        "vehicle",
+        "demo"
+      ]
+    },
+    {
+      "name": "CLUSTER",
+      "kind": "menu",
+      "title": "Cluster",
+      "repoLink": false,
+      "settings": [
+        "clusterSlotMode",
+        "widgetMedia",
+        "widgetTrip",
+        [
+          "checkbox",
+          "WIDGET_CHARGING",
+          "Right widget: Charging finish time (auto)",
+          {
+            "1": 0
+          }
+        ],
+        "gearDisplay",
+        "cabinTempDisplay",
+        "hvSocGauge",
+        "brakeIndicator",
+        "cornerRightDisplay",
+        "cornerLeftDisplay",
+        "clusterNudgeX",
+        "clusterNudgeY"
+      ]
+    },
+    {
+      "name": "HUD",
+      "kind": "menu",
+      "title": "HUD",
+      "repoLink": false,
+      "settings": [
+        "hudNavMode",
+        "hudHeadway",
+        "hudLine1",
+        "hudLine2",
+        "hudLine3",
+        "hudNudgeX",
+        "hudNudgeY"
+      ]
+    },
+    {
       "name": "DIAG",
       "kind": "menu",
       "title": "Live Telemetry & Diagnostics",
+      "repoLink": false,
       "items": [
         [
           "button",
@@ -215,8 +326,18 @@
         ],
         [
           "tworow",
+          "DIAG_HEADWAY",
+          "HUD Lead-Car Headway (GapVehicleAhead)"
+        ],
+        [
+          "tworow",
           "DIAG_MEDIA",
           "Right Widget (Media & BC Button)"
+        ],
+        [
+          "tworow",
+          "DIAG_CHARGING",
+          "Plug-In Charging & Finish Prognosis"
         ],
         [
           "tworow",
@@ -296,28 +417,16 @@
       ]
     },
     {
-      "key": "rightWidgetMode",
-      "label": "Right-side cluster widget",
-      "type": "choice",
-      "default": "cycle",
-      "options": [
-        [
-          "cycle",
-          "Auto Media / Trip (BC button cycles)"
-        ],
-        [
-          "media",
-          "Media Playback (Album Art + Progress)"
-        ],
-        [
-          "trip",
-          "Trip & Powertrain Summary"
-        ],
-        [
-          "off",
-          "Off"
-        ]
-      ]
+      "key": "widgetMedia",
+      "label": "Right widget: Media playback",
+      "type": "bool",
+      "default": true
+    },
+    {
+      "key": "widgetTrip",
+      "label": "Right widget: Trip & powertrain",
+      "type": "bool",
+      "default": true
     },
     {
       "key": "hudNavMode",
@@ -345,11 +454,36 @@
       ]
     },
     {
+      "key": "hudHeadway",
+      "label": "Lead-car headway (HUD)",
+      "type": "choice",
+      "default": "full",
+      "options": [
+        [
+          "full",
+          "Time + distance + closing speed"
+        ],
+        [
+          "compact",
+          "Time + distance only"
+        ],
+        [
+          "off",
+          "Off"
+        ]
+      ]
+    },
+    {
       "key": "hudLine1",
       "label": "HUD Line 1 (top)",
       "type": "choice",
-      "default": "efficiency",
+      "default": "efficiency_gear",
+      "reset": 2,
       "options": [
+        [
+          "efficiency_gear",
+          "Efficiency + Gear (fixed slots)"
+        ],
         [
           "efficiency",
           "Efficiency (mi/kWh or MPG)"
@@ -367,6 +501,14 @@
           "HV Battery %"
         ],
         [
+          "soc12",
+          "12V Battery %"
+        ],
+        [
+          "headway",
+          "Lead-car headway"
+        ],
+        [
           "temps",
           "Oil + Coolant temp"
         ],
@@ -380,15 +522,16 @@
       "key": "hudLine2",
       "label": "HUD Line 2 (middle)",
       "type": "choice",
-      "default": "power_gear",
+      "default": "power",
+      "reset": 2,
       "options": [
-        [
-          "power_gear",
-          "Power / Boost + Gear"
-        ],
         [
           "power",
           "Power / Boost only"
+        ],
+        [
+          "power_gear",
+          "Power / Boost + Gear"
         ],
         [
           "gear",
@@ -399,8 +542,16 @@
           "HV Battery %"
         ],
         [
+          "soc12",
+          "12V Battery %"
+        ],
+        [
           "soc_oil",
           "HV Battery % + Oil temp"
+        ],
+        [
+          "headway",
+          "Lead-car headway"
         ],
         [
           "temps",
@@ -435,6 +586,14 @@
           "HV Battery % + Oil temp"
         ],
         [
+          "soc12",
+          "12V Battery %"
+        ],
+        [
+          "headway",
+          "Lead-car headway"
+        ],
+        [
           "gear",
           "Current gear (D1-D8)"
         ],
@@ -445,6 +604,18 @@
       ]
     },
     {
+      "key": "cabinTempDisplay",
+      "label": "Cabin temperature (left of ambient)",
+      "type": "bool",
+      "default": true
+    },
+    {
+      "key": "hvSocGauge",
+      "label": "HV battery % on gauge (PHEV)",
+      "type": "bool",
+      "default": true
+    },
+    {
       "key": "cornerRightDisplay",
       "label": "Bottom-right indicator",
       "type": "choice",
@@ -453,15 +624,15 @@
       "options": [
         [
           "auto",
-          "HV Battery % (IAT on ICE)"
+          "Auto (12V % / 12V V / IAT)"
         ],
         [
-          "soc",
-          "HV Battery %"
+          "soc12",
+          "12V battery %"
         ],
         [
           "batt",
-          "HV Battery temp"
+          "HV battery temp"
         ],
         [
           "gbx",
@@ -474,6 +645,10 @@
         [
           "iat",
           "Intake air temp"
+        ],
+        [
+          "soc",
+          "HV battery % (bottom corner)"
         ],
         [
           "off",
@@ -780,6 +955,10 @@
           "Demo PHEV (530e)"
         ],
         [
+          "charging",
+          "Demo PHEV Charging"
+        ],
+        [
           "ice",
           "Demo ICE (B48 / B58)"
         ],
@@ -823,6 +1002,11 @@
         "invalid": 255
       },
       "ambient": {
+        "factor": 0.5,
+        "offset": -40,
+        "invalid": 255
+      },
+      "cabin": {
         "factor": 0.5,
         "offset": -40,
         "invalid": 255

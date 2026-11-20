@@ -1,10 +1,10 @@
 [
   {
-    "version": "0.17.3",
-    "upstreamVersion": "0.17.2",
+    "version": "0.19.1",
+    "upstreamVersion": "0.19.0",
     "cnRevision": 1,
     "changes": [
-      "新增 12 套仪表主题，中控设置与操作提示适度汉化。",
+      "新增 Vector、M View 布局，改进全屏排列与音乐显示。",
       "保留原版主题名称、仪表风格和单位，支持国内源在线更新。"
     ]
   }

@@ -20,8 +20,24 @@ import pack_data  # noqa: E402
 from localize import unicode_resources, localize_spec, load_locale, languages
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-ROOT = os.path.abspath(os.path.join(HERE, '..', '..'))
-KIT = os.path.join(ROOT, 'kit')
+VENDOR_ROOT = os.path.abspath(os.path.join(HERE, '..', '..'))
+KIT = os.path.join(VENDOR_ROOT, 'kit')
+
+
+def resolve_app_root(explicit=None):
+    if explicit:
+        return os.path.abspath(explicit)
+    if os.path.basename(os.path.dirname(VENDOR_ROOT)) == 'vendor':
+        cand = os.path.abspath(os.path.join(VENDOR_ROOT, '..', '..'))
+        if os.path.isdir(os.path.join(cand, 'apps')):
+            return cand
+    cwd = os.path.abspath(os.getcwd())
+    if os.path.isdir(os.path.join(cwd, 'apps')) and os.path.isfile(os.path.join(cwd, 'mgu-repo.json')):
+        return cwd
+    return VENDOR_ROOT
+
+
+ROOT = resolve_app_root()
 APPS = os.path.join(ROOT, 'apps')
 DIST = os.path.join(ROOT, 'dist')
 SDK = os.path.join(ROOT, 'oap-sdk')
@@ -161,8 +177,8 @@ def build_ui(spec, language='en'):
     xml = ['<?xml version="1.0" encoding="UTF-8"?>', '<application>']
     ui = {'schemaVersion': '1.3.0', 'containers': {}}
     screens = list(spec.get('screens', []))
-    # a "menu" screen with "settings": true shows the settings itself: no separate settings screen
-    if spec.get('settings') and not any(sc.get('settings') is True for sc in screens):
+    # a "menu" screen with "settings": true or a list of keys shows settings itself: no separate settings screen
+    if spec.get('settings') and not any(bool(sc.get('settings')) for sc in screens):
         screens.append({'name': 'SETTINGS', 'kind': 'settings', 'title': 'Settings'})
     state_ids = {}
     for scr in screens:
@@ -191,8 +207,25 @@ def build_ui(spec, language='en'):
         strings[s] = text
         return {cell: {'value': s, 'type': 'StringId'}}
 
-    def settings_items(items):
-        for s in spec['settings']:
+    def settings_items(items, subset=None, include_repo=True):
+        by_key = {s['key']: s for s in spec.get('settings', [])}
+        entries = list(subset) if isinstance(subset, list) else [s['key'] for s in spec.get('settings', [])]
+        for ent in entries:
+            if isinstance(ent, list):
+                kindi, name = ent[0], ent[1]
+                label = ent[2] if len(ent) > 2 else ''
+                extra = ent[3] if len(ent) > 3 and isinstance(ent[3], dict) else None
+                if kindi == 'twocol':
+                    rows = [{'Text1stCol': {'value': hmi_text(label), 'type': 'Text'}, 'Text2ndCol': {'value': '', 'type': 'Text'}}]
+                elif kindi == 'tworow':
+                    rows = [{'Text1stRow': {'value': hmi_text(label), 'type': 'Text'}, 'Text2ndRow': {'value': '', 'type': 'Text'}}]
+                else:
+                    rows = [text_row(name, label)] if label else [{'Text': {'value': '', 'type': 'Text'}}]
+                items.append(comp(kindi, name, rows=rows, extra_props=extra))
+                continue
+            s = by_key.get(ent)
+            if not s:
+                raise SystemExit('%s: unknown setting key %r in screen settings subset' % (app, ent))
             name = 'SET_' + s['key'].upper()
             if s['type'] == 'bool':
                 items.append(comp('checkbox', name, rows=[text_row('SET_' + s['key'], s['label'])]))
@@ -211,7 +244,7 @@ def build_ui(spec, language='en'):
                 strings[sid(app, 'SET_' + s['key'])] = s['label']
                 items.append(comp('tworow', name, rows=[{'Text1stRow': {'value': s['label'], 'type': 'Text'},
                                                         'Text2ndRow': {'value': '', 'type': 'Text'}}]))
-        if spec.get('repoLink', True):
+        if include_repo and spec.get('repoLink', True):
             repo_title, repo_link = sid(app, 'REPO_CREDITS_TITLE'), sid(app, 'REPO_CREDITS_LINK')
             strings[repo_title] = spec.get('repoTitle', 'GitHub Repository')
             strings[repo_link] = spec.get('repoLink', 'github.com/chyiz/mgu-apps')
@@ -255,6 +288,7 @@ def build_ui(spec, language='en'):
             for it in scr.get('items', []):
                 kindi, name = it[0], it[1]
                 label = it[2] if len(it) > 2 else ''
+                extra = it[3] if len(it) > 3 and isinstance(it[3], dict) else None
                 if kindi == 'twocol':
                     rows = [{'Text1stCol': {'value': hmi_text(label), 'type': 'Text'}, 'Text2ndCol': {'value': '', 'type': 'Text'}}]
                 elif kindi == 'tworow':
@@ -265,9 +299,10 @@ def build_ui(spec, language='en'):
                     rows = [{}]
                 else:
                     rows = [text_row(name, label)] if label else [{'Text': {'value': '', 'type': 'Text'}}]
-                items.append(comp(kindi, name, rows=rows))
+                items.append(comp(kindi, name, rows=rows, extra_props=extra))
             if kind == 'menu' and scr.get('settings'):
-                settings_items(items)
+                include_repo = scr.get('repoLink', scr.get('settings') is True)
+                settings_items(items, scr.get('settings'), include_repo=include_repo)
             groups.append(('List', items))
         tid = nid()
         groups.append(('Titlebar', [(tid, [f'            <component id="{tid}" type="title"/>'],
@@ -411,7 +446,6 @@ def build(app_id, language='en', omit_sdk=False):
     # --- source/ (the npm package) ---
     pkg = {
         'name': app_id, 'version': ver, 'description': spec.get('description', spec['title']),
-        'main': 'javascript/app.js', 'private': False, 'author': spec.get('vendor', 'custom'), 'license': 'UNLICENSED',
         'engines': {'node': '>=8.7.0'},
         'oapAppSettings': {
             'maxDiskUsage': spec.get('maxDiskUsage', 20971520), 'cpuLimit': spec.get('cpuLimit', 60),
@@ -457,14 +491,38 @@ def build(app_id, language='en', omit_sdk=False):
             # a committed pack (e.g. dtc_scanner/dtc_db.pack); a local folder of the same name replaces it
             shutil.copy(os.path.join(adir, f), os.path.join(src, 'javascript', f))
             print('  %s (committed)' % f)
+    # external vendor & npm files declared in app.json
+    for dst_name, rel_src in (spec.get('vendorFiles') or {}).items():
+        vp = os.path.join(VENDOR_ROOT, rel_src)
+        if not os.path.isfile(vp):
+            raise SystemExit('%s: missing vendorFile %s (%s)' % (app_id, dst_name, vp))
+        shutil.copy(vp, os.path.join(src, 'javascript', dst_name))
+    for dst_name, rel_mod in (spec.get('npmFiles') or {}).items():
+        np = os.path.join(ROOT, 'node_modules', rel_mod)
+        if not os.path.isfile(np):
+            raise SystemExit('%s: missing npmFile %s (%s - run npm ci)' % (app_id, dst_name, np))
+        shutil.copy(np, os.path.join(src, 'javascript', dst_name))
+    if os.path.isfile(os.path.join(ROOT, 'LICENSE')) and not os.path.exists(os.path.join(src, 'javascript', 'LICENSE')):
+        shutil.copy(os.path.join(ROOT, 'LICENSE'), os.path.join(src, 'javascript', 'LICENSE'))
+    if spec.get('bundleNotices') and not os.path.exists(os.path.join(src, 'javascript', 'NOTICE')):
+        lines = spec['bundleNotices']
+        ntxt = ('\n'.join(lines) if isinstance(lines, list) else str(lines)).rstrip() + '\n'
+        open(os.path.join(src, 'javascript', 'NOTICE'), 'w', encoding='utf-8', newline='\n').write(ntxt)
     # kit runtime
     kr = os.path.join(KIT, 'runtime')
     for f in os.listdir(kr):
+        if f in ('locales', 'credits.js') and language == 'en':
+            continue
         p = os.path.join(kr, f)
         if os.path.isdir(p):
             shutil.copytree(p, os.path.join(src, 'javascript', 'kit', f))
         else:
             shutil.copy(p, os.path.join(src, 'javascript', 'kit', f))
+    if app_id != 'redline':
+        for unused_font in ('gear_barlow.json', 'OFL-Barlow.txt', 'OFL-NotoSansSC.txt'):
+            ufp = os.path.join(src, 'javascript', 'kit', 'fonts', unused_font)
+            if os.path.exists(ufp):
+                os.remove(ufp)
     rt_spec = {k: spec.get(k) for k in ('id', 'title', 'version', 'screens', 'settings', 'config', 'startWidget')}
     rt_spec['stateIds'] = state_ids
     json.dump(rt_spec, open(os.path.join(src, 'javascript', 'kit', 'app-spec.json'), 'w', encoding='utf-8', newline='\n'), indent=1)
@@ -569,13 +627,20 @@ def gz_header_free(path):
 
 
 def main():
+    global ROOT, APPS, DIST, SDK
     import argparse
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--app-root', default=None, help='Root directory of the app repository')
     parser.add_argument('--language', choices=languages(), default='en')
     parser.add_argument('--stub-sdk', action='store_true', help='Generate a local bench stub oap-sdk/ if missing')
     parser.add_argument('--omit-sdk', action='store_true', help='Leave out node_modules/oap-sdk so head unit links donor oap-sdk')
     parser.add_argument('apps', nargs='*')
     args = parser.parse_args()
+    if args.app_root:
+        ROOT = resolve_app_root(args.app_root)
+        APPS = os.path.join(ROOT, 'apps')
+        DIST = os.path.join(ROOT, 'dist')
+        SDK = os.path.join(ROOT, 'oap-sdk')
     if args.stub_sdk:
         os.environ['OAP_STUB_SDK'] = '1'
     omit_sdk = args.omit_sdk or os.environ.get('OAP_OMIT_SDK') == '1'

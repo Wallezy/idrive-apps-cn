@@ -1,5 +1,13 @@
 [
   {
+    "version": "1.7.23",
+    "upstreamVersion": "1.7.22",
+    "cnRevision": 1,
+    "changes": [
+      "同步上游兼容性更新，保留简体中文界面。"
+    ]
+  },
+  {
     "version": "1.7.22",
     "upstreamVersion": "1.7.21",
     "cnRevision": 1,

@@ -227,6 +227,339 @@ function driveModeOf(raw) {
     return null;
 }
 
+function pad2(n) {
+    const v = Math.max(0, Math.min(99, Math.round(n)));
+    return v < 10 ? ('0' + v) : String(v);
+}
+
+function formatRemainDuration(mins) {
+    if (typeof mins !== 'number' || !isFinite(mins) || mins <= 0) return '';
+    const m = Math.round(mins);
+    const h = Math.floor(m / 60);
+    const rem = m % 60;
+    if (h > 0 && rem > 0) return h + 'h ' + rem + 'm';
+    if (h > 0) return h + 'h';
+    return rem + 'm';
+}
+
+function closeSub(s) {
+    if (!s) return;
+    try {
+        if (typeof s.shutdown === 'function') s.shutdown();
+    } catch (e) { /* ignore */ }
+    try {
+        if (typeof s.stop === 'function') s.stop();
+    } catch (e) { /* ignore */ }
+}
+
+/**
+ * Decode 12V auxiliary battery State of Charge (%) from `CDS.statusBattery2`.
+ * `conditionBatteryChargingCondition` is UInt8 (0..100 %, 255 = invalid).
+ */
+function decodeStatusBattery2(v) {
+    const raw = (v && typeof v === 'object') ? v.conditionBatteryChargingCondition : v;
+    if (typeof raw !== 'number' || !isFinite(raw) || raw < 0 || raw > 100) return null;
+    return raw;
+}
+
+/**
+ * Decode interior cabin temperature from `Climate2.statusTemperatureInside`.
+ * `temperatureInside` is UInt8 (0..250 -> raw * 0.5 - 40 degC, 255 = invalid).
+ */
+function decodeCabinTemp(v) {
+    const raw = (v && typeof v === 'object') ? v.temperatureInside : v;
+    if (typeof raw !== 'number' || !isFinite(raw) || raw < 0 || raw >= 251) return null;
+    const tempC = raw * 0.5 - 40;
+    return (tempC >= -40 && tempC <= 85) ? tempC : null;
+}
+
+const LEAD_STALE_MS = 2500;
+
+/**
+ * Tracks radar/camera lead vehicle distance, time-headway, and closing/opening speed
+ * from `de.bmw.dass.GapVehicleAhead` (`GapVehicleDrivingAhead`, `DataFrontVehicle`, `DataFrontVehicleExtended`).
+ */
+class LeadVehicleTracker {
+    constructor() {
+        this.reset();
+    }
+
+    reset() {
+        this.objId = null;
+        this.gapM = null;
+        this.relSpeedKmh = null;
+        this.vehType = null;
+        this.status = 'idle';
+        this.rawGap8 = null;
+        this.rawGapX = null;
+        this.rawSpeedX = null;
+        this.lastValidMs = 0;
+        this._refGapM = null;
+        this._refMs = 0;
+    }
+
+    _clearTarget(reason) {
+        this.gapM = null;
+        this.relSpeedKmh = null;
+        this.lastValidMs = 0;
+        this._refGapM = null;
+        this._refMs = 0;
+        this.status = reason || 'none';
+    }
+
+    _updateDistance(gapM, objId, nowMs) {
+        if (typeof gapM !== 'number' || !isFinite(gapM) || gapM < 0.4 || gapM > 260) return;
+        const sameObj = (objId === null || this.objId === null || objId === this.objId);
+        if (!sameObj) {
+            this.relSpeedKmh = null;
+            this._refGapM = gapM;
+            this._refMs = nowMs;
+        } else if (this._refGapM !== null && this._refMs > 0) {
+            const dtMs = nowMs - this._refMs;
+            if (dtMs >= 240 && dtMs <= 2200) {
+                const instKmh = ((gapM - this._refGapM) / (dtMs / 1000)) * 3.6;
+                if (isFinite(instKmh) && Math.abs(instKmh) <= 140) {
+                    this.relSpeedKmh = this.relSpeedKmh === null
+                        ? instKmh
+                        : (this.relSpeedKmh * 0.62 + instKmh * 0.38);
+                }
+                this._refGapM = gapM;
+                this._refMs = nowMs;
+            } else if (dtMs > 2200 || dtMs < 0) {
+                this._refGapM = gapM;
+                this._refMs = nowMs;
+            }
+        } else {
+            this._refGapM = gapM;
+            this._refMs = nowMs;
+        }
+        if (objId !== null) this.objId = objId;
+        this.gapM = gapM;
+        this.lastValidMs = nowMs;
+    }
+
+    feedGapAhead(v, nowMs) {
+        if (!v || typeof v !== 'object') return;
+        const now = typeof nowMs === 'number' ? nowMs : Date.now();
+        const st = v.statusMeasurementVehicleDrivingAhead;
+        const g8 = v.gapVehicleDrivingAhead;
+        if (typeof g8 === 'number') this.rawGap8 = g8;
+        const vt = v.vehicleTypeVehicleDrivingAhead;
+        if (vt !== undefined && vt !== null) this.vehType = String(vt);
+
+        const isNoTarget = st === 0 || st === 'KEIN_ELEMENT_GEMESSEN' ||
+            (typeof st === 'string' && /KEIN_ELEMENT|UNGUELTIG|FEHLER/.test(st)) ||
+            (typeof st === 'number' && st >= 5);
+        if (isNoTarget) {
+            // Only clear if high-rate DataFrontVehicle hasn't reported a fresh valid object in the last 600ms
+            if (now - this.lastValidMs > 600 || this.rawGapX === null || this.rawGapX >= 4090) {
+                this._clearTarget(String(st));
+            }
+            return;
+        }
+
+        const isMeasured = st === 1 || st === 2 || st === 3 || st === 4 ||
+            (typeof st === 'string' && /ELEMENT.*GEMESSEN|ELEMENT_PRAEDIZIERT/.test(st));
+        if (isMeasured) {
+            this.status = String(st);
+            // Prefer high-resolution DataFrontVehicle.frontVehicleGapX when fresh; otherwise use gapVehicleDrivingAhead (m)
+            const hasFreshFrontX = this.rawGapX !== null && this.rawGapX > 0 && this.rawGapX < 4090 && (now - this.lastValidMs < 900);
+            if (!hasFreshFrontX && typeof g8 === 'number' && g8 > 0 && g8 < 250) {
+                this._updateDistance(g8, this.objId, now);
+            }
+        }
+    }
+
+    feedDataFront(v, nowMs) {
+        if (!v || typeof v !== 'object') return;
+        const now = typeof nowMs === 'number' ? nowMs : Date.now();
+        const q = v.qualifierEventDataFunctionFrontVehicle;
+        const oid = typeof v.frontVehicleObjectID === 'number' ? v.frontVehicleObjectID : null;
+        const gx = typeof v.frontVehicleGapX === 'number' ? v.frontVehicleGapX : null;
+        const sx = typeof v.frontVehicleSpeedX === 'number' ? v.frontVehicleSpeedX : null;
+
+        if (gx !== null) this.rawGapX = gx;
+        if (sx !== null) this.rawSpeedX = sx;
+
+        const qInvalid = q === 2 || q === 15 ||
+            (typeof q === 'string' && /NOT_AVAILABLE|UNBEFUELLT|INVALID/.test(q));
+        if (qInvalid || (oid !== null && oid >= 250) || (gx !== null && (gx <= 0 || gx >= 4090))) {
+            this._clearTarget(qInvalid ? String(q) : 'no_obj');
+            return;
+        }
+
+        if (gx !== null && gx > 0 && gx < 4090) {
+            this.status = q !== undefined ? String(q) : 'front_ok';
+            this._updateDistance(gx * 0.0625, oid, now);
+        }
+    }
+
+    feedDataFrontExt(v) {
+        if (!v || typeof v !== 'object') return;
+        const ot = v.frontVehicleExtendedObjectType;
+        if (ot !== undefined && ot !== null && ot !== 0 && ot !== 'KEIN_OBJEKT' && ot !== 'SIGNAL_UNBEFUELLT') {
+            this.vehType = String(ot);
+        }
+    }
+
+    snapshot(egoSpeedKmh, nowMs) {
+        const now = typeof nowMs === 'number' ? nowMs : Date.now();
+        const active = this.gapM !== null && this.lastValidMs > 0 && (now - this.lastValidMs <= LEAD_STALE_MS);
+        if (!active) {
+            return {
+                active: false,
+                gapM: null,
+                headwaySec: null,
+                relSpeedKmh: null,
+                objId: this.objId,
+                vehType: this.vehType,
+                rawGap8: this.rawGap8,
+                rawGapX: this.rawGapX,
+                rawSpeedX: this.rawSpeedX,
+                status: this.status,
+            };
+        }
+        const spd = (typeof egoSpeedKmh === 'number' && isFinite(egoSpeedKmh)) ? egoSpeedKmh : 0;
+        let headwaySec = null;
+        if (spd >= 12) {
+            const rawHw = this.gapM / (spd / 3.6);
+            if (isFinite(rawHw) && rawHw > 0) {
+                headwaySec = Math.max(0.1, Math.min(9.9, rawHw));
+            }
+        }
+        return {
+            active: true,
+            gapM: this.gapM,
+            headwaySec,
+            relSpeedKmh: this.relSpeedKmh,
+            objId: this.objId,
+            vehType: this.vehType,
+            rawGap8: this.rawGap8,
+            rawGapX: this.rawGapX,
+            rawSpeedX: this.rawSpeedX,
+            status: this.status,
+        };
+    }
+}
+
+/**
+ * Derive PHEV/BEV plug-in charging session state, charging speed (kW / A), and estimated finish time
+ * from BMW `Vehicle` + `Charging` SOME/IP signals with stationary shore-power (-kW at P, 0 mph) fallback.
+ */
+function computeChargingState(raw, ctx, nowMs) {
+    const r = raw || {};
+    const c = ctx || {};
+    const now = typeof nowMs === 'number' && isFinite(nowMs) ? nowMs : Date.now();
+    const speedKmh = typeof c.speedKmh === 'number' && isFinite(c.speedKmh) ? c.speedKmh : null;
+    const rpm = typeof c.rpm === 'number' && isFinite(c.rpm) ? c.rpm : 0;
+    const hvKw = typeof c.hvKw === 'number' && isFinite(c.hvKw) ? c.hvKw : null;
+    const soc = typeof c.soc === 'number' && isFinite(c.soc) ? c.soc : null;
+    const stage = c.stage || null;
+
+    const notStationary = (speedKmh !== null && speedKmh >= 1.5) || stage === 'D' || stage === 'R';
+    if (notStationary) {
+        r._shorePowerSince = 0;
+        return {
+            active: false,
+            plugConnected: false,
+            source: 'driving',
+            chargeKw: null,
+            maxAmps: null,
+            targetSoc: typeof r.targetSoc === 'number' ? r.targetSoc : 100,
+            remainMin: null,
+            remainText: '',
+            finishTimeText: '--:--',
+        };
+    }
+
+    let plugConnected = null;
+    if (r.wirePlugged === true || r.dcPlugged === true || r.plugLocked === true ||
+        (typeof r.chargeMethod === 'number' && r.chargeMethod > 0 && r.chargeMethod < 200)) {
+        plugConnected = true;
+    } else if (r.wirePlugged === false && r.dcPlugged !== true) {
+        plugConnected = false;
+    }
+
+    const stationaryShoreCandidate = (stage === 'P' || !stage) && rpm < 100 && hvKw !== null && hvKw <= -0.65 && plugConnected !== false;
+    let shorePowerActive = false;
+    if (stationaryShoreCandidate) {
+        if (!r._shorePowerSince) r._shorePowerSince = now;
+        if (plugConnected === true || (now - r._shorePowerSince >= 1500)) {
+            shorePowerActive = true;
+        }
+    } else {
+        r._shorePowerSince = 0;
+    }
+
+    const lsc = r.lscStatus || null; // 'active' | 'init' | 'paused' | 'done' | 'error' | 'none'
+    const isLscActive = lsc === 'active' || lsc === 'init';
+    const isLscStopped = lsc === 'done' || lsc === 'none' || lsc === 'error';
+
+    let remainMin = (typeof r.residualMin === 'number' && isFinite(r.residualMin) && r.residualMin > 0 && r.residualMin <= 2880)
+        ? Math.round(r.residualMin)
+        : ((typeof r.predDurMin === 'number' && isFinite(r.predDurMin) && r.predDurMin > 0 && r.predDurMin <= 2880)
+            ? Math.round(r.predDurMin) : null);
+
+    const hasClock = typeof r.endHour === 'number' && r.endHour >= 0 && r.endHour <= 23 &&
+        typeof r.endMin === 'number' && r.endMin >= 0 && r.endMin <= 59;
+
+    const active = Boolean(
+        isLscActive ||
+        shorePowerActive ||
+        (plugConnected === true && !isLscStopped && ((hvKw !== null && hvKw <= -0.3) || remainMin > 0 || hasClock))
+    );
+
+    const targetSoc = (typeof r.targetSoc === 'number' && isFinite(r.targetSoc) && r.targetSoc >= 10 && r.targetSoc <= 100)
+        ? Math.round(r.targetSoc) : 100;
+    const chargeKw = (active && hvKw !== null && hvKw < -0.05) ? Math.abs(hvKw) : null;
+
+    if (active && remainMin === null && hasClock) {
+        const dNow = new Date(now);
+        const nowMin = dNow.getHours() * 60 + dNow.getMinutes();
+        let tgtMin = r.endHour * 60 + r.endMin;
+        if (tgtMin + 10 < nowMin) tgtMin += 1440;
+        const diff = tgtMin - nowMin;
+        if (diff > 0 && diff <= 2880) remainMin = diff;
+    }
+
+    if (active && remainMin === null && chargeKw !== null && chargeKw >= 0.4 && soc !== null && soc < targetSoc) {
+        // Fallback estimate using G30 530e net HV pack energy (~10.8 kWh) & 96% charger-to-pack efficiency
+        const estMin = Math.round(((targetSoc - soc) / 100) * 10.8 / (chargeKw * 0.96) * 60);
+        if (estMin >= 1 && estMin <= 2880) remainMin = estMin;
+    }
+
+    let finishTimeText = '--:--';
+    if (active) {
+        if (hasClock) {
+            finishTimeText = pad2(r.endHour) + ':' + pad2(r.endMin);
+        } else if (remainMin !== null && remainMin > 0) {
+            const finDate = new Date(now + remainMin * 60000);
+            finishTimeText = pad2(finDate.getHours()) + ':' + pad2(finDate.getMinutes());
+        } else if (soc !== null && soc >= targetSoc - 0.5) {
+            finishTimeText = 'FULL';
+        }
+    }
+
+    let source = 'idle';
+    if (active) {
+        source = isLscActive ? 'bmw_lsc' : (plugConnected === true ? 'bmw_plug' : 'shore_kw');
+    } else if (plugConnected === true) {
+        source = lsc === 'done' ? 'complete' : (lsc === 'paused' ? 'paused' : 'plugged_idle');
+    }
+
+    return {
+        active,
+        plugConnected: plugConnected === true || shorePowerActive,
+        source,
+        chargeKw,
+        maxAmps: (typeof r.maxAmps === 'number' && isFinite(r.maxAmps) && r.maxAmps > 0 && r.maxAmps <= 80) ? Math.round(r.maxAmps) : null,
+        targetSoc,
+        remainMin,
+        remainText: active ? formatRemainDuration(remainMin) : '',
+        finishTimeText,
+    };
+}
+
 function bcToL100(rawVal, unitStr) {
     if (typeof rawVal !== 'number' || !isFinite(rawVal) || rawVal <= 0 || rawVal >= 6553) return null;
     const u = String(unitStr || '').toUpperCase();
@@ -452,6 +785,47 @@ class DemoGenerator {
 
     sample(kind, nowMs) {
         const t = ((nowMs - this.t0) / 1000);
+        if (kind === 'charging') {
+            const soc = Math.min(99, 68 + Math.floor((t % 120) / 15));
+            const remainMin = Math.max(12, Math.round((100 - soc) * 3.1));
+            const fin = new Date(nowMs + remainMin * 60000);
+            const fh = fin.getHours();
+            const fm = fin.getMinutes();
+            const fStr = (fh < 10 ? '0' : '') + fh + ':' + (fm < 10 ? '0' : '') + fm;
+            return {
+                speedKmh: 0, rpm: 0, gear: 0, stage: 'P', program: 'D',
+                hvKw: -3.5,
+                soc,
+                battTempC: 24.0,
+                oilTempC: 29,
+                coolantTempC: 31,
+                boostBar: null, dmeFuelLh: 0, injVolumeRaw: 0,
+                erangeKm: 26, frangeKm: 390,
+                gLong: 0, gLat: 0, pedalPct: 0, driverBraking: false, torqueNm: 0, massKg: 2100,
+                frictionG: 0, frictionKw: 0, pureRegen: false, absActive: false,
+                driveMode: 'eco', ambientC: 19.0, cabinTempC: 20.5, gearboxOilC: 32, v12: 13.7, soc12: 91, iatC: 22, xdriveFrontPct: 0,
+                leadVehicle: { active: false, gapM: null, headwaySec: null, relSpeedKmh: null, status: 'parked' },
+                tpms: {
+                    FL: { pressureBar: 2.4, targetBar: 2.4, tempC: 24 },
+                    FR: { pressureBar: 2.4, targetBar: 2.4, tempC: 24 },
+                    RL: { pressureBar: 2.6, targetBar: 2.6, tempC: 24 },
+                    RR: { pressureBar: 2.6, targetBar: 2.6, tempC: 24 },
+                },
+                charging: {
+                    active: true,
+                    plugConnected: true,
+                    source: 'bmw_lsc',
+                    chargeKw: 3.5,
+                    maxAmps: 16,
+                    targetSoc: 100,
+                    remainMin,
+                    remainText: formatRemainDuration(remainMin),
+                    finishTimeText: fStr,
+                },
+                hudNav: { routeActive: false, guide: null, show: null, hasLanes: false, miniMapActive: false, miniMapReason: '', wocHudShowing: false, hudSlots: '', summary: 'No active route' },
+                demo: true,
+            };
+        }
         const cycle = t % 48; // 48-second driving scenario loop
         if (kind === 'ice') {
             const warm = Math.min(1, Math.max(0, (cycle - 4) / 22));
@@ -477,6 +851,13 @@ class DemoGenerator {
             }
             this.injAcc += fuelLh * 140;
             const fb = computeFrictionBrake({ speedKmh, rpm, gear, gLong, pedalPct, driverBraking, torqueNm, massKg: 1780 });
+            const iceLead = (cycle >= 26 && cycle < 32)
+                ? { active: false, gapM: null, headwaySec: null, relSpeedKmh: null, status: 'clear' }
+                : (cycle >= 32 && cycle < 38)
+                    ? { active: true, gapM: 17.5, headwaySec: 17.5 / (Math.max(12, speedKmh) / 3.6), relSpeedKmh: -11.5, status: 'demo' }
+                    : (speedKmh < 5
+                        ? { active: true, gapM: 4.8, headwaySec: null, relSpeedKmh: 0, status: 'demo' }
+                        : { active: true, gapM: 38.0, headwaySec: 38.0 / (speedKmh / 3.6), relSpeedKmh: 0, status: 'demo' });
             return {
                 speedKmh, rpm, gear, stage, program,
                 oilTempC, coolantTempC,
@@ -496,10 +877,13 @@ class DemoGenerator {
                 absActive: fb.absActive,
                 driveMode: program === 'S' ? 'sport' : 'comfort',
                 ambientC: 18.5,
+                cabinTempC: 21.5,
                 gearboxOilC: 72 + warm * 14,
                 v12: 14.1,
+                soc12: 84,
                 iatC: 34,
                 xdriveFrontPct: 22,
+                leadVehicle: iceLead,
                 tpms: {
                     FL: { pressureBar: 2.4, targetBar: 2.4, tempC: 31 },
                     FR: { pressureBar: 2.4, targetBar: 2.4, tempC: 32 },
@@ -537,6 +921,13 @@ class DemoGenerator {
         }
         this.injAcc += fuelLh * 140;
         const fbPhev = computeFrictionBrake({ speedKmh, rpm, gear, hvKw, gLong, pedalPct, driverBraking, torqueNm, massKg: 2100 });
+        const phevLead = (cycle >= 38 && cycle < 44)
+            ? { active: false, gapM: null, headwaySec: null, relSpeedKmh: null, status: 'clear' }
+            : (cycle >= 12 && cycle < 22)
+                ? { active: true, gapM: 16.5, headwaySec: 16.5 / (Math.max(12, speedKmh) / 3.6), relSpeedKmh: -10.2, status: 'demo' }
+                : (speedKmh < 5
+                    ? { active: true, gapM: 4.6, headwaySec: null, relSpeedKmh: 0, status: 'demo' }
+                    : { active: true, gapM: 36.0, headwaySec: 36.0 / (speedKmh / 3.6), relSpeedKmh: -1.2, status: 'demo' });
         return {
             speedKmh, rpm, gear, stage, program,
             hvKw,
@@ -561,10 +952,13 @@ class DemoGenerator {
             absActive: fbPhev.absActive,
             driveMode,
             ambientC: 21.5,
+            cabinTempC: 22.0,
             gearboxOilC: 76,
             v12: 13.8,
+            soc12: 86,
             iatC: 29,
             xdriveFrontPct: 0,
+            leadVehicle: phevLead,
             tpms: {
                 FL: { pressureBar: 2.4, targetBar: 2.4, tempC: 28 },
                 FR: { pressureBar: 2.4, targetBar: 2.4, tempC: 29 },
@@ -590,7 +984,9 @@ class SignalHub {
         this.fastKw = new FastKw();
         this.navTracker = new NavTracker(this.opts);
         this.mediaTracker = new MediaTracker();
+        this.leadTracker = new LeadVehicleTracker();
         this.live = { tpms: {}, brakeRestVal: null, rawBraking: null };
+        this.chargingRaw = { _shorePowerSince: 0 };
         this.tpmsRaw = { p: {}, target: {}, temp: {}, psiSeen: false };
         this.dsc = {
             sgbd: null, pressDid: null, probed: false, wheelSensorSeen: false,
@@ -604,10 +1000,19 @@ class SignalHub {
         this.ipc = { active: false, list: [] };
         this.uds = { available: false, busy: 0, stats: { sent: 0, replies: 0, missed: 0, blocked: 0 }, smeAnswered: false, smeSilentSince: 0 };
         this.subs = [];
+        this._dynSubs = Object.create(null);
+        this._mediaActive = false;
+        this._navActive = false;
+        this._demand = {
+            gapAhead: true, climate: true, media: true, nav: true,
+            brakeUds: true, hvUds: true, v12Uds: true, gbxUds: true, iatUds: true,
+        };
+        this._demandExtra = {};
         this.timers = [];
         this.diag = null;
         this.readers = {};
         this.stopped = false;
+        this._started = false;
         this._pollNowFn = null;
         this._probeStepFn = null;
         this._lastWantedWrite = 0;
@@ -656,6 +1061,16 @@ class SignalHub {
                 const oil = sc('temp', v && v.temperatureEngineOilDrive);
                 if (cool !== null) { this.live.coolantTempC = cool; markReal(); }
                 if (oil !== null) { this.live.oilTempC = oil; markReal(); }
+            },
+            statusBattery2: (v) => {
+                if (v && typeof v === 'object' && typeof v.conditionBatteryChargingCondition === 'number') {
+                    this.live.rawSoc12 = v.conditionBatteryChargingCondition;
+                }
+                const s12 = decodeStatusBattery2(v);
+                if (s12 !== null) {
+                    this.live.soc12 = s12;
+                    markReal();
+                }
             },
         });
 
@@ -862,12 +1277,105 @@ class SignalHub {
             },
         });
 
+        const feedChargingLimit = (v) => {
+            if (!v || typeof v !== 'object') return;
+            const c = this.chargingRaw;
+            c.restStatus = v.displayRestTimeEndOfChargingStatus;
+            c.hrStatus = v.displayChargingTimeHrStatus;
+            c.mnStatus = v.displayChargingTimeMnStatus;
+            c.effStatus = v.displayChargingCurrentEffStatus;
+            const ok = (st) => st === undefined || st === 1 || st === 'ANZEIGE';
+            if (ok(c.effStatus) && typeof v.displayChargingCurrentEffect === 'number' && v.displayChargingCurrentEffect > 0 && v.displayChargingCurrentEffect < 250) {
+                c.maxAmps = v.displayChargingCurrentEffect;
+            } else if (typeof v.displayChargingCurrentLimitMode2 === 'number' && v.displayChargingCurrentLimitMode2 >= 4 && v.displayChargingCurrentLimitMode2 < 250 && c.maxAmps === undefined) {
+                c.maxAmps = v.displayChargingCurrentLimitMode2;
+            }
+            markReal();
+        };
+
+        const feedChargingStatus2 = (v) => {
+            if (!v || typeof v !== 'object') return;
+            const c = this.chargingRaw;
+            const ok = (st) => st === undefined || st === 1 || st === 'ANZEIGE';
+            const bad = (st) => st === 2 || st === 'KEINE_ANZEIGE' || st === 13 || st === 14 || st === 15 ||
+                (typeof st === 'string' && /NICHT_VERFUEGBAR|FEHLER|UNBEFUELLT/.test(st));
+            if (typeof v.displayResidualTimeEndOfCharging === 'number') {
+                if (!bad(c.restStatus) && v.displayResidualTimeEndOfCharging > 0 && v.displayResidualTimeEndOfCharging < 65000) {
+                    c.residualMin = v.displayResidualTimeEndOfCharging;
+                } else if (v.displayResidualTimeEndOfCharging === 0 || bad(c.restStatus)) {
+                    c.residualMin = null;
+                }
+            }
+            const hrOk = ok(c.hrStatus) || (!bad(c.hrStatus) && typeof v.displayChargingTimeHour === 'number' && v.displayChargingTimeHour <= 23);
+            const mnOk = ok(c.mnStatus) || (!bad(c.mnStatus) && typeof v.displayChargingTimeMinute === 'number' && v.displayChargingTimeMinute <= 59);
+            if (hrOk && mnOk && typeof v.displayChargingTimeHour === 'number' && v.displayChargingTimeHour <= 23 &&
+                typeof v.displayChargingTimeMinute === 'number' && v.displayChargingTimeMinute <= 59) {
+                c.endHour = v.displayChargingTimeHour;
+                c.endMin = v.displayChargingTimeMinute;
+            } else if (bad(c.hrStatus) || v.displayChargingTimeHour >= 24) {
+                c.endHour = null;
+                c.endMin = null;
+            }
+            markReal();
+        };
+
+        const feedLastStateCharging = (v) => {
+            if (!v || typeof v !== 'object') return;
+            const c = this.chargingRaw;
+            const s = v.chargingStatusLsc;
+            if (s === 2 || s === 'LADEN_AKTIV') c.lscStatus = 'active';
+            else if (s === 1 || s === 'INITIALISIERUNG') c.lscStatus = 'init';
+            else if (s === 3 || s === 'LADEPAUSE') c.lscStatus = 'paused';
+            else if (s === 4 || s === 'LADEN_BEENDET' || s === 'LADEBEENDET') c.lscStatus = 'done';
+            else if (s === 5 || s === 'LADEFEHLER') c.lscStatus = 'error';
+            else if (s === 0 || s === 'KEIN_LADEN') c.lscStatus = 'none';
+            if (typeof v.predictionChargingDuration === 'number' && v.predictionChargingDuration > 0 && v.predictionChargingDuration < 65000) {
+                c.predDurMin = v.predictionChargingDuration;
+            }
+            if (typeof v.displayActValueSoc === 'number' && v.displayActValueSoc >= 0 && v.displayActValueSoc <= 100 && this.live.someipSocPct === undefined) {
+                this.live.someipSocPct = v.displayActValueSoc;
+            }
+            markReal();
+        };
+
         watch('de.bmw.infotainment.vehicle.Vehicle', {
             statusNewCurrentUnitsStatusExt: (v) => {
                 this.carUnitsRaw.ext = v;
                 this._recomputeTpms();
                 markReal();
             },
+            chargingStatus2: feedChargingStatus2,
+            displayChargingCurrentLimit2: feedChargingLimit,
+            lastStateCallCharging: feedLastStateCharging,
+        });
+
+        watch('de.bmw.infotainment.vehicle.Charging', {
+            statusChargingCable: (v) => {
+                if (!v || typeof v !== 'object') return;
+                const c = this.chargingRaw;
+                const w = v.statusChargingWirePlugged;
+                if (w === 1 || w === 'KABEL_GESTECKT') c.wirePlugged = true;
+                else if (w === 0 || w === 'KEIN_KABEL_GESTECKT') c.wirePlugged = false;
+                const dc = v.statusDirectCurrentChargingWirePlugged;
+                if (dc === 1 || dc === 'DC_MINUS_LADESTECKER_GESTECKT') c.dcPlugged = true;
+                else if (dc === 0 || dc === 'DC_MINUS_LADESTECKER_NICHT_GESTECKT') c.dcPlugged = false;
+                const cm = v.chargingTypeImmediate;
+                if (typeof cm === 'number') c.chargeMethod = cm;
+                else if (typeof cm === 'string') c.chargeMethod = /KEIN|FEHLER|UNBEFUELLT|NICHT/.test(cm) ? 0 : 1;
+                markReal();
+            },
+            displayChargingStatus: (v) => {
+                if (!v || typeof v !== 'object') return;
+                const c = this.chargingRaw;
+                const p = v.statusChargeControlPlug;
+                if (p === 2 || p === 'LADESTECKER_VERRIEGELT') c.plugLocked = true;
+                else if (p === 1 || p === 'LADESTECKER_ENTRIEGELT') c.plugLocked = false;
+                if (typeof v.statusSoeChargingTarget === 'number' && v.statusSoeChargingTarget >= 10 && v.statusSoeChargingTarget <= 100) {
+                    c.targetSoc = v.statusSoeChargingTarget;
+                }
+                markReal();
+            },
+            lastStateCallCharging: feedLastStateCharging,
         });
 
         watch('de.bmw.infrastructure.EnvironmentalInformation', {
@@ -973,17 +1481,9 @@ class SignalHub {
             },
         });
 
-        // Read-only HUD navigation & mini-map state tracker (Guidance, GuidanceEventList, CarPlay, Android Auto, DCSM2 status)
-        this.navTracker.start(this.ctx, this.log, () => {
-            if (!this.ctx.settings) return true;
-            const en = this.ctx.settings.get('enabled') !== false;
-            const tgt = this.ctx.settings.get('displayTarget') || 'both';
-            const mode = this.ctx.settings.get('hudNavMode') || 'own_nav_minimap';
-            return en && (tgt === 'both' || tgt === 'hud') && mode !== 'yield_route';
-        });
-
-        // Live head-unit Media Playback (album art + position) & BC stalk button tracker
-        this.mediaTracker.start(this.ctx, this.log);
+        this._started = true;
+        // Start demand-gated optional SOME/IP watchers (GapVehicleAhead, Climate2, MediaTracker, NavTracker)
+        this.syncDemand(this.ctx.settings && this.ctx.settings.values ? this.ctx.settings.values : {}, this._demandExtra);
 
         // Poll /dev/shm/cluster-info every 500 ms and cooperatively signal /tmp/mgu-edrive-wanted.json
         const ipcTimer = setInterval(() => {
@@ -994,6 +1494,150 @@ class SignalHub {
 
         // Start strict ReadOnlyDiag poller (0x22 / 0x01 / 0x09 only)
         this._startUds().catch((e) => this.log.warn('uds init: ' + (e.message || e)));
+    }
+
+    _setDynSub(key, want, iface, inst, handlers, onTeardown) {
+        const cur = this._dynSubs[key];
+        if (!want) {
+            if (cur) {
+                cur.cancelled = true;
+                if (cur.sub) closeSub(cur.sub);
+                delete this._dynSubs[key];
+                if (typeof onTeardown === 'function') onTeardown();
+            }
+            return;
+        }
+        if (cur || this.stopped) return;
+        if (!this.ctx.signals || typeof this.ctx.signals.watch !== 'function') {
+            this._dynSubs[key] = { cancelled: false, sub: null };
+            return;
+        }
+        const slot = { cancelled: false, sub: null };
+        this._dynSubs[key] = slot;
+        try {
+            const p = this.ctx.signals.watch(iface, inst, handlers, this.log);
+            if (p && typeof p.then === 'function') {
+                p.then((r) => {
+                    if (!r) return;
+                    if (slot.cancelled || this.stopped || this._dynSubs[key] !== slot) {
+                        closeSub(r);
+                        return;
+                    }
+                    slot.sub = r;
+                }).catch(() => {});
+            } else if (p) {
+                slot.sub = p;
+            }
+        } catch (e) {
+            delete this._dynSubs[key];
+            this.log.warn('watch ' + iface + ': ' + (e.message || e));
+        }
+    }
+
+    /**
+     * Dynamically start/stop optional SOME/IP proxies and gate UDS polling based on active settings
+     * so disabled features consume zero bus bandwidth or CPU wakeups.
+     */
+    syncDemand(settingsValues, extraOpts) {
+        const s = settingsValues || (this.ctx.settings && this.ctx.settings.values) || {};
+        if (extraOpts) this._demandExtra = extraOpts;
+        const ex = this._demandExtra || {};
+        const forceAll = Boolean(ex.diagVisible || this.probe.untilMs > Date.now());
+
+        const enabled = s.enabled !== false;
+        const target = s.displayTarget || 'both';
+        const wantHud = enabled && (target === 'both' || target === 'hud');
+        const wantCluster = enabled && (target === 'both' || target === 'cluster');
+        const wantPanel = wantCluster && (s.clusterSlotMode || 'panel_only') !== 'map_only';
+
+        const l1 = s.hudLine1 || 'efficiency_gear';
+        const l2 = s.hudLine2 || 'power';
+        const l3 = s.hudLine3 || 'brake';
+        const anyHudHeadway = l1 === 'headway' || l2 === 'headway' || l3 === 'headway';
+        const anyHudBrake = l1 === 'brake' || l2 === 'brake' || l3 === 'brake';
+
+        const wantGapAhead = (enabled && wantHud && ((s.hudHeadway || 'full') !== 'off' || anyHudHeadway)) || forceAll;
+        const wantClimate = (enabled && wantPanel && s.cabinTempDisplay !== false) || forceAll;
+        const wantMedia = (enabled && wantPanel && (s.widgetMedia !== false || s.widgetTrip !== false)) || forceAll;
+        const wantNav = (enabled && wantHud && (s.hudNavMode || 'own_nav_minimap') !== 'yield_route') || forceAll;
+
+        const crMode = s.cornerRightDisplay || 'auto';
+        const clMode = s.cornerLeftDisplay || 'oil_cool';
+        const smartAlerts = s.smartAlerts !== false;
+        const veh = s.vehicle || 'auto';
+
+        this._demand = {
+            gapAhead: wantGapAhead,
+            climate: wantClimate,
+            media: wantMedia,
+            nav: wantNav,
+            brakeUds: (enabled && ((wantCluster && (s.brakeIndicator || 'bar_num') !== 'off') || (wantHud && anyHudBrake))) || forceAll,
+            hvUds: (enabled && veh !== 'ice') || forceAll,
+            v12Uds: (enabled && (smartAlerts || (wantPanel && s.widgetTrip !== false) || (wantCluster && (crMode === 'auto' || crMode === 'v12')))) || forceAll,
+            gbxUds: (enabled && (smartAlerts || (wantPanel && s.widgetTrip !== false) || (wantCluster && (clMode === 'oil_gbx' || crMode === 'gbx')))) || forceAll,
+            iatUds: (enabled && ((wantPanel && s.widgetTrip !== false && veh !== 'phev') || (wantCluster && (crMode === 'iat' || crMode === 'auto')))) || forceAll,
+        };
+
+        if (!this._started || this.stopped) return this._demand;
+
+        const markReal = () => { this.lastRealSignalT = Date.now(); };
+
+        this._setDynSub('gapAhead', wantGapAhead, 'de.bmw.dass.GapVehicleAhead', '1', {
+            GapVehicleDrivingAhead: (v) => {
+                this.leadTracker.feedGapAhead(v, Date.now());
+                markReal();
+            },
+            DataFrontVehicle: (v) => {
+                this.leadTracker.feedDataFront(v, Date.now());
+                markReal();
+            },
+            DataFrontVehicleExtended: (v) => {
+                this.leadTracker.feedDataFrontExt(v);
+                markReal();
+            },
+        }, () => { this.leadTracker.reset(); });
+
+        this._setDynSub('climate', wantClimate, 'de.bmw.infotainment.climate.Climate2', '1', {
+            statusTemperatureInside: (v) => {
+                if (v && typeof v === 'object' && typeof v.temperatureInside === 'number') {
+                    this.live.rawCabinTemp = v.temperatureInside;
+                }
+                const tc = decodeCabinTemp(v);
+                if (tc !== null) {
+                    this.live.cabinTempC = tc;
+                    markReal();
+                }
+            },
+        }, () => { this.live.cabinTempC = undefined; });
+
+        if (wantNav && !this._navActive) {
+            this._navActive = true;
+            this.navTracker.start(this.ctx, this.log, () => Boolean(this._demand.nav));
+        } else if (!wantNav && this._navActive) {
+            this._navActive = false;
+            this.navTracker.stop();
+        }
+
+        if (wantMedia && !this._mediaActive) {
+            this._mediaActive = true;
+            this.mediaTracker.start(this.ctx, this.log);
+        } else if (!wantMedia && this._mediaActive) {
+            this._mediaActive = false;
+            this.mediaTracker.stop();
+        }
+
+        return this._demand;
+    }
+
+    activeWatchers() {
+        return {
+            gapAhead: Boolean(this._dynSubs.gapAhead),
+            climate: Boolean(this._dynSubs.climate),
+            media: this._mediaActive,
+            nav: this._navActive,
+            brakeUds: Boolean(this._demand.brakeUds),
+            hvUds: Boolean(this._demand.hvUds),
+        };
     }
 
     wakeUds() {
@@ -1038,6 +1682,7 @@ class SignalHub {
         this.probe.untilMs = now + dur;
         this.probe.lines = 0;
         this.probe.savedPath = this.probeLogPath;
+        this.syncDemand(this.ctx.settings && this.ctx.settings.values ? this.ctx.settings.values : {}, this._demandExtra);
 
         const targets = [this.probeLogPath];
         if (this.ctx && this.ctx.dataDir) {
@@ -1058,6 +1703,7 @@ class SignalHub {
                     this.probe.timer = null;
                 }
                 this.probe.untilMs = 0;
+                this.syncDemand(this.ctx.settings && this.ctx.settings.values ? this.ctx.settings.values : {}, this._demandExtra);
                 this._appendProbeLine('# probe finished lines=' + this.probe.lines);
                 return;
             }
@@ -1069,6 +1715,7 @@ class SignalHub {
                 }
                 const tNow = Date.now();
                 const navSnap = this.navTracker.snapshot(tNow);
+                const leadSnap = this.leadTracker.snapshot(this.live.speedKmh, tNow);
                 const rec = {
                     t: new Date(tNow).toISOString(),
                     spdKmh: this.live.speedKmh !== undefined ? Number(this.live.speedKmh.toFixed(1)) : null,
@@ -1082,6 +1729,19 @@ class SignalHub {
                     rawBrk: this.live.rawBraking,
                     dscPump: this.live.dscPumpState,
                     someipHv: this.live.hvEnergyRaw || this.live.rawChargeHybrid,
+                    soc12: this.live.soc12 !== undefined ? this.live.soc12 : this.live.rawSoc12,
+                    cabinC: this.live.cabinTempC !== undefined ? this.live.cabinTempC : null,
+                    rawCabin: this.live.rawCabinTemp,
+                    lead: {
+                        active: leadSnap.active,
+                        gapM: leadSnap.gapM !== null ? Number(leadSnap.gapM.toFixed(2)) : null,
+                        hwSec: leadSnap.headwaySec !== null ? Number(leadSnap.headwaySec.toFixed(2)) : null,
+                        relKmh: leadSnap.relSpeedKmh !== null ? Number(leadSnap.relSpeedKmh.toFixed(1)) : null,
+                        raw8: leadSnap.rawGap8,
+                        rawX: leadSnap.rawGapX,
+                        rawVx: leadSnap.rawSpeedX,
+                        st: leadSnap.status,
+                    },
                     dsc: {
                         sgbd: this.dsc.sgbd,
                         did: this.dsc.pressDid ? this.dsc.pressDid.toString(16).toUpperCase() : null,
@@ -1495,7 +2155,7 @@ class SignalHub {
         // braking on G30!). Polls DSC 0xDBE5/0xDB29 directly whenever not in Park and foot is off throttle (< 4%),
         // matching the exact responsive caliper pressure seen during the 30s Brake Probe, with zero UDS traffic while on gas!
         const dscTimer = setInterval(() => {
-            if (this.stopped || !isEnabled() || this.isDemoActive() || this.live.carLocked) return;
+            if (this.stopped || !isEnabled() || !this._demand.brakeUds || this.isDemoActive() || this.live.carLocked) return;
             if (this.probe.untilMs > Date.now()) return;
             const stg = this.live.stage || null;
             if (stg === 'P') {
@@ -1523,7 +2183,7 @@ class SignalHub {
 
         // Fast SME HV voltage/current loop (~420 ms)
         const fastTimer = setInterval(async () => {
-            if (this.stopped || !isEnabled() || this.isDemoActive() || this.live.carLocked) return;
+            if (this.stopped || !isEnabled() || !this._demand.hvUds || this.isDemoActive() || this.live.carLocked) return;
             if (fastBusy || (this.ipc.active && typeof this.ipc.kw === 'number')) return;
             if (checkSmeSilence()) return;
             fastBusy = true;
@@ -1543,7 +2203,7 @@ class SignalHub {
             slowBusy = true;
             slowTick++;
             try {
-                if (!(this.ipc.active && typeof this.ipc.soc === 'number') && !checkSmeSilence()) {
+                if (this._demand.hvUds && !(this.ipc.active && typeof this.ipc.soc === 'number') && !checkSmeSilence()) {
                     await readSmeSocAndTemp();
                 }
                 if ((this.live.rpm || 0) >= 350 && !link.silent(dmeCfg.ecu || 18)) {
@@ -1556,7 +2216,7 @@ class SignalHub {
                         }
                     }, false);
                 }
-                if (slowTick % 8 === 1) {
+                if (this._demand.v12Uds && slowTick % 8 === 1) {
                     if (link.silent(dmeCfg.ecu || 18) && slowTick % 24 === 1 && typeof link.wake === 'function') {
                         link.wake(dmeCfg.ecu || 18);
                     }
@@ -1567,13 +2227,13 @@ class SignalHub {
                         }, false);
                     }
                 }
-                if (slowTick % 6 === 2 && this.live.gearboxOilC === undefined && !link.silent(egsCfg.ecu || 24)) {
+                if (this._demand.gbxUds && slowTick % 6 === 2 && this.live.gearboxOilC === undefined && !link.silent(egsCfg.ecu || 24)) {
                     await exclusive(async () => {
                         const gbVal = await this.readers.egs.value('gearboxOil', egsCfg.gearboxOil || []);
                         if (typeof gbVal === 'number') this.live.gearboxOilC = gbVal;
                     }, false);
                 }
-                if (slowTick % 6 === 4 && !link.silent(dmeCfg.ecu || 18)) {
+                if (this._demand.iatUds && slowTick % 6 === 4 && !link.silent(dmeCfg.ecu || 18)) {
                     await exclusive(async () => {
                         const iatVal = await this.readers.dme.value('iat', dmeCfg.iat || []);
                         if (typeof iatVal === 'number') this.live.iatC = iatVal;
@@ -1616,9 +2276,9 @@ class SignalHub {
 
         if (this.isDemoActive()) {
             const vehPref = (this.ctx.settings && this.ctx.settings.get('vehicle')) || 'auto';
-            const simKind = demoMode === 'ice' ? 'ice' : (demoMode === 'phev' ? 'phev' : (vehPref === 'ice' ? 'ice' : 'phev'));
+            const simKind = demoMode === 'charging' ? 'charging' : (demoMode === 'ice' ? 'ice' : (demoMode === 'phev' ? 'phev' : (vehPref === 'ice' ? 'ice' : 'phev')));
             const d = this.demoGen.sample(simKind, now);
-            d.smeAnswered = simKind === 'phev';
+            d.smeAnswered = simKind === 'phev' || simKind === 'charging';
             d.ipcActive = false;
             d.navRouteActive = Boolean(d.hudNav && d.hudNav.routeActive);
             d.navHasLanes = Boolean(d.hudNav && d.hudNav.hasLanes);
@@ -1626,6 +2286,7 @@ class SignalHub {
             d.probeSavedPath = this.probe.savedPath;
             d.dscBrake = null;
             d.media = this.mediaTracker.snapshot(now, true);
+            d.charging = d.charging || { active: false, plugConnected: false, source: 'idle', chargeKw: null, maxAmps: null, targetSoc: 100, remainMin: null, remainText: '', finishTimeText: '--:--' };
             d.tripDistKm = 42.6;
             d.tripMinutes = 54;
             return d;
@@ -1670,6 +2331,13 @@ class SignalHub {
         const hudNav = this.navTracker.snapshot(now);
         const navRouteActive = hudNav.routeActive;
         const navHasLanes = hudNav.hasLanes;
+        const charging = computeChargingState(this.chargingRaw, {
+            speedKmh,
+            rpm: l.rpm !== undefined ? l.rpm : 0,
+            hvKw,
+            soc,
+            stage: l.stage || null,
+        }, now);
 
         return {
             speedKmh: l.speedKmh !== undefined ? l.speedKmh : null,
@@ -1719,6 +2387,7 @@ class SignalHub {
             navRouteActive,
             navHasLanes,
             media: this.mediaTracker.snapshot(now, false),
+            charging,
             tripDistKm: l.tripDistKm !== undefined ? l.tripDistKm : null,
             tripMinutes: l.tripMinutes !== undefined ? l.tripMinutes : null,
             bcAvgSpeedKmh: l.bcAvgSpeedKmh !== undefined ? l.bcAvgSpeedKmh : null,
@@ -1726,8 +2395,13 @@ class SignalHub {
             probeSavedPath: this.probe.savedPath,
             driveMode: l.driveMode || 'comfort',
             ambientC: l.ambientC !== undefined ? l.ambientC : null,
+            cabinTempC: l.cabinTempC !== undefined ? l.cabinTempC : null,
+            rawCabinTemp: l.rawCabinTemp !== undefined ? l.rawCabinTemp : null,
             gearboxOilC: l.gearboxOilC !== undefined ? l.gearboxOilC : null,
             v12: l.v12 !== undefined ? l.v12 : null,
+            soc12: l.soc12 !== undefined ? l.soc12 : null,
+            rawSoc12: l.rawSoc12 !== undefined ? l.rawSoc12 : null,
+            leadVehicle: this.leadTracker.snapshot(speedKmh, now),
             iatC: l.iatC !== undefined ? l.iatC : null,
             xdriveFrontPct: l.xdriveFrontPct !== undefined ? l.xdriveFrontPct : null,
             tpms: l.tpms || {},
@@ -1745,18 +2419,30 @@ class SignalHub {
         }
         this.navTracker.stop();
         this.mediaTracker.stop();
+        this._navActive = false;
+        this._mediaActive = false;
+        const dynKeys = Object.keys(this._dynSubs);
+        for (let i = 0; i < dynKeys.length; i++) {
+            const slot = this._dynSubs[dynKeys[i]];
+            if (slot) {
+                slot.cancelled = true;
+                if (slot.sub) closeSub(slot.sub);
+            }
+        }
+        this._dynSubs = Object.create(null);
         if (this.diag) this.diag.cancel();
         for (let i = 0; i < this.timers.length; i++) clearInterval(this.timers[i]);
         this.timers = [];
         for (let i = 0; i < this.subs.length; i++) {
-            try { if (typeof this.subs[i].stop === 'function') this.subs[i].stop(); } catch (e) { /* ignore */ }
+            closeSub(this.subs[i]);
         }
         this.subs = [];
     }
 }
 
 module.exports = {
-    SignalHub, GearGuess, FastKw, DemoGenerator,
-    computeFrictionBrake, decodeDscPressure, decodeDscPedal, decodeDscRegen,
+    SignalHub, GearGuess, FastKw, DemoGenerator, LeadVehicleTracker,
+    decodeStatusBattery2, decodeCabinTemp,
+    computeFrictionBrake, computeChargingState, decodeDscPressure, decodeDscPedal, decodeDscRegen,
     flagActive, gearOf, stageOf, selectionOf, programOf, driveModeOf,
 };

@@ -1,5 +1,13 @@
 [
   {
+    "version": "1.6.4",
+    "upstreamVersion": "1.6.3",
+    "cnRevision": 1,
+    "changes": [
+      "完善保养数据识别与展示。"
+    ]
+  },
+  {
     "version": "1.6.2",
     "upstreamVersion": "1.6.1",
     "cnRevision": 1,

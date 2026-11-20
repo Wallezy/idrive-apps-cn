@@ -66,7 +66,21 @@ function detectAnomaly(telemetry, units, state, nowMs) {
         };
     }
 
-    // 3. 12V Auxiliary battery low voltage (< 12.1 V sustained > 5s)
+    // 3. 12V Auxiliary battery low State of Charge (< 55% sustained >= 5s)
+    if (typeof t.soc12 === 'number' && isFinite(t.soc12) && t.soc12 >= 0 && t.soc12 < 55) {
+        if (!state._soc12LowSince) state._soc12LowSince = nowMs;
+        if (nowMs - state._soc12LowSince >= 5000) {
+            return {
+                id: 'soc12',
+                severity: t.soc12 < 40 ? 'red' : 'amber',
+                label: '12V ' + Math.round(t.soc12) + '%',
+            };
+        }
+    } else {
+        state._soc12LowSince = 0;
+    }
+
+    // 4. 12V Auxiliary battery low voltage (< 12.1 V sustained >= 5s)
     if (typeof t.v12 === 'number' && isFinite(t.v12) && t.v12 > 5 && t.v12 < 12.1) {
         if (!state._v12LowSince) state._v12LowSince = nowMs;
         if (nowMs - state._v12LowSince >= 5000) {
@@ -93,7 +107,7 @@ class VehicleProfile {
         this.iceOnlySince = 0;
         this.engineOn = false;
         this.engineOffSince = 0;
-        this._alertState = { _v12LowSince: 0 };
+        this._alertState = { _v12LowSince: 0, _soc12LowSince: 0 };
     }
 
     evaluate(telemetry, settings, units, nowMs) {

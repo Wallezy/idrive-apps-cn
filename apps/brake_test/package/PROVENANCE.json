@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/cauliflowermossgrape/idrive7-apps",
-  "commit": "b2880634eb214e29f008422b970cf22ea2de280f",
+  "commit": "35bca28bc82b30482d73782877ebaf92c69dcb8c",
   "language": "zh-CN",
   "sdk": "Excluded; donor-linked by mgu-deploy",
   "adaptations": [
@@ -9,11 +9,11 @@
     "Numeric three-part CN versions"
   ],
   "component": "brake_test",
-  "upstreamVersion": "1.5.20",
-  "releaseVersion": "1.5.21",
+  "upstreamVersion": "1.5.21",
+  "releaseVersion": "1.5.22",
   "cnRevision": 1,
   "adaptedSourceFilesSha256": {
-    "apps/brake_test/app.json": "9574923a374ebeca280023399cd3886582b51efad689595d7758bb369e654cc7",
+    "apps/brake_test/app.json": "5eafc96fc85bcafd5183d933f0350abf8ce6f3db512a2b0f086c292103cc0874",
     "apps/brake_test/icon.png": "c0d9bd3d5ec1b16c99ba947e5568a1867d50720aff80e2eefafab21a481b7e7f",
     "apps/brake_test/main.js": "e975e80bae8098629ea5dab4894ef1ca6d5dc1eab772f0e0f05aa5011fd3c326"
   }

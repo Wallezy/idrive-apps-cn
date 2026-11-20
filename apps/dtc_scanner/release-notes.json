@@ -1,5 +1,13 @@
 [
   {
+    "version": "2.9.10",
+    "upstreamVersion": "2.9.8",
+    "cnRevision": 1,
+    "changes": [
+      "同步上游兼容性更新，保留简体中文界面。"
+    ]
+  },
+  {
     "version": "2.9.9",
     "upstreamVersion": "2.9.7",
     "cnRevision": 2,

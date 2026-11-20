@@ -1,7 +1,7 @@
 {
  "id": "ambient_config",
  "title": "\u6c1b\u56f4\u706f\u8bbe\u7f6e",
- "version": "2.5.2",
+ "version": "2.7.14",
  "screens": [
   {
    "name": "MAIN",
@@ -88,6 +88,12 @@
    "hidden": true
   },
   {
+   "key": "doorCar",
+   "label": "\u5f00\u95e8\u65f6\u4fdd\u7559\u539f\u8f66\u8b66\u793a\u706f\uff08G20\uff0fG26\uff09",
+   "type": "bool",
+   "default": false
+  },
+  {
    "key": "hazardRed",
    "label": "\u53cc\u95ea\u65f6\u663e\u793a\u7ea2\u8272",
    "type": "bool",
@@ -97,6 +103,12 @@
   {
    "key": "strobe",
    "label": "\u8fdc\u5149\u9891\u95ea\u4e0e\u706f\u5149\u79c0\uff08\u4ec5\u9650\u79c1\u4eba\u573a\u5730\uff09",
+   "type": "bool",
+   "default": false
+  },
+  {
+   "key": "strobeLeverDriving",
+   "label": "\u884c\u9a76\u65f6\u5141\u8bb8\u62e8\u6746\u542f\u52a8\u95ea\u70c1\uff08\u4ec5\u9650\u5c01\u95ed\u573a\u5730\uff09",
    "type": "bool",
    "default": false
   },
@@ -237,6 +249,13 @@
      "\u8f6e\u6d41\u95ea\u70c1"
     ]
    ]
+  },
+  {
+   "key": "strobeLever",
+   "label": "\u901a\u8fc7\u8fdc\u5149\u62e8\u6746\u542f\u52a8\u95ea\u70c1",
+   "type": "bool",
+   "default": false,
+   "hidden": true
   },
   {
    "key": "strobeRate",

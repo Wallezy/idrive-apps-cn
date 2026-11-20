@@ -34,34 +34,44 @@ const {
     NW: HUD_NAV_W, NH: HUD_NAV_H, ROAD_W: HUD_ROAD_W, ROAD_H: HUD_ROAD_H,
     drawHudNav, drawHudRoadBanner, hudNavKey, hudRoadKey,
 } = require('./hud_nav_renderer');
+const { buildStockBackdrop } = require('./image_decode');
+const { COVER_SIDE, paginateTitle, resolveRightWidgetPage } = require('./media_tracker');
 
 const DEFAULT_CONF_DIR = '/var/opt/cluster-render';
 const DEFAULT_WAZE_STATUS = '/run/waze-on-cluster/status.json';
 
-const BELOW_SPEED_BASE = { x: 392, y: 429, w: 214, h: 84 };
-// Strictly x >= 1461 so we NEVER overlap KOMBI4's GEAR_WIN (1380..1460), which both masks digits
-// and triggers BMW's safety black box over Media (1406..1597, 342..419).
-const GEAR_D_BASE = { x: 1463, y: 650, w: 74, h: 56 };
+// Shifted +16px down so there is generous breathing room under the main digital speed digits while clearing the traffic light sign (>=536)
+const BELOW_SPEED_BASE = { x: 392, y: 445, w: 214, h: 84 };
+// Snugly right of KOMBI4's single-letter 'D' (1400..1424; GEAR_WIN 1380..1426). Hidden in S/M where BMW renders S1..S8 natively.
+const GEAR_D_BASE = { x: 1429, y: 650, w: 30, h: 56 };
+// Sleek car-silhouette cabin temperature badge in the pocket between gear_d (1429..1459) and stock ambient temp (+57°F at 1540+)
+const CABIN_TEMP_BASE = { x: 1458, y: 654, w: 74, h: 50 };
 const BRAKE_RAIL_BASE = { x: 1280, y: 609, w: 296, h: 31 };
 const CORNER_LEFT_BASE = { x: 8, y: 643, w: 116, h: 66 };
-const CORNER_RIGHT_BASE = { x: 1816, y: 643, w: 98, h: 66 };
-// Centered at x=1400 inside KOMBI4's right-wing widget pocket (clear of CENTER_MAP<=1200 & Power Gauge bezel>=1560)
-const RIGHT_WIDGET_BASE = { x: 1244, y: 214, w: 312, h: 266 };
+// Bottom-right corner readout below battery icon (12V SoC % by default now that PHEV HV SoC overlays the HV battery gauge)
+const CORNER_RIGHT_BASE = { x: 1816, y: 646, w: 98, h: 66 };
+// PHEV-only HV Battery SoC % overlay centered inside the dark pocket of the bottom-right HV battery sub-gauge (between 100 and 50)
+const HV_SOC_GAUGE_BASE = { x: 1794, y: 482, w: 92, h: 58 };
+// Right-Wing Gauge & Widget pocket (1252..1788, 88..604): full-wing gauge-edge artwork backdrop (no darkened border)
+// with foreground cover & text centered at world x=1438 (cover 1366..1510, y=184..328)
+const RIGHT_WIDGET_BASE = { x: 1252, y: 88, w: 536, h: 516 };
 
 // Strictly y=100..200 (<= 202 Assisted Driving / ACC set-speed & green car keep-out)
-const HUD_BASE = { x: 136, y: 100, w: 260, h: 100 };
+const HUD_BASE = { x: 136, y: 100, w: 268, h: 100 };
+// Dedicated Lead-Car Headway badge right above BMW's green ACC car (x=284..404 < 405 nav, y=139..180 > 138 road & well above Row 3 brake)
+const HUD_HEADWAY_BASE = { x: 284, y: 139, w: 120, h: 41 };
 // Full-width top-row street & highway exit badge banner (x=132..676 <= 680, y=100..138)
 const HUD_ROAD_BASE = { x: 132, y: 100, w: HUD_ROAD_W, h: HUD_ROAD_H };
 // Right-side HUD turn-by-turn arrow & lane guidance below road banner (x=412..676 <= 680, y=140..372 <= 380)
 const HUD_NAV_BASE = { x: 412, y: 140, w: HUD_NAV_W, h: HUD_NAV_H };
 
 // Slot 0x100 (1088x480 at world 416,120): borderless side-bottom readouts leaving center route x=368..680 100% clear
-const MAP_SPEED_RECT = { x: 16, y: 309, w: 204, h: 84 };
+const MAP_SPEED_RECT = { x: 16, y: 325, w: 204, h: 84 };
 const MAP_LEFT_RECT = { x: 186, y: 380, w: 182, h: 68 };
 const MAP_RIGHT_RECT = { x: 680, y: 374, w: 228, h: 74 };
 
 const CLUSTER_LAYER_NAMES = ['below_speed', 'gear_d', 'brake_rail', 'corner_left', 'corner_right'];
-const PANEL_ALL_LAYERS = ['below_speed', 'gear_d', 'brake_rail', 'corner_left', 'corner_right', 'right_widget'];
+const PANEL_ALL_LAYERS = ['below_speed', 'gear_d', 'cabin_temp', 'brake_rail', 'corner_left', 'corner_right', 'hv_soc_gauge', 'right_widget'];
 const MAP_LAYER_NAMES = ['map_speed', 'map_left', 'map_right'];
 
 const COL = {
@@ -70,9 +80,13 @@ const COL = {
     shadow: [4, 8, 14, 224],
     white: '#f2f5fa',
     cyan: '#38c7ff',
+    mediaCyan: '#45d6ff',
     icyBlue: '#5bc8ff',
     softBlue: '#9ec5eb',
     tagBlue: '#7fb8f0',
+    tagGray: '#b4bcc6',
+    mediaSub: '#cbd2dc',
+    mediaTime: '#d4dbe4',
     amber: '#ffb347',
     orange: '#f97316',
     red: '#ef4444',
@@ -80,7 +94,7 @@ const COL = {
     label: '#7fb8f0',
     railDim: [48, 66, 90, 125],
     mapRailDim: [38, 62, 92, 185],
-    progTrack: [36, 58, 84, 200],
+    progTrack: [36, 56, 78, 175],
     tileBg: [16, 28, 46, 235],
     tileRim: [68, 112, 160, 180],
     divider: [80, 125, 175, 105],
@@ -88,12 +102,15 @@ const COL = {
 
 function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
 
-function formatMmSs(sec) {
+function formatDuration(sec) {
     if (typeof sec !== 'number' || !isFinite(sec) || sec < 0) return '--:--';
     const s = Math.floor(sec);
-    const m = Math.floor(s / 60);
+    const h = Math.floor(s / 3600);
+    const m = Math.floor((s % 3600) / 60);
     const r = s % 60;
-    return m + ':' + (r < 10 ? '0' + r : String(r));
+    const rs = r < 10 ? '0' + r : String(r);
+    if (h > 0) return h + ':' + (m < 10 ? '0' + m : String(m)) + ':' + rs;
+    return m + ':' + rs;
 }
 
 /**
@@ -193,7 +210,7 @@ function drawTextOutline(cv, str, x, y, size, color, opts) {
 }
 
 function fitTextLine(cv, str, maxW, sizes) {
-    const clean = String(str || '').replace(/[^\x20-\x7e\u3000-\u9fff\uff00-\uffef]/g, '').trim();
+    const clean = String(str || '').replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim();
     if (!clean) return { text: '', size: sizes[0] };
     for (let i = 0; i < sizes.length; i++) {
         const sz = sizes[i];
@@ -202,11 +219,11 @@ function fitTextLine(cv, str, maxW, sizes) {
         }
     }
     const minSz = sizes[sizes.length - 1];
-    let s = clean;
-    while (s.length > 4 && cv.textWidth(s + '...', minSz, { font: 'bold', literal: true }) > maxW) {
-        s = s.slice(0, -1).trim();
+    const cps = Array.from(clean);
+    while (cps.length > 3 && cv.textWidth(cps.join('').trim() + '...', minSz, { font: 'bold', literal: true }) > maxW) {
+        cps.pop();
     }
-    return { text: s + '...', size: minSz };
+    return { text: cps.join('').trim() + '...', size: minSz };
 }
 
 function paintRadialGlow(cv, cx, cy, radius, rgb, peakAlpha) {
@@ -240,7 +257,34 @@ function paintRadialGlow(cv, cx, cy, radius, rgb, peakAlpha) {
     }
 }
 
-function blitRoundedCover(cv, ox, oy, cover, radius) {
+function fillSlantBar(cv, x0, y, w, h, fillW, col) {
+    if (fillW <= 0) return;
+    const rgba = Array.isArray(col) ? col : [69, 214, 255, 255];
+    const [r, g, b, a] = [rgba[0], rgba[1], rgba[2], rgba[3] !== undefined ? rgba[3] : 255];
+    const maxW = Math.min(w, Math.max(1, fillW));
+    const d = cv.d;
+    for (let row = 0; row < h; row++) {
+        const py = y + row;
+        if (py < 0 || py >= cv.h) continue;
+        // BMW 45-degree slant on right end: upper rows extend slightly further right than lower rows
+        const slant = Math.min(Math.max(0, h - 1 - row), w - 1);
+        const rowEnd = Math.min(x0 + w, Math.max(x0 + 1, x0 + maxW - (h - 1 - row)));
+        for (let px = x0; px < rowEnd; px++) {
+            if (px < 0 || px >= cv.w) continue;
+            const o = (py * cv.w + px) * 4;
+            d[o] = r; d[o + 1] = g; d[o + 2] = b; d[o + 3] = a;
+        }
+        // Subtle 1px dark outline at slant edge
+        if (slant >= 0 && rowEnd >= x0 && rowEnd < cv.w) {
+            const o = (py * cv.w + rowEnd) * 4;
+            if (d[o + 3] < 220) {
+                d[o] = 2; d[o + 1] = 6; d[o + 2] = 12; d[o + 3] = 220;
+            }
+        }
+    }
+}
+
+function blitCoverArt(cv, ox, oy, cover, radius) {
     const side = cover.w;
     const src = cover.d;
     const dst = cv.d;
@@ -284,24 +328,39 @@ function blitRoundedCover(cv, ox, oy, cover, radius) {
     cv.strokeRoundRect(ox, oy, side, side, rad, 1, [255, 255, 255, 52]);
 }
 
-function resolveCornerRightMode(settingVal, profile, t) {
+function resolveCornerRightMode(settingVal, profile, t, hvSocGaugeOn) {
     const mode = settingVal || 'auto';
     if (mode === 'off') return 'off';
     if (mode !== 'auto') return mode;
-    if ((profile && profile.vehicleType === 'phev') ||
+    const isPhev = Boolean((profile && profile.vehicleType === 'phev') ||
         typeof (t && t.soc) === 'number' ||
-        typeof (t && t.battTempC) === 'number') {
-        return 'soc';
+        typeof (t && t.battTempC) === 'number');
+    // Now that PHEV HV Battery % overlays the HV battery gauge by default, bottom-right auto-selects 12V % (or 12V V)
+    if (t && typeof t.soc12 === 'number' && isFinite(t.soc12)) return 'soc12';
+    if (t && typeof t.v12 === 'number' && isFinite(t.v12)) return 'v12';
+    if (isPhev) {
+        if (hvSocGaugeOn === false) return 'soc';
+        if (t && typeof t.battTempC === 'number' && isFinite(t.battTempC)) return 'batt';
+        return 'soc12';
     }
     return 'iat';
 }
 
 function formatCornerRightMetric(t, units, mode) {
-    let tag = 'SOC';
+    let tag = '12V';
     let valText = '--';
     let col = COL.dim;
 
-    if (mode === 'soc') {
+    if (mode === 'soc12') {
+        tag = '12V';
+        if (typeof t.soc12 === 'number' && isFinite(t.soc12)) {
+            const pct12 = clamp(Math.round(t.soc12), 0, 100);
+            valText = pct12 + '%';
+            col = pct12 < 40 ? COL.red : (pct12 < 55 ? COL.amber : COL.white);
+        } else {
+            valText = '--%';
+        }
+    } else if (mode === 'soc') {
         tag = 'SOC';
         if (typeof t.soc === 'number' && isFinite(t.soc)) {
             const pct = clamp(Math.round(t.soc), 0, 100);
@@ -332,6 +391,38 @@ function formatCornerRightMetric(t, units, mode) {
         col = COL.white;
     }
     return { tag, valText, col };
+}
+
+function formatLeadHeadwayParts(lead, units, mode) {
+    if (!lead || !lead.active || typeof lead.gapM !== 'number' || !isFinite(lead.gapM)) return null;
+    const isMi = units && units.distUnit === 'mi';
+    const isMph = units && units.speedUnit === 'mph';
+    let distStr;
+    if (isMi) {
+        const ft = Math.round(lead.gapM * 3.28084);
+        distStr = ft >= 528 ? ((lead.gapM * 0.000621371).toFixed(1) + ' mi') : (ft + ' ft');
+    } else {
+        distStr = lead.gapM < 10 ? (lead.gapM.toFixed(1) + ' m') : (Math.round(lead.gapM) + ' m');
+    }
+
+    const hasHw = typeof lead.headwaySec === 'number' && isFinite(lead.headwaySec);
+    const primaryStr = hasHw ? (lead.headwaySec.toFixed(1) + 's') : distStr;
+    const primaryCol = hasHw
+        ? (lead.headwaySec < 1.0 ? COL.red : (lead.headwaySec < 1.5 ? COL.amber : COL.cyan))
+        : (lead.gapM < 3.0 ? COL.amber : COL.cyan);
+    const secDistStr = hasHw ? distStr : '';
+
+    let deltaStr = '';
+    let deltaCol = COL.softBlue;
+    if (mode === 'full' && typeof lead.relSpeedKmh === 'number' && isFinite(lead.relSpeedKmh)) {
+        const rv = Math.round(isMph ? lead.relSpeedKmh * 0.621371 : lead.relSpeedKmh);
+        const dead = isMph ? 2 : 3;
+        if (Math.abs(rv) >= dead) {
+            deltaStr = (rv > 0 ? '+' : '') + rv + (isMph ? ' mph' : ' km/h');
+            deltaCol = rv <= (isMph ? -10 : -16) ? COL.red : (rv < 0 ? COL.amber : COL.softBlue);
+        }
+    }
+    return { primaryStr, primaryCol, secDistStr, deltaStr, deltaCol, distStr };
 }
 
 class OverlayRenderer {
@@ -527,6 +618,7 @@ class OverlayRenderer {
         const hn = t.hudNav || null;
         const wocHudOn = Boolean(hn && hn.wocHudShowing);
         const miniMapOn = Boolean(hn && hn.miniMapActive);
+        const fallbackNavOn = Boolean(hn && hn.noTurnFallback);
         const routeOn = Boolean((hn && hn.routeActive) || t.navRouteActive);
         const lanesOn = Boolean((hn && hn.hasLanes) || t.navHasLanes);
 
@@ -536,11 +628,11 @@ class OverlayRenderer {
             hudYieldedToNav = routeOn || wocHudOn;
             hudYieldReason = wocHudOn ? 'waze_hud' : (routeOn ? 'route' : '');
         } else if (!wocHudOn && hudNavMode === 'own_nav_minimap') {
-            hudYieldedToNav = miniMapOn;
-            hudYieldReason = miniMapOn ? (hn.miniMapReason || 'minimap') : '';
+            hudYieldedToNav = miniMapOn || fallbackNavOn;
+            hudYieldReason = miniMapOn ? (hn.miniMapReason || 'minimap') : (fallbackNavOn ? 'bmw_nav_fallback' : '');
         } else if (!wocHudOn && hudNavMode === 'yield_lanes') {
-            hudYieldedToNav = lanesOn || miniMapOn;
-            hudYieldReason = miniMapOn ? (hn.miniMapReason || 'minimap') : (lanesOn ? 'lanes' : '');
+            hudYieldedToNav = lanesOn || miniMapOn || fallbackNavOn;
+            hudYieldReason = miniMapOn ? (hn.miniMapReason || 'minimap') : (lanesOn ? 'lanes' : (fallbackNavOn ? 'bmw_nav_fallback' : ''));
         }
         const showHud = wantHud && !hudYieldedToNav;
         const showOwnHudNav = showHud && !wocHudOn && hudNavMode !== 'yield_route' && hudNavMode !== 'keep' &&
@@ -558,52 +650,57 @@ class OverlayRenderer {
         const gearDisplay = s.gearDisplay === 'left_of_speed' ? 'below_speed' : (s.gearDisplay || 'next_to_d');
         const brakeMode = s.brakeIndicator || 'bar_num';
         const cornerLeftMode = s.cornerLeftDisplay || 'oil_cool';
-        const cornerRightMode = resolveCornerRightMode(s.cornerRightDisplay, profile, t);
-        const rightWidgetMode = s.rightWidgetMode || 'cycle';
-        const hudLine1 = s.hudLine1 || 'efficiency';
-        const hudLine2 = s.hudLine2 || 'power_gear';
+        const hvSocGaugeEnabled = s.hvSocGauge !== false;
+        const cabinTempEnabled = s.cabinTempDisplay !== false;
+        const cornerRightMode = resolveCornerRightMode(s.cornerRightDisplay, profile, t, hvSocGaugeEnabled);
+        const rightWidgetMode = s.rightWidgetMode || (((s.widgetMedia !== false ? 'M' : '') + (s.widgetTrip !== false ? 'T' : '')) || 'off');
+        const hudHeadwayMode = s.hudHeadway || 'full';
+        const hudLine1 = s.hudLine1 || 'efficiency_gear';
+        const hudLine2 = s.hudLine2 || 'power';
         const hudLine3 = s.hudLine3 || 'brake';
 
-        // Resolve active Right-Wing Widget page ('media', 'trip', or 'off')
+        const chg = t.charging || null;
+        const isCharging = Boolean(chg && chg.active);
+
+        // Resolve active Right-Wing Widget page ('charging' locked on charge | 'media' | 'trip' | 'off')
         const media = t.media || null;
-        let rightWidgetPage = 'off';
-        if (panelAllowed && rightWidgetMode !== 'off') {
-            if (rightWidgetMode === 'media') {
-                rightWidgetPage = 'media';
-            } else if (rightWidgetMode === 'trip') {
-                rightWidgetPage = 'trip';
-            } else {
-                // 'cycle': follows BC button page ('media' -> 'trip' -> 'off'); when on 'media' with no active
-                // audio yet on boot, show 'trip' automatically until music starts!
-                const bcPage = (media && media.page) || 'media';
-                if (bcPage === 'off') rightWidgetPage = 'off';
-                else if (bcPage === 'trip') rightWidgetPage = 'trip';
-                else rightWidgetPage = (media && media.active) ? 'media' : 'trip';
-            }
-        }
+        const rightWidgetPage = panelAllowed ? resolveRightWidgetPage(s, media, isCharging) : 'off';
 
-        const hero = profile.isEv
-            ? formatEvEff(eff.evKmPerKwh, units)
-            : formatFuelEff(eff.fuelLPer100km, eff.isDfco, units);
-        const heroCol = profile.mode === 'ev_regen' ? COL.cyan
-            : profile.isEv ? COL.white
-            : (eff.isDfco ? COL.cyan : (profile.isCold ? COL.icyBlue : COL.white));
-
+        let hero;
+        let heroCol;
         let subText = '';
         let subCol = COL.softBlue;
-        if (profile.isEv) {
-            const pFmt = formatPowerKw(t.hvKw);
-            subText = pFmt.text;
-            subCol = (t.hvKw !== null && t.hvKw > 55) ? COL.amber : COL.cyan;
-        } else if (profile.isCold && profile.coldCeilingRpm) {
-            subText = '<' + (profile.coldCeilingRpm / 1000).toFixed(1) + 'k RPM';
-            subCol = COL.icyBlue;
-        } else if (typeof t.boostBar === 'number' && isFinite(t.boostBar)) {
-            const bFmt = formatPress(t.boostBar, true, units);
-            subText = bFmt.text;
-            subCol = t.boostBar > 0.8 ? COL.amber : COL.cyan;
+
+        if (isCharging) {
+            hero = {
+                value: (typeof chg.chargeKw === 'number' && isFinite(chg.chargeKw)) ? chg.chargeKw.toFixed(1) : '--',
+                unit: 'kW',
+            };
+            heroCol = COL.cyan;
+            subText = chg.maxAmps ? ('CHARGING ' + Math.round(chg.maxAmps) + 'A') : 'CHARGING';
+            subCol = COL.softBlue;
         } else {
-            subText = (t.rpm ? Math.round(t.rpm) + ' rpm' : '--');
+            hero = profile.isEv
+                ? formatEvEff(eff.evKmPerKwh, units)
+                : formatFuelEff(eff.fuelLPer100km, eff.isDfco, units);
+            heroCol = profile.mode === 'ev_regen' ? COL.cyan
+                : profile.isEv ? COL.white
+                : (eff.isDfco ? COL.cyan : (profile.isCold ? COL.icyBlue : COL.white));
+
+            if (profile.isEv) {
+                const pFmt = formatPowerKw(t.hvKw);
+                subText = pFmt.text;
+                subCol = (t.hvKw !== null && t.hvKw > 55) ? COL.amber : COL.cyan;
+            } else if (profile.isCold && profile.coldCeilingRpm) {
+                subText = '<' + (profile.coldCeilingRpm / 1000).toFixed(1) + 'k RPM';
+                subCol = COL.icyBlue;
+            } else if (typeof t.boostBar === 'number' && isFinite(t.boostBar)) {
+                const bFmt = formatPress(t.boostBar, true, units);
+                subText = bFmt.text;
+                subCol = t.boostBar > 0.8 ? COL.amber : COL.cyan;
+            } else {
+                subText = (t.rpm ? Math.round(t.rpm) + ' rpm' : '--');
+            }
         }
 
         const inNormalD = t.stage === 'D' && t.program !== 'S' && t.program !== 'M' &&
@@ -619,10 +716,29 @@ class OverlayRenderer {
         const brakeLit = (!isParked && fg > 0.02) ? clamp(Math.round((fg / 0.55) * 20), 1, 20) : (brakeHold ? 1 : 0);
         const showBrakeRail = brakeMode !== 'off' && !isParked;
 
+        const showHvSocGauge = Boolean(
+            panelAllowed &&
+            hvSocGaugeEnabled &&
+            profile && profile.vehicleType === 'phev' &&
+            typeof t.soc === 'number' && isFinite(t.soc)
+        );
+        const showCabinTemp = Boolean(
+            panelAllowed &&
+            cabinTempEnabled &&
+            typeof t.cabinTempC === 'number' && isFinite(t.cabinTempC)
+        );
+        const showHudHeadway = Boolean(
+            showHud &&
+            hudHeadwayMode !== 'off' &&
+            t.leadVehicle && t.leadVehicle.active
+        );
+
         this.lastSummary = {
             hero, heroCol, subText, subCol, inNormalD, dGearText,
-            isParked, showBrakeRail, brakeHold,
-            panelAllowed, showHud, showOwnHudNav, showHudRoad, wocHudOverlay, hudYieldedToNav, hudYieldReason,
+            isParked, isCharging, showBrakeRail, brakeHold,
+            panelAllowed, showHud, showOwnHudNav, showHudRoad, showHudHeadway, hudHeadwayMode,
+            showHvSocGauge, showCabinTemp,
+            wocHudOverlay, hudYieldedToNav, hudYieldReason,
             showFallbackMap: showMapOverlay, showMapOverlay, clusterSlotMode,
             rightWidgetMode, rightWidgetPage,
             brakeMode, brakeLit, frictionG: fg, brakeBar: t.brakeBar,
@@ -632,10 +748,10 @@ class OverlayRenderer {
 
         // 1. CLUSTER PANEL LAYERS (slot 0x203)
         if (panelAllowed) {
-            // 1a. Zone 1: Below Speed Indicator (392..606, 429..513)
+            // 1a. Zone 1: Below Speed Indicator (392..606, 445..529; clear gap under speed & above traffic light sign)
             const bsRect = {
                 x: clamp(BELOW_SPEED_BASE.x + cx, 387, 412),
-                y: clamp(BELOW_SPEED_BASE.y + cy, 429, 430),
+                y: clamp(BELOW_SPEED_BASE.y + cy, 433, 452),
                 w: BELOW_SPEED_BASE.w,
                 h: BELOW_SPEED_BASE.h,
             };
@@ -644,9 +760,9 @@ class OverlayRenderer {
             this._setVisible('below_speed', true);
             this._upload('below_speed');
 
-            // 1b. Zone 2: Shift Position Next to Stock 'D' (1463..1537, 650..706; strictly x >= 1461 clear of GEAR_WIN)
+            // 1b. Zone 2: Shift Position Snugly Next to Stock 'D' (1429..1459, 650..706; strictly x >= 1427 clear of GEAR_WIN)
             const gdRect = {
-                x: clamp(GEAR_D_BASE.x + cx, 1461, 1466),
+                x: clamp(GEAR_D_BASE.x + cx, 1427, 1435),
                 y: clamp(GEAR_D_BASE.y + cy, 648, 654),
                 w: GEAR_D_BASE.w,
                 h: GEAR_D_BASE.h,
@@ -654,24 +770,41 @@ class OverlayRenderer {
             const lGd = this._ensureOrLocal('gear_d', Object.assign({ target: 'panel', visible: false, z: 14 }, gdRect));
             const showGearDigit = gearDisplay === 'next_to_d' && inNormalD;
             const alertObj = s.smartAlerts !== false ? profile.alert : null;
-            if (showGearDigit || alertObj) {
-                this._paintGearNextToD(lGd.cv, showGearDigit ? String(Math.round(t.gear)) : '', alertObj);
+            if (showGearDigit) {
+                this._paintGearNextToD(lGd.cv, String(Math.round(t.gear)));
                 this._setVisible('gear_d', true);
                 this._upload('gear_d');
             } else {
                 this._setVisible('gear_d', false);
             }
 
-            // 1c. Zone 3: Slim Friction Brake Force Rail (1280..1576, 609..640; hidden in Park)
+            // 1b2. Cabin Temperature Badge Left of Ambient Temp (1458..1532, 654..704; car-silhouette enclosure)
+            if (showCabinTemp) {
+                const ctRect = {
+                    x: clamp(CABIN_TEMP_BASE.x + cx, 1457, 1463),
+                    y: clamp(CABIN_TEMP_BASE.y + cy, 650, 658),
+                    w: CABIN_TEMP_BASE.w,
+                    h: CABIN_TEMP_BASE.h,
+                };
+                const lCt = this._ensureOrLocal('cabin_temp', Object.assign({ target: 'panel', visible: true, z: 14 }, ctRect));
+                this._paintCabinTemp(lCt.cv, t.cabinTempC, units);
+                this._setVisible('cabin_temp', true);
+                this._upload('cabin_temp');
+            } else {
+                this._setVisible('cabin_temp', false);
+            }
+
+            // 1c. Zone 3: Slim Friction Brake Force Rail + Passive Anomaly Alert (1280..1576, 609..640; hidden in Park unless alert)
             const brRect = {
                 x: clamp(BRAKE_RAIL_BASE.x + cx, 1276, 1288),
                 y: clamp(BRAKE_RAIL_BASE.y + cy, 599, 617),
                 w: BRAKE_RAIL_BASE.w,
                 h: BRAKE_RAIL_BASE.h,
             };
-            const lBr = this._ensureOrLocal('brake_rail', Object.assign({ target: 'panel', visible: showBrakeRail, z: 13 }, brRect));
-            if (showBrakeRail) {
-                this._paintBrakeRail(lBr.cv, fg, brakeLit, Boolean(t.absActive), brakeMode === 'bar_num' && !brakeHold, t.brakeBar);
+            const showBrakeOrAlert = Boolean(showBrakeRail || (alertObj && alertObj.label));
+            const lBr = this._ensureOrLocal('brake_rail', Object.assign({ target: 'panel', visible: showBrakeOrAlert, z: 13 }, brRect));
+            if (showBrakeOrAlert) {
+                this._paintBrakeRail(lBr.cv, fg, brakeLit, Boolean(t.absActive), brakeMode === 'bar_num' && !brakeHold, t.brakeBar, alertObj, showBrakeRail);
                 this._setVisible('brake_rail', true);
                 this._upload('brake_rail');
             } else {
@@ -694,10 +827,10 @@ class OverlayRenderer {
                 this._setVisible('corner_left', false);
             }
 
-            // 1e. Zone 5: Bottom-Right HV Battery % SoC / Vital (1816..1914, 643..709)
+            // 1e. Zone 5: Bottom-Right 12V Battery % / Vital (1816..1914, 646..712; separated from battery icon)
             const crRect = {
                 x: clamp(CORNER_RIGHT_BASE.x + cx, 1815, 1820),
-                y: clamp(CORNER_RIGHT_BASE.y + cy, 643, 648),
+                y: clamp(CORNER_RIGHT_BASE.y + cy, 644, 651),
                 w: CORNER_RIGHT_BASE.w,
                 h: CORNER_RIGHT_BASE.h,
             };
@@ -710,21 +843,60 @@ class OverlayRenderer {
                 this._setVisible('corner_right', false);
             }
 
-            // 1f. Zone 6: Right-Wing Media / Trip Widget (1244..1556, 214..480)
+            // 1e2. PHEV HV Battery SoC % Overlay Inside HV Battery Sub-Gauge (1794..1886, 482..540; PHEV only)
+            if (showHvSocGauge) {
+                const hgRect = {
+                    x: clamp(HV_SOC_GAUGE_BASE.x + cx, 1786, 1802),
+                    y: clamp(HV_SOC_GAUGE_BASE.y + cy, 476, 488),
+                    w: HV_SOC_GAUGE_BASE.w,
+                    h: HV_SOC_GAUGE_BASE.h,
+                };
+                const lHg = this._ensureOrLocal('hv_soc_gauge', Object.assign({ target: 'panel', visible: true, z: 15 }, hgRect));
+                this._paintHvSocGauge(lHg.cv, t.soc);
+                this._setVisible('hv_soc_gauge', true);
+                this._upload('hv_soc_gauge');
+            } else {
+                this._setVisible('hv_soc_gauge', false);
+            }
+
+            // 1f. Zone 6: Right-Wing Charging / Media / Trip Widget (1252..1788, 88..604)
             if (rightWidgetPage !== 'off') {
                 const rwRect = {
-                    x: clamp(RIGHT_WIDGET_BASE.x + cx, 1232, 1256),
-                    y: clamp(RIGHT_WIDGET_BASE.y + cy, 202, 226),
+                    x: clamp(RIGHT_WIDGET_BASE.x + cx, 1244, 1260),
+                    y: clamp(RIGHT_WIDGET_BASE.y + cy, 86, 96),
                     w: RIGHT_WIDGET_BASE.w,
                     h: RIGHT_WIDGET_BASE.h,
                 };
                 const lRw = this._ensureOrLocal('right_widget', Object.assign({ target: 'panel', visible: true, z: 11 }, rwRect));
-                if (rightWidgetPage === 'media') {
-                    const elKey = media && typeof media.elapsedSec === 'number' ? Math.floor(media.elapsedSec) : -1;
-                    const totKey = media && typeof media.totalSec === 'number' ? Math.floor(media.totalSec) : -1;
-                    const rwKey = 'M|' + (media ? [media.active ? 1 : 0, media.playing ? 1 : 0, media.title, media.artist, media.coverRev, elKey, totKey].join('|') : 'none');
+                if (rightWidgetPage === 'charging') {
+                    const kwKey = (chg && typeof chg.chargeKw === 'number' && isFinite(chg.chargeKw)) ? chg.chargeKw.toFixed(1) : '--';
+                    const rwKey = 'C|' + [
+                        chg ? chg.finishTimeText : '--:--',
+                        chg ? chg.remainText : '',
+                        kwKey,
+                        chg && chg.maxAmps ? chg.maxAmps : '',
+                        typeof t.soc === 'number' ? Math.round(t.soc) : -1,
+                        chg ? chg.targetSoc : 100,
+                        typeof t.erangeKm === 'number' ? Math.round(t.erangeKm) : -1,
+                        units.distUnit,
+                    ].join('|');
                     if (rwKey !== this.lastRightWidgetKey || !lRw.prevBuf) {
-                        this._paintRightMedia(lRw.cv, media);
+                        this._paintRightCharging(lRw.cv, chg, t, units);
+                        this.lastRightWidgetKey = rwKey;
+                    }
+                } else if (rightWidgetPage === 'media') {
+                    const remKey = media && typeof media.remainSec === 'number' ? Math.ceil(media.remainSec) : -1;
+                    const totKey = media && typeof media.totalSec === 'number' ? Math.floor(media.totalSec) : -1;
+                    const tElapsed = media ? Math.max(0, now - (media.trackSinceMs || 0)) : 0;
+                    const titleInfo = (media && media.active && media.title)
+                        ? paginateTitle(lRw.cv, media.title, 332, [30, 27, 24, 22], 22, tElapsed)
+                        : null;
+                    const rwKey = 'M|' + rwRect.x + ',' + rwRect.y + '|' + (media
+                        ? [media.active ? 1 : 0, media.playing ? 1 : 0, media.title, media.artist, media.coverRev,
+                            titleInfo ? titleInfo.page : 0, remKey, totKey].join('|')
+                        : 'none');
+                    if (rwKey !== this.lastRightWidgetKey || !lRw.prevBuf) {
+                        this._paintRightMedia(lRw.cv, media, titleInfo, rwRect.x, rwRect.y);
                         this.lastRightWidgetKey = rwKey;
                     }
                 } else {
@@ -734,6 +906,7 @@ class OverlayRenderer {
                         Math.round((t.tripDistKm || -1) * 10), t.tripMinutes || -1,
                         Math.round(t.gearboxOilC || -99), Math.round(t.battTempC || -99),
                         Math.round(t.iatC || -99), typeof t.v12 === 'number' ? t.v12.toFixed(1) : '--',
+                        typeof t.soc12 === 'number' ? Math.round(t.soc12) : -1,
                         hero.value, hero.unit,
                     ].join('|');
                     if (rwKey !== this.lastRightWidgetKey || !lRw.prevBuf) {
@@ -789,6 +962,21 @@ class OverlayRenderer {
             this._setVisible('hud_main', false);
         }
 
+        // 2b2. HUD LEAD-CAR HEADWAY BADGE (124x45 at x=280..404 < 405 nav, y=140..185 > 138 road & < 202 ACC)
+        if (showHudHeadway) {
+            const hwX = clamp(HUD_HEADWAY_BASE.x + hx, 268, 404 - HUD_HEADWAY_BASE.w);
+            const hwMinY = showHudRoad ? (hudTopY + HUD_ROAD_H + 1) : 104;
+            const hwY = clamp(HUD_HEADWAY_BASE.y + hy, hwMinY, 201 - HUD_HEADWAY_BASE.h);
+            const lHudHw = this._ensureOrLocal('hud_headway', {
+                target: 'hud', klass: 'overlay', x: hwX, y: hwY, w: HUD_HEADWAY_BASE.w, h: HUD_HEADWAY_BASE.h, visible: true, z: 13,
+            });
+            this._paintHudHeadway(lHudHw.cv, t.leadVehicle, units, hudHeadwayMode);
+            this._setVisible('hud_headway', true);
+            this._upload('hud_headway');
+        } else {
+            this._setVisible('hud_headway', false);
+        }
+
         // 2c. HUD NAVIGATION LAYER (264x232 right-side slot x=412..676, y=140..372 below road banner; yields for mini-map)
         if (showOwnHudNav) {
             const navX = clamp(HUD_NAV_BASE.x + hx, 406, 680 - HUD_NAV_W);
@@ -812,7 +1000,7 @@ class OverlayRenderer {
         if (showMapOverlay) {
             const msRect = {
                 x: clamp(MAP_SPEED_RECT.x + cx, 8, 32),
-                y: clamp(MAP_SPEED_RECT.y + cy, 297, 321),
+                y: clamp(MAP_SPEED_RECT.y + cy, 313, 335),
                 w: MAP_SPEED_RECT.w,
                 h: MAP_SPEED_RECT.h,
             };
@@ -907,33 +1095,82 @@ class OverlayRenderer {
         }
     }
 
-    _paintGearNextToD(cv, digitStr, alertObj) {
+    _paintGearNextToD(cv, digitStr) {
         cv.clear(COL.clear);
         if (digitStr) {
-            drawTextOutline(cv, digitStr, 3, 46, 42, COL.white, { font: 'bold', align: 'left' });
-        }
-        if (alertObj && alertObj.label) {
-            const col = alertObj.severity === 'red' ? COL.red : COL.amber;
-            const lbl = alertObj.label.length > 6 ? alertObj.label.slice(0, 6) : alertObj.label;
-            drawTextOutline(cv, lbl, 28, 42, 14, col, { font: 'bold', align: 'left' });
+            drawTextOutline(cv, digitStr, 2, 46, 40, COL.white, { font: 'bold', align: 'left' });
         }
     }
 
-    _paintBrakeRail(cv, fg, litCount, absActive, showNum, brakeBar) {
+    /**
+     * Sleek BMW sedan-silhouette enclosure around interior cabin temperature (`74x50`),
+     * placed directly left of stock ambient temperature (`+57°F`) with breathing room before '+'.
+     */
+    _paintCabinTemp(cv, cabinTempC, units) {
         cv.clear(COL.clear);
-        const SEG_N = 20;
-        const barX0 = 2;
-        const barX1 = 294;
-        const segW = (barX1 - barX0) / SEG_N;
+        const tf = formatTemp(cabinTempC, units);
+        const fillCol = [10, 18, 30, 182];
+        const rimCol = '#8eb8e5';
 
-        for (let i = 0; i < SEG_N; i++) {
-            const sx1 = Math.round(barX1 - i * segW) - 1;
-            const sx0 = Math.round(barX1 - (i + 1) * segW) + 2;
-            let col = COL.railDim;
-            if (litCount > 0 && i < litCount) {
-                col = i >= 13 ? COL.red : (i >= 6 ? COL.orange : COL.amber);
+        // Fill upper greenhouse + lower sedan body
+        cv.convex([[12, 19], [21, 8], [50, 8], [59, 19]], fillCol);
+        cv.roundRect(3, 18, 66, 22, 3, fillCol);
+
+        // Two subtle lower tire treads so the silhouette reads unmistakably as a car at a glance
+        cv.roundRect(11, 39, 11, 4, 1.5, COL.outline);
+        cv.roundRect(50, 39, 11, 4, 1.5, COL.outline);
+        cv.roundRect(12, 39, 9, 3, 1, rimCol);
+        cv.roundRect(51, 39, 9, 3, 1, rimCol);
+
+        // Sedan greenhouse + body contour + subtle B-pillar & window sill
+        const pts = [
+            [4, 20],
+            [12, 18],
+            [21, 8],
+            [50, 8],
+            [59, 18],
+            [68, 20],
+            [68, 39],
+            [4, 39],
+            [4, 20],
+        ];
+        cv.polyline(pts, 3.2, COL.outline);
+        cv.polyline(pts, 1.6, rimCol);
+        cv.line(35, 9, 35, 18, 1.2, [142, 184, 229, 115]);
+        cv.line(13, 18, 58, 18, 1.0, [142, 184, 229, 95]);
+
+        const sz = tf.text.length >= 5 ? 16 : 17;
+        drawTextOutline(cv, tf.text, 36, 35, sz, COL.white, { font: 'bold', align: 'center' });
+    }
+
+    /**
+     * PHEV-only HV Battery State of Charge (%) centered inside the dark pocket of the bottom-right HV battery gauge.
+     */
+    _paintHvSocGauge(cv, soc) {
+        cv.clear(COL.clear);
+        const pct = clamp(Math.round(soc), 0, 100);
+        const col = pct <= 10 ? COL.red : (pct <= 20 ? COL.amber : COL.white);
+        drawTextOutline(cv, 'SOC', 46, 16, 13, COL.tagBlue, { font: 'bold', align: 'center' });
+        drawTextOutline(cv, pct + '%', 46, 47, 29, col, { font: 'num', align: 'center' });
+    }
+
+    _paintBrakeRail(cv, fg, litCount, absActive, showNum, brakeBar, alertObj, showSegments) {
+        cv.clear(COL.clear);
+        if (showSegments !== false) {
+            const SEG_N = 20;
+            const barX0 = 2;
+            const barX1 = 294;
+            const segW = (barX1 - barX0) / SEG_N;
+
+            for (let i = 0; i < SEG_N; i++) {
+                const sx1 = Math.round(barX1 - i * segW) - 1;
+                const sx0 = Math.round(barX1 - (i + 1) * segW) + 2;
+                let col = COL.railDim;
+                if (litCount > 0 && i < litCount) {
+                    col = i >= 13 ? COL.red : (i >= 6 ? COL.orange : COL.amber);
+                }
+                cv.fillRect(sx0, 21, Math.max(2, sx1 - sx0), 7, col);
             }
-            cv.fillRect(sx0, 21, Math.max(2, sx1 - sx0), 7, col);
         }
 
         if (litCount > 0 && showNum) {
@@ -942,6 +1179,9 @@ class OverlayRenderer {
             const lbl = (absActive ? 'ABS ' : '') + valStr;
             const col = (fg >= 0.36 || absActive) ? COL.red : COL.amber;
             drawTextOutline(cv, lbl, 3, 15, 15, col, { font: 'bold', align: 'left' });
+        } else if (litCount === 0 && alertObj && alertObj.label) {
+            const aCol = alertObj.severity === 'red' ? COL.red : COL.amber;
+            drawTextOutline(cv, alertObj.label, 3, 15, 15, aCol, { font: 'bold', align: 'left' });
         }
     }
 
@@ -967,144 +1207,250 @@ class OverlayRenderer {
     _paintCornerRight(cv, t, units, mode) {
         cv.clear(COL.clear);
         const m = formatCornerRightMetric(t, units, mode);
-        drawTextOutline(cv, m.tag, cv.w - 4, 20, 16, COL.tagBlue, { font: 'bold', align: 'right' });
-        drawTextOutline(cv, m.valText, cv.w - 4, 53, 28, m.col, { font: 'num', align: 'right' });
+        drawTextOutline(cv, m.tag, cv.w - 4, 21, 16, COL.tagGray, { font: 'bold', align: 'right' });
+        drawTextOutline(cv, m.valText, cv.w - 4, 55, 28, m.col, { font: 'num', align: 'right' });
     }
 
     /**
-     * Re-implemented OEM-style Right-Wing Media Playback Widget (312x266 centered at world x=1400):
-     *   - Soft ambient radial glow extracted from album cover dominant colors
-     *   - Crisp 124x124 rounded-corner album cover (or sleek vector music-note tile)
-     *   - Black-outlined track title + artist/album
-     *   - Smooth progress bar + elapsed / total duration timestamps
+     * Re-implemented OEM-scale Right-Wing Media Playback Widget (536x516 at 1252,88):
+     *   - Gauge-edge translucent album-art backdrop filling the right-wing face cleanly with zero darkened edge
+     *   - Crisp 144x144 album artwork centered at x=186 (world x=1438, y=184..328)
+     *   - Track title (Latin + CJK): downscales 30 -> 27 -> 24 -> 22px bold before paginating cleanly across segments
+     *   - Artist / Show name in clean light gray (#cbd2dc)
+     *   - Slanted BMW cyan progress bar with right-side-only time remaining (zero left timestamp)
      */
-    _paintRightMedia(cv, media) {
+    _paintRightMedia(cv, media, titleInfoPre, ox, oy) {
         cv.clear(COL.clear);
-        const midX = Math.round(cv.w / 2); // 156 => world x = 1400
-        const coverSide = 124;
-        const coverX = midX - Math.round(coverSide / 2); // 94
-        const coverY = 16;
+        const fgCx = 186; // world x = 1438 (+42px right matching BMW stock Now Playing alignment)
+        const coverSide = COVER_SIDE; // 144
+        const coverX = fgCx - Math.round(coverSide / 2); // 114 (world x = 1366..1510)
+        const coverY = 96; // world y = 184..328
 
         const hasMedia = Boolean(media && media.active && media.title);
         const cover = hasMedia ? media.cover : null;
-        const glowRgb = cover && Array.isArray(cover.accent) ? cover.accent : [56, 178, 246];
-        paintRadialGlow(cv, midX, coverY + 66, 114, glowRgb, hasMedia ? 52 : 28);
 
         if (cover && cover.d && cover.w === coverSide && cover.h === coverSide) {
-            blitRoundedCover(cv, coverX, coverY, cover, 10);
+            const bgBuf = buildStockBackdrop(cover, cv.w, cv.h, {
+                ox: typeof ox === 'number' ? ox : 1252,
+                oy: typeof oy === 'number' ? oy : 88,
+                vx: fgCx,
+                vy: 224,
+            });
+            if (bgBuf && bgBuf.length === cv.d.length) {
+                bgBuf.copy(cv.d);
+            }
+            blitCoverArt(cv, coverX, coverY, cover, 4);
         } else {
-            cv.roundRect(coverX, coverY, coverSide, coverSide, 10, COL.tileBg);
-            cv.strokeRoundRect(coverX, coverY, coverSide, coverSide, 10, 2, COL.tileRim);
-            // Vector eighth-note icon
-            cv.circle(midX - 13, coverY + 80, 10, COL.icyBlue);
-            cv.circle(midX + 15, coverY + 74, 10, COL.icyBlue);
-            cv.fillRect(midX - 6, coverY + 38, 4, 42, COL.icyBlue);
-            cv.fillRect(midX + 22, coverY + 32, 4, 42, COL.icyBlue);
-            cv.line(midX - 4, coverY + 39, midX + 24, coverY + 33, 6, COL.icyBlue);
+            paintRadialGlow(cv, fgCx, coverY + 72, 118, [56, 178, 246], hasMedia ? 38 : 24);
+            cv.roundRect(coverX, coverY, coverSide, coverSide, 4, COL.tileBg);
+            cv.strokeRoundRect(coverX, coverY, coverSide, coverSide, 4, 2, COL.tileRim);
+            cv.roundRect(fgCx - 27, coverY + 82, 24, 20, 10, COL.icyBlue);
+            cv.roundRect(fgCx + 5, coverY + 74, 24, 20, 10, COL.icyBlue);
+            cv.fillRect(fgCx - 8, coverY + 42, 5, 50, COL.icyBlue);
+            cv.fillRect(fgCx + 24, coverY + 36, 5, 48, COL.icyBlue);
+            cv.fillRect(fgCx - 8, coverY + 36, 37, 8, COL.icyBlue);
         }
 
         if (!hasMedia) {
-            drawTextOutline(cv, '暂无媒体播放', midX, 176, 20, COL.softBlue, { font: 'bold', align: 'center' });
-            drawTextOutline(cv, '按 BC 键查看行程', midX, 204, 15, COL.tagBlue, { font: 'bold', align: 'center' });
+            drawTextOutline(cv, '暂无媒体播放', fgCx, 286, 24, COL.mediaSub, { font: 'bold', align: 'center' });
+            drawTextOutline(cv, '按 BC 键查看行程', fgCx, 316, 17, COL.tagGray, { font: 'bold', align: 'center' });
             return;
         }
 
-        const tFit = fitTextLine(cv, media.title, cv.w - 16, [21, 19, 17]);
-        drawTextOutline(cv, tFit.text, midX, 172, tFit.size, COL.white, { font: 'bold', align: 'center' });
+        const tInfo = titleInfoPre || paginateTitle(cv, media.title, 332, [30, 27, 24, 22], 22, 0);
+        if (tInfo && tInfo.text) {
+            drawTextOutline(cv, tInfo.text, fgCx, 286, tInfo.size, COL.white, { font: 'bold', align: 'center' });
+        }
 
         const subRaw = media.artist || media.source || '';
         if (subRaw) {
-            const aFit = fitTextLine(cv, subRaw, cv.w - 20, [16, 15, 14]);
-            drawTextOutline(cv, aFit.text, midX, 198, aFit.size, COL.softBlue, { font: 'bold', align: 'center' });
+            const aFit = fitTextLine(cv, subRaw, 328, [23, 21, 19]);
+            drawTextOutline(cv, aFit.text, fgCx, 320, aFit.size, COL.mediaSub, { font: 'bold', align: 'center' });
         }
 
-        if (typeof media.totalSec === 'number' && media.totalSec > 0 && typeof media.elapsedSec === 'number') {
-            const barX = 36;
-            const barW = cv.w - 72; // 240
-            const barY = 215;
-            const frac = clamp(media.frac || 0, 0, 1);
-            cv.fillRect(barX - 1, barY - 1, barW + 2, 8, COL.outline);
-            cv.fillRect(barX, barY, barW, 6, COL.progTrack);
-            const fillW = Math.max(4, Math.round(barW * frac));
-            cv.fillRect(barX, barY, fillW, 6, media.playing === false ? COL.amber : COL.cyan);
+        const barX0 = 32; // world x = 1284
+        const barW = 296; // world x1 = 1580
+        const barX1 = barX0 + barW;
+        const barY = 374; // world y = 462..472
+        const barH = 10;
 
-            drawTextOutline(cv, formatMmSs(media.elapsedSec), barX, 240, 14, COL.tagBlue, { font: 'bold', align: 'left' });
-            if (media.playing === false) {
-                drawTextOutline(cv, '已暂停', midX, 240, 13, COL.amber, { font: 'bold', align: 'center' });
-            }
-            drawTextOutline(cv, formatMmSs(media.totalSec), barX + barW, 240, 14, COL.tagBlue, { font: 'bold', align: 'right' });
+        if (typeof media.totalSec === 'number' && media.totalSec > 0 && typeof media.elapsedSec === 'number') {
+            const frac = clamp(media.frac || 0, 0, 1);
+            const fillW = Math.max(barH + 2, Math.round(barW * frac));
+            const rem = typeof media.remainSec === 'number' ? Math.max(0, media.remainSec) : Math.max(0, media.totalSec - media.elapsedSec);
+            const remLabel = media.playing === false ? ('已暂停  -' + formatDuration(rem)) : ('-' + formatDuration(rem));
+            drawTextOutline(cv, remLabel, barX1, 362, 20, media.playing === false ? COL.amber : COL.mediaTime, { font: 'bold', align: 'right' });
+
+            fillSlantBar(cv, barX0, barY, barW, barH, barW, COL.progTrack);
+            fillSlantBar(cv, barX0, barY, barW, barH, fillW, media.playing === false ? [255, 179, 71, 255] : [69, 214, 255, 255]);
         } else {
             const liveTag = media.playing === false ? '已暂停' : (media.source || '实时音频');
-            drawTextOutline(cv, liveTag, midX, 228, 15, media.playing === false ? COL.amber : COL.tagBlue, { font: 'bold', align: 'center' });
+            drawTextOutline(cv, liveTag, barX1, 364, 19, media.playing === false ? COL.amber : COL.mediaTime, { font: 'bold', align: 'right' });
         }
     }
 
     /**
-     * Right-Wing Trip & Powertrain Summary Widget (312x266, BC-cycled Page 2):
-     * Borderless white/blue black-outlined 2x3 grid matching BMW Live Cockpit typography.
+     * Right-Wing Trip & Powertrain Summary Widget (centered identically at world x=1438, BC-cycled):
      */
     _paintRightTrip(cv, t, hero, profile, units) {
         cv.clear(COL.clear);
-        const midX = Math.round(cv.w / 2);
+        const midX = 186;
+        const leftX = 40;
+        const rightX = 332;
         const isMi = units.distUnit === 'mi';
         const dUnit = isMi ? ' mi' : ' km';
         const dScale = isMi ? 0.621371 : 1;
 
-        drawTextOutline(cv, '行程与车辆信息', midX, 24, 15, COL.tagBlue, { font: 'bold', align: 'center' });
-        cv.fillRect(28, 34, cv.w - 56, 2, COL.divider);
+        drawTextOutline(cv, '行程与车辆信息', midX, 122, 17, COL.tagGray, { font: 'bold', align: 'center' });
+        cv.fillRect(leftX, 134, rightX - leftX, 2, COL.divider);
 
-        // Row 1 (y = 58 / 88): EV Range (or Instant Efficiency on ICE) + Fuel Range
         if (profile && profile.vehicleType === 'phev') {
             const evStr = (typeof t.erangeKm === 'number' && isFinite(t.erangeKm))
                 ? (Math.round(t.erangeKm * dScale) + dUnit) : ('--' + dUnit);
-            drawTextOutline(cv, '纯电续航', 22, 58, 14, COL.tagBlue, { font: 'bold', align: 'left' });
-            drawTextOutline(cv, evStr, 22, 88, 26, COL.cyan, { font: 'num', align: 'left' });
+            drawTextOutline(cv, '纯电续航', leftX, 168, 15, COL.tagBlue, { font: 'bold', align: 'left' });
+            drawTextOutline(cv, evStr, leftX, 202, 28, COL.cyan, { font: 'num', align: 'left' });
         } else {
-            drawTextOutline(cv, '实时能耗', 22, 58, 14, COL.tagBlue, { font: 'bold', align: 'left' });
-            drawTextOutline(cv, hero.value + ' ' + hero.unit, 22, 88, 22, COL.white, { font: 'bold', align: 'left' });
+            drawTextOutline(cv, '实时能耗', leftX, 168, 15, COL.tagBlue, { font: 'bold', align: 'left' });
+            drawTextOutline(cv, hero.value + ' ' + hero.unit, leftX, 202, 24, COL.white, { font: 'bold', align: 'left' });
         }
 
         const fuelStr = (typeof t.frangeKm === 'number' && isFinite(t.frangeKm))
             ? (Math.round(t.frangeKm * dScale) + dUnit) : ('--' + dUnit);
-        drawTextOutline(cv, '燃油续航', cv.w - 22, 58, 14, COL.tagBlue, { font: 'bold', align: 'right' });
-        drawTextOutline(cv, fuelStr, cv.w - 22, 88, 26, COL.white, { font: 'num', align: 'right' });
+        drawTextOutline(cv, '燃油续航', rightX, 168, 15, COL.tagBlue, { font: 'bold', align: 'right' });
+        drawTextOutline(cv, fuelStr, rightX, 202, 28, COL.white, { font: 'num', align: 'right' });
 
-        // Row 2 (y = 128 / 158): Trip Distance / Duration + Gearbox Oil Temp
         let tripStr = '--';
         if (typeof t.tripDistKm === 'number' && isFinite(t.tripDistKm)) {
             tripStr = (t.tripDistKm * dScale).toFixed(1) + dUnit;
         } else if (typeof t.tripMinutes === 'number' && t.tripMinutes >= 0) {
             tripStr = Math.floor(t.tripMinutes / 60) + 'h ' + (t.tripMinutes % 60) + 'm';
         }
-        drawTextOutline(cv, '行程距离', 22, 128, 14, COL.tagBlue, { font: 'bold', align: 'left' });
-        drawTextOutline(cv, tripStr, 22, 158, 25, COL.white, { font: 'num', align: 'left' });
+        drawTextOutline(cv, '行程距离', leftX, 254, 15, COL.tagBlue, { font: 'bold', align: 'left' });
+        drawTextOutline(cv, tripStr, leftX, 288, 28, COL.white, { font: 'num', align: 'left' });
 
         const gbxStr = formatTemp(t.gearboxOilC, units).text;
         const gbxCol = (typeof t.gearboxOilC === 'number' && t.gearboxOilC >= 105) ? COL.amber : COL.white;
-        drawTextOutline(cv, '变速箱', cv.w - 22, 128, 14, COL.tagBlue, { font: 'bold', align: 'right' });
-        drawTextOutline(cv, gbxStr, cv.w - 22, 158, 25, gbxCol, { font: 'num', align: 'right' });
+        drawTextOutline(cv, '变速箱', rightX, 254, 15, COL.tagBlue, { font: 'bold', align: 'right' });
+        drawTextOutline(cv, gbxStr, rightX, 288, 28, gbxCol, { font: 'num', align: 'right' });
 
-        // Row 3 (y = 198 / 228): HV Batt Temp (or IAT) + 12V Aux Battery
         if (profile && profile.vehicleType === 'phev') {
             const btStr = formatTemp(t.battTempC, units).text;
-            drawTextOutline(cv, '动力电池', 22, 198, 14, COL.tagBlue, { font: 'bold', align: 'left' });
-            drawTextOutline(cv, btStr, 22, 228, 25, COL.white, { font: 'num', align: 'left' });
+            drawTextOutline(cv, 'HV BATT', leftX, 340, 15, COL.tagBlue, { font: 'bold', align: 'left' });
+            drawTextOutline(cv, btStr, leftX, 374, 28, COL.white, { font: 'num', align: 'left' });
         } else {
             const iatStr = formatTemp(t.iatC, units).text;
-            drawTextOutline(cv, '进气温度', 22, 198, 14, COL.tagBlue, { font: 'bold', align: 'left' });
-            drawTextOutline(cv, iatStr, 22, 228, 25, COL.white, { font: 'num', align: 'left' });
+            drawTextOutline(cv, 'INTAKE', leftX, 340, 15, COL.tagBlue, { font: 'bold', align: 'left' });
+            drawTextOutline(cv, iatStr, leftX, 374, 28, COL.white, { font: 'num', align: 'left' });
         }
 
-        const v12Str = (typeof t.v12 === 'number' && isFinite(t.v12)) ? (t.v12.toFixed(1) + 'V') : '--';
-        const v12Col = (typeof t.v12 === 'number' && t.v12 < 12.1) ? COL.amber : COL.white;
-        drawTextOutline(cv, '12V 电池', cv.w - 22, 198, 14, COL.tagBlue, { font: 'bold', align: 'right' });
-        drawTextOutline(cv, v12Str, cv.w - 22, 228, 25, v12Col, { font: 'num', align: 'right' });
+        const hasV12 = typeof t.v12 === 'number' && isFinite(t.v12);
+        const hasSoc12 = typeof t.soc12 === 'number' && isFinite(t.soc12);
+        let v12Str = '--';
+        if (hasV12 && hasSoc12) {
+            v12Str = t.v12.toFixed(1) + 'V ' + Math.round(t.soc12) + '%';
+        } else if (hasSoc12) {
+            v12Str = Math.round(t.soc12) + '%';
+        } else if (hasV12) {
+            v12Str = t.v12.toFixed(1) + 'V';
+        }
+        const v12Low = (hasV12 && t.v12 < 12.1) || (hasSoc12 && t.soc12 < 55);
+        const v12Col = (hasSoc12 && t.soc12 < 40) ? COL.red : (v12Low ? COL.amber : COL.white);
+        drawTextOutline(cv, '12V AUX', rightX, 340, 15, COL.tagBlue, { font: 'bold', align: 'right' });
+        drawTextOutline(cv, v12Str, rightX, 374, (hasV12 && hasSoc12) ? 23 : 28, v12Col, { font: (hasV12 && hasSoc12) ? 'bold' : 'num', align: 'right' });
+    }
+
+    /**
+     * Right-Wing Plug-In Charging Finish Time Widget (auto-locked while car is charging):
+     */
+    _paintRightCharging(cv, chg, t, units) {
+        cv.clear(COL.clear);
+        const c = chg || {};
+        const midX = 186;
+        const leftX = 40;
+        const rightX = 332;
+        const isMi = units.distUnit === 'mi';
+        const dUnit = isMi ? ' mi' : ' km';
+        const dScale = isMi ? 0.621371 : 1;
+
+        paintRadialGlow(cv, midX, 210, 148, [56, 178, 246], 34);
+        drawTextOutline(cv, 'CHARGING', midX, 122, 18, COL.cyan, { font: 'bold', align: 'center' });
+        cv.fillRect(leftX, 134, rightX - leftX, 2, COL.divider);
+
+        drawTextOutline(cv, 'EST. FINISH', midX, 166, 15, COL.tagGray, { font: 'bold', align: 'center' });
+        const finStr = c.finishTimeText || '--:--';
+        drawTextOutline(cv, finStr, midX, 224, 52, COL.white, { font: 'num', align: 'center' });
+
+        const remLabel = c.remainText ? (c.remainText + ' left') : 'Plugged in';
+        drawTextOutline(cv, remLabel, midX, 256, 20, COL.softBlue, { font: 'bold', align: 'center' });
+
+        const kwStr = (typeof c.chargeKw === 'number' && isFinite(c.chargeKw)) ? (c.chargeKw.toFixed(1) + ' kW') : '-- kW';
+        const speedTag = c.maxAmps ? ('SPEED (' + Math.round(c.maxAmps) + 'A)') : 'CHARGE SPEED';
+        drawTextOutline(cv, speedTag, leftX, 294, 15, COL.tagBlue, { font: 'bold', align: 'left' });
+        drawTextOutline(cv, kwStr, leftX, 326, 26, COL.cyan, { font: 'bold', align: 'left' });
+
+        const socPct = (typeof t.soc === 'number' && isFinite(t.soc)) ? Math.round(t.soc) : null;
+        const targetPct = c.targetSoc || 100;
+        const erStr = (typeof t.erangeKm === 'number' && isFinite(t.erangeKm)) ? (' (' + Math.round(t.erangeKm * dScale) + dUnit + ')') : '';
+        const socValStr = (socPct !== null ? (socPct + '%') : '--%') + erStr;
+        drawTextOutline(cv, 'TARGET ' + targetPct + '%', rightX, 294, 15, COL.tagBlue, { font: 'bold', align: 'right' });
+        drawTextOutline(cv, socValStr, rightX, 326, 24, COL.white, { font: 'bold', align: 'right' });
+
+        const barX0 = 32;
+        const barW = 296;
+        const barY = 374;
+        const barH = 10;
+        const frac = socPct !== null ? clamp(socPct / 100, 0, 1) : 0;
+        const fillW = Math.max(barH + 2, Math.round(barW * frac));
+        fillSlantBar(cv, barX0, barY, barW, barH, barW, COL.progTrack);
+        if (socPct !== null && socPct > 0) {
+            fillSlantBar(cv, barX0, barY, barW, barH, fillW, [69, 214, 255, 255]);
+        }
+    }
+
+    /**
+     * Dedicated HUD Lead-Car Headway badge (`120x41`) right above BMW's green ACC car:
+     *   - Row 1: crisp rear-car outline + perspective headway bars + headway timer (`1.8s`, or distance below 12 km/h)
+     *   - Row 2: physical following distance (`118 ft` / `36 m`) + optional closing/opening delta (`-6 mph`)
+     */
+    _paintHudHeadway(cv, lead, units, mode) {
+        cv.clear(COL.clear);
+        const p = formatLeadHeadwayParts(lead, units, mode);
+        if (!p) return;
+
+        const rx = cv.w - 3;
+        const mainW = drawTextOutline(cv, p.primaryStr, rx, 20, 22, p.primaryCol, { font: 'num', align: 'right' });
+
+        // Crisp rear-car outline (hollow rear window + tires) + 2 tapered perspective headway bars
+        const icX = Math.max(2, Math.round(rx - mainW - 24));
+        const carRoof = [[icX + 4, 2], [icX + 14, 2], [icX + 17, 7], [icX + 1, 7], [icX + 4, 2]];
+        cv.polyline(carRoof, 3.0, COL.outline);
+        cv.fillRect(icX, 6, 18, 6, COL.outline);
+        cv.polyline(carRoof, 1.5, p.primaryCol);
+        cv.fillRect(icX + 1, 7, 16, 4, p.primaryCol);
+        // Rear window dark cutout + two tire ticks
+        cv.convex([[icX + 5, 3.5], [icX + 13, 3.5], [icX + 14.5, 6.5], [icX + 3.5, 6.5]], COL.outline);
+        cv.fillRect(icX + 1, 11, 3, 2, p.primaryCol);
+        cv.fillRect(icX + 14, 11, 3, 2, p.primaryCol);
+        // Perspective headway range bars below rear bumper
+        cv.fillRect(icX + 2, 14, 14, 3, COL.outline);
+        cv.fillRect(icX + 3, 15, 12, 1.6, p.primaryCol);
+        cv.fillRect(icX, 18, 18, 3, COL.outline);
+        cv.fillRect(icX + 1, 19, 16, 1.6, p.primaryCol);
+
+        if (p.deltaStr && p.secDistStr) {
+            const dW = drawTextOutline(cv, p.deltaStr, rx, 36, 13, p.deltaCol, { font: 'bold', align: 'right' });
+            drawTextOutline(cv, p.secDistStr, rx - dW - 6, 36, 13, COL.softBlue, { font: 'bold', align: 'right' });
+        } else if (p.secDistStr) {
+            drawTextOutline(cv, p.secDistStr, rx, 36, 13, COL.softBlue, { font: 'bold', align: 'right' });
+        } else if (p.deltaStr) {
+            drawTextOutline(cv, p.deltaStr, rx, 36, 13, p.deltaCol, { font: 'bold', align: 'right' });
+        }
     }
 
     _paintHud(cv, lineModes, hero, heroCol, subText, subCol, gearStr, t, profile, units, fg, brakeLit, brakeHold, alertObj, compactBelowRoad) {
         cv.clear(COL.clear); // Borderless 3-line black-outlined text (strictly y=100..200 <= 202 ACC)
         const compact = Boolean(compactBelowRoad);
-        const modes = Array.isArray(lineModes) ? lineModes.slice(0, 3) : ['efficiency', 'power_gear', 'brake'];
+        const modes = Array.isArray(lineModes) ? lineModes.slice(0, 3) : ['efficiency_gear', 'power', 'brake'];
         // When `hud_road` occupies Row 1 (py=0..38), shift compact metrics into Row 2 (py=57, 77, 95) while staying <= py=99!
         const baselines = compact ? [57, 77, 95] : [35, 65, 92];
         const socStr = (typeof t.soc === 'number' && isFinite(t.soc)) ? ('SOC ' + Math.round(t.soc) + '%') : 'SOC --%';
@@ -1123,16 +1469,25 @@ class OverlayRenderer {
                 continue;
             }
             if (m === 'off') continue;
-            if (m === 'efficiency') {
-                const nSize = compact ? (idx === 0 ? 24 : 18) : (idx === 0 ? 40 : 24);
-                const uSize = compact ? 14 : (idx === 0 ? 19 : 16);
-                const valW = drawTextOutline(cv, hero.value, 6, by, nSize, heroCol, { font: 'num', align: 'left' });
-                drawTextOutline(cv, hero.unit, 10 + valW, by - 1, uSize, COL.softBlue, { font: 'bold', align: 'left' });
+            if (m === 'efficiency_gear' || m === 'efficiency') {
+                // Fixed non-shifting horizontal anchors for value (right-aligned), unit (left-aligned), and gear (left-aligned)
+                const valRightX = compact ? 44 : 64;
+                const unitX = compact ? 49 : 70;
+                const gearX = compact ? 132 : 166;
+                const nSize = compact ? (idx === 0 ? 24 : 18) : (idx === 0 ? 38 : 24);
+                const uLong = String(hero.unit || '').length > 7;
+                const uSize = compact ? (uLong ? 13 : 14) : (uLong ? 16 : (idx === 0 ? 18 : 15));
+                drawTextOutline(cv, hero.value, valRightX, by, nSize, heroCol, { font: 'num', align: 'right' });
+                drawTextOutline(cv, hero.unit, unitX, by - 1, uSize, COL.softBlue, { font: 'bold', align: 'left' });
+                if (m === 'efficiency_gear' && gearStr) {
+                    const gSize = compact ? (idx === 0 ? 22 : 18) : (idx === 0 ? 30 : 22);
+                    drawTextOutline(cv, gearStr, gearX, by, gSize, COL.white, { font: 'bold', align: 'left' });
+                }
             } else if (m === 'power_gear') {
                 const sz = compact ? (idx === 0 ? 19 : 17) : (idx === 0 ? 26 : (idx === 1 ? 22 : 19));
-                const subW = drawTextOutline(cv, subText, 6, by, sz, subCol, { font: 'bold', align: 'left' });
+                const gx = compact ? 132 : 166;
+                drawTextOutline(cv, subText, 6, by, sz, subCol, { font: 'bold', align: 'left' });
                 if (gearStr) {
-                    const gx = Math.min(cv.w - 48, Math.max(compact ? 104 : 122, Math.round(16 + subW)));
                     drawTextOutline(cv, gearStr, gx, by, sz, COL.white, { font: 'bold', align: 'left' });
                 }
             } else if (m === 'power') {
@@ -1146,6 +1501,18 @@ class OverlayRenderer {
             } else if (m === 'soc') {
                 const sz = compact ? (idx === 0 ? 20 : 17) : (idx === 0 ? 28 : (idx === 1 ? 22 : 19));
                 drawTextOutline(cv, socStr, 6, by, sz, socCol, { font: 'bold', align: 'left' });
+            } else if (m === 'soc12') {
+                const s12Str = (typeof t.soc12 === 'number' && isFinite(t.soc12)) ? ('12V ' + Math.round(t.soc12) + '%') : '12V --%';
+                const s12Col = (typeof t.soc12 === 'number' && t.soc12 < 40) ? COL.red : ((typeof t.soc12 === 'number' && t.soc12 < 55) ? COL.amber : COL.white);
+                const sz = compact ? (idx === 0 ? 20 : 17) : (idx === 0 ? 26 : (idx === 1 ? 22 : 19));
+                drawTextOutline(cv, s12Str, 6, by, sz, s12Col, { font: 'bold', align: 'left' });
+            } else if (m === 'headway') {
+                const hp = formatLeadHeadwayParts(t.leadVehicle, units, 'full');
+                if (hp) {
+                    const sz = compact ? 16 : (idx === 0 ? 22 : 19);
+                    const hwTxt = hp.primaryStr + (hp.secDistStr ? ('  ' + hp.secDistStr) : '') + (hp.deltaStr ? ('  ' + hp.deltaStr) : '');
+                    drawTextOutline(cv, hwTxt, 6, by, sz, hp.primaryCol, { font: 'bold', align: 'left' });
+                }
             } else if (m === 'soc_oil') {
                 const sz = compact ? 16 : (idx === 0 ? 22 : 19);
                 drawTextOutline(cv, socStr + '  ' + oilStr, 6, by, sz, COL.softBlue, { font: 'bold', align: 'left' });
@@ -1154,20 +1521,23 @@ class OverlayRenderer {
                 drawTextOutline(cv, oilStr + '  ' + coolStr, 6, by, sz, tempCol, { font: 'bold', align: 'left' });
             } else if (m === 'brake') {
                 if (brakeLit > 0) {
-                    const hSegs = 12;
+                    const hSegs = compact ? 10 : 12;
+                    const stepX = compact ? 13 : 14;
                     const hLit = brakeHold ? 1 : clamp(Math.round((fg / 0.55) * hSegs), 1, hSegs);
                     const segH = compact ? 5 : 6;
-                    const segY = compact ? (by - 8) : (by - 11);
+                    const segY = compact ? (by - 7) : (by - 11);
                     for (let i = 0; i < hSegs; i++) {
-                        const sx = 6 + i * 14;
-                        const sc = i < hLit ? (i >= 8 ? COL.red : (i >= 4 ? COL.orange : COL.amber)) : COL.mapRailDim;
-                        cv.fillRect(sx - 1, segY - 1, 13, segH + 2, COL.outline);
-                        cv.fillRect(sx, segY, 11, segH, sc);
+                        const sx = 6 + i * stepX;
+                        const redIdx = compact ? 7 : 8;
+                        const orgIdx = compact ? 3 : 4;
+                        const sc = i < hLit ? (i >= redIdx ? COL.red : (i >= orgIdx ? COL.orange : COL.amber)) : COL.mapRailDim;
+                        cv.fillRect(sx - 1, segY - 1, stepX - 1, segH + 2, COL.outline);
+                        cv.fillRect(sx, segY, stepX - 3, segH, sc);
                     }
                     if (!brakeHold && fg > 0.02) {
                         const hasBar = typeof t.brakeBar === 'number' && isFinite(t.brakeBar) && t.brakeBar >= 1.5;
                         const bStr = hasBar ? (Math.round(t.brakeBar) + ' bar') : (fg.toFixed(2) + 'g');
-                        drawTextOutline(cv, bStr, 178, compact ? (by - 1) : (by - 3), compact ? 14 : 15, fg >= 0.36 ? COL.red : COL.amber, { font: 'bold', align: 'left' });
+                        drawTextOutline(cv, bStr, 6 + hSegs * stepX + 6, compact ? by : (by - 3), compact ? 14 : 15, fg >= 0.36 ? COL.red : COL.amber, { font: 'bold', align: 'left' });
                     }
                 }
             }
@@ -1231,7 +1601,7 @@ class OverlayRenderer {
             const m = formatCornerRightMetric(t, units, cornerRightMode);
             const valX = cv.w - 6;
             const valW = drawTextOutline(cv, m.valText, valX, 60, 28, m.col, { font: 'num', align: 'right' });
-            drawTextOutline(cv, m.tag, valX - valW - 6, 58, 18, COL.tagBlue, { font: 'bold', align: 'right' });
+            drawTextOutline(cv, m.tag, valX - valW - 6, 58, 18, COL.tagGray, { font: 'bold', align: 'right' });
         }
     }
 
@@ -1254,13 +1624,17 @@ module.exports = {
     inspectClusterSlotConfig,
     changes,
     resolveCornerRightMode,
+    formatLeadHeadwayParts,
     BELOW_SPEED_BASE,
     GEAR_D_BASE,
+    CABIN_TEMP_BASE,
     BRAKE_RAIL_BASE,
     CORNER_LEFT_BASE,
     CORNER_RIGHT_BASE,
+    HV_SOC_GAUGE_BASE,
     RIGHT_WIDGET_BASE,
     HUD_BASE,
+    HUD_HEADWAY_BASE,
     HUD_ROAD_BASE,
     HUD_NAV_BASE,
     MAP_SPEED_RECT,

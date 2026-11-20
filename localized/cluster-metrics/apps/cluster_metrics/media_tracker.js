@@ -10,21 +10,94 @@ const fs = require('fs');
 const { decodeCoverThumb, MAX_BYTES } = require('./image_decode');
 const { foldAscii } = require('./hud_nav_renderer');
 
-const COVER_SIDE = 124;
-const META_KEYS = { 3: 'TITLE', 5: 'ARTIST', 7: 'ALBUM', 9: 'ALBUM_ARTIST', 17: 'COVER_FILE', 32: 'PERFORMER' };
-const ITEM_TYPES = { 1: 'ARTIST', 2: 'ALBUM', 3: 'TITLE', ARTIST: 'ARTIST', ALBUM: 'ALBUM', TITLE: 'TITLE' };
+const COVER_SIDE = 144;
+const META_KEYS = { 3: 'TITLE', 5: 'ARTIST', 7: 'ALBUM', 9: 'ALBUM_ARTIST', 17: 'COVER_FILE', 32: 'PERFORMER', 40: 'EPISODE', 47: 'SERIES' };
+const ITEM_TYPES = { 0: 'UNDEFINED', 1: 'ARTIST', 2: 'ALBUM', 3: 'TITLE', ARTIST: 'ARTIST', ALBUM: 'ALBUM', TITLE: 'TITLE', UNDEFINED: 'UNDEFINED' };
 const PAGES = ['media', 'trip', 'off'];
+const BOLD_OPTS = { font: 'bold' };
 
 function isObj(v) { return Boolean(v && typeof v === 'object' && !Array.isArray(v)); }
 
+function normId(v) {
+    if (v === undefined || v === null) return '';
+    if (typeof v === 'number' || typeof v === 'string' || typeof v === 'boolean') return String(v);
+    if (typeof v === 'object') {
+        if (typeof v.value === 'number' || typeof v.value === 'string') return String(v.value);
+        if (v.high !== undefined || v.low !== undefined) return String(v.high || 0) + ':' + String(v.low || 0);
+        try { return JSON.stringify(v); } catch (e) { return ''; }
+    }
+    return String(v);
+}
+
+function fnv1aHex(buf) {
+    if (!buf || !buf.length) return 'empty';
+    let h = 2166136261;
+    for (let i = 0; i < buf.length; i++) {
+        h ^= buf[i];
+        h = Math.imul(h, 16777619) >>> 0;
+    }
+    return 'b:' + buf.length + ':' + h.toString(16);
+}
+
+function isRenderableMediaCp(cp) {
+    if (cp >= 0x20 && cp <= 0x7e) return true;
+    if (cp === 0x00b0 || cp === 0x00b7 || cp === 0x2014 || cp === 0x2022 || cp === 0x2026) return true;
+    if (cp >= 0x3000 && cp <= 0x30ff) return true; // CJK symbols, Hiragana, Katakana
+    if (cp >= 0x31f0 && cp <= 0x31ff) return true; // Katakana phonetic extensions
+    if (cp >= 0x3400 && cp <= 0x4dbf) return true; // CJK Extension A
+    if (cp >= 0x4e00 && cp <= 0x9fff) return true; // CJK Unified Ideographs
+    if (cp >= 0xf900 && cp <= 0xfaff) return true; // CJK Compatibility Ideographs
+    if (cp >= 0xff00 && cp <= 0xffef) return true; // Halfwidth/Fullwidth forms
+    if (cp >= 0xac00 && cp <= 0xd7af) return true; // Hangul syllables
+    return false;
+}
+
+function isCjkBreakCp(cp) {
+    return (cp >= 0x2e80 && cp <= 0xfaff) || (cp >= 0xff00 && cp <= 0xffef) || (cp >= 0xac00 && cp <= 0xd7af);
+}
+
 function cleanMediaText(raw, maxLen) {
     if (typeof raw !== 'string') return '';
-    const rawTrim = raw.replace(/[\u0000-\u001f\u007f]/g, '').trim();
+    const rawTrim = raw.replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim();
     if (!rawTrim) return '';
-    const folded = foldAscii(rawTrim);
-    if (!folded) return rawTrim.length > 0 ? '[Track]' : '';
-    const lim = maxLen || 64;
-    return folded.length > lim ? (folded.slice(0, lim - 3).trim() + '...') : folded;
+    // Map common punctuation & Latin diacritics while keeping CJK / Japanese / Korean intact
+    let mapped = rawTrim
+        .replace(/[\u2018\u2019\u201A\u201B]/g, "'")
+        .replace(/[\u201C\u201D\u201E]/g, '"')
+        .replace(/[\u2012\u2013\u2014\u2212]/g, '-')
+        .replace(/\u2026/g, '...')
+        .replace(/[\u00A0\u3000]/g, ' ')
+        .replace(/\u00DF/g, 'ss')
+        .replace(/\u00C6/g, 'AE')
+        .replace(/\u00E6/g, 'ae')
+        .replace(/\u00D8/g, 'O')
+        .replace(/\u00F8/g, 'o')
+        .replace(/\u0141/g, 'L')
+        .replace(/\u0142/g, 'l')
+        .replace(/\uFF08/g, '(')
+        .replace(/\uFF09/g, ')')
+        .replace(/\uFF01/g, '!')
+        .replace(/\uFF1F/g, '?')
+        .replace(/\uFF1A/g, ':')
+        .replace(/\uFF5E/g, '~');
+    if (typeof mapped.normalize === 'function') {
+        mapped = mapped.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    }
+    let kept = '';
+    for (const ch of mapped) {
+        const cp = ch.codePointAt(0);
+        if (isRenderableMediaCp(cp)) {
+            kept += ch;
+        } else if (cp > 0x7e && cp < 0x0250) {
+            // Remaining Latin-extended glyph: run through ASCII folder if transliterable
+            const asc = foldAscii(ch);
+            if (asc) kept += asc;
+        }
+    }
+    kept = kept.replace(/\s+/g, ' ').trim();
+    if (!kept) return rawTrim.length > 0 ? '[Track]' : '';
+    const lim = maxLen || 160;
+    return kept.length > lim ? (kept.slice(0, lim - 3).trim() + '...') : kept;
 }
 
 function extractMetaValue(v, depth) {
@@ -52,44 +125,187 @@ function parseMediaPlayerMetadata(meta) {
             const val = extractMetaValue(e.value, 0);
             if (k && val && !map[k]) map[k] = val;
         }
-        const title = cleanMediaText(map.TITLE || '');
-        const artist = cleanMediaText(map.ARTIST || map.ALBUM_ARTIST || map.PERFORMER || '');
-        const album = cleanMediaText(map.ALBUM || '');
+        const title = cleanMediaText(map.TITLE || map.EPISODE || '', 160);
+        const artist = cleanMediaText(map.ARTIST || map.SERIES || map.ALBUM_ARTIST || map.PERFORMER || '', 80);
+        const album = cleanMediaText(map.ALBUM || '', 80);
         const coverFile = typeof map.COVER_FILE === 'string' ? map.COVER_FILE.replace(/\0/g, '').trim() : '';
         if (!title && !artist) return null;
-        return { title: title || artist, artist: title ? artist : album, album, coverFile };
+        return { title: title || artist, artist: title ? artist : album, album, coverFile, explicitTitle: Boolean(title) };
     }
     if (!isObj(meta)) return null;
-    const t = cleanMediaText(meta.title || meta.track || '');
-    const a = cleanMediaText(meta.artist || meta.performer || '');
+    const t = cleanMediaText(meta.title || meta.track || meta.episode || '', 160);
+    const a = cleanMediaText(meta.artist || meta.series || meta.performer || '', 80);
     if (!t && !a) return null;
-    return { title: t || a, artist: t ? a : '', album: cleanMediaText(meta.album || ''), coverFile: '' };
+    return { title: t || a, artist: t ? a : '', album: cleanMediaText(meta.album || '', 80), coverFile: '', explicitTitle: Boolean(t) };
 }
 
 function parseHmiPlayerMetadata(v) {
     if (!isObj(v)) return null;
-    const l1 = typeof v.firstLineText === 'string' ? v.firstLineText.replace(/\0/g, '').trim() : '';
-    const l2 = typeof v.secondLineText === 'string' ? v.secondLineText.replace(/\0/g, '').trim() : '';
-    const l3 = typeof v.threeRowText === 'string' ? v.threeRowText.replace(/\0/g, '').trim() : '';
+    const rawLine = (s) => (typeof s === 'string' ? s.replace(/[\0\r]+/g, '').trim() : '');
+    const l1 = rawLine(v.firstLineText);
+    const l2 = rawLine(v.secondLineText);
+    const l3Raw = typeof v.threeRowText === 'string' ? v.threeRowText.replace(/\0/g, '').trim() : '';
     const t1 = ITEM_TYPES[v.firstLineType] || '';
     const t2 = ITEM_TYPES[v.secondLineType] || '';
+    const uiType = v.uiType;
+    const isThreeRow = uiType === 2 || uiType === 'THREE_ROWS_TEXT' || l3Raw.length > 0;
 
-    let rawTitle = l1;
-    let rawSub = l2;
-    if (t2 === 'TITLE' && t1 === 'ARTIST' && l2) {
+    // Extract any unique track/episode line inside threeRowText (BMW often sends Show in firstLineText,
+    // Date/Album in secondLineText, and Episode/Track in threeRowText).
+    const l3Parts = l3Raw ? l3Raw.split(/\n+/).map((s) => s.trim()).filter(Boolean) : [];
+    const l3Unique = [];
+    for (let i = 0; i < l3Parts.length; i++) {
+        const s = l3Parts[i];
+        if (s !== l1 && s !== l2 && l3Unique.indexOf(s) < 0) l3Unique.push(s);
+    }
+
+    let rawTitle = '';
+    let explicitTitle = false;
+    if (t1 === 'TITLE' && l1) {
+        rawTitle = l1;
+        explicitTitle = true;
+    } else if (t2 === 'TITLE' && l2) {
         rawTitle = l2;
-        rawSub = l1;
+        explicitTitle = true;
+    } else if (l3Unique.length > 0) {
+        rawTitle = l3Unique[0];
+        explicitTitle = true;
+    } else if (isThreeRow && l3Parts.length > 0) {
+        rawTitle = l3Parts[l3Parts.length - 1];
+        explicitTitle = Boolean(rawTitle);
+    } else {
+        rawTitle = l1 || l2 || '';
+        explicitTitle = false;
     }
-    if (!rawTitle && l3) {
-        const parts = l3.split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
-        rawTitle = parts[0] || '';
-        rawSub = parts[1] || '';
-    }
-    const title = cleanMediaText(rawTitle);
-    const artist = cleanMediaText(rawSub);
+
+    // Choose artist / show name (never concatenate album/date onto artist like "Artist - Album")
+    let rawArtist = '';
+    if (t1 === 'ARTIST' && l1 && l1 !== rawTitle) rawArtist = l1;
+    else if (t2 === 'ARTIST' && l2 && l2 !== rawTitle) rawArtist = l2;
+    else if (l1 && l1 !== rawTitle && t1 !== 'ALBUM') rawArtist = l1;
+    else if (l2 && l2 !== rawTitle && t2 !== 'ALBUM') rawArtist = l2;
+    else if (l1 && l1 !== rawTitle) rawArtist = l1;
+    else if (l2 && l2 !== rawTitle) rawArtist = l2;
+
+    const rawAlbum = (t1 === 'ALBUM' && l1) ? l1 : ((t2 === 'ALBUM' && l2) ? l2 : '');
+    const title = cleanMediaText(rawTitle, 160);
+    const artist = cleanMediaText(rawArtist, 80);
+    const album = cleanMediaText(rawAlbum, 80);
     const trackId = typeof v.trackId === 'number' && isFinite(v.trackId) ? v.trackId : null;
-    if (!title && !artist) return { empty: true, trackId };
-    return { empty: false, title: title || artist, artist: title ? artist : '', trackId };
+    const shape = (t1 || String(v.firstLineType !== undefined ? v.firstLineType : '?')) + '/' +
+        (t2 || String(v.secondLineType !== undefined ? v.secondLineType : '?')) +
+        (l3Raw ? ('/3R(' + l3Parts.length + ')') : '');
+
+    if (!title && !artist) return { empty: true, trackId, shape };
+    return {
+        empty: false,
+        title: title || artist,
+        artist: title ? artist : album,
+        album,
+        explicitTitle,
+        firstType: t1,
+        secondType: t2,
+        trackId,
+        shape,
+    };
+}
+
+/**
+ * Resize long titles (Latin & CJK) down across `sizes` until `minSize`; if still wider than `maxW`,
+ * split cleanly between words (Latin) or characters (CJK) and paginate across segments over time.
+ */
+function paginateTitle(cv, title, maxW, sizes, minSize, elapsedMs) {
+    const szList = Array.isArray(sizes) && sizes.length ? sizes : [30, 27, 24, 22];
+    const minSz = minSize || szList[szList.length - 1] || 22;
+    const clean = cleanMediaText(String(title || ''), 220);
+    if (!clean) return { text: '', size: szList[0], page: 0, pages: 1 };
+
+    for (let i = 0; i < szList.length; i++) {
+        const sz = szList[i];
+        if (cv.textWidth(clean, sz, BOLD_OPTS) <= maxW) {
+            return { text: clean, size: sz, page: 0, pages: 1 };
+        }
+    }
+
+    // Tokenize into words (Latin runs) & single characters (CJK) so CJK wraps without inserting extra spaces
+    const tokens = [];
+    let curWord = '';
+    let pendingSpace = false;
+    for (const ch of clean) {
+        if (/\s/.test(ch)) {
+            if (curWord) {
+                tokens.push({ str: curWord, spaceBefore: pendingSpace });
+                curWord = '';
+                pendingSpace = false;
+            }
+            if (tokens.length > 0) pendingSpace = true;
+            continue;
+        }
+        const cp = ch.codePointAt(0);
+        if (isCjkBreakCp(cp)) {
+            if (curWord) {
+                tokens.push({ str: curWord, spaceBefore: pendingSpace });
+                curWord = '';
+                pendingSpace = false;
+            }
+            tokens.push({ str: ch, spaceBefore: pendingSpace });
+            pendingSpace = false;
+        } else {
+            curWord += ch;
+        }
+    }
+    if (curWord) tokens.push({ str: curWord, spaceBefore: pendingSpace });
+
+    const segs = [];
+    const contW = cv.textWidth('..', minSz, BOLD_OPTS);
+    let idx = 0;
+
+    while (idx < tokens.length && segs.length < 6) {
+        const firstTok = tokens[idx++];
+        let line = firstTok.str;
+        if (cv.textWidth(line, minSz, BOLD_OPTS) > maxW - contW && line.length > 3) {
+            // Very long single non-CJK token without spaces: slice cleanly to fit
+            let part = line;
+            while (part.length > 3 && cv.textWidth(part + '..', minSz, BOLD_OPTS) > maxW) {
+                part = part.slice(0, -1);
+            }
+            const rest = line.slice(part.length);
+            if (rest) tokens.splice(idx, 0, { str: rest, spaceBefore: false });
+            segs.push({ text: part, truncated: idx < tokens.length });
+            continue;
+        }
+        while (idx < tokens.length) {
+            const nxt = tokens[idx];
+            const cand = line + (nxt.spaceBefore ? ' ' : '') + nxt.str;
+            const isFinal = (idx === tokens.length - 1);
+            const limitW = isFinal ? maxW : (maxW - contW);
+            if (cv.textWidth(cand, minSz, BOLD_OPTS) <= limitW) {
+                line = cand;
+                idx++;
+            } else {
+                break;
+            }
+        }
+        segs.push({ text: line, truncated: idx < tokens.length });
+    }
+
+    if (segs.length <= 1) {
+        return { text: (segs[0] && segs[0].text) || clean, size: minSz, page: 0, pages: 1 };
+    }
+
+    const formatted = [];
+    for (let i = 0; i < segs.length; i++) {
+        const s = segs[i];
+        formatted.push(s.truncated ? (s.text + (i === segs.length - 1 && segs.length === 6 ? '...' : '..')) : s.text);
+    }
+
+    const FIRST_HOLD_MS = 3500;
+    const NEXT_HOLD_MS = 2800;
+    const totalCycle = FIRST_HOLD_MS + (formatted.length - 1) * NEXT_HOLD_MS;
+    const tIn = Math.max(0, typeof elapsedMs === 'number' && isFinite(elapsedMs) ? elapsedMs : 0) % totalCycle;
+    const page = tIn < FIRST_HOLD_MS ? 0 : (1 + Math.floor((tIn - FIRST_HOLD_MS) / NEXT_HOLD_MS));
+    const safePage = Math.max(0, Math.min(formatted.length - 1, page));
+    return { text: formatted[safePage], size: minSz, page: safePage, pages: formatted.length };
 }
 
 function parseTimeStruct(v) {
@@ -150,19 +366,29 @@ function getDemoCover() {
 class MediaTracker {
     constructor() {
         this.hmiMeta = null;
+        this.hmiMainThird = '';
         this.mpMeta = null;
+        this.mpPlaying = false;
+        this.mpUpdatedAt = 0;
         this.time = null; // { elapsedSec, totalSec, atMs }
         this.playing = true;
         this.source = '';
+        this.trackKey = '';
+        this.trackSinceMs = 0;
         this.cover = null; // { w, h, d, accent, id }
         this.coverRev = 0;
-        this.coverCache = []; // [{ key, cover }]
+        this.coverCache = []; // [{ key, cover }] (keyed strictly by image byte FNV-1a hash!)
+        this._coverUpdatedAt = 0;
         this._chunkState = null; // { id, totalSize, buf, written }
         this._decodeTimer = null;
+        this._coverRefetchTimer = null;
         this._decodeSeq = 0;
+        this._hmiSub = null;
+        this._mpSub = null;
 
-        // Right-wing BC page cycling state
-        this.pageIndex = 0; // 0='media', 1='trip', 2='off'
+        // Right-wing BC page cycling state (checkbox-driven; high-beam double-tap removed)
+        this.bcStep = 0;
+        this.pageIndex = 0;
         this.bcClicks = 0;
         this.lastBcAt = 0;
         this.lastBcSource = '';
@@ -171,9 +397,6 @@ class MediaTracker {
         this._stalkDownVal = null;
         this._stalkDownAt = 0;
         this._lastTurnSignalAt = 0;
-        this._hbaDown = false;
-        this._hbaTaps = 0;
-        this._hbaTimer = null;
         this.rawStalk = null;
         this.rawKombiSel = null;
 
@@ -193,8 +416,11 @@ class MediaTracker {
         if (this.coverCache.length > 8) this.coverCache.length = 8;
     }
 
-    _applyCoverBytes(key, buf, syncDecode) {
+    _applyCoverBytes(_hintKey, buf, syncDecode) {
         if (!buf || buf.length < 16 || buf.length > MAX_BYTES) return false;
+        // Key by FNV-1a byte hash + length so Int64 coverArtId objects or reused IDs NEVER collide!
+        const key = fnv1aHex(buf);
+        this._coverUpdatedAt = Date.now();
         const cached = this._cacheGet(key);
         if (cached) {
             this.cover = cached;
@@ -215,6 +441,7 @@ class MediaTracker {
             this._cachePut(key, thumb);
             this.cover = thumb;
             this.coverRev++;
+            this._coverUpdatedAt = Date.now();
             return true;
         };
         if (syncDecode) return runDecode();
@@ -223,26 +450,82 @@ class MediaTracker {
         return true;
     }
 
+    _scheduleCoverRefetch() {
+        if (this._stopped) return;
+        if (this._coverRefetchTimer) {
+            clearTimeout(this._coverRefetchTimer);
+            this._coverRefetchTimer = null;
+        }
+        const changedAt = Date.now();
+        this._coverRefetchTimer = setTimeout(() => {
+            this._coverRefetchTimer = null;
+            if (this._stopped) return;
+            if (this._coverUpdatedAt < changedAt - 1200) {
+                this._queryCoverArtNow();
+            }
+        }, 450);
+        if (this._coverRefetchTimer && typeof this._coverRefetchTimer.unref === 'function') {
+            this._coverRefetchTimer.unref();
+        }
+    }
+
+    _queryCoverArtNow() {
+        const px = this._hmiSub && this._hmiSub.proxy;
+        if (px && typeof px.getValue === 'function') {
+            px.getValue('coverArt', 2500).then((v) => {
+                if (!this._stopped && v) this.feedHmiCoverArt(v, false);
+            }).catch(() => {});
+        }
+    }
+
+    refresh() {
+        if (this._stopped) return;
+        const px = this._hmiSub && this._hmiSub.proxy;
+        if (px && typeof px.getValue === 'function') {
+            px.getValue('playerMetadata', 2500).then((v) => {
+                if (!this._stopped && v) this.feedHmiMetadata(v, Date.now());
+            }).catch(() => {});
+            px.getValue('mainMenuMetadata', 2500).then((v) => {
+                if (!this._stopped && v) this.feedHmiMainMenuMetadata(v);
+            }).catch(() => {});
+            px.getValue('coverArt', 2500).then((v) => {
+                if (!this._stopped && v) this.feedHmiCoverArt(v, false);
+            }).catch(() => {});
+        }
+        const mpx = this._mpSub && this._mpSub.proxy;
+        if (mpx && typeof mpx.getValue === 'function') {
+            mpx.getValue('currentItemMetadata', 2500).then((v) => {
+                if (!this._stopped && v) this.feedMediaPlayerMetadata(v, Date.now());
+            }).catch(() => {});
+        }
+    }
+
     _loadCoverFile(filePath) {
         if (!filePath || typeof filePath !== 'string' || filePath.length > 360) return;
-        const key = 'file:' + filePath;
-        const cached = this._cacheGet(key);
-        if (cached) {
-            this.cover = cached;
-            this.coverRev++;
-            return;
-        }
         const seq = ++this._decodeSeq;
         fs.stat(filePath, (err, st) => {
             if (err || !st || !st.isFile() || st.size > MAX_BYTES || seq !== this._decodeSeq || this._stopped) return;
             fs.readFile(filePath, (err2, buf) => {
                 if (err2 || !buf || seq !== this._decodeSeq || this._stopped) return;
-                this._applyCoverBytes(key, buf, true);
+                this._applyCoverBytes('file:' + filePath, buf, true);
             });
         });
     }
 
-    feedHmiMetadata(v) {
+    feedHmiMainMenuMetadata(v) {
+        if (!isObj(v)) return;
+        const l1 = typeof v.firstLineText === 'string' ? v.firstLineText.replace(/\0/g, '').trim() : '';
+        const l2 = typeof v.secondLineText === 'string' ? v.secondLineText.replace(/\0/g, '').trim() : '';
+        const l3 = typeof v.thirdLineText === 'string' ? v.thirdLineText.replace(/\0/g, '').trim() : '';
+        if (l3 && l3 !== l1 && l3 !== l2) {
+            this.hmiMainThird = cleanMediaText(l3, 160);
+        } else if (!l3) {
+            this.hmiMainThird = '';
+        }
+    }
+
+    feedHmiMetadata(v, nowMs) {
+        const now = typeof nowMs === 'number' ? nowMs : Date.now();
         const parsed = parseHmiPlayerMetadata(v);
         if (!parsed) return;
         if (parsed.empty) {
@@ -253,8 +536,18 @@ class MediaTracker {
         const nextKey = parsed.title + '|' + parsed.artist;
         this.hmiMeta = parsed;
         this.source = 'HMI';
+        // Drop stale CarPlayMedia metadata when user switched HMI to a different source/show
+        if (this.mpMeta && !this.mpPlaying &&
+            this.mpMeta.artist !== parsed.title && this.mpMeta.artist !== parsed.artist &&
+            this.mpMeta.title !== parsed.title) {
+            this.mpMeta = null;
+        }
         if (prevKey && prevKey !== nextKey) {
             this.time = null;
+            this.trackSinceMs = now;
+            this._scheduleCoverRefetch();
+        } else if (!this.trackSinceMs) {
+            this.trackSinceMs = now;
         }
     }
 
@@ -270,15 +563,20 @@ class MediaTracker {
 
     feedHmiCoverArt(v, syncDecode) {
         if (!isObj(v)) return false;
+        if (v.sink === 1 || v.sink === 2 || v.sink === 'FOND_LEFT' || v.sink === 'FOND_RIGHT') return false;
         const chunk = toBytesBuffer(v.coverArt);
-        const cid = v.coverArtId !== undefined && v.coverArtId !== null ? String(v.coverArtId) : '';
+        const cidRaw = normId(v.coverArtId);
+        const trkRaw = normId(v.trackId);
+        const cid = (cidRaw ? cidRaw : 'noid') + ':' + trkRaw;
         const totalSize = typeof v.totalSize === 'number' && isFinite(v.totalSize) ? v.totalSize : (chunk ? chunk.length : 0);
         const offset = typeof v.offset === 'number' && isFinite(v.offset) && v.offset >= 0 ? v.offset : 0;
 
         if (!chunk || chunk.length === 0 || totalSize <= 0) {
             if (totalSize === 0) {
+                this._chunkState = null;
                 this.cover = null;
                 this.coverRev++;
+                this._coverUpdatedAt = Date.now();
             }
             return false;
         }
@@ -287,12 +585,11 @@ class MediaTracker {
         if (offset === 0 && chunk.length >= totalSize) {
             this._chunkState = null;
             const full = chunk.length === totalSize ? chunk : chunk.slice(0, totalSize);
-            const key = 'hmi:' + (cid || (totalSize + ':' + full[0] + ':' + full[full.length - 1]));
-            return this._applyCoverBytes(key, full, Boolean(syncDecode));
+            return this._applyCoverBytes(cid, full, Boolean(syncDecode));
         }
 
-        // Multi-chunk CoverArt reassembly
-        if (!this._chunkState || this._chunkState.id !== cid || this._chunkState.totalSize !== totalSize) {
+        // Multi-chunk CoverArt reassembly: fresh transfer on offset === 0 or size/id change
+        if (offset === 0 || !this._chunkState || this._chunkState.id !== cid || this._chunkState.totalSize !== totalSize) {
             this._chunkState = {
                 id: cid,
                 totalSize,
@@ -309,8 +606,7 @@ class MediaTracker {
         if (st.written >= st.totalSize) {
             const doneBuf = st.buf;
             this._chunkState = null;
-            const key = 'hmi:' + (cid || st.totalSize);
-            return this._applyCoverBytes(key, doneBuf, Boolean(syncDecode));
+            return this._applyCoverBytes(cid, doneBuf, Boolean(syncDecode));
         }
         return false;
     }
@@ -326,6 +622,7 @@ class MediaTracker {
             if (/(^|_)PLAY$/i.test(raw)) playing = true;
             else if (/PAUSE|STOP/i.test(raw)) playing = false;
         }
+        this.mpPlaying = playing;
         if (playing !== this.playing) {
             if (this.time) {
                 const prog = this._computeProgress(now);
@@ -335,18 +632,26 @@ class MediaTracker {
         }
     }
 
-    feedMediaPlayerMetadata(v) {
+    feedMediaPlayerMetadata(v, nowMs) {
+        const now = typeof nowMs === 'number' ? nowMs : Date.now();
         const parsed = parseMediaPlayerMetadata(v);
         const prevTrack = this.mpMeta ? (this.mpMeta.title + '|' + this.mpMeta.artist) : '';
         this.mpMeta = parsed;
         if (!parsed) return;
+        this.mpUpdatedAt = now;
         if (!this.source) this.source = 'CarPlay';
         const nextTrack = parsed.title + '|' + parsed.artist;
-        if (prevTrack && prevTrack !== nextTrack) {
+        const trackChanged = Boolean(prevTrack && prevTrack !== nextTrack);
+        if (trackChanged) {
             this.time = null;
+            this.trackSinceMs = now;
+        } else if (!this.trackSinceMs) {
+            this.trackSinceMs = now;
         }
-        if (parsed.coverFile && !this.cover) {
+        if (parsed.coverFile) {
             this._loadCoverFile(parsed.coverFile);
+        } else if (trackChanged) {
+            this._scheduleCoverRefetch();
         }
     }
 
@@ -362,6 +667,7 @@ class MediaTracker {
         if (now - this.lastBcAt < 220) return false;
         this.lastBcAt = now;
         this.bcClicks++;
+        this.bcStep++;
         this.lastBcSource = reason || 'bc';
         this.pageIndex = (this.pageIndex + 1) % PAGES.length;
         return true;
@@ -394,22 +700,6 @@ class MediaTracker {
 
     feedStalk(v, nowMs) {
         const now = typeof nowMs === 'number' ? nowMs : Date.now();
-        if (isObj(v) && v.statusPushButtonMainBeamAssistant !== undefined) {
-            const hba = v.statusPushButtonMainBeamAssistant;
-            const pressed = hba === 'TASTER_GEDRUECKT' || hba === 1;
-            if (pressed && !this._hbaDown) {
-                this._hbaTaps++;
-                if (this._hbaTimer) clearTimeout(this._hbaTimer);
-                this._hbaTimer = setTimeout(() => {
-                    const n = this._hbaTaps;
-                    this._hbaTaps = 0;
-                    this._hbaTimer = null;
-                    if (n === 2) this.triggerBcClick('stalk_hba_2tap', Date.now());
-                }, 620);
-                if (this._hbaTimer && typeof this._hbaTimer.unref === 'function') this._hbaTimer.unref();
-            }
-            this._hbaDown = pressed;
-        }
         const raw = isObj(v) ? v.operationColumnStalks : v;
         if (typeof raw !== 'number' || !isFinite(raw) || raw === 255) return false;
         this.rawStalk = raw;
@@ -434,7 +724,7 @@ class MediaTracker {
             }
             return false;
         }
-        // Returned to resting value: if it was a momentary 25..1100ms button pulse, count as BC click!
+        // Returned to resting value: if it was a momentary 20..1100ms button pulse, count as BC click!
         if (this._stalkDownVal !== null) {
             const heldMs = now - this._stalkDownAt;
             this._stalkDownVal = null;
@@ -467,14 +757,17 @@ class MediaTracker {
             playing: true,
             source: 'CarPlay',
             title: 'Midnight City',
-            artist: 'M83 - Hurry Up, We Are Dreaming',
+            artist: 'M83',
             elapsedSec,
             totalSec,
             remainSec: totalSec - elapsedSec,
             frac: elapsedSec / totalSec,
             cover: getDemoCover(),
             coverRev: 1,
+            trackSinceMs: 0,
+            rawShape: 'DEMO',
             page: PAGES[this.pageIndex] || 'media',
+            bcStep: this.bcStep,
             bcClicks: this.bcClicks,
             lastBcSource: this.lastBcSource,
             rawStalk: this.rawStalk,
@@ -486,27 +779,59 @@ class MediaTracker {
         const now = typeof nowMs === 'number' ? nowMs : Date.now();
         if (isDemo) return this.demoSnapshot(now);
 
-        const meta = this.hmiMeta || this.mpMeta;
-        const prog = meta ? this._computeProgress(now) : null;
-        const artistLine = meta
-            ? (meta.artist && meta.album && meta.artist.indexOf(meta.album) < 0 && (meta.artist.length + meta.album.length < 34)
-                ? (meta.artist + ' - ' + meta.album)
-                : (meta.artist || meta.album || ''))
-            : '';
+        let title = '';
+        let artist = '';
+        const h = this.hmiMeta;
+        const m = this.mpMeta;
+        const mpMatchesHmi = Boolean(h && m && m.explicitTitle && (
+            m.artist === h.title || m.artist === h.artist || m.album === h.artist ||
+            this.mpPlaying || (now - this.mpUpdatedAt < 30000)
+        ));
+
+        if (h && h.explicitTitle) {
+            title = h.title;
+            artist = h.artist || (mpMatchesHmi ? m.artist : '');
+        } else if (m && m.title && (!h || mpMatchesHmi)) {
+            title = m.title;
+            artist = m.artist || (h ? h.title : '') || '';
+        } else if (h && this.hmiMainThird && h.firstType !== 'TITLE') {
+            title = this.hmiMainThird;
+            artist = h.title || h.artist || '';
+        } else if (h) {
+            title = h.title;
+            artist = h.artist || '';
+        } else if (m) {
+            title = m.title;
+            artist = m.artist || m.album || '';
+        }
+
+        const key = title + '|' + artist;
+        if (key && key !== this.trackKey) {
+            this.trackKey = key;
+            this.trackSinceMs = now;
+        } else if (!key) {
+            this.trackKey = '';
+        }
+
+        const active = Boolean(title);
+        const prog = active ? this._computeProgress(now) : null;
 
         return {
-            active: Boolean(meta && meta.title),
+            active,
             playing: this.playing,
-            source: this.source || (this.mpMeta ? 'CarPlay' : ''),
-            title: meta ? meta.title : '',
-            artist: artistLine,
+            source: this.source || (m ? 'CarPlay' : ''),
+            title,
+            artist,
             elapsedSec: prog ? prog.elapsedSec : null,
             totalSec: prog ? prog.totalSec : null,
             remainSec: prog ? prog.remainSec : null,
             frac: prog ? prog.frac : null,
-            cover: meta ? this.cover : null,
+            cover: active ? this.cover : null,
             coverRev: this.coverRev,
+            trackSinceMs: this.trackSinceMs || now,
+            rawShape: h ? h.shape : (m ? 'CarPlayMeta' : '--'),
             page: PAGES[this.pageIndex] || 'media',
+            bcStep: this.bcStep,
             bcClicks: this.bcClicks,
             lastBcSource: this.lastBcSource,
             rawStalk: this.rawStalk,
@@ -518,7 +843,7 @@ class MediaTracker {
         this._stopped = false;
         if (!ctx || !ctx.signals || typeof ctx.signals.watch !== 'function') return;
 
-        const addSub = (p) => {
+        const addSub = (p, onReady) => {
             if (p && typeof p.then === 'function') {
                 p.then((r) => {
                     if (!r) return;
@@ -527,9 +852,11 @@ class MediaTracker {
                         return;
                     }
                     this._subs.push(r);
+                    if (onReady) onReady(r);
                 }).catch(() => {});
             } else if (p) {
                 this._subs.push(p);
+                if (onReady) onReady(p);
             }
         };
 
@@ -538,12 +865,13 @@ class MediaTracker {
                 'de.bmw.infotainment.hmi.hmimediastate.HmiMediaState',
                 'HMI_CID',
                 {
-                    playerMetadata: (v) => this.feedHmiMetadata(v),
+                    playerMetadata: (v) => this.feedHmiMetadata(v, Date.now()),
+                    mainMenuMetadata: (v) => this.feedHmiMainMenuMetadata(v),
                     trackProgress: (v) => this.feedHmiProgress(v, Date.now()),
                     coverArt: (v) => this.feedHmiCoverArt(v, false),
                 },
                 log
-            ));
+            ), (r) => { this._hmiSub = r; });
         } catch (e) { /* optional */ }
 
         try {
@@ -551,12 +879,12 @@ class MediaTracker {
                 'de.bmw.infotainment.entertainment.mediaplayer.MediaPlayer',
                 'CarPlayMedia',
                 {
-                    currentItemMetadata: (v) => this.feedMediaPlayerMetadata(v),
+                    currentItemMetadata: (v) => this.feedMediaPlayerMetadata(v, Date.now()),
                     currentItemTime: (v) => this.feedMediaPlayerTime(v, Date.now()),
                     playerState: (v) => this.feedMediaPlayerState(v, Date.now()),
                 },
                 log
-            ));
+            ), (r) => { this._mpSub = r; });
         } catch (e) { /* optional */ }
 
         try {
@@ -579,9 +907,9 @@ class MediaTracker {
             clearTimeout(this._decodeTimer);
             this._decodeTimer = null;
         }
-        if (this._hbaTimer) {
-            clearTimeout(this._hbaTimer);
-            this._hbaTimer = null;
+        if (this._coverRefetchTimer) {
+            clearTimeout(this._coverRefetchTimer);
+            this._coverRefetchTimer = null;
         }
         for (let i = 0; i < this._subs.length; i++) {
             const s = this._subs[i];
@@ -591,7 +919,37 @@ class MediaTracker {
             } catch (e) { /* ignore */ }
         }
         this._subs = [];
+        this._hmiSub = null;
+        this._mpSub = null;
     }
+}
+
+function resolveRightWidgetPage(settingsObj, media, isCharging) {
+    if (isCharging) return 'charging';
+    const s = settingsObj || {};
+    if (s.rightWidgetMode && s.widgetMedia === undefined && s.widgetTrip === undefined) {
+        const legacyMode = s.rightWidgetMode;
+        if (legacyMode === 'off') return 'off';
+        if (legacyMode === 'media') return 'media';
+        if (legacyMode === 'trip') return 'trip';
+    }
+    const allowMedia = s.widgetMedia !== false;
+    const allowTrip = s.widgetTrip !== false;
+    const enabled = [];
+    if (allowMedia) enabled.push('media');
+    if (allowTrip) enabled.push('trip');
+    if (!enabled.length) return 'off';
+
+    const cycle = enabled.concat(['off']);
+    const stepRaw = (media && typeof media.bcStep === 'number') ? media.bcStep
+        : (media && typeof media.bcClicks === 'number' ? media.bcClicks
+            : (media && media.page ? Math.max(0, PAGES.indexOf(media.page)) : 0));
+    const idx = ((stepRaw % cycle.length) + cycle.length) % cycle.length;
+    const picked = cycle[idx];
+    if (idx === 0 && picked === 'media' && !(media && media.active) && enabled.indexOf('trip') >= 0) {
+        return 'trip';
+    }
+    return picked;
 }
 
 module.exports = {
@@ -601,5 +959,10 @@ module.exports = {
     parseHmiPlayerMetadata,
     parseMediaPlayerMetadata,
     parseTimeStruct,
+    paginateTitle,
+    resolveRightWidgetPage,
+    cleanMediaText,
+    fnv1aHex,
+    normId,
     getDemoCover,
 };

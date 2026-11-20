@@ -139,7 +139,7 @@ global.setInterval = (fn, ms) => { const id = realInterval(fn, ms); timers.push(
         name = 'strobe'; others.comfort = false; values.strobe = true; await tab(4);
         ok(labels.includes('仅限私人场地使用。') && labels.includes('启动频闪'), 'translated safety and controls');
         const untranslated = allLabels.filter((s) => /[A-Za-z]{3}/.test(s.replace(/BDC_G11|BDC_G05|BDC|BMW|FLM01|FLE|Comfort|Redline/g, '')));
-        assert.deepStrictEqual(untranslated, [], 'visible English leftovers across all screens');
+        assert.deepStrictEqual(untranslated, [], 'visible English leftovers across all screens: ' + JSON.stringify(untranslated));
         console.log('Ambient Chinese UI: ' + checks + ' checks, 8 rendered states; settings and control keys preserved');
     } finally {
         timers.forEach(clearInterval);

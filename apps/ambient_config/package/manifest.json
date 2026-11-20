@@ -163,7 +163,8 @@
     "de.bmw.infrastructure.VehicleCondition": {
       "instances": "1",
       "attributes": {
-        "VehicleCondition": "s"
+        "VehicleCondition": "s",
+        "vehicleConditionNoCrc": "s"
       }
     },
     "de.bmw.body.Light": {
@@ -181,7 +182,8 @@
     "de.bmw.infotainment.vehicle.Vehicle2": {
       "instances": "1",
       "attributes": {
-        "statusCarSpeed2": "rs"
+        "statusCarSpeed2": "rs",
+        "statusLightStatus": "rs"
       }
     }
   },

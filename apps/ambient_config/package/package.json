@@ -1,6 +1,6 @@
 {
   "name": "ambient_config",
-  "version": "2.5.2",
+  "version": "2.7.14",
   "description": "Any colour on the ambient light, animations, and a look for each driving mode",
   "main": "javascript/localized-entry.js",
   "private": false,

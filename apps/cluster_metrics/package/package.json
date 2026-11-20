@@ -1,11 +1,7 @@
 {
   "name": "cluster_metrics",
-  "version": "0.6.1",
-  "description": "在仪表或抬头显示上查看能耗、温度、电量与挡位，支持导航叠加。简体中文设置；首次使用需手动开启，Beta 待车机验证。",
-  "main": "javascript/localized-entry.js",
-  "private": false,
-  "author": "chyiz",
-  "license": "MIT",
+  "version": "0.8.1",
+  "description": "在仪表或抬头显示上查看能耗、温度、电量与挡位，支持导航叠加。简体中文设置；首次使用需手动开启。",
   "engines": {
     "node": ">=8.7.0"
   },
@@ -24,7 +20,9 @@
   "mguHmi": [
     "ID7"
   ],
+  "main": "javascript/localized-entry.js",
   "mguLocalOnly": true,
+  "license": "GPL-3.0-only",
   "files": [
     "package.json",
     "npm-shrinkwrap.json",

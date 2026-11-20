@@ -1,5 +1,13 @@
 [
   {
+    "version": "2.27.10",
+    "upstreamVersion": "2.27.9",
+    "cnRevision": 1,
+    "changes": [
+      "完善双发动机控制模块数据读取，增加车辆状态信息。"
+    ]
+  },
+  {
     "version": "2.27.5",
     "upstreamVersion": "2.27.3",
     "cnRevision": 2,

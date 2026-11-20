@@ -1,5 +1,13 @@
 [
   {
+    "version": "2.7.14",
+    "upstreamVersion": "2.7.13",
+    "cnRevision": 1,
+    "changes": [
+      "改进自定义灯色、门灯控制与颜色恢复，增强车身模块忙时兼容。"
+    ]
+  },
+  {
     "version": "2.5.2",
     "upstreamVersion": "2.5.0",
     "cnRevision": 2,

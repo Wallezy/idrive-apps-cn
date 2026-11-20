@@ -1,8 +1,9 @@
-Third-party open-source notices:
+Cluster Metrics - GNU General Public License v3.0 (GPL-3.0, see LICENSE).
+Copyright (c) 2026 chyiz (https://github.com/chyiz)
 
-1. cluster_render_client.js
-   License: Mozilla Public License 2.0 (MPL-2.0)
-   Copyright (C) 2026 Robert Nisipeanu
-
-2. Pre-baked Latin/numeric font atlases (kit/runtime/fonts/*.json)
-   License: SIL Open Font License 1.1 (OFL-1.1)
+Bundled runtime dependencies retain their upstream licenses:
+- kit/*, redline_hud_nav.js, redline_nav.js: MIT License (cauliflowermossgrape/idrive7-apps)
+- cluster_render_client.js: MPL-2.0, Copyright (C) 2026 Robert Nisipeanu
+- jpeg_decoder.js (jpeg-js 0.4.4): Apache-2.0 / BSD-3-Clause
+- kit/fonts/{bold,gear,label,light,num}.json: Ubuntu Font Licence 1.0 (LICENSE-UbuntuFont.txt)
+- kit/fonts/cjk.json: SIL Open Font License 1.1 (LICENSE-NotoSansCJK.txt)

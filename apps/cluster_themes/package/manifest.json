@@ -177,7 +177,14 @@
       "instances": "1",
       "attributes": {
         "dataDisplayGearbox": "s",
-        "statusMSystem": "rs"
+        "controlDisplayMSystems": "rs"
+      }
+    },
+    "de.bmw.infotainment.hmi.hmimediastate.HmiMediaState": {
+      "instances": "1",
+      "attributes": {
+        "playerMetadata": "rs",
+        "trackProgress": "rs"
       }
     },
     "de.bmw.infotainment.vehicle.TPMS": {

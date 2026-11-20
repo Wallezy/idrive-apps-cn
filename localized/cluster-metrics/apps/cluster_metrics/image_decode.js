@@ -10,8 +10,8 @@ const zlib = require('zlib');
 let JpegMod = null;
 try { JpegMod = require('./jpeg_decoder'); } catch (e) { JpegMod = null; }
 
-const MAX_BYTES = 460 * 1024;
-const MAX_SIDE = 1200;
+const MAX_BYTES = 2 * 1024 * 1024;
+const MAX_SIDE = 1600;
 
 function isJpeg(buf) {
     return Boolean(Buffer.isBuffer(buf) && buf.length >= 4 && buf[0] === 0xFF && buf[1] === 0xD8);
@@ -228,7 +228,173 @@ function shrinkSquare(rgba, sw, sh, side) {
 function decodeCoverThumb(buf, side) {
     const img = decodeImage(buf);
     if (!img) return null;
-    return shrinkSquare(img.rgba, img.w, img.h, side || 124);
+    return shrinkSquare(img.rgba, img.w, img.h, side || 144);
+}
+
+function smoothstep(e0, e1, x) {
+    const t = Math.max(0, Math.min(1, (x - e0) / (e1 - e0)));
+    return t * t * (3 - 2 * t);
+}
+
+function pwl(pts, x) {
+    if (x <= pts[0][0]) return pts[0][1];
+    const last = pts[pts.length - 1];
+    if (x >= last[0]) return last[1];
+    for (let i = 1; i < pts.length; i++) {
+        const a = pts[i - 1], b = pts[i];
+        if (x <= b[0]) return a[1] + (b[1] - a[1]) * ((x - a[0]) / (b[0] - a[0]));
+    }
+    return last[1];
+}
+
+// Calibrated 1920x720 right-wing Power % gauge envelope (clears all KOMBI4 telltales & POWER % label)
+const WING_TOP_Y = [[1335, 89], [1480, 95], [1565, 104], [1650, 145], [1780, 210]];
+const WING_OUTER_X = [
+    [88, 1538], [120, 1592], [160, 1644], [200, 1688], [240, 1726], [280, 1744],
+    [320, 1768], [355, 1776], [400, 1766], [450, 1740], [500, 1702], [550, 1652], [602, 1584],
+];
+const WING_INNER_X = [
+    [88, 1342], [180, 1404], [270, 1468], [355, 1506], [450, 1470], [540, 1424], [602, 1396],
+];
+const WING_BOTTOM_Y = 601;
+
+/**
+ * Full-wing gauge-edge translucent album-art backdrop matching BMW's stock Media widget:
+ *   - 1-pass smoothed zoomed artwork extends cleanly to the top, outer-right & bottom gauge edges
+ *     at uniform opacity (zero darkened border or outer circular falloff).
+ *   - Softly tapers along the inner grey boomerang seam toward the navigation map.
+ *   - Compact local dark shadow only directly behind foreground cover & text for crisp readability.
+ */
+function buildStockBackdrop(cover, cw, ch, opts) {
+    if (!cover || !cover.d || !cover.w || !cover.h) return null;
+    const o = opts || {};
+    const ox = typeof o.ox === 'number' ? o.ox : 1252;
+    const oy = typeof o.oy === 'number' ? o.oy : 88;
+    const vx = typeof o.vx === 'number' ? o.vx : 186; // foreground cover & text local center (world 1438)
+    const vy = typeof o.vy === 'number' ? o.vy : 224; // foreground local vertical center
+    const cacheKey = [cw, ch, ox, oy, vx, vy].join(':');
+    if (cover._backdrop && cover._backdropKey === cacheKey) return cover._backdrop;
+
+    const s = cover.w;
+    const sh = cover.h;
+    const srcRgba = cover.d;
+    const blurred = Buffer.allocUnsafe(s * sh * 3);
+
+    // 1-pass 3x3 smoothing keeps bold shapes & colors recognizable like BMW's stock wing backdrop
+    for (let y = 0; y < sh; y++) {
+        const ym = y > 0 ? y - 1 : 0;
+        const yp = y + 1 < sh ? y + 1 : sh - 1;
+        const rows = [ym, y, yp];
+        for (let x = 0; x < s; x++) {
+            const xm = x > 0 ? x - 1 : 0;
+            const xp = x + 1 < s ? x + 1 : s - 1;
+            const cols = [xm, x, xp];
+            let r = 0, g = 0, b = 0;
+            for (let ry = 0; ry < 3; ry++) {
+                const rowOff = rows[ry] * s;
+                for (let cx0 = 0; cx0 < 3; cx0++) {
+                    const so = (rowOff + cols[cx0]) * 4;
+                    r += srcRgba[so];
+                    g += srcRgba[so + 1];
+                    b += srcRgba[so + 2];
+                }
+            }
+            const dstOff = (y * s + x) * 3;
+            blurred[dstOff] = Math.round(r / 9);
+            blurred[dstOff + 1] = Math.round(g / 9);
+            blurred[dstOff + 2] = Math.round(b / 9);
+        }
+    }
+
+    const out = Buffer.alloc(cw * ch * 4);
+    // Span zoomed artwork generously over the whole Power % gauge face centered at world (1560, 346)
+    const artW = 514;
+    const artH = 514;
+    const artX0World = 1560 - Math.round(artW / 2);
+    const artY0World = 346 - Math.round(artH / 2);
+    const srcSpanX = (s - 1) / artW;
+    const srcSpanY = (sh - 1) / artH;
+    const peakArtAlpha = 98;
+    const rxVig = 112;
+    const ryVig = 132;
+
+    for (let y = 0; y < ch; y++) {
+        const wy = oy + y;
+        const rowOut = y * cw;
+        const vdy = (y - vy) / ryVig;
+
+        const inYBand = wy >= 88 && wy <= WING_BOTTOM_Y;
+        const botAa = inYBand ? smoothstep(WING_BOTTOM_Y, WING_BOTTOM_Y - 3, wy) : 0;
+        const innerX = inYBand ? pwl(WING_INNER_X, wy) : 9999;
+        const outerX = inYBand ? pwl(WING_OUTER_X, wy) : -1;
+
+        for (let x = 0; x < cw; x++) {
+            const wx = ox + x;
+
+            let artR = 0, artG = 0, artB = 0, artA = 0;
+            if (inYBand && wx >= innerX - 18 && wx <= outerX) {
+                const topY = pwl(WING_TOP_Y, wx);
+                if (wy >= topY) {
+                    const topAa = smoothstep(topY, topY + 3, wy);
+                    const rightAa = smoothstep(outerX, outerX - 3, wx);
+                    const innerFade = smoothstep(innerX - 18, innerX + 10, wx);
+                    const mask = topAa * botAa * rightAa * innerFade;
+                    if (mask > 0.005) {
+                        const sx = Math.max(0, Math.min(s - 1, (wx - artX0World) * srcSpanX));
+                        const sy = Math.max(0, Math.min(sh - 1, (wy - artY0World) * srcSpanY));
+                        const ix0 = Math.floor(sx);
+                        const iy0 = Math.floor(sy);
+                        const ix1 = Math.min(s - 1, ix0 + 1);
+                        const iy1 = Math.min(sh - 1, iy0 + 1);
+                        const fx = sx - ix0;
+                        const fy = sy - iy0;
+
+                        const o00 = (iy0 * s + ix0) * 3;
+                        const o10 = (iy0 * s + ix1) * 3;
+                        const o01 = (iy1 * s + ix0) * 3;
+                        const o11 = (iy1 * s + ix1) * 3;
+
+                        const w00 = (1 - fx) * (1 - fy);
+                        const w10 = fx * (1 - fy);
+                        const w01 = (1 - fx) * fy;
+                        const w11 = fx * fy;
+
+                        artR = blurred[o00] * w00 + blurred[o10] * w10 + blurred[o01] * w01 + blurred[o11] * w11;
+                        artG = blurred[o00 + 1] * w00 + blurred[o10 + 1] * w10 + blurred[o01 + 1] * w01 + blurred[o11 + 1] * w11;
+                        artB = blurred[o00 + 2] * w00 + blurred[o10 + 2] * w10 + blurred[o01 + 2] * w01 + blurred[o11 + 2] * w11;
+                        artA = peakArtAlpha * mask;
+                    }
+                }
+            }
+
+            // Compact local dark shadow behind foreground cover, title, artist, and bar ONLY (never darkens outer wing edges!)
+            const vdx = (x - vx) / rxVig;
+            const vDist = Math.sqrt(vdx * vdx + vdy * vdy);
+            const vigFade = (vDist < 1 && wx >= 1276) ? smoothstep(1.0, 0.25, vDist) : 0;
+
+            if (artA <= 0.5 && vigFade <= 0.005) continue;
+
+            const artDim = 1 - 0.72 * vigFade;
+            const dArtA = (artA / 255) * artDim;
+            const darkA = 0.46 * vigFade;
+            const outA = darkA + dArtA * (1 - darkA);
+            if (outA <= 0.002) continue;
+
+            const sr = Math.round((4 * darkA + artR * dArtA * (1 - darkA)) / outA);
+            const sg = Math.round((7 * darkA + artG * dArtA * (1 - darkA)) / outA);
+            const sb = Math.round((12 * darkA + artB * dArtA * (1 - darkA)) / outA);
+
+            const oo = (rowOut + x) * 4;
+            out[oo] = sr;
+            out[oo + 1] = sg;
+            out[oo + 2] = sb;
+            out[oo + 3] = Math.min(255, Math.round(outA * 255));
+        }
+    }
+
+    cover._backdrop = out;
+    cover._backdropKey = cacheKey;
+    return out;
 }
 
 module.exports = {
@@ -238,4 +404,5 @@ module.exports = {
     decodeImage,
     shrinkSquare,
     decodeCoverThumb,
+    buildStockBackdrop,
 };

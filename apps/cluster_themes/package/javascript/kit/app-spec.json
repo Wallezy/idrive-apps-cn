@@ -1,7 +1,7 @@
 {
  "id": "cluster_themes",
  "title": "\u4eea\u8868\u4e3b\u9898",
- "version": "0.17.3",
+ "version": "0.19.1",
  "screens": [
   {
    "name": "MAIN",
@@ -35,16 +35,20 @@
      "M"
     ],
     [
+     "mview",
+     "M view"
+    ],
+    [
+     "vector",
+     "Vector"
+    ],
+    [
      "sport",
      "Sport"
     ],
     [
      "minimal",
      "Minimal"
-    ],
-    [
-     "roadster",
-     "Roadster"
     ],
     [
      "track",
@@ -109,16 +113,20 @@
      "M"
     ],
     [
+     "mview",
+     "M view"
+    ],
+    [
+     "vector",
+     "Vector"
+    ],
+    [
      "sport",
      "Sport"
     ],
     [
      "minimal",
      "Minimal"
-    ],
-    [
-     "roadster",
-     "Roadster"
     ],
     [
      "track",
@@ -169,16 +177,20 @@
      "M"
     ],
     [
+     "mview",
+     "M view"
+    ],
+    [
+     "vector",
+     "Vector"
+    ],
+    [
      "sport",
      "Sport"
     ],
     [
      "minimal",
      "Minimal"
-    ],
-    [
-     "roadster",
-     "Roadster"
     ],
     [
      "track",
@@ -229,16 +241,20 @@
      "M"
     ],
     [
+     "mview",
+     "M view"
+    ],
+    [
+     "vector",
+     "Vector"
+    ],
+    [
      "sport",
      "Sport"
     ],
     [
      "minimal",
      "Minimal"
-    ],
-    [
-     "roadster",
-     "Roadster"
     ],
     [
      "track",
@@ -603,12 +619,6 @@
    "label": "\u663e\u793a\u589e\u538b\u503c",
    "type": "bool",
    "default": true
-  },
-  {
-   "key": "stripClear",
-   "label": "\u4fdd\u7559\u539f\u8f66\u5e95\u90e8\u4fe1\u606f\u680f",
-   "type": "bool",
-   "default": false
   },
   {
    "key": "cameraNotch",

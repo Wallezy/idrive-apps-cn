@@ -107,3 +107,23 @@ GEARBOX	变速箱
 HV BATT	动力电池
 INTAKE	进气温度
 12V AUX	12V 电池
+12V Battery %	12V 电池电量
+12V battery %	12V 电池电量
+Auto (12V % / 12V V / IAT)	自动（12V 电量／电压／进气温度）
+Cabin temperature (left of ambient)	车内温度（外温左侧）
+Cluster	仪表盘
+Demo PHEV Charging	演示插混充电
+Efficiency + Gear (fixed slots)	能耗与挡位（固定位置）
+General	通用
+HUD	抬头显示
+HUD Lead-Car Headway (GapVehicleAhead)	抬头显示跟车距离
+HV battery % (bottom corner)	高压电池电量（底角）
+HV battery % on gauge (PHEV)	高压电池电量表（插混）
+HV battery temp	高压电池温度
+Lead-car headway	跟车距离
+Lead-car headway (HUD)	跟车距离（抬头显示）
+Plug-In Charging & Finish Prognosis	充电与预计完成时间
+Right widget: Media playback	右侧信息：媒体播放
+Right widget: Trip & powertrain	右侧信息：行程与车辆
+Time + distance + closing speed	时距、距离与接近速度
+Time + distance only	仅时距与距离

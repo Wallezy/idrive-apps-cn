@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/cauliflowermossgrape/idrive7-apps",
-  "commit": "b2880634eb214e29f008422b970cf22ea2de280f",
+  "commit": "35bca28bc82b30482d73782877ebaf92c69dcb8c",
   "language": "zh-CN",
   "sdk": "Excluded; donor-linked by mgu-deploy",
   "adaptations": [
@@ -9,13 +9,14 @@
     "Numeric three-part CN versions"
   ],
   "component": "draggy",
-  "upstreamVersion": "2.5.20",
-  "releaseVersion": "2.5.21",
+  "upstreamVersion": "2.6.0",
+  "releaseVersion": "2.6.1",
   "cnRevision": 1,
   "adaptedSourceFilesSha256": {
-    "apps/draggy/app.json": "e173d06d0059da43756cbb7b4639b233bf389f59bca6fcbf2c628378207925bf",
+    "apps/draggy/app.json": "78fe8fb17346a32ac3d3b98dbc44cf3fb88c8c9e80341e4a31a441452d92a928",
     "apps/draggy/demo.js": "8122403dc6316224b34b01b5fa45ea409aaa0846efc3482ca5263b48623e2a60",
     "apps/draggy/icon.png": "4d57c4caa4dff86649f7395796c8fbd05eeac035efba6df067f95dd0cf6f160b",
-    "apps/draggy/main.js": "6de1e00a79ba5e75d58cfcc67cbb62b1e3194ad36a42a22f765ad17522157359"
+    "apps/draggy/main.js": "425e59fe01e7337bda9de342893de8293db712edfdde440820ecfbc9f09830b9",
+    "apps/draggy/wheelspin.js": "bed5b7d02f340a7249813f60e0daaf5f68bba64a2cebbefa4e3093576782b1a7"
   }
 }

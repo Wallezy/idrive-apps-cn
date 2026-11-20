@@ -10,7 +10,7 @@ Redraws the whole instrument cluster in a theme of your choice. Open **Cluster T
 
 ## Themes
 
-Every theme ends just above BMW's own bottom strip, so the car's range, clock, street, drive mode and outside temperature always show under it and the theme doesn't repeat them. Every theme shows the drive mode (Comfort, Sport and so on) next to the gear.
+Every theme fills the cluster and shows its own clock, range and outside temperature along the bottom, in the theme's style. Only BMW's gear letter at the bottom right stays uncovered: when a theme covers it, BMW draws a black box over the theme (issue #5). Every theme shows the drive mode (Comfort, Sport and so on) next to the gear.
 
 ### GT3
 
@@ -30,9 +30,9 @@ A race dash.
 A current M8's cluster, traced off a photo of it and drawn on black.
 
 - **Middle:** two bowed glass rev blades either side of the gear and speed, reading 0 to 7000 rpm like the M40i's own cluster. A red marker rides each blade at the rpm, the blade glows below it, and orange and red marks sit before and past your redline. The gear shows with its shifter programme: P, D3, S3 or M3, and the drive mode sits under the speed.
-- **Left:** a black card with a grey rim and four readouts where the M8 has its tyre block: boost, coolant, oil and intake air out of the box, each one changeable on the Readouts tab. The fuel dial sits over the card's lower corner, drawn like the M8's: a thin glass bracket inside a hatched chrome bezel, lit from the bottom up to the level, with a red streak at the level and another at the reserve.
-- **Right:** what the engine, chassis, steering and gearbox are set to, as four rows with a step bar, and the oil temperature dial, the same glass bracket (blue streak at the cold end, red at the hot end). The rows follow the drive mode buttons: Eco Pro, Comfort, Sport, Sport Plus and Sport Individual. The car only reports that an Individual setup is on, not what each part is set to, so those rows read INDIVIDUAL.
-- **Bottom:** left clear, so BMW's own strip (range, clock, street, drive mode, outside temperature) shows under the theme.
+- **Left:** a black card with a grey rim and four readouts where the M8 has its tyre block: boost, coolant, oil and intake air out of the box, each one changeable on the Readouts tab. The fuel dial sits over the card's lower corner, drawn like the M8's: a thin glass bracket inside a hatched chrome bezel, lit from the bottom up to the level, with a thin red line at the level.
+- **Right:** what the engine, chassis, steering and gearbox are set to, as four rows with a step bar, and the oil temperature dial, the same glass bracket. The rows follow the drive mode buttons: Eco Pro, Comfort, Sport, Sport Plus and Sport Individual. The car only reports that an Individual setup is on, not what each part is set to, so those rows read INDIVIDUAL.
+- **Bottom:** the clock, range and outside temperature, with BMW's own gear letter.
 - **With the Waze map:** the blades keep their shape and numbers and move out to the sides, the map fills the middle between them, and the gear, speed and drive mode sit in a row under it.
 
 <p align="center"><img src="../../docs/images/cluster-m.png" width="900" alt="M theme"></p>
@@ -44,21 +44,39 @@ The look of BMW's newer Live Cockpit Sport view.
 - **Left:** speed as a blue bracket on BMW's 0 to 200 mph scale (0 to 320 km/h), with a fuel bar up its lower leg.
 - **Right:** revs as a red bracket on the M40i's 0 to 7000 rpm scale, with yellow and red marks around your redline, with an oil temperature bar up its lower leg.
 - **Middle:** the speed in big figures with the gear and drive mode under it, over a road like BMW's own Sport view whose lane dashes run towards you as you drive. With "Show Waze map inside the theme" on, the map takes the middle and the speed and gear move into the brackets.
-- **Bottom:** boost and coolant in the blue and red bar. BMW's own strip under it shows the clock, range and outside temperature, so the theme doesn't repeat them.
+- **Bottom:** boost and coolant in the blue and red bar. Under it, the clock, range and outside temperature, with BMW's own gear letter.
 
 <p align="center"><img src="../../docs/images/cluster-sport.png" width="900" alt="Sport theme"></p>
+
+### M view
+
+The look of the M view in the newer M cars' Live Cockpit (M3, M4, M5), for any car. Asked for in issue #15.
+
+- **Left:** speed along a white line with rounded corners, 0 to 200 mph (0 to 330 km/h). The band inside the line lights up from 0 to the needle.
+- **Right:** revs the same way, 0 to 8000 rpm, with yellow and red marks from your redline.
+- **Panels:** dark grey panels inside both scales, and a red glow by the needle, as on BMW's own M view.
+- **Middle:** the speed and the gear, each over its own line, with the speed in the other unit under it (km/h under mph, or the other way round) and the drive mode under the gear. With "Show Waze map inside the theme" on, the map shows in an oval window between the two scales that fades into the black, and the window opens and closes without the theme being built again.
+- **Corners:** fuel on the far left and oil temperature on the far right, as small dials.
+- **Bottom:** the clock, range and outside temperature, with BMW's own gear letter.
+
+<p align="center"><img src="../../docs/images/cluster-mview.png" width="900" alt="M view theme"></p>
+
+### Vector
+
+A race-sim style dash with angled frames and a music panel.
+
+- **Left:** a round rev counter in segments, 0 to 8000 rpm, red from your redline, with the speed and the gear inside it.
+- **Middle:** boost, torque and power as bars. With "Show Waze map inside the theme" on, the map shows here instead.
+- **Right:** coolant, oil, fuel and boost as rings, and the music panel: the song that is playing with its title, artist and time, read from the car's own now playing. When nothing is playing, the panel shows average speed, peak boost and lateral G instead. The music panel is experimental: please tell us in an issue whether it works with your sources (radio, Bluetooth, USB, CarPlay).
+- **Bottom:** the clock, range and outside temperature, with BMW's own gear letter.
+
+<p align="center"><img src="../../docs/images/cluster-vector.png" width="900" alt="Vector theme"></p>
 
 ### Minimal
 
 Just the speed, big, with the gear and drive mode beside it, a thin fuel line under it (the reserve end is red), and oil and coolant in small print.
 
 <p align="center"><img src="../../docs/images/cluster-minimal.png" width="900" alt="Minimal theme"></p>
-
-### Roadster
-
-Two classic round dials with chrome rings and an orange needle: speed on the left (0 to 160 mph, or 0 to 240 km/h), revs on the right (0 to 7000 rpm, a red band before the redline, and the ring turns red at your shift point). The speed also shows in figures inside its dial, and the gear sits between the dials in chrome. Six readouts left and right: oil, coolant and fuel, then boost, torque and power, each one changeable on the Readouts tab.
-
-<p align="center"><img src="../../docs/images/cluster-roadster.png" width="900" alt="Roadster theme"></p>
 
 ### Track
 
@@ -80,7 +98,7 @@ A segmented rev arc sweeps across the top of the screen, white, then rally yello
 
 ### Retro 80s
 
-An 80s digital dash: amber seven-segment digits with their unlit 8s showing faintly behind, for the gear and the speed. A segmented rev bar runs across the top, bar graphs show oil, water and fuel on the left, and boost and two readouts sit on the right.
+An 80s digital dash: amber seven-segment digits with their unlit 8s showing faintly behind, for the gear and the speed. A segmented rev bar runs across the top, bar graphs show oil, water and fuel on the left, and boost and two readouts sit on the right. The clock, range and outside temperature along the bottom are seven-segment digits too.
 
 <p align="center"><img src="../../docs/images/cluster-retro80s.png" width="900" alt="Retro 80s theme"></p>
 
@@ -105,7 +123,7 @@ Calm and premium. One ribbon of light runs along under the top edge of the clust
 <p align="center"><img src="../../docs/images/cluster-ribbon.png" width="900" alt="Ribbon theme"></p>
 <p align="center"><img src="../../docs/images/cluster-ribbon-christmas.png" width="900" alt="Ribbon theme, Christmas edition"></p>
 
-Minimal, Roadster, Track, Drag, Rally, Retro 80s, Cruise, Dyno and Ribbon have no map window yet; with "Show Waze map inside the theme" on, Waze stays in its usual place while they show.
+Minimal, Track, Drag, Rally, Retro 80s, Cruise, Dyno and Ribbon have no map window yet; with "Show Waze map inside the theme" on, Waze stays in its usual place while they show.
 
 More themes are on the way.
 
@@ -119,7 +137,7 @@ More themes are on the way.
 ## Settings
 
 - **Theme**, and one per drive mode.
-- **Readouts:** pick which car sensor each GT3, M, Roadster, Track, Drag, Rally, Retro 80s or Dyno readout shows (speed, rpm, boost, temperatures, tyres, fuel, g, power and more). Plug-in hybrids can also show **Hybrid battery**, the high-voltage battery's charge in % (not yet checked on a hybrid).
+- **Readouts:** pick which car sensor each GT3, M, Track, Drag, Rally, Retro 80s or Dyno readout shows (speed, rpm, boost, temperatures, tyres, fuel, g, power and more). Plug-in hybrids can also show **Hybrid battery**, the high-voltage battery's charge in % (not yet checked on a hybrid).
 - **Show Waze map inside the theme:** GT3, Sport and M open a window in the middle and Waze on Cluster draws its map in it, above BMW's own map view, so nothing shows twice. When the map goes away the theme fills back in. While it is on, Waze's map on the HUD is off. Needs robertnisipeanu's Waze on Cluster; turning it off gives Waze its usual place back.
 - **Badge:** the model name, like "BMW X3 M40i", as text in the theme's font (GT3 top left, Sport, M and Minimal top centre, where BMW puts its own). Off by default.
 - **Warnings:** oil, coolant and boost limits. A readout over its limit flashes red (oil 130°C and coolant 115°C by default, boost off).
@@ -136,7 +154,6 @@ More themes are on the way.
 - **Shift point before redline:** how far below the redline the shift lights peak (300 rpm by default).
 - **Cold-engine rev guard:** until the oil reaches 80°C, the shift point starts at 4500 rpm and climbs as the oil warms up.
 - **Show boost.**
-- **Leave BMW's bottom strip clear** (off by default): the theme draws only above BMW's own bottom strip (range, clock, belt light, P), squeezed a little to fit. Try it if BMW draws black boxes over the theme: one M car owner found that leaving the strip clear stopped them (issue #5). Not yet tested on a car with this setting.
 - **Leave room for the driver camera** (off by default): for newer cars with a driver attention camera in the top middle of the cluster, where other cars show the model badge. The shift lights and rev bars (GT3, Track, Dyno, Rally) become two mirrored wings either side of the camera that fill from the outer ends in towards it and meet at the shift point, Track's rpm numbers are left out, M's logo is hidden, and Ribbon's ribbon dips under the camera instead. The camera's spot is taken from where the badge sits on a car without one. Not yet tested on a car with a camera; please report how it lines up on yours.
 - **Holiday editions:** a string of glowing holiday lights along the top of every theme, and Ribbon's own holiday edition. Auto (the default) puts them on by the date: Thanksgiving in its week (Monday to Sunday), Christmas from December 1 to 26, New Year from December 27 to January 2, and the Fourth of July from July 1 to 5, then takes them off again. Or pick one holiday to keep it on, or Off. The date follows the Time zone (clock) setting.
 - **G-meter** (its own tab): the range (0.8, 1.0, 1.2, 1.5 or 2.0 g at the edge; 1.2 by default), the trail (off, 1, 2 or 4 seconds), **Swap left / right** (if the dot goes the wrong way in a turn) and **Brake on top**, the best left, right, accelerating, braking and overall g of the drive with a Reset button, and a live copy of the meter. The g comes from the car's own acceleration sensor: parked on level ground it reads 0.00, and a hill adds a little.

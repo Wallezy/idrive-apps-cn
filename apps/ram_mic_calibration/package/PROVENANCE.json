@@ -9,7 +9,7 @@
     "sha256": "207b97122c766c370e9e563a4c3759191737707fdf155184de2bd0cff51308b2"
   },
   "upstreamVersion": "0.1.1",
-  "releaseVersion": "0.1.5",
+  "releaseVersion": "0.4.1",
   "cnRevision": 2,
   "source": "https://gitee.com/xiaobai-151/mgu-cn-xiaobai/raw/main/packages/ram_mic_calibration@0.1.1.tgz",
   "license": "MIT",
@@ -17,5 +17,9 @@
   "communityReference": {
     "version": "0.1.4",
     "sha256": "12e4f5ea4a9b1a995b3c0b2eff1555280b72f34bfd1c2be4421a34ffa85dd438"
+  },
+  "additionalAdaptation": {
+    "referenceVersion": "0.4.0",
+    "scope": "audio DTC precheck with active status included in request mask; retain CN calibration flow"
   }
 }

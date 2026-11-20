@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.10.13
+
+- Keep diagnostic journals in RAM; preserve bounded failure and shutdown logs with CN diagnostics.
+
 - 修复 Android Auto 显示未就绪时异常退出，并完善自动恢复。
 - 保留全屏、显示位置和 HUD 设置，补充故障诊断信息。
 
@@ -25,4 +29,8 @@
 - Report mask support to the settings application. Reject unsupported
   mode changes and stop a retained expanded layer if a restarted renderer
   does not support its mask. Standard map mode remains available.
+## 0.10.12
 
+The diagnostic journal is kept in memory and written to storage only around
+failures and at shutdown, which greatly reduces writes to the head unit's
+storage.

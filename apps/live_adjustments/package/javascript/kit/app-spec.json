@@ -1,7 +1,7 @@
 {
  "id": "live_adjustments",
  "title": "\u53d1\u52a8\u673a\u8bbe\u7f6e",
- "version": "0.9.7",
+ "version": "0.9.11",
  "screens": [
   {
    "name": "MAIN",

@@ -1,96 +1,63 @@
 'use strict';
 /**
- * nav_tracker.js - Read-only navigation & HUD mini-map state tracker.
+ * nav_tracker.js - Read-only navigation & G30 HUD mini-map state tracker.
  *
- * Adapted from cauliflowermossgrape/idrive7-apps (apps/redline/nav.js, MIT) with
- * G30 HUD Mini-Map (Junction View) detection:
- *   1. Reads next maneuver (arrow, highway branch/fork/exit, roundabout, U-turn,
- *      destination flag), formatted distance, street name, and lane guidance from
- *      GuidanceEventList.queryContent, Guidance.conclusiveDart, and
- *      Guidance / ProjectedModeGuiding.currentLaneGuiding.
- *   2. Detects when HUD guidance switches to an intersection Mini-Map WITHOUT
- *      relying on arbitrary distance thresholds:
- *        a) Live DCSM2 slot table (/run/cluster-render/status.txt): BMW HmiMain3D
- *           maps HUD map/junction scene 0x01000200 or 0x01000201 on slot 0x3xx.
- *        b) Lane-guidance-to-minimap swap: on BMW built-in Navigation, when
- *           currentLaneGuiding was active for the current maneuver (turnKey) and
- *           clears to empty while that exact same maneuver is still active (BMW
- *           replaced the lane box with the zoomed intersection mini-map).
- *        c) Waze-on-Cluster HUD projection (/run/waze-on-cluster/status.json):
- *           auto-hides when Waze-on-Cluster's own HUD map is enabled.
+ * Uses Redline's GuidanceEventList / Guidance maneuver decoders (`redline_nav`) and layers
+ * G30-specific capabilities on top:
+ *   1. Highway exit badge extraction from `DescriptionElement.icon.text` ("14B") or leading "Exit ...".
+ *   2. Highway `passiveManeuver` promotion when a real maneuver follows within 300 m.
+ *   3. Exact intersection Mini-Map (Junction View) auto-yield detection without distance hacks:
+ *        a) GuidanceRenderedContent HUD view (`HIGH_GUIDING`, `JUNCTION_VIEW`, `CITY_HIGHWAY_MAP`, `TUNNEL`)
+ *        b) Live DCSM2 slot table (/run/cluster-render/status.txt, mapped `0x01000200`/`0x01000201`)
+ *        c) Lane-guidance-to-minimap clearing on BMW built-in nav + Waze-on-Cluster HUD status
  *
  * Strict Node 8.16.2 (ES2017): no optional chaining, no ??, no dependencies.
  */
 
 const fs = require('fs');
+const {
+    decodeEvent: baseDecodeEvent,
+    decodeLanes,
+    metres,
+    straightOn,
+    staleThen,
+    thenOf,
+    enumOf,
+    unionOf,
+    distOf,
+} = require('./redline_nav');
 
-const STALE_MS = 3500;
+const STALE_MS = 6000;
 const QUERY_MS = 1000;
+const QUERY_TIMEOUT_MS = 1800;
 const PROXY_RETRY_MS = 30000;
 const CALL_BACKOFF_MS = 2000;
 const FAILS_RECONNECT = 5;
-const THEN_M = 150;
-const STRAIGHT_DEG = 30;
+const LANES_MINIMAP_MAX_MS = 18000;
+const NO_TURN_FALLBACK_MS = 5000;
 
 const DEFAULT_CR_STATUS = '/run/cluster-render/status.txt';
 const DEFAULT_WAZE_STATUS = '/run/waze-on-cluster/status.json';
 
-const UNITS = { KM: 'km', METER: 'm', MILE_UK: 'mi', MILE_US: 'mi', YARD: 'yd', FEET: 'ft' };
-const UNIT_M = { km: 1000, m: 1, mi: 1609.344, yd: 0.9144, ft: 0.3048 };
-const FRACTIONS = { '\u00bd': '.5', '\u00bc': '.25', '\u00be': '.75' };
+const RENDERED_CONTENT_TYPES = [
+    'NONE', 'HIGH_GUIDING', 'JUNCTION_VIEW', 'CITY_HIGHWAY_MAP',
+    'SIGN_POST_INFO', 'SAPA', 'TUNNEL', 'SCREENSHOT', 'NOTIFY',
+];
+const DISPLAY_TYPES = ['NONE', 'CID', 'IC', 'HUD'];
 
 const isObj = (v) => Boolean(v && typeof v === 'object' && !Array.isArray(v));
-const str = (v) => (typeof v === 'string' ? v : (typeof v === 'number' && isFinite(v) ? String(v) : null));
 function mono() { const t = process.hrtime(); return t[0] * 1000 + t[1] / 1e6; }
 
-const ENUMS = {
-    TurnDirection: ['NONE', 'STRAIGHT_ON', 'LEFT', 'SLIGHT_LEFT', 'HARD_LEFT', 'RIGHT', 'SLIGHT_RIGHT', 'HARD_RIGHT', 'UTURN_RIGHT', 'UTURN_LEFT'],
-    BranchType: [null, 'BRANCH_LEFT', 'BRANCH_RIGHT', 'HIGHWAY_IN_LEFT', 'HIGHWAY_IN_RIGHT', 'HIGHWAY_IN_STRAIGHT', 'HIGHWAY_OUT_LEFT', 'HIGHWAY_OUT_RIGHT',
-        'HIGHWAY_OUT_STRAIGHT', 'FORK_LEFT', 'FORK_RIGHT', 'TRIPLE_FORK_LEFT', 'TRIPLE_FORK_RIGHT', 'TRIPLE_FORK_STRAIGHT', 'OVERPASS', 'UNDERPASS'],
-    Side: [null, 'LEFT', 'RIGHT'],
-    DestinationPosition: [null, 'LEFT', 'CENTER', 'RIGHT', 'NOT_DIGITIZED'],
-    MainRoadDirection: ['LEFT', 'RIGHT'],
-    VehicleTransportationType: ['FERRY', 'CAR_TRAIN'],
-    AdditionalLaneInfo: ['NONE', 'ELLIPSIS', 'BUS', 'HOV', 'SCOOTER', 'BIKE', 'TOLL_ETC', 'TOLL_CASH', 'TOLL_ETC_CASH', 'BLOCKED'],
-    LaneMarker: [null, 'SOLID', 'DASHED'],
-    DistanceUnit: ['NONE', 'KM', 'MILE_UK', 'MILE_US', 'METER', 'YARD', 'FEET'],
-    ProjectedModeGuidingProvider: ['NONE', 'CAR_PLAY', 'ANDROID_AUTO', 'CAR_LIFE', 'OTHER'],
-    RenderedContentType: ['NONE', 'HIGH_GUIDING', 'JUNCTION_VIEW', 'CITY_HIGHWAY_MAP', 'SIGN_POST_INFO', 'SAPA', 'TUNNEL', 'SCREENSHOT', 'NOTIFY'],
-    DisplayType: ['NONE', 'CID', 'IC', 'HUD'],
-    ManeuverGeometry: [null, 'TWO_WAY_FORK_TAKE_LEFT', 'TWO_WAY_FORK_TAKE_RIGHT', 'THREE_WAY_FORK_TAKE_LEFT', 'THREE_WAY_FORK_TAKE_CENTER',
-        'THREE_WAY_FORK_TAKE_RIGHT', 'EXIT_LEFT_TAKE_LEFT', 'EXIT_LEFT_TAKE_RIGHT', 'EXIT_RIGHT_TAKE_LEFT', 'EXIT_RIGHT_TAKE_RIGHT',
-        'EXIT_LEFT_TWO_WAY_FORK_TAKE_LEFT_LEFT', 'EXIT_LEFT_TWO_WAY_FORK_TAKE_LEFT_RIGHT', 'EXIT_RIGHT_TWO_WAY_FORK_TAKE_RIGHT_LEFT',
-        'EXIT_RIGHT_TWO_WAY_FORK_TAKE_RIGHT_RIGHT', 'TWO_WAY_FORK_OVERPASS_LEFT_TAKE_LEFT', 'TWO_WAY_FORK_OVERPASS_LEFT_TAKE_RIGHT',
-        'TWO_WAY_FORK_OVERPASS_RIGHT_TAKE_LEFT', 'TWO_WAY_FORK_OVERPASS_RIGHT_TAKE_RIGHT', 'TWO_WAY_FORK_UNDERPASS_LEFT_TAKE_LEFT',
-        'TWO_WAY_FORK_UNDERPASS_LEFT_TAKE_RIGHT', 'TWO_WAY_FORK_UNDERPASS_RIGHT_TAKE_LEFT', 'TWO_WAY_FORK_UNDERPASS_RIGHT_TAKE_RIGHT',
-        'TWO_WAY_FORK_OVERPASS_LEFT_UNDERPASS_RIGHT_TAKE_LEFT', 'TWO_WAY_FORK_OVERPASS_LEFT_UNDERPASS_RIGHT_TAKE_RIGHT',
-        'TWO_WAY_FORK_UNDERPASS_LEFT_OVERPASS_RIGHT_TAKE_LEFT', 'TWO_WAY_FORK_UNDERPASS_LEFT_OVERPASS_RIGHT_TAKE_RIGHT',
-        'THREE_WAY_FORK_OVERPASS_CENTER_TAKE_LEFT', 'THREE_WAY_FORK_OVERPASS_CENTER_TAKE_CENTER', 'THREE_WAY_FORK_OVERPASS_CENTER_TAKE_RIGHT',
-        'THREE_WAY_FORK_UNDERPASS_CENTER_TAKE_LEFT', 'THREE_WAY_FORK_UNDERPASS_CENTER_TAKE_CENTER', 'THREE_WAY_FORK_UNDERPASS_CENTER_TAKE_RIGHT'],
-};
-
-function enumOf(type, v) {
-    const names = ENUMS[type];
-    if (typeof v === 'string') return names.indexOf(v) >= 0 ? v : null;
-    if (typeof v === 'number' && v >= 0 && v < names.length && v === Math.floor(v)) return names[v];
+function enumName(list, v) {
+    if (typeof v === 'string') return list.indexOf(v) >= 0 ? v : null;
+    if (typeof v === 'number' && v >= 0 && v < list.length && v === Math.floor(v)) return list[v];
     return null;
-}
-
-function unionOf(e) {
-    if (!isObj(e)) return null;
-    const keys = Object.keys(e).filter((k) => isObj(e[k]));
-    if (keys.length !== 1) return null;
-    return { kind: keys[0], body: e[keys[0]] };
 }
 
 function safeStr(t) {
     return String(t || '').replace(/[\u0000-\u001f\u007f]/g, '').replace(/[\s\u00a0\u2000-\u200b\u202f\u205f\u3000]+/g, ' ').trim();
 }
 
-/**
- * Extract street/route text AND highway exit badge (`DescriptionElement.icon.text` or leading "Exit 14B")
- * from `GuidancePanel.description.elements`.
- */
 function decodeDescription(b, isHighwayExit) {
     const els = b && b.description && Array.isArray(b.description.elements) ? b.description.elements : [];
     let exitBadge = null;
@@ -130,93 +97,44 @@ function decodeDescription(b, isHighwayExit) {
     return { road, exitBadge };
 }
 
-function distOf(b) {
-    const f = b && b.formattedDistance;
-    const unitName = f ? enumOf('DistanceUnit', f.unit) : null;
-    let d = f ? str(f.distance) : null;
-    const u = unitName ? UNITS[unitName] : null;
-    if (d !== null) {
-        d = safeStr(d).replace(/^(\d*)([\u00bd\u00bc\u00be])/, (x, n, fr) => (n || '0') + FRACTIONS[fr]);
-        if (u) d = d.replace(new RegExp('\\s*' + u + '$', 'i'), '').trim();
-    }
-    if (!d || !u || !/\d/.test(d)) return { dist: null, unit: null, uk: false };
-    return { dist: d, unit: u, uk: unitName === 'MILE_UK' || unitName === 'YARD' };
-}
-
-function metres(m) {
-    if (!m || !m.dist || !m.unit) return null;
-    const t = String(m.dist).trim();
-    const v = parseFloat(/^\d{1,3}([, ]\d{3})+$/.test(t) ? t.replace(/[, ]/g, '') : t.replace(',', '.'));
-    return isFinite(v) ? v * UNIT_M[m.unit] : null;
-}
-
-const SKIP = {
-    pointOfInterest: 1, laneGuiding: 1, trafficEvent: 1, trafficFlowItem: 1,
-    routeSegmentItem: 1, placeholderElement: 1, tunnel: 1, border: 1, tollgate: 1,
-    passiveManeuver: 1, speedLimitAssist: 1, speedLimit: 1, speedCamera: 1,
-    speedSectionCamera: 1, dangerousCurve: 1, schoolZone: 1,
-};
-
 function decodeEvent(e) {
     const u = unionOf(e);
-    if (!u || SKIP[u.kind]) return null;
+    if (!u) return null;
     const b = u.body;
-    const d = distOf(b);
-    const dtd = Number(b.distanceToDestination);
-    const branchDir = u.kind === 'branch' ? (enumOf('BranchType', b.branchType) || 'NONE') : null;
-    const geom = (u.kind === 'intersection' || u.kind === 'branch') ? enumOf('ManeuverGeometry', b.detailedGeometry) : null;
-    const isHwyExit = u.kind === 'branch' || /^EXIT_/.test(geom || '');
+
+    if (u.kind === 'passiveManeuver') {
+        const d = distOf(b);
+        if (!d.dist) return null;
+        const dtd = Number(b.distanceToDestination);
+        const desc = decodeDescription(b, false);
+        return {
+            kind: 'turn',
+            dir: 'STRAIGHT_ON',
+            geom: null,
+            exit: null,
+            exitAngle: null,
+            side: null,
+            flag: null,
+            stop: null,
+            passive: true,
+            dist: d.dist,
+            unit: d.unit,
+            uk: d.uk,
+            road: desc.road,
+            exitBadge: desc.exitBadge,
+            unreliable: b.unreliable === true,
+            dtd: isFinite(dtd) && dtd >= 0 ? dtd : null,
+        };
+    }
+
+    const base = baseDecodeEvent(e);
+    if (!base) return null;
+    const isHwyExit = base.kind === 'branch' || /^EXIT_/.test(base.geom || '');
     const desc = decodeDescription(b, isHwyExit);
-    const m = {
-        kind: null, dir: null, geom: null, exit: null, exitAngle: null, side: null,
-        flag: null, stop: null, dist: d.dist, unit: d.unit, uk: d.uk,
-        road: desc.road, exitBadge: desc.exitBadge, unreliable: b.unreliable === true,
-        dtd: isFinite(dtd) && dtd >= 0 ? dtd : null,
-    };
-    switch (u.kind) {
-    case 'intersection':
-        m.kind = 'turn';
-        m.dir = enumOf('TurnDirection', b.direction) || 'NONE';
-        m.geom = geom;
-        break;
-    case 'branch':
-        m.kind = 'branch';
-        m.dir = branchDir;
-        m.geom = geom;
-        break;
-    case 'roundabout': {
-        m.kind = 'roundabout';
-        const n = Number(b.exitNumber);
-        const a = Number(b.exitAngle);
-        m.exit = isFinite(n) && n > 0 && n < 100 ? Math.round(n) : null;
-        m.exitAngle = isFinite(a) && a >= -360 && a <= 720 ? ((a % 360) + 360) % 360 : null;
-        m.side = enumOf('Side', b.driveDirection) === 'LEFT' ? 'left' : 'right';
-        break;
-    }
-    case 'alongMainRoad':
-        m.kind = 'keep';
-        m.dir = enumOf('MainRoadDirection', b.mainRoadDirection) || 'NONE';
-        break;
-    case 'laneChange':
-        m.kind = 'lanechange';
-        m.dir = enumOf('Side', b.changeSide) || 'NONE';
-        break;
-    case 'destinationManeuver':
-        m.kind = 'destination';
-        m.dir = enumOf('DestinationPosition', b.position) || 'CENTER';
-        m.flag = b.isCheckeredFlag !== false;
-        m.stop = isFinite(Number(b.stopOverNumber)) && Number(b.stopOverNumber) > 0 ? Math.round(Number(b.stopOverNumber)) : null;
-        break;
-    case 'vehicleTransportation':
-        m.kind = 'transport';
-        m.dir = enumOf('VehicleTransportationType', b.type) || 'FERRY';
-        break;
-    default:
-        if (!b.formattedDistance) return null;
-        m.kind = 'follow';
-        m.dir = u.kind;
-    }
-    return m;
+    base.passive = false;
+    base.road = desc.road;
+    base.exitBadge = desc.exitBadge;
+    return base;
 }
 
 function decodeEvents(reply) {
@@ -239,95 +157,77 @@ function decodeEvents(reply) {
         out.events.push(m);
         out.uids.push(isFinite(uid) ? uid : null);
     }
+    if (out.events.length >= 2 && out.events[0].passive && !out.events[1].passive) {
+        const d1 = metres(out.events[1]);
+        if (d1 !== null && d1 <= 300) {
+            out.events.shift();
+            out.uids.shift();
+        }
+    }
     return out;
+}
+
+function decodeNextIntersection(v) {
+    if (!isObj(v)) return null;
+    const d = distOf({ formattedDistance: v.distance });
+    const desc = decodeDescription({ description: v.intersection }, false);
+    if (!d.dist && !desc.road) return null;
+    return {
+        kind: 'turn',
+        dir: 'STRAIGHT_ON',
+        geom: null,
+        exit: null,
+        exitAngle: null,
+        side: null,
+        flag: null,
+        stop: null,
+        dist: d.dist,
+        unit: d.unit,
+        uk: d.uk,
+        road: desc.road,
+        exitBadge: desc.exitBadge,
+        unreliable: false,
+        dtd: null,
+    };
 }
 
 function decodeDart(v) {
     return isObj(v) && isObj(v.maneuver) ? decodeEvent(v.maneuver) : null;
 }
 
-function decodeLanes(v) {
-    const row = isObj(v) && Array.isArray(v.rows) ? v.rows[0] : null;
-    if (!isObj(row) || !Array.isArray(row.lanes) || !row.lanes.length) return null;
-    const list = (a) => (Array.isArray(a) ? a : []).map((x) => enumOf('TurnDirection', x)).filter((s) => s && s !== 'NONE');
-    const lanes = row.lanes.slice(0, 16).map((rawLane) => {
-        const l = isObj(rawLane) ? rawLane : {};
-        let follows = list(l.directionsToFollow);
-        const one = enumOf('TurnDirection', l.directionToFollow);
-        if (one && one !== 'NONE' && follows.indexOf(one) < 0) follows = [one].concat(follows);
-        const others = list(l.otherDirections).filter((d) => follows.indexOf(d) < 0);
-        const rawHi = l.isHighlighted !== undefined ? l.isHighlighted : l.highlight;
-        return {
-            follow: follows[0] || 'NONE',
-            follows: follows,
-            others: others,
-            hi: rawHi === true || Boolean(follows.length && rawHi !== false && rawHi !== 0),
-            info: enumOf('AdditionalLaneInfo', l.additionalLaneInfo) || 'NONE',
-        };
-    });
-    const rawRec = row.recommendedCarPositionLaneIndex !== undefined
-        ? row.recommendedCarPositionLaneIndex
-        : row.recommendedLaneIndex;
-    const rec = Number(rawRec);
-    const dtd = Number(row.distanceToDestination);
-    return {
-        lanes: lanes,
-        rec: isFinite(rec) && rec >= 0 && rec < lanes.length ? rec : null,
-        markers: Array.isArray(row.laneMarkers) ? row.laneMarkers.map((x) => enumOf('LaneMarker', x)) : [],
-        dtd: isFinite(dtd) && dtd >= 0 ? dtd : null,
-    };
-}
-
-function straightOn(m) {
-    if (!m) return false;
-    if (m.kind === 'turn') return m.dir === 'STRAIGHT_ON';
-    if (m.kind === 'roundabout' && typeof m.exitAngle === 'number') {
-        return Math.min(m.exitAngle, 360 - m.exitAngle) <= STRAIGHT_DEG;
-    }
-    return false;
-}
-
-function staleThen(uids) {
-    return Boolean(uids && typeof uids[0] === 'number' && typeof uids[1] === 'number' && uids[1] < uids[0]);
-}
-
-function thenOf(a, b) {
-    if (!a || !b || b.kind === 'follow') return null;
-    const same = [a.kind, a.dir, a.geom, a.exit, a.road].join('|') === [b.kind, b.dir, b.geom, b.exit, b.road].join('|');
-    let gap = null;
-    let shown = false;
-    if (a.dtd !== null && b.dtd !== null && a.dtd - b.dtd > 0) {
-        gap = a.dtd - b.dtd;
-        shown = true;
-    } else if (metres(a) !== null && metres(b) !== null && metres(b) >= metres(a)) {
-        gap = metres(b) - metres(a);
-    }
-    if (same && (gap === null || gap <= 0)) return null;
-    if (gap === null) return b.dist === null && !straightOn(a) ? Object.assign({}, b, { gap: null }) : null;
-    return gap <= THEN_M ? Object.assign({}, b, { gap: shown ? gap : null }) : null;
-}
-
-/**
- * Parse /run/cluster-render/status.txt for HUD slot (0x3xx) mappings.
- * HmiMain3D HUD scenes (verified in cluster-render src/slots.cpp):
- *   0x01000200, 0x01000201 -> BMW HUD Mini-Map / Junction View (NAVI_JV / NAVI_HG)
- *   0x01000210, 0x01000211 -> BMW HUD standard arrow/roadbook guidance
- */
 function parseHudStatusText(txt) {
-    const out = { miniMapScene: false, hudSlots: '' };
+    const out = { miniMapScene: false, stockGuidanceScene: false, hudSlots: '' };
     if (!txt || typeof txt !== 'string') return out;
     const lines = txt.split(/\r?\n/);
     const slots = [];
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i].trim();
-        if (line.indexOf('slot 0x3') !== 0) continue;
-        slots.push(line.replace(/^slot\s+/, ''));
-        // Match 0x1000200 or 0x1000201 whenever assigned (status 1, e.g. map 0 parked behind 0x323!) or shown (status 2)
-        if (/^slot\s+0x3[0-9a-f]+\s+(?:status\s+)?[12]\b.*?\b0x0?100020[01]\b/i.test(line)) {
-            out.miniMapScene = true;
+        const hdr = /^slot\s+(0x3[0-9a-f]+)\s+(?:status\s+)?(\d+)\s*:\s*(.*)$/i.exec(line);
+        if (!hdr) continue;
+        const slotHex = hdr[1].toLowerCase();
+        const slotSt = parseInt(hdr[2], 10);
+        const entries = hdr[3].split(',');
+        const shortEnts = [];
+        for (let k = 0; k < entries.length; k++) {
+            const em = /0x([0-9a-f]+)\s+class\s+\d+\s+map\s+(\d+)/i.exec(entries[k]);
+            if (!em) continue;
+            const contentHex = em[1].toLowerCase();
+            const contentId = parseInt(contentHex, 16);
+            const mapSt = parseInt(em[2], 10);
+            const shortContent = contentHex.replace(/^0+/, '') || '0';
+            shortEnts.push(shortContent + '@m' + mapSt);
+            if (contentId === 0x01000200 || contentId === 0x01000201) {
+                out.stockGuidanceScene = true;
+                if (mapSt >= 1 && mapSt <= 3 && (slotSt === 1 || slotSt === 2)) {
+                    out.miniMapScene = true;
+                }
+            } else if (contentId === 0x01000210 || contentId === 0x01000211) {
+                out.stockGuidanceScene = true;
+            }
         }
+        slots.push(slotHex + ' s' + slotSt + ':' + (shortEnts.join(',') || 'empty'));
     }
-    out.hudSlots = slots.join('; ');
+    out.hudSlots = slots.join(' | ');
     return out;
 }
 
@@ -348,10 +248,11 @@ function decodeRenderedContent(rawContent) {
     if (!isObj(vc)) return null;
     const sceneId = typeof vc.ramsesSceneId === 'number' && isFinite(vc.ramsesSceneId) ? vc.ramsesSceneId : 0;
     const rawCt = isObj(vc.type) ? vc.type.contentType : vc.contentType;
-    const ct = enumOf('RenderedContentType', rawCt) || (typeof rawCt === 'string' && rawCt ? rawCt : 'NONE');
+    const ct = enumName(RENDERED_CONTENT_TYPES, rawCt) || (typeof rawCt === 'string' && rawCt ? rawCt : 'NONE');
     const isMapType = ct === 'HIGH_GUIDING' || ct === 'JUNCTION_VIEW' || ct === 'CITY_HIGHWAY_MAP' || ct === 'TUNNEL' ||
         (ct !== 'NONE' && (sceneId === 0x01000200 || sceneId === 0x01000201));
-    return { contentType: ct, ramsesSceneId: sceneId, isMapType };
+    const assoc = isObj(vc.associatedEvent) ? decodeEvent(vc.associatedEvent) : null;
+    return { contentType: ct, ramsesSceneId: sceneId, isMapType, assoc };
 }
 
 function eventQuery() {
@@ -359,9 +260,9 @@ function eventQuery() {
         viewConfigs: [{
             viewport: {
                 startPoint: { anchorPoint: { standardReferencePoint: 'CCP' }, offsets: [] },
-                maxElementCount: 6,
+                maxElementCount: 10,
                 endPoints: [],
-                includedTypes: ['INCLUDE_ACTIVE_MANEUVERS', 'INCLUDE_LANE_GUIDINGS', 'INCLUDE_ALONG_MAIN_ROAD', 'INCLUDE_DESTINATIONS'],
+                includedTypes: ['INCLUDE_ACTIVE_MANEUVERS', 'INCLUDE_ALONG_MAIN_ROAD', 'INCLUDE_DESTINATIONS', 'INCLUDE_PASSIVE_MANEUVER_JCT'],
             },
             options: [],
             minimumUpdateIntervalMs: 1000,
@@ -380,13 +281,20 @@ class NavTracker {
         this.turnAt = -Infinity;
         this.dart = null;
         this.dartAt = -Infinity;
+        this.renderedTurn = null;
+        this.renderedTurnAt = -Infinity;
+        this.nextInt = null;
+        this.nextIntAt = -Infinity;
         this.lanes = null;
         this.lanesAt = -Infinity;
         this.turnKey = '';
         this.lanesSeenForTurn = false;
         this.lanesSwitchedToMiniMap = false;
-        this.viewTargets = Object.create(null); // viewId -> 'HUD' | 'IC' | 'CID' | 'NONE'
-        this.viewStates = Object.create(null);  // viewId -> { contentType, ramsesSceneId, isMapType }
+        this.lanesMiniMapSince = 0;
+        this.routeActiveSince = 0;
+        this.lastValidShowAt = -Infinity;
+        this.viewTargets = Object.create(null);
+        this.viewStates = Object.create(null);
         this.hudViewSeen = false;
         this.hudRenderedMiniMap = false;
         this.hudRenderedReason = '';
@@ -445,13 +353,18 @@ class NavTracker {
         }
     }
 
-    _reset(nowMs) {
+    _reset(nowMs, keepBmwDart) {
         this.turn = null;
-        this.dart = null;
+        if (!keepBmwDart) {
+            this.dart = null;
+            this.renderedTurn = null;
+            this.nextInt = null;
+        }
         this.lanes = null;
         this.turnKey = '';
         this.lanesSeenForTurn = false;
         this.lanesSwitchedToMiniMap = false;
+        this.lanesMiniMapSince = 0;
         this.hudRenderedMiniMap = false;
         this.hudRenderedReason = '';
         const vkeys = Object.keys(this.viewStates);
@@ -500,18 +413,37 @@ class NavTracker {
         if (!viewId) return;
         const vc = isObj(reply) && isObj(reply.viewConfig) ? reply.viewConfig : reply;
         const rawTgt = isObj(vc) ? vc.targetUI : null;
-        const tgt = enumOf('DisplayType', rawTgt);
-        if (tgt) {
+        let tgt = enumName(DISPLAY_TYPES, rawTgt);
+        if ((!tgt || tgt === 'NONE') && isObj(vc) && Array.isArray(vc.options)) {
+            for (let i = 0; i < vc.options.length && (!tgt || tgt === 'NONE'); i++) {
+                const sc = vc.options[i] && vc.options[i].sceneConfig;
+                const ids = sc && Array.isArray(sc.possibleSceneIds) ? sc.possibleSceneIds : [];
+                for (let j = 0; j < ids.length; j++) {
+                    const id = Number(ids[j]);
+                    if (id >= 0x01000200 && id <= 0x010002FF) { tgt = 'HUD'; break; }
+                    if (id >= 0x01000300 && id <= 0x010003FF) { tgt = 'IC'; break; }
+                }
+            }
+        }
+        if (tgt && tgt !== 'NONE') {
             this.viewTargets[String(viewId)] = tgt;
             this._recomputeRenderedHud();
         }
     }
 
-    feedRenderedContent(viewId, rawContent) {
+    feedRenderedContent(viewId, rawContent, nowMs) {
+        const now = typeof nowMs === 'number' ? nowMs : mono();
         const vid = String(viewId || 'default');
         const dec = decodeRenderedContent(rawContent);
         if (!dec) return null;
         this.viewStates[vid] = dec;
+        if (this._isHudView(vid, dec) && dec.assoc) {
+            this.renderedTurn = dec.assoc;
+            this.renderedTurnAt = now;
+            this._noteManeuver(this.renderedTurn, now);
+        } else if (this._isHudView(vid, dec) && dec.contentType === 'NONE') {
+            this.renderedTurn = null;
+        }
         this._recomputeRenderedHud();
         return dec;
     }
@@ -526,7 +458,7 @@ class NavTracker {
             if (v !== false) return;
             if (src === 'carplay') this.route.carplay = false;
             else if (src === 'androidauto') this.route.aa = false;
-            else if (src === 'guidance') { this.route.state = null; this.route.provider = null; this.dart = null; }
+            else if (src === 'guidance') { this.route.state = null; this.route.provider = null; this.dart = null; this.nextInt = null; }
         } else if (src === 'guidance' && name === 'guidanceState') {
             this.route.state = v;
         } else if (src === 'guidance' && name === 'guidingProvider') {
@@ -537,9 +469,8 @@ class NavTracker {
         } else if (name === 'conclusiveDart') {
             this.dart = decodeDart(v);
             this.dartAt = now;
-            this._noteManeuver(this.dart, now);
+            if (this.dart) this._noteManeuver(this.dart, now);
         } else if (name === 'currentLaneGuiding') {
-            // Ignore empty phone lanes when BMW native nav is guiding (and vice versa)
             const g = this.guideSource();
             if ((src === 'phone' && g === 'BMW') || (src === 'guidance' && (g === 'CAR_PLAY' || g === 'ANDROID_AUTO') && this.lanes && !decodeLanes(v))) {
                 return;
@@ -550,17 +481,15 @@ class NavTracker {
                 this.lanesAt = now;
                 if (this.turnKey !== '') this.lanesSeenForTurn = true;
                 this.lanesSwitchedToMiniMap = false;
+                this.lanesMiniMapSince = 0;
             } else {
-                // Non-distance mini-map transition detection:
-                // On BMW built-in Navigation, when lane guidance was active for the current maneuver
-                // and clears to empty while the exact same maneuver & active route continue,
-                // BMW has swapped the lane guidance row out for its zoomed intersection mini-map!
                 if (this.lanes && this.lanesSeenForTurn && this.turnKey !== '' && g === 'BMW' && this.routing()) {
                     const cur = this.currentManeuver(now);
                     const sameSegment = !(typeof this.lanes.dtd === 'number' && cur && typeof cur.dtd === 'number') ||
                         Math.abs(this.lanes.dtd - cur.dtd) <= 350;
                     if (cur && this._keyOf(cur) === this.turnKey && !straightOn(cur) && sameSegment) {
                         this.lanesSwitchedToMiniMap = true;
+                        this.lanesMiniMapSince = now;
                     }
                 }
                 this.lanes = null;
@@ -568,6 +497,9 @@ class NavTracker {
             }
         } else if (name === 'nextIntersection') {
             this.rawNextIntersection = v;
+            const ni = decodeNextIntersection(v);
+            this.nextInt = ni;
+            this.nextIntAt = now;
         }
 
         if (this.routeSure()) this.route.sureSeen = true;
@@ -579,8 +511,10 @@ class NavTracker {
         }
 
         const is = this.routing();
+        if (is && !was) this.routeActiveSince = now;
+        const keepBmwDart = Boolean(is && this.guideSource() === 'BMW' && (this.route.state === 'ACTIVE' || this.route.state === 2));
         if ((was && !is) || (wasSure && !this.routeSure()) || this.guideSource() !== oldGuide) {
-            this._reset(now);
+            this._reset(now, keepBmwDart);
         }
     }
 
@@ -605,8 +539,14 @@ class NavTracker {
 
     currentManeuver(nowMs) {
         const now = typeof nowMs === 'number' ? nowMs : mono();
-        const dartOk = this.dart && (now - this.dartAt <= STALE_MS || this.route.state === 'ACTIVE' || this.route.state === 2);
-        const m = (this.turn && now - this.turnAt <= STALE_MS) ? this.turn : (dartOk ? this.dart : null);
+        const bmwActive = this.route.state === 'ACTIVE' || this.route.state === 2;
+        const dartOk = this.dart && (now - this.dartAt <= STALE_MS || bmwActive);
+        const renOk = this.renderedTurn && (now - this.renderedTurnAt <= STALE_MS || bmwActive);
+        const niOk = this.nextInt && bmwActive && (now - this.nextIntAt <= 30000);
+        const m = (this.turn && now - this.turnAt <= STALE_MS) ? this.turn
+            : (dartOk ? this.dart
+                : (renOk ? this.renderedTurn
+                    : (niOk ? this.nextInt : null)));
         if (!m) return null;
         return Object.assign({}, m, { lanes: this.lanes });
     }
@@ -638,6 +578,11 @@ class NavTracker {
 
         const routeActive = this.routing() && !this.phonesMismatch();
         const show = routeActive ? this.currentManeuver(mNow) : null;
+        if (show) this.lastValidShowAt = mNow;
+        if (this.lanesSwitchedToMiniMap && this.lanesMiniMapSince > 0 && mNow - this.lanesMiniMapSince > LANES_MINIMAP_MAX_MS) {
+            this.lanesSwitchedToMiniMap = false;
+            this.lanesMiniMapSince = 0;
+        }
         const hasLanes = Boolean(show && show.lanes && show.lanes.lanes && show.lanes.lanes.length > 0);
         const guide = routeActive ? this.guideSource() : 'NONE';
 
@@ -654,6 +599,12 @@ class NavTracker {
             miniMapReason = 'lanes_to_minimap';
         }
 
+        const noTurnFallback = Boolean(
+            !this.wocHudShowing && routeActive && !show && !miniMapActive &&
+            guide === 'BMW' && this.routeActiveSince > 0 &&
+            (mNow - Math.max(this.routeActiveSince, this.lastValidShowAt) >= NO_TURN_FALLBACK_MS)
+        );
+
         let summary = 'No active route';
         if (this.wocHudShowing) {
             summary = 'Waze HUD map (overlaying metrics)';
@@ -663,24 +614,26 @@ class NavTracker {
                     (show.dist ? ' ' + show.dist + (show.unit || '') : '') +
                     (hasLanes ? ' [' + show.lanes.lanes.length + ' lanes]' : '');
             } else {
-                summary = guide + ': route active (waiting for turn)';
+                summary = guide + ': route active (' + (this.lastErr ? ('err: ' + this.lastErr) : 'waiting for turn') + ')';
             }
             if (miniMapActive) summary += ' -> MINI-MAP (' + miniMapReason + ')';
+            else if (noTurnFallback) summary += ' -> YIELD (bmw_nav_fallback)';
         }
 
-            return {
-                routeActive,
-                guide,
-                show,
-                hasLanes,
-                miniMapActive,
-                miniMapReason,
-                hudViewSeen: this.hudViewSeen,
-                wocHudShowing: this.wocHudShowing,
-                hudSlots: this.hudSlots,
-                rawNextIntersection: this.rawNextIntersection,
-                summary,
-            };
+        return {
+            routeActive,
+            guide,
+            show,
+            hasLanes,
+            miniMapActive,
+            miniMapReason,
+            noTurnFallback,
+            hudViewSeen: this.hudViewSeen,
+            wocHudShowing: this.wocHudShowing,
+            hudSlots: this.hudSlots,
+            rawNextIntersection: this.rawNextIntersection,
+            summary,
+        };
     }
 
     start(ctx, log, wantedFn) {
@@ -720,8 +673,9 @@ class NavTracker {
                 const f = S.fields[j];
                 handlers[f] = (v) => this.feedField(S.name, f, v, mono());
             }
+            const watchOpts = S.name === 'guidance' ? { pollMs: 3000 } : undefined;
             try {
-                const p = ctx.signals.watch(S.iface, S.inst, handlers, log);
+                const p = ctx.signals.watch(S.iface, S.inst, handlers, log, watchOpts);
                 if (p && typeof p.then === 'function') {
                     p.then((res) => {
                         if (!res) return;
@@ -737,7 +691,6 @@ class NavTracker {
             } catch (e) { /* optional signal */ }
         }
 
-        // First-party BMW HUD Mini-Map / Junction View state via GuidanceRenderedContent (service 64284)
         let rcProxy = null;
         let rcPolling = false;
         const knownViewIds = Object.create(null);
@@ -745,7 +698,7 @@ class NavTracker {
         const pollHudViewContent = (id) => {
             if (!id || !rcProxy || !ctx.signals.call) return Promise.resolve();
             return ctx.signals.call(rcProxy, 'getViewContent', { viewId: id }, 900)
-                .then((cntReply) => { this.feedRenderedContent(id, cntReply); })
+                .then((cntReply) => { this.feedRenderedContent(id, cntReply, mono()); })
                 .catch(() => {});
         };
         const inspectViewId = (vid) => {
@@ -786,7 +739,6 @@ class NavTracker {
                 this._subs.push(res);
                 if (res.proxy) {
                     rcProxy = res.proxy;
-                    // Flush any registeredViews that arrived synchronously before rcWatch resolved!
                     Object.keys(knownViewIds).forEach((id) => inspectViewId(id));
                     if (typeof ctx.signals.on === 'function') {
                         ctx.signals.on(rcProxy, 'viewContentChanged', (arg0, arg1) => {
@@ -800,12 +752,12 @@ class NavTracker {
                                 payload = arg0.viewContent !== undefined ? arg0.viewContent : arg0;
                             }
                             if (vid) inspectViewId(vid);
-                            this.feedRenderedContent(vid || 'hud', payload);
+                            this.feedRenderedContent(vid || 'hud', payload, mono());
                         }, log);
                     }
                 }
             }).catch(() => {});
-        } catch (e) { /* optional on non-nav units */ }
+        } catch (e) { /* optional */ }
 
         let elProxy = null;
         let proxyFailedAt = -Infinity;
@@ -817,7 +769,6 @@ class NavTracker {
         const ask = () => {
             const now = mono();
             if (this._stopped || !this.routing() || !want()) return;
-            // Also actively poll HUD RenderedContent at 1 Hz while routing so missed broadcasts never leave mini-map stuck!
             if (rcProxy && !rcPolling && ctx.signals.call) {
                 const vIds = Object.keys(knownViewIds);
                 const hudIds = vIds.filter((id) => !queriedConfigs[id] || this._isHudView(id, this.viewStates[id]));
@@ -839,7 +790,7 @@ class NavTracker {
                 if (elProxy) return elProxy;
                 return ctx.signals.proxy('de.bmw.infotainment.navigation.guiding.GuidanceEventList', 'Main_Instance')
                     .then((px) => { elProxy = px; return px; }, (err) => { proxyFailedAt = mono(); throw err; });
-            }).then((px) => ctx.signals.call(px, 'queryContent', eventQuery(), 900))
+            }).then((px) => ctx.signals.call(px, 'queryContent', eventQuery(), QUERY_TIMEOUT_MS))
                 .then((reply) => {
                     callFails = 0;
                     this.feedEvents(reply, mono(), askedAt);
@@ -884,6 +835,7 @@ module.exports = {
     decodeEvents,
     decodeLanes,
     decodeDart,
+    decodeNextIntersection,
     decodeRenderedContent,
     parseHudStatusText,
     parseWazeHudShowing,

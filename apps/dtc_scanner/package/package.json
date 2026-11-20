@@ -1,6 +1,6 @@
 {
   "name": "dtc_scanner",
-  "version": "2.9.9",
+  "version": "2.9.10",
   "description": "Read and clear fault memory of every control unit, plus active Check Control messages",
   "main": "javascript/localized-entry.js",
   "private": false,

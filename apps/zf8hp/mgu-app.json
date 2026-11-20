@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "id": "zf8hp",
-  "version": "1.5.8",
+  "version": "1.5.9",
   "tree": "package",
   "modules": [
     "src/sdk.js"

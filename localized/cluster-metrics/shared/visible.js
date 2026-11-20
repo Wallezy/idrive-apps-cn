@@ -1,7 +1,7 @@
 'use strict';
 /**
- * visible.js - hardware-calibrated 1920x720 KOMBI4 and 800x480 HUD keep-out geometry
- * verified directly against real G30 530e Live Cockpit Professional photographs.
+ * visible.js - G30 530e calibrated 1920x720 KOMBI4 and 800x480 HUD keep-out geometry.
+ * Measurements calibrated from local car photographs and test patterns.
  *
  * Strict Node 8.16.2 (ES2017): no optional chaining, no ??, no dependencies.
  */
@@ -12,17 +12,16 @@ const HOOD = [
     [1920, 240],
 ];
 
-// BMW solid overlays, telltales, gauges, and content keep-out rectangles: [x0, y0, x1, y1]
 const LANE_CENTERING = [108, 120, 190, 220];
 const BRAKE_ABS_DSC = [10, 220, 195, 405];
 const AUTO_HOLD_PARK = [1748, 144, 1916, 265];
 const EDRIVE_HOLE = AUTO_HOLD_PARK;
-const STEERING_FAULT = [1765, 265, 1905, 365];
-const MIDDLE_RIGHT_ICONS = [1680, 365, 1920, 445];
+const STEERING_FAULT = [1810, 260, 1910, 340];
+const MIDDLE_RIGHT_ICONS = [1805, 340, 1920, 425];
 
 const SPEED_NEEDLE_FAN = [180, 120, 386, 636];
 const MAIN_SPEED_DIGITS = [420, 340, 620, 428];
-const TRAFFIC_LIGHT_SIGN = [495, 514, 580, 672];
+const TRAFFIC_LIGHT_SIGN = [495, 536, 580, 672];
 
 const CENTER_MAP = [660, 120, 1200, 585];
 const MEDIA_WIDGET = [1180, 170, 1685, 582];
@@ -36,81 +35,91 @@ const FUEL_GAUGE_LOWER_LEFT = [6, 418, 210, 642];
 const FUEL_RANGE_CLOCK = [126, 650, 480, 716];
 const BELT = [587, 663, 626, 700];
 const REAR_BELTS_AIRBAG = [505, 648, 760, 716];
-// Real-car KOMBI4 PRNDL window (x: 1380..1460, y: 656..720): BMW draws an opaque mask here
-// AND triggers BLACK_BOX (x: 1406..1597, y: 342..419) if any layer overlaps 1380..1460!
-const GEAR_WIN = [1380, 656, 1460, 720];
-const DRIVE_MODE_STOCK_D = [1230, 652, 1460, 714];
+// Single-letter PRND selector box on G30 KOMBI4 ('D' occupies x=1400..1424, y=656..708).
+// Note: in Sport/Manual ('S1'..'S8' / 'M1'..'M8') BMW widens to x~1456, and Cluster Metrics hides gear_d completely.
+const GEAR_WIN = [1380, 656, 1426, 720];
+const DRIVE_MODE_STOCK_D = [1230, 652, 1426, 714];
 const STOCK_D_INDICATOR = GEAR_WIN;
 const AMBIENT_TEMP = [1540, 652, 1668, 712];
-const SOC_GAUGE_LOWER_RIGHT = [1695, 405, 1916, 642];
+const SOC_GAUGE_LOWER_RIGHT = [1782, 415, 1916, 642];
 const EV_RANGE = [1680, 650, 1814, 714];
 
-// HUD visible windshield aperture + stock BMW areas (including Assisted Driving / ACC set-speed & car y=202..308)
 const HUD_WINDOW = { x: 120, y: 100, w: 560, h: 280 };
 const HUD_ACC_ASSIST = [120, 202, 395, 308];
 const HUD_BMW = [120, 202, 395, 380];
 const HUD_STOCK_SPEED = [135, 308, 395, 378];
 const HUD_STOCK_NAV = [405, 115, 680, 378];
 
+const PANEL_KEEPOUTS = [
+    ['BMW BLACK_BOX', BLACK_BOX],
+    ['BMW GEAR_WIN (triggers BLACK_BOX & clips gear)', GEAR_WIN],
+    ['BMW BELT', BELT],
+    ['BMW REAR_BELTS_AIRBAG', REAR_BELTS_AIRBAG],
+    ['BMW LANE_CENTERING', LANE_CENTERING],
+    ['BMW BRAKE_ABS_DSC', BRAKE_ABS_DSC],
+    ['BMW AUTO_HOLD_PARK', AUTO_HOLD_PARK],
+    ['BMW STEERING_FAULT', STEERING_FAULT],
+    ['BMW MIDDLE_RIGHT_ICONS', MIDDLE_RIGHT_ICONS],
+    ['BMW SPEED_NEEDLE_FAN', SPEED_NEEDLE_FAN],
+    ['BMW TRAFFIC_LIGHT_SIGN', TRAFFIC_LIGHT_SIGN],
+    ['BMW MEDIA_WIDGET', MEDIA_WIDGET],
+    ['BMW MASTER_WARN_TRIANGLE', MASTER_WARN_TRIANGLE],
+];
+
 function hoodY(x) {
-    if (x <= HOOD[0][0]) return HOOD[0][1];
-    const last = HOOD[HOOD.length - 1];
-    if (x >= last[0]) return last[1];
-    for (let i = 1; i < HOOD.length; i++) {
-        const a = HOOD[i - 1], b = HOOD[i];
-        if (x <= b[0]) return a[1] + (b[1] - a[1]) * (x - a[0]) / (b[0] - a[0]);
-    }
-    return last[1];
-}
-
-function overlaps(w, box) {
-    return w.x < box[2] && w.x + w.w > box[0] && w.y < box[3] && w.y + w.h > box[1];
-}
-
-function check(widgets, target) {
-    const out = [];
-    if (!Array.isArray(widgets)) return out;
-    widgets.forEach((w) => {
-        if (!w || typeof w.x !== 'number' || typeof w.y !== 'number' || typeof w.w !== 'number' || typeof w.h !== 'number') return;
-        const id = String(w.id);
-        if (target === 'panel') {
-            const under = [];
-            const tryX = (x, what) => {
-                const d = Math.ceil(hoodY(x) - w.y);
-                if (d > 0) under.push({ d, what });
-            };
-            tryX(w.x, 'top-left corner');
-            tryX(w.x + w.w, 'top-right corner');
-            const steps = 4;
-            for (let i = 1; i < steps; i++) tryX(w.x + w.w * i / steps, 'top edge at x ' + Math.round(w.x + w.w * i / steps));
-            if (under.length) {
-                const worst = under.reduce((a, b) => (b.d > a.d ? b : a));
-                out.push(id + ': ' + worst.what + ' ' + worst.d + ' px under the hood');
-            }
-            if (overlaps(w, BLACK_BOX)) out.push(id + ': overlaps BMW BLACK_BOX');
-            if (overlaps(w, GEAR_WIN)) out.push(id + ': overlaps BMW GEAR_WIN (triggers BLACK_BOX & clips gear)');
-            if (overlaps(w, BELT)) out.push(id + ': overlaps BMW BELT');
-            if (overlaps(w, REAR_BELTS_AIRBAG)) out.push(id + ': overlaps BMW REAR_BELTS_AIRBAG');
-            if (overlaps(w, LANE_CENTERING)) out.push(id + ': overlaps BMW LANE_CENTERING');
-            if (overlaps(w, BRAKE_ABS_DSC)) out.push(id + ': overlaps BMW BRAKE_ABS_DSC');
-            if (overlaps(w, AUTO_HOLD_PARK)) out.push(id + ': overlaps BMW AUTO_HOLD_PARK');
-            if (overlaps(w, STEERING_FAULT)) out.push(id + ': overlaps BMW STEERING_FAULT');
-            if (overlaps(w, MIDDLE_RIGHT_ICONS)) out.push(id + ': overlaps BMW MIDDLE_RIGHT_ICONS');
-            if (overlaps(w, SPEED_NEEDLE_FAN)) out.push(id + ': overlaps BMW SPEED_NEEDLE_FAN');
-            if (overlaps(w, TRAFFIC_LIGHT_SIGN)) out.push(id + ': overlaps BMW TRAFFIC_LIGHT_SIGN');
-            if (overlaps(w, MEDIA_WIDGET)) out.push(id + ': overlaps BMW MEDIA_WIDGET');
-            if (overlaps(w, MASTER_WARN_TRIANGLE)) out.push(id + ': overlaps BMW MASTER_WARN_TRIANGLE');
-        } else if (target === 'hud') {
-            const win = HUD_WINDOW;
-            const d = Math.max(
-                win.x - w.x, win.y - w.y,
-                (w.x + w.w) - (win.x + win.w), (w.y + w.h) - (win.y + win.h));
-            if (d > 0) out.push(id + ': ' + Math.ceil(d) + ' px outside HUD_WINDOW');
-            if (overlaps(w, HUD_BMW)) out.push(id + ': overlaps BMW HUD_BMW / ACC_ASSIST');
-            if (overlaps(w, HUD_STOCK_NAV)) out.push(id + ': overlaps BMW HUD_STOCK_NAV');
+    for (let i = 0; i < HOOD.length - 1; i++) {
+        const p0 = HOOD[i], p1 = HOOD[i + 1];
+        if (x <= p0[0]) return p0[1];
+        if (x <= p1[0]) {
+            const frac = (x - p0[0]) / (p1[0] - p0[0]);
+            return p0[1] + (p1[1] - p0[1]) * frac;
         }
-    });
-    return out;
+    }
+    return HOOD[HOOD.length - 1][1];
+}
+
+function overlaps(rect, zone) {
+    return rect.x < zone[2] && rect.x + rect.w > zone[0] && rect.y < zone[3] && rect.y + rect.h > zone[1];
+}
+
+function checkPanelRect(rect, id, issues) {
+    let maxClip = 0;
+    let clipMsg = '';
+    for (let s = 0; s <= 4; s++) {
+        const sx = rect.x + (rect.w * s) / 4;
+        const depth = Math.ceil(hoodY(sx) - rect.y);
+        if (depth > maxClip) {
+            maxClip = depth;
+            clipMsg = s === 0 ? 'left corner' : (s === 4 ? 'right corner' : 'x=' + Math.round(sx));
+        }
+    }
+    if (maxClip > 0) issues.push(id + ': hood overlap ' + maxClip + ' px at ' + clipMsg);
+    for (let i = 0; i < PANEL_KEEPOUTS.length; i++) {
+        if (overlaps(rect, PANEL_KEEPOUTS[i][1])) {
+            issues.push(id + ': overlaps ' + PANEL_KEEPOUTS[i][0]);
+        }
+    }
+}
+
+function checkHudRect(rect, id, issues) {
+    const hw = HUD_WINDOW;
+    const spill = Math.max(hw.x - rect.x, hw.y - rect.y, (rect.x + rect.w) - (hw.x + hw.w), (rect.y + rect.h) - (hw.y + hw.h));
+    if (spill > 0) issues.push(id + ': ' + Math.ceil(spill) + ' px outside HUD_WINDOW');
+    if (overlaps(rect, HUD_BMW)) issues.push(id + ': overlaps BMW HUD_BMW / ACC_ASSIST');
+    if (overlaps(rect, HUD_STOCK_NAV)) issues.push(id + ': overlaps BMW HUD_STOCK_NAV');
+}
+
+function check(layers, target) {
+    const issues = [];
+    if (!Array.isArray(layers)) return issues;
+    for (let i = 0; i < layers.length; i++) {
+        const l = layers[i];
+        if (!l || typeof l.x !== 'number' || typeof l.y !== 'number' || typeof l.w !== 'number' || typeof l.h !== 'number') continue;
+        const id = String(l.id);
+        if (target === 'panel') checkPanelRect(l, id, issues);
+        else if (target === 'hud') checkHudRect(l, id, issues);
+    }
+    return issues;
 }
 
 module.exports = {

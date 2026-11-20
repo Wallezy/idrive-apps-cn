@@ -1,5 +1,13 @@
 [
   {
+    "version": "0.4.1",
+    "upstreamVersion": "0.4.0",
+    "cnRevision": 1,
+    "changes": [
+      "校准前检查当前音频故障，保留停车确认与倒计时。"
+    ]
+  },
+  {
     "version": "0.1.5",
     "upstreamVersion": "0.1.1",
     "cnRevision": 2,

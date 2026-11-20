@@ -1,5 +1,13 @@
 [
   {
+    "version": "1.5.9",
+    "upstreamVersion": "1.5.8",
+    "cnRevision": 1,
+    "changes": [
+      "改进变速箱识别与诊断数据兼容。"
+    ]
+  },
+  {
     "version": "1.5.8",
     "upstreamVersion": "1.5.6",
     "cnRevision": 2,

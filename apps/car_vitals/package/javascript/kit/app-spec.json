@@ -1,7 +1,7 @@
 {
  "id": "car_vitals",
  "title": "M \u8f66\u8f86\u4eea\u8868",
- "version": "2.27.5",
+ "version": "2.27.10",
  "screens": [
   {
    "name": "MAIN",
@@ -351,6 +351,12 @@
   {
    "key": "flipLong",
    "label": "G \u503c\u5706\u5708\uff1a\u4ea4\u6362\u52a0\u901f\u548c\u5236\u52a8\uff08\u5236\u52a8\u5728\u4e0a\uff09",
+   "type": "bool",
+   "default": false
+  },
+  {
+   "key": "programSteady",
+   "label": "M-Track \u7b49\u6a21\u5757\uff1aS\uff0fM \u95ea\u70c1\u65f6\u663e\u793a S",
    "type": "bool",
    "default": false
   },

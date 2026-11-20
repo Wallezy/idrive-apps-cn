@@ -80,8 +80,27 @@ async function readStatus(diag) {
     return { code, text: STATUS[code] || '未知状态 ' + code };
 }
 
+async function checkFaults(diag) {
+    // RAM01 FS_LESEN uses ReadDTCByStatusMask (0x0C). The local
+    // ABL checks speaker, microphone and booster fault ranges.
+    const reply = await request(diag, 0x19, [0x02, 0x0D], [0x59, 0x02]);
+    if (reply.length < 3 || (reply.length - 3) % 4 || !(reply[2] & 1)) {
+        throw new Error('无法确认 RAM 故障的当前状态');
+    }
+    for (let i = 3; i < reply.length; i += 4) {
+        const code = (reply[i] << 16) | (reply[i + 1] << 8) | reply[i + 2];
+        const related = (code >= 0x031D01 && code <= 0x031DB7)
+            || (code >= 0x031E80 && code <= 0x031E8E)
+            || (code >= 0xB7F4B0 && code <= 0xB7F4BB);
+        if (related && (reply[i + 3] & 1)) {
+            throw new Error('请先排除 RAM 音频故障 ' + code.toString(16).toUpperCase().padStart(6, '0'));
+        }
+    }
+}
+
 async function calibrate(diag, assertParked, show, delay) {
     await identify(diag);
+    await checkFaults(diag);
     try {
         const previous = await readStatus(diag);
         if (previous.code === 1) throw new Error('RAM 已在校准，请读取结果');
@@ -107,4 +126,4 @@ async function calibrate(diag, assertParked, show, delay) {
     }
 }
 
-module.exports = { identify, readStatus, calibrate };
+module.exports = { identify, readStatus, checkFaults, calibrate };
