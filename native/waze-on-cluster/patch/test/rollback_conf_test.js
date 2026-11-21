@@ -52,7 +52,8 @@ if (!list.length) {
     try { git(['fetch', '--no-tags'].concat(shallow ? ['--depth=1'] : [], ['origin', '+refs/tags/waze-on-cluster@*:refs/tags/waze-on-cluster@*'])); } catch (e) {}
     list = tags() || [];
 }
-var RELEASES = list.map(function (t) { return t.slice('waze-on-cluster@'.length); }).filter(function (v) { return /^\d+\.\d+\.\d+$/.test(v); }).sort(cmp);
+var RELEASES = list.map(function (t) { return t.slice('waze-on-cluster@'.length); }).filter(function (v) { return /^\d+\.\d+\.\d+$/.test(v); })
+    .filter(function (v) { return !process.env.WOC_RELEASE_MAX || cmp(v, process.env.WOC_RELEASE_MAX) <= 0; }).sort(cmp);
 ok('every release from 0.5.0 to 0.10.7 is at hand', RELEASES.indexOf('0.5.0') >= 0 && RELEASES.indexOf('0.10.7') >= 0, RELEASES.join(' '));
 if (!RELEASES.length) process.exit(1);
 
