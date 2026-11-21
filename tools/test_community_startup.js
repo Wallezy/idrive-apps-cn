@@ -49,7 +49,7 @@ try {
             if (out && canvas.png) {
                 fs.mkdirSync(out, { recursive: true });
                 fs.writeFileSync(path.join(out, id + '-' + name.replace(/[^a-zA-Z0-9_-]/g, '') +
-                    (id === 'dpf_monitor' ? '-' + pageIndex : '') + '.png'), canvas.png());
+                    (['dpf_monitor', 'rear_comfort'].includes(id) ? '-' + pageIndex : '') + '.png'), canvas.png());
             }
         },
     });
@@ -57,6 +57,8 @@ try {
     hu.ui.isVisible = () => true;
     hu.ui.onFocus = () => {};
     hu.ctx.onExit = () => {};
+    hu.ctx.onTouch = fn => { hu.touch = fn; };
+    hu.ctx.app = new EventEmitter();
     const canvas = hu.ctx.canvas;
     hu.ctx.canvas = (...args) => {
         const cv = canvas(...args), text = cv.text;
@@ -77,6 +79,12 @@ try {
                 hu.settings.values.demo = 'on';
                 await hu.loops.MAIN();
                 for (pageIndex = 1; pageIndex < 6; pageIndex++) {
+                    hu.handlers.BTN_PAGE();
+                    await hu.loops.MAIN();
+                }
+            }
+            if (id === 'rear_comfort') {
+                for (pageIndex = 1; pageIndex < 7; pageIndex++) {
                     hu.handlers.BTN_PAGE();
                     await hu.loops.MAIN();
                 }

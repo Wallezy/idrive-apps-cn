@@ -8,9 +8,9 @@
     "size": 5490736,
     "sha256": "bf1bd20c03b3c78ba055528f81fb35b8a390b74cdb50d537a16fe82a2ed8719f"
   },
-  "upstreamVersion": "0.4.4",
-  "releaseVersion": "0.4.6",
-  "cnRevision": 2,
+  "upstreamVersion": "0.5.6",
+  "releaseVersion": "0.5.7",
+  "cnRevision": 1,
   "source": "https://github.com/alexp50/bmw-apps/pull/3",
   "license": "MIT",
   "vehicleTested": false,
@@ -18,6 +18,6 @@
     "repository": "https://github.com/alexp50/bmw-apps",
     "commit": "4fb5a5dba1ec7c6a57545ae935a14cb91a194d19",
     "version": "0.5.6",
-    "scope": "Selected blower/status fixes; seat features retained at imported baseline"
+    "scope": "Rear climate and seat features with cancellation, sibling-failure stop and release guards"
   }
 }

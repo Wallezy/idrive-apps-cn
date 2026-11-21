@@ -143,8 +143,8 @@ jobs:
     runs-on: ubuntu-24.04
     env:
       WOC_RELEASE_REMOTE: https://github.com/robertnisipeanu/idrive-apps.git
-      # The reviewed upstream baseline uses the on-disk patch format.
-      WOC_RELEASE_MAX: 0.10.12
+      # The reviewed history includes the memory-patch migration.
+      WOC_RELEASE_MAX: 0.11.0
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -170,6 +170,7 @@ jobs:
           persist-credentials: false
       - uses: ./.github/actions/build-image
       - run: make -C native/waze-on-cluster test-x86
+      - run: make -C native/waze-on-cluster test-preload
 
   # release.js check across two runners: two clean builds of each changed
   # component, compared byte for byte by the release job

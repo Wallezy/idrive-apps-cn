@@ -66,6 +66,7 @@ jobs:
         run: |
           node tools/test_dpf_projection.js
           node tools/test_rear_climate.js
+          node tools/test_rear_seats.js
           node tools/test_community.js
       - name: System monitor sampling, lifecycle and Chinese layouts
         run: |

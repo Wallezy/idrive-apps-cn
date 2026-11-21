@@ -28,11 +28,15 @@ class RearControl {
         this.signals = signals; this.log = log; this.changed = changed || (() => {});
         this.p = {}; this.subs = []; this.busy = false; this.seatAlive = 0;
         this.haveACFond2 = false;
+        this.seatCancelToken = 0; this.activeSeatRequests = new Set();
+        this.seatVisible = true; this.activeSeatButtons = new Map();
         this.state = {
-            climate: { left: null, right: null, blower: null, auto: null, on: null, lock: null },
+            climate: { left: null, right: null, blower: null, auto: null, on: null, lock: null, sync: null },
             left: { heat: 0, vent: 0, massage: 0, program: 1 },
             right: { heat: 0, vent: 0, massage: 0, program: 1 },
             memory: { side: null, status: 'Waiting for BMW seat memory', requestor: null },
+            seatMotion: { active: false, label: 'Ready', step: '' },
+            seatModes: { lounge: null, visibility: null },
             shades: { left: null, right: null, rear: null },
             screens: { left: null, right: null, focus: 'NO_RSE_SELECTION', display: null,
                 brightness: null, volume: null, ready: null, remote: null, apps: [] },
@@ -71,18 +75,13 @@ class RearControl {
                 this.state.climate.blower = blowerStage(tier3 ? v.statusManualBlowerLevel3RowOfSeats : v.statusManualBlowerLevel2RowOfSeats);
                 this.touch();
             },
+            statusACFront: (v) => {
+                this.state.climate.sync = String(v.statusSync || '') === 'SYNC_AN'; this.touch();
+            },
             statusSeatHeatingDRR: (v) => { this.state.left.heat = stage(v.statusSeatHeaterDRR); this.touch(); },
             statusSeatHeatingPSR: (v) => { this.state.right.heat = stage(v.statusSeatHeaterPSR); this.touch(); },
             statusSeatClimateDRR: (v) => { this.state.left.vent = stage(v.statusSeatClimateDRR); this.touch(); },
             statusSeatClimatePSR: (v) => { this.state.right.vent = stage(v.statusSeatClimatePSR); this.touch(); }
-        });
-        await this.watch('seatMemory', 'de.bmw.infotainment.misc.SeatFunction', '1', {
-            statusRequestMMIDisplay: (v) => {
-                this.state.memory.side = v && v.iDSenderInquiryMMIDisplay;
-                this.state.memory.status = v && v.statusSelectionPopUp || 'KEINE_ANFORDERUNG';
-                this.state.memory.requestor = v && v.statusDirectionOperationRequest;
-                this.touch();
-            }
         });
         await this.watch('comfort', 'de.bmw.infotainment.misc.ComfortFunctionIuK', '1', {
             statusSeatMassageRL: (v) => {
@@ -204,6 +203,17 @@ class RearControl {
         return this.operation('Rear climate ' + (on ? 'on' : 'off'),
             () => this.signals.set(this.require('climate'), 'acFond', x));
     }
+    async setClimateSync(enabled) {
+        const x = {
+            operationScentSelectionSmell: 'SIGNAL_UNGUELTIG',
+            controlScentIntensity: 'SIGNAL_UNBEFUELLT',
+            operationAUCFront: 'SIGNAL_UNBEFUELLT',
+            operationScent: 'SIGNAL_UNBEFUELLT',
+            operationSync: enabled ? 'SYNCH_AN' : 'SYNCH_AUS'
+        };
+        return this.operation('Front-to-rear climate sync ' + (enabled ? 'on' : 'off'),
+            () => this.signals.set(this.require('climate'), 'acSpecialFunction', x));
+    }
     seatClimateValue(side, kind, level) {
         const x = {
             operationStratificationSeatHeaterDR: 8, operationStratificationSeatHeaterPS: 8,
@@ -243,52 +253,218 @@ class RearControl {
             await pause(300); await this.signals.set(p, field, { [member]: 'KEINE_AKTION' });
         });
     }
-    async moveSeat(side, action) {
-        return this.operation('Rear ' + side + ' seat', async () => {
-            const p = this.require('seat');
-            const r = await this.signals.call(p, 'startSeatOperation', {
-                seatPosition: side === 'left' ? 'REAR_LEFT' : 'REAR_RIGHT', seatAction: action
-            });
-            const id = r && r.requestorID;
-            if (id === undefined || id === null) throw new Error('Seat controller did not grant movement');
-            try { await pause(350); await this.signals.call(p, 'aliveSeatOperation', { requestorID: id }); }
-            finally { await this.signals.call(p, 'stopSeatOperation', { requestorID: id }).catch(() => {}); }
+    seatPosition(side) { return side === 'left' ? 'REAR_LEFT' : 'REAR_RIGHT'; }
+    checkSeatToken(token) {
+        if (!this.seatVisible || token !== this.seatCancelToken) throw new Error('Seat movement stopped');
+    }
+    async parallelSeats(tasks, token) {
+        let failure = null;
+        await Promise.all(tasks.map(async (task) => {
+            try { this.checkSeatToken(token); await task(); }
+            catch (e) {
+                if (!failure) {
+                    failure = e;
+                    await this.stopSeatMovement();
+                }
+            }
+        }));
+        if (failure) throw failure;
+        this.checkSeatToken(token);
+    }
+    async moveSeatRaw(position, action, holdMs, token) {
+        this.checkSeatToken(token);
+        const p = this.require('seat');
+        const r = await this.signals.call(p, 'startSeatOperation', { seatPosition: position, seatAction: action });
+        const id = r && r.requestorID;
+        if (id === undefined || id === null) throw new Error('Seat controller did not grant movement');
+        this.activeSeatRequests.add(id);
+        const until = Date.now() + Math.max(250, holdMs || 850);
+        try {
+            this.checkSeatToken(token);
+            while (Date.now() < until) {
+                this.checkSeatToken(token);
+                await pause(Math.min(400, Math.max(1, until - Date.now())));
+                this.checkSeatToken(token);
+                await this.signals.call(p, 'aliveSeatOperation', { requestorID: id });
+            }
+        } finally {
+            this.activeSeatRequests.delete(id);
+            await this.signals.call(p, 'stopSeatOperation', { requestorID: id }).catch(() => {});
+        }
+    }
+    async moveSeat(side, action, holdMs, position) {
+        return this.operation((position === 'FRONT_RIGHT' ? 'Front passenger' : 'Rear ' + side) + ' seat', async () => {
+            const token = this.seatCancelToken;
+            this.state.seatMotion = { active: true, label: 'Manual adjustment', step: action }; this.touch();
+            try { await this.moveSeatRaw(position || this.seatPosition(side), action, holdMs || 850, token); }
+            finally { this.state.seatMotion = { active: false, label: 'Ready', step: '' }; this.touch(); }
+        });
+    }
+    async stopSeatMovement() {
+        this.seatCancelToken += 1;
+        const p = this.p.seat;
+        const ids = Array.from(this.activeSeatRequests);
+        if (p) await Promise.all(ids.map((id) => this.signals.call(p, 'stopSeatOperation', { requestorID: id }).catch(() => {})));
+        const comfort = this.p.comfort;
+        if (comfort) await Promise.all(Array.from(this.activeSeatButtons).map(([field, neutral]) =>
+            this.signals.set(comfort, field, neutral).catch(() => {})));
+        this.activeSeatRequests.clear();
+        this.state.seatMotion = { active: false, label: 'Stopped', step: '' }; this.touch();
+        return 'All seat movement stopped';
+    }
+    rearSeatNativeValue(side, command) {
+        const right = side === 'right';
+        const suffix = right ? 'PSSR' : 'DRSR';
+        const value = {};
+        [
+            'operationFunctionAdjustmentLongitudinalPosition',
+            'operationFunctionAdjustmentBackrestAngle',
+            'operationFunctionAdjustmentTilt',
+            'operationFunctionAdjustmentBackrestHead',
+            'operationFunctionAdjustmentHeadrest'
+        ].forEach((name) => { value[name + suffix] = 'KEINE_AKTION'; });
+        if (right) value.operationFunctionSleepingPositionButtonPSSR = command === 'sleep' ? 'TASTE_BETAETIGT' : 'KEINE_AKTION';
+        value['operationFunctionResetButton' + suffix] = command === 'reset' ? 'TASTE_BETAETIGT' : 'KEINE_AKTION';
+        value['operationFunctionMemoryButton' + suffix] = 'KEINE_AKTION';
+        value['storeEventMemory' + suffix] = 'SIGNAL_UNBEFUELLT';
+        value['selectionSittingPositionMemory' + suffix] = 'SIGNAL_UNBEFUELLT';
+        value['requesterSittingPositionMemory' + suffix] = 'HMI';
+        return value;
+    }
+    async pulseRearSeatButton(side, command, token) {
+        this.checkSeatToken(token);
+        const p = this.require('comfort');
+        const field = side === 'right' ? 'seatAdjustmentPSR' : 'seatAdjustmentDRR';
+        const neutral = this.rearSeatNativeValue(side, 'none');
+        this.activeSeatButtons.set(field, neutral);
+        try {
+            await this.signals.set(p, field, this.rearSeatNativeValue(side, command));
+            this.checkSeatToken(token);
+            await pause(300);
+            this.checkSeatToken(token);
+        } finally {
+            try { await this.signals.set(p, field, neutral); }
+            finally { this.activeSeatButtons.delete(field); }
+        }
+    }
+    async loungeMode(enabled) {
+        const title = enabled ? 'Executive Lounge on' : 'Executive Lounge off';
+        return this.operation(title, async () => {
+            const token = ++this.seatCancelToken;
+            this.state.seatMotion = {
+                active: true,
+                label: title,
+                step: enabled ? 'Moving front passenger seat fully forward' : 'Retracting the Executive Lounge footrest'
+            };
+            this.touch();
+            try {
+                if (enabled) {
+                    await this.moveSeatRaw('FRONT_RIGHT', 'SEAT_ADJUSTMENT_HORIZONTAL_FRONT', 20000, token);
+                    this.state.seatMotion.step = 'Lowering the Executive Lounge footrest'; this.touch();
+                    await this.moveSeatRaw('REAR_RIGHT', 'SEAT_ADJUSTMENT_FOOTREST_SWING_OUT', 14000, token);
+                    this.state.seatMotion.step = 'Reclining the right rear seat'; this.touch();
+                    await this.pulseRearSeatButton('right', 'sleep', token);
+                } else {
+                    await this.moveSeatRaw('REAR_RIGHT', 'SEAT_ADJUSTMENT_FOOTREST_RETRACT', 14000, token);
+                    this.state.seatMotion.step = 'Returning the right rear seat'; this.touch();
+                    await this.pulseRearSeatButton('right', 'reset', token);
+                }
+                this.checkSeatToken(token);
+                this.state.seatModes.lounge = !!enabled;
+            } finally {
+                this.state.seatMotion = { active: false, label: 'Ready', step: '' };
+                this.touch();
+            }
+        });
+    }
+    async resetRearSeats() {
+        return this.operation('Reset both rear seats', async () => {
+            const token = ++this.seatCancelToken;
+            this.state.seatMotion = { active: true, label: 'Reset both rear seats', step: '' }; this.touch();
+            try {
+                await this.parallelSeats([
+                    () => this.pulseRearSeatButton('left', 'reset', token),
+                    () => this.pulseRearSeatButton('right', 'reset', token)
+                ], token);
+                this.state.seatModes = { lounge: false, visibility: false };
+            } finally {
+                this.state.seatMotion = { active: false, label: 'Ready', step: '' }; this.touch();
+            }
+        });
+    }
+    async visibilityMode() {
+        return this.operation('Rear visibility position', async () => {
+            const token = ++this.seatCancelToken;
+            this.state.seatMotion = { active: true, label: 'Rear visibility position', step: 'Tucking both rear seats' };
+            this.touch();
+            try {
+                for (const [action, duration] of [
+                    ['SEAT_ADJUSTMENT_HORIZONTAL_BACK', 15000],
+                    ['SEAT_ADJUSTMENT_VERTICAL_DOWN', 15000],
+                    ['SEAT_ADJUSTMENT_BACKREST_ANGLE_BACK', 15000],
+                    ['SEAT_ADJUSTMENT_HEADREST_DOWN', 12000]
+                ]) await this.parallelSeats([
+                    () => this.moveSeatRaw('REAR_LEFT', action, duration, token),
+                    () => this.moveSeatRaw('REAR_RIGHT', action, duration, token)
+                ], token);
+                this.state.seatModes.visibility = true;
+                this.state.seatModes.lounge = false;
+                this.state.seatMotion = { active: false, label: 'Visibility position complete', step: '' };
+                this.touch();
+            } catch (e) {
+                this.state.seatMotion = { active: false, label: e && e.message === 'Seat movement stopped' ? 'Stopped' : 'Visibility position interrupted', step: '' };
+                this.touch();
+                throw e;
+            }
         });
     }
     seatTarget(side) { return side === 'left' ? 'FASH' : 'BFSH'; }
+    seatMemoryValue(side, slot, mode) {
+        const right = side === 'right';
+        const suffix = right ? 'PSSR' : 'DRSR';
+        const value = this.rearSeatNativeValue(side, 'none');
+        value['operationFunctionMemoryButton' + suffix] = mode === 'recall' ? 'TASTE_' + slot + '_GEDRUECKT' : 'KEINE_AKTION';
+        value['storeEventMemory' + suffix] = mode === 'store' ? 'M' + slot + '_SPEICHERN' : 'KEINE_AKTION';
+        value['selectionSittingPositionMemory' + suffix] = this.seatTarget(side);
+        value['requesterSittingPositionMemory' + suffix] = 'HMI';
+        return value;
+    }
     async storeSeatMemory(side, slot) {
         const n = Math.max(1, Math.min(3, Math.round(slot)));
         return this.operation('Rear ' + side + ' memory ' + n + ' stored', async () => {
-            const p = this.require('seatMemory'), target = this.seatTarget(side);
-            await this.signals.set(p, 'controlSeatMemory', {
-                storeEventSeatMemoryPos: 'M' + n + '_SPEICHERN',
-                requestorSeatPositionStoreCommand: 'HMI',
-                selectionTargetSeatPosition: target
-            });
-            await pause(220);
-            await this.signals.set(p, 'controlSeatMemory', {
-                storeEventSeatMemoryPos: 'KEINE_AKTION',
-                requestorSeatPositionStoreCommand: 'HMI',
-                selectionTargetSeatPosition: target
-            });
+            const p = this.require('comfort');
+            const field = side === 'right' ? 'seatAdjustmentPSR' : 'seatAdjustmentDRR';
+            const token = this.seatCancelToken, neutral = this.seatMemoryValue(side, n, 'none');
+            this.checkSeatToken(token);
+            this.activeSeatButtons.set(field, neutral);
+            try {
+                await this.signals.set(p, field, this.seatMemoryValue(side, n, 'store'));
+                this.checkSeatToken(token); await pause(300); this.checkSeatToken(token);
+            } finally {
+                try { await this.signals.set(p, field, neutral); }
+                finally { this.activeSeatButtons.delete(field); }
+            }
+            this.state.memory = { side, status: 'Memory ' + n + ' stored', requestor: 'HMI' };
+            this.touch();
         });
     }
     async recallSeatMemory(side, slot) {
         const n = Math.max(1, Math.min(3, Math.round(slot)));
         return this.operation('Rear ' + side + ' memory ' + n + ' requested', async () => {
-            const p = this.require('seatMemory'), target = this.seatTarget(side);
-            this.seatAlive = (this.seatAlive + 1) & 15;
-            const value = (command) => ({
-                seatControlCommand1: 'KEINE_AKTION', seatControlCommand2: 'KEINE_AKTION', seatControlCommand3: 'KEINE_AKTION',
-                aliveControlSeatAdjustment: this.seatAlive,
-                controlSeatAdjustment: command,
-                iDReceiverControlSeatAdjustment: target,
-                iDSenderControlSeatAdjustment: 'HMI'
-            });
-            await this.signals.set(p, 'controlSeatAdjustment', value('MEMORY_' + n));
-            await pause(300);
-            this.seatAlive = (this.seatAlive + 1) & 15;
-            await this.signals.set(p, 'controlSeatAdjustment', value('KEINE_AKTION'));
+            const p = this.require('comfort');
+            const field = side === 'right' ? 'seatAdjustmentPSR' : 'seatAdjustmentDRR';
+            const token = this.seatCancelToken, neutral = this.seatMemoryValue(side, n, 'none');
+            this.checkSeatToken(token);
+            this.activeSeatButtons.set(field, neutral);
+            try {
+                await this.signals.set(p, field, this.seatMemoryValue(side, n, 'recall'));
+                this.checkSeatToken(token); await pause(300); this.checkSeatToken(token);
+            } finally {
+                try { await this.signals.set(p, field, neutral); }
+                finally { this.activeSeatButtons.delete(field); }
+            }
+            this.state.memory = { side, status: 'Memory ' + n + ' recalled', requestor: 'HMI' };
+            this.touch();
         });
     }
     async shade(which, direction) {

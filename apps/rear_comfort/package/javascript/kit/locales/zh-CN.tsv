@@ -2041,3 +2041,86 @@ ACTIVE · INFERRED	再生中 · 推断
 now min	当前（分钟）
 New screen	新建页面
 Health	健康状态
+ONE-TOUCH POSITIONS	一键姿态
+VISIBILITY	开阔视野
+RESET BOTH	双座复位
+LOUNGE ON	展开休憩
+LOUNGE OFF	收回休憩
+STOP ALL MOVEMENT	停止全部调节
+Executive Lounge on	展开行政休憩
+Executive Lounge off	收回行政休憩
+Moving front passenger seat fully forward	副驾驶座椅前移
+Retracting the Executive Lounge footrest	收回后排腿托
+Lowering the Executive Lounge footrest	展开后排腿托
+Reclining the right rear seat	右后座椅后仰
+Returning the right rear seat	右后座椅复位
+Rear visibility position	后排开阔视野
+Tucking both rear seats	正在调节后排双座
+Visibility position complete	视野姿态完成
+Visibility position interrupted	视野姿态中断
+Seat movement stopped	座椅调节已停止
+All seat movement stopped	已停止全部座椅调节
+Manual adjustment	手动调节
+Reset both rear seats	后排双座复位
+Front passenger	副驾驶
+Front-to-rear climate sync	前后排空调同步
+Climate sync	空调同步
+SYNC	同步
+Sync is front to rear. Rear controls never command the front zones.	同步前排设置到后排，后排操作仅控制后排。
+hold to move	按住调节
+stopped	已停止
+complete	已完成
+Stopped	已停止
+RECALL MEMORY	调用记忆
+SAVE	保存
+UPPER BACKREST	肩部靠背
+THIGH SUPPORT	腿部支撑
+HEAD RESTRAINT	头枕
+FRONT PASSENGER	副驾驶
+FOOTREST	腿托
+Complete seat adjustment	座椅调节
+Choose rear seat	选择后排座椅
+LEFT REAR	左后座
+RIGHT REAR	右后座
+TILT UP	上倾
+TILT DOWN	下倾
+UPRIGHT	直立
+RECLINE	后仰
+EXTEND	伸出
+RETRACT	收回
+FORE / AFT	前后
+UP / DOWN	上下
+FIRM / SOFT	软硬
+CUSHION TILT	坐垫倾角
+SEAT_ADJUSTMENT_HORIZONTAL_FRONT	前移
+SEAT_ADJUSTMENT_HORIZONTAL_BACK	后移
+SEAT_ADJUSTMENT_VERTICAL_UP	升高
+SEAT_ADJUSTMENT_VERTICAL_DOWN	降低
+SEAT_ADJUSTMENT_TILT_UP	坐垫上倾
+SEAT_ADJUSTMENT_TILT_DOWN	坐垫下倾
+SEAT_ADJUSTMENT_BACKREST_ANGLE_FRONT	靠背前倾
+SEAT_ADJUSTMENT_BACKREST_ANGLE_BACK	靠背后仰
+SEAT_ADJUSTMENT_BACKREST_HEAD_TO_FRONT	肩部前移
+SEAT_ADJUSTMENT_BACKREST_HEAD_TO_BACK	肩部后移
+SEAT_ADJUSTMENT_DEPTH_ENLARGE	腿托伸出
+SEAT_ADJUSTMENT_DEPTH_REDUCE	腿托收回
+SEAT_ADJUSTMENT_HEADREST_UP	头枕升高
+SEAT_ADJUSTMENT_HEADREST_DOWN	头枕降低
+SEAT_ADJUSTMENT_FOOTREST_SWING_OUT	展开腿托
+SEAT_ADJUSTMENT_FOOTREST_RETRACT	收回腿托
+LUMBAR_UP	腰托升高
+LUMBAR_DOWN	腰托降低
+LUMBAR_INFLATE	腰托加硬
+LUMBAR_DEFLATE	腰托减软
+CAR	总览
+RSE	后排娱乐
+Rear climate control	后排空调控制
+FORWARD	前移
+BACKWARD	后移
+HEIGHT	高度
+BACKREST	靠背
+Visibility position	开阔视野姿态
+Massage programme	按摩程序
+Remote control	遥控操作
+DIM	调暗
+TOUCH COMMAND	后排控制

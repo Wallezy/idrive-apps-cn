@@ -4,7 +4,7 @@
   "sourceCommit": "beffe76911bcf83df00a4b29332dc313bd574a65",
   "components": {
     "cluster-render": "0.6.10",
-    "waze-on-cluster": "0.10.13",
+    "waze-on-cluster": "0.11.1",
     "robertn_waze_cluster": "0.6.19",
     "brake_test": "1.5.22",
     "car_vitals": "2.27.10",
@@ -28,7 +28,7 @@
     "dpf_monitor": "0.4.1",
     "green_light_alert": "0.2.6",
     "parking_clearance": "0.1.9",
-    "rear_comfort": "0.4.6",
+    "rear_comfort": "0.5.7",
     "ride_height": "0.6.1",
     "road_trip_computer": "1.0.1",
     "start_stop_insight": "0.1.4",

@@ -82,6 +82,15 @@
   ],
   "waze-on-cluster": [
     {
+      "version": "0.11.1",
+      "upstreamVersion": "0.11.0",
+      "cnRevision": 1,
+      "changes": [
+        "CarPlay 地图补丁改为内存加载，兼容旧版补丁迁移与故障恢复。",
+        "保留仪表盘全屏、显示位置和 HUD 设置。"
+      ]
+    },
+    {
       "version": "0.10.13",
       "upstreamVersion": "0.10.12",
       "cnRevision": 1,

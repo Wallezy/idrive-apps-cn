@@ -99,6 +99,7 @@ class Display {
         this.sheet = null;                           // sheet.js page drawn over the app's (openSheet)
         this.ccuLast = null;                         // last controller state (knob counter, press, push)
         this.ownHidden = new Set();                  // more bar buttons left out where the kit runs the screen (hideButton)
+        this.onTouch = null;
         G.onConfirm(() => { this.lastWords = null; this.tickHandlers.forEach((fn) => fn()); });   // a reset asks / runs out
         const canvasScreens = (spec.screens || []).filter((s) => s.kind === 'canvas');
         this.screen = canvasScreens[0] || null;
@@ -415,6 +416,14 @@ class Display {
      * running the screen also on a bar button (pressed), a sheet's targets, or the page (ctx.onTap).
      */
     _touch(phase, x, y) {
+        if (this.onTouch && this.own() && !this.sheet) {
+            try {
+                if (this.onTouch(phase, x, y)) {
+                    if (phase >= 3) { this.ownDown = null; this.downAt = null; this.dragging = false; }
+                    return;
+                }
+            } catch (e) { this.log.error('touch', e); }
+        }
         const inside = (r) => x >= r.x && x < r.x + r.w && y >= r.y && y < r.y + r.h;
         if (this.own()) {
             const pl = this.place, sx = x * pl.scale + pl.ox, sy = y * pl.scale + pl.oy;

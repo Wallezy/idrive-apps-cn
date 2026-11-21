@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 0.11.1
+
+- Apply CarPlay map changes in memory and migrate known disk patches to stock.
+- Preserve CN fullscreen, HUD, target and diagnostic behavior.
+
 ## 0.10.13
 
 - Keep diagnostic journals in RAM; preserve bounded failure and shutdown logs with CN diagnostics.

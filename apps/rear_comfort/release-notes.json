@@ -1,5 +1,14 @@
 [
   {
+    "version": "0.5.7",
+    "upstreamVersion": "0.5.6",
+    "cnRevision": 1,
+    "changes": [
+      "新增后排休憩、视野姿态与按住调节，完善记忆和空调同步。",
+      "修复联动失败后未停止、退出页面及取消后继续调节的问题。"
+    ]
+  },
+  {
     "version": "0.4.6",
     "upstreamVersion": "0.4.4",
     "cnRevision": 2,
