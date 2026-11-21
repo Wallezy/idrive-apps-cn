@@ -112,6 +112,20 @@ function world(handler) {
     assert.strictEqual(fake.ownDown, null);
     assert.strictEqual(fake.downAt, null);
     assert.strictEqual(fake.dragging, false);
+    const displayPrototype = Display.Display ? Display.Display.prototype : Display.prototype;
+    let covered = 0;
+    assert(displayPrototype.openSheet.call({
+        canSheet: () => true, sheetTimer: 1, _paintSheet() {},
+        _layoutChanged() { covered++; },
+    }, {}));
+    assert.strictEqual(covered, 1, 'an in-app settings sheet must notify the page to cancel its hold');
+    const manifest = require('../apps/rear_comfort/package/manifest.json').proxies;
+    const climate = manifest['de.bmw.infotainment.climate.Climate'].attributes;
+    const comfort = manifest['de.bmw.infotainment.misc.ComfortFunctionIuK'].attributes;
+    assert.strictEqual(climate.acSpecialFunction, 'w');
+    assert.strictEqual(climate.statusACFront, 'rs');
+    assert.strictEqual(comfort.seatAdjustmentDRR, 'w');
+    assert.strictEqual(comfort.seatAdjustmentPSR, 'w');
     // The actual page's raw-touch and lifecycle handlers, with isolated motion.
     w = world();
     let starts = 0, stops = 0, render, rawTouch, layout, visible, focus;

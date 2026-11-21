@@ -262,6 +262,7 @@ class Display {
         if (!this.sheet) this.saved = this.app;          // the app's last frame, back when the sheet closes
         this.sheetHead = false;
         this.sheet = sheet; this.sheetDown = -1;
+        this._layoutChanged();
         if (!this.sheetTimer) this.sheetTimer = setInterval(() => this._paintSheet(), 33);   // scrolling glides
         this._paintSheet();
         return true;

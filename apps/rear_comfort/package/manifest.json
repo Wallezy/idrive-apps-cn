@@ -140,7 +140,9 @@
         "statusSeatHeatingDRR": "rs",
         "statusSeatHeatingPSR": "rs",
         "statusSeatClimateDRR": "rs",
-        "statusSeatClimatePSR": "rs"
+        "statusSeatClimatePSR": "rs",
+        "acSpecialFunction": "w",
+        "statusACFront": "rs"
       }
     },
     "de.bmw.infotainment.misc.SeatFunction": {
@@ -161,7 +163,9 @@
         "statusSeatMassageRL": "rs",
         "statusSeatMassageRR": "rs",
         "statusAdjustmentLumbarRL": "rs",
-        "statusAdjustmentLumbarRR": "rs"
+        "statusAdjustmentLumbarRR": "rs",
+        "seatAdjustmentDRR": "w",
+        "seatAdjustmentPSR": "w"
       }
     },
     "de.bmw.infotainment.vehicle.A4A": {
