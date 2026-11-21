@@ -1,5 +1,13 @@
 [
   {
+    "version": "0.4.6",
+    "upstreamVersion": "0.4.4",
+    "cnRevision": 2,
+    "changes": [
+      "修复后排空调风量调节与温度、开关状态显示。"
+    ]
+  },
+  {
     "version": "0.4.5",
     "upstreamVersion": "0.4.4",
     "cnRevision": 1,

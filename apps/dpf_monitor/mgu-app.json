@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "id": "dpf_monitor",
-  "version": "0.3.3",
+  "version": "0.4.1",
   "tree": "package",
   "modules": [
     "src/sdk.js"

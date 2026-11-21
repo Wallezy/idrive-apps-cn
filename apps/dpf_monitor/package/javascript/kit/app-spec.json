@@ -1,7 +1,7 @@
 {
   "id": "dpf_monitor",
   "title": "颗粒捕集器监测",
-  "version": "0.3.3",
+  "version": "0.4.1",
   "screens": [
     {
       "name": "MAIN",

@@ -5,7 +5,7 @@
     "type": "OnlineApp",
     "name": "dpf_monitor",
     "vendor": "alexp50",
-    "version": "0.3.3",
+    "version": "0.4.1",
     "defaultLanguage": "en_GB",
     "stringBundleUuid": "c73d198c-961e-5eb3-aa80-e2da0e74e9f0",
     "resourceBundleUuid": "0627f35e-227b-5804-963a-74be3f6d9663",

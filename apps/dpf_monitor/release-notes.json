@@ -1,5 +1,13 @@
 [
   {
+    "version": "0.4.1",
+    "upstreamVersion": "0.4.0",
+    "cnRevision": 1,
+    "changes": [
+      "新增下次颗粒捕集器再生的预计距离和行驶时间。"
+    ]
+  },
+  {
     "version": "0.3.3",
     "upstreamVersion": "0.3.2",
     "cnRevision": 1,

@@ -1,7 +1,7 @@
 {
  "id": "ambient_config",
  "title": "\u6c1b\u56f4\u706f\u8bbe\u7f6e",
- "version": "2.7.14",
+ "version": "2.7.16",
  "screens": [
   {
    "name": "MAIN",
@@ -53,6 +53,22 @@
    "type": "bool",
    "default": false,
    "hidden": true
+  },
+  {
+   "key": "decorWith",
+   "label": "\u88c5\u9970\u706f\u8ddf\u968f\u5206\u533a",
+   "type": "choice",
+   "default": "upper",
+   "options": [
+    [
+     "upper",
+     "\u4e0a\u5c42\u706f\u5149"
+    ],
+    [
+     "lower",
+     "\u4e0b\u5c42\u706f\u5149\uff08\u539f\u5382\u65b9\u5f0f\uff09"
+    ]
+   ]
   },
   {
    "key": "nightDim",

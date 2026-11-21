@@ -1,6 +1,6 @@
 {
   "name": "rear_comfort",
-  "version": "0.4.5",
+  "version": "0.4.6",
   "description": "G12 行政座舱后排空调、舒适座椅、按摩、遮阳帘及娱乐控制",
   "main": "javascript/localized-entry.js",
   "private": false,

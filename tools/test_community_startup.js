@@ -7,6 +7,7 @@ const id = process.argv[2], app = path.join(__dirname, '../apps', id, 'package')
 const out = process.argv[3] && path.resolve(process.argv[3]);
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'community-startup-'));
 const source = path.join(tmp, 'source'), errors = [], frames = [], drawnText = [];
+let pageIndex = 0;
 fs.cpSync(app, source, { recursive: true });
 fs.writeFileSync(path.join(source, 'javascript/app.js'),
     fs.readFileSync(path.join(source, 'javascript/localized-entry.js'), 'utf8').replace("require('./app.js');", ''));
@@ -47,7 +48,8 @@ try {
             frames.push(name);
             if (out && canvas.png) {
                 fs.mkdirSync(out, { recursive: true });
-                fs.writeFileSync(path.join(out, id + '-' + name.replace(/[^a-zA-Z0-9_-]/g, '') + '.png'), canvas.png());
+                fs.writeFileSync(path.join(out, id + '-' + name.replace(/[^a-zA-Z0-9_-]/g, '') +
+                    (id === 'dpf_monitor' ? '-' + pageIndex : '') + '.png'), canvas.png());
             }
         },
     });
@@ -69,6 +71,14 @@ try {
                 if (result && typeof result.png === 'function') {
                     frames.push(name);
                     if (out) { fs.mkdirSync(out, { recursive: true }); fs.writeFileSync(path.join(out, id + '-' + name + '.png'), result.png()); }
+                }
+            }
+            if (id === 'dpf_monitor') {
+                hu.settings.values.demo = 'on';
+                await hu.loops.MAIN();
+                for (pageIndex = 1; pageIndex < 6; pageIndex++) {
+                    hu.handlers.BTN_PAGE();
+                    await hu.loops.MAIN();
                 }
             }
         } catch (e) { errors.push(e.stack || String(e)); }

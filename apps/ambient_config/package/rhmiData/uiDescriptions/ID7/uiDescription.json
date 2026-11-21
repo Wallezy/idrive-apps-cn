@@ -64,118 +64,8 @@
    "name": "SETTINGS",
    "components": {
     "9": {
-     "type": "checkBox",
-     "name": "SET_NIGHTDIM",
-     "properties": {
-      "Visible": {
-       "value": 1,
-       "type": "UInt"
-      },
-      "Focusable": {
-       "value": 2,
-       "type": "UInt"
-      }
-     },
-     "rows": [
-      {
-       "Text": {
-        "value": "SID_AMBIENT_CONFIG_SET_NIGHTDIM",
-        "type": "StringId"
-       }
-      }
-     ]
-    },
-    "10": {
-     "type": "checkBox",
-     "name": "SET_KEEP",
-     "properties": {
-      "Visible": {
-       "value": 1,
-       "type": "UInt"
-      },
-      "Focusable": {
-       "value": 2,
-       "type": "UInt"
-      }
-     },
-     "rows": [
-      {
-       "Text": {
-        "value": "SID_AMBIENT_CONFIG_SET_KEEP",
-        "type": "StringId"
-       }
-      }
-     ]
-    },
-    "11": {
-     "type": "checkBox",
-     "name": "SET_DOORCAR",
-     "properties": {
-      "Visible": {
-       "value": 1,
-       "type": "UInt"
-      },
-      "Focusable": {
-       "value": 2,
-       "type": "UInt"
-      }
-     },
-     "rows": [
-      {
-       "Text": {
-        "value": "SID_AMBIENT_CONFIG_SET_DOORCAR",
-        "type": "StringId"
-       }
-      }
-     ]
-    },
-    "12": {
-     "type": "checkBox",
-     "name": "SET_STROBE",
-     "properties": {
-      "Visible": {
-       "value": 1,
-       "type": "UInt"
-      },
-      "Focusable": {
-       "value": 2,
-       "type": "UInt"
-      }
-     },
-     "rows": [
-      {
-       "Text": {
-        "value": "SID_AMBIENT_CONFIG_SET_STROBE",
-        "type": "StringId"
-       }
-      }
-     ]
-    },
-    "13": {
-     "type": "checkBox",
-     "name": "SET_STROBELEVERDRIVING",
-     "properties": {
-      "Visible": {
-       "value": 1,
-       "type": "UInt"
-      },
-      "Focusable": {
-       "value": 2,
-       "type": "UInt"
-      }
-     },
-     "rows": [
-      {
-       "Text": {
-        "value": "SID_AMBIENT_CONFIG_SET_STROBELEVERDRIVING",
-        "type": "StringId"
-       }
-      }
-     ]
-    },
-    "14": {
      "type": "dropDownMenu",
-     "name": "SET_DRIVE",
+     "name": "SET_DECORWITH",
      "rows": [
       {
        "ItemText": {
@@ -201,7 +91,145 @@
       }
      }
     },
+    "10": {
+     "type": "checkBox",
+     "name": "SET_NIGHTDIM",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 2,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text": {
+        "value": "SID_AMBIENT_CONFIG_SET_NIGHTDIM",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
+    "11": {
+     "type": "checkBox",
+     "name": "SET_KEEP",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 2,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text": {
+        "value": "SID_AMBIENT_CONFIG_SET_KEEP",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
+    "12": {
+     "type": "checkBox",
+     "name": "SET_DOORCAR",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 2,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text": {
+        "value": "SID_AMBIENT_CONFIG_SET_DOORCAR",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
+    "13": {
+     "type": "checkBox",
+     "name": "SET_STROBE",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 2,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text": {
+        "value": "SID_AMBIENT_CONFIG_SET_STROBE",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
+    "14": {
+     "type": "checkBox",
+     "name": "SET_STROBELEVERDRIVING",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 2,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text": {
+        "value": "SID_AMBIENT_CONFIG_SET_STROBELEVERDRIVING",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
     "15": {
+     "type": "dropDownMenu",
+     "name": "SET_DRIVE",
+     "rows": [
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0003",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0004",
+        "type": "StringId"
+       }
+      }
+     ],
+     "cells": {
+      "HeaderText": {
+       "value": "SID_CN_STATIC_0005",
+       "type": "StringId"
+      },
+      "SelectedItem": {
+       "value": 0,
+       "type": "UInt"
+      }
+     }
+    },
+    "16": {
      "type": "button",
      "name": "CN_CREDITS",
      "properties": {
@@ -227,7 +255,7 @@
       }
      ]
     },
-    "16": {
+    "17": {
      "type": "button",
      "name": "REPO_CREDITS",
      "properties": {
@@ -253,7 +281,7 @@
       }
      ]
     },
-    "17": {
+    "18": {
      "type": "title",
      "name": "SETTINGS_TITLE",
      "rows": [

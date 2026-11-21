@@ -1703,7 +1703,7 @@
   "Pink": "粉色",
   "White": "白色",
   "Whole car": "全车",
-  "Upper lights": "上层灯带",
+  "Upper lights": "上层灯光",
   "Lower lights": "下层灯带",
   "Upper": "上层",
   "Lower": "下层",
@@ -2075,5 +2075,7 @@
   "Start the strobe with the flasher lever": "通过远光拨杆启动闪烁",
   "IterioDev's Comfort tool has its ambient colour on and changes the same lights, so Ambient config has stopped changing them. Turn its colour and its drive-mode colours off in IterioDev's Ambient Light app (the seats keep working), or uninstall Comfort in the Store (Installed, Head-unit tools, Comfort).": "其他舒适功能应用正在控制氛围灯，本应用已暂停调色。请关闭该应用的灯色与驾驶模式配色，座椅功能仍可保留；也可在商店的已安装组件中卸载舒适服务。",
   "Lever start: On": "拨杆启动：开启",
-  "Lever start: Off": "拨杆启动：关闭"
+  "Lever start: Off": "拨杆启动：关闭",
+  "Decor lights (dash, under the door trim) with": "装饰灯跟随分区",
+  "Lower lights (like BMW)": "下层灯光（原厂方式）"
 }

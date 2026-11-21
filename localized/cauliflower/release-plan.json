@@ -1,14 +1,16 @@
 {
   "ambient_config": {
-    "upstreamVersion": "2.7.13",
-    "releaseVersion": "2.7.14",
+    "upstreamVersion": "2.7.15",
+    "releaseVersion": "2.7.16",
     "cnRevision": 1,
     "title": "氛围灯设置",
     "description": "自定义氛围灯颜色、亮度与动画，按驾驶模式切换。 简体中文界面，支持在线更新。",
     "englishDescription": "Ambient config with Chinese menus and status text.",
     "changes": [
-      "改进自定义灯色、门灯控制与颜色恢复，增强车身模块忙时兼容。"
-    ]
+      "改进部分车型车身模块识别，减少自定义颜色无法使用的情况。",
+      "新增装饰灯分区选择，可跟随上层或下层灯光。"
+    ],
+    "upstreamCommit": "a948390fb8f04ecd68bbac9f5e8620534f35ec25"
   },
   "brake_test": {
     "upstreamVersion": "1.5.21",

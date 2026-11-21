@@ -39,6 +39,7 @@ jobs:
       - name: Ambient controls and upstream regression checks
         run: |
           node tools/test_ambient_busy.js
+          node tools/test_ambient_discovery.js
           node tools/test_ambient_input.js
           node tools/test_ambient_renderer.js
           node localized/cauliflower/kit/tools/test_ambient_config.js
@@ -62,7 +63,10 @@ jobs:
           python3 localized/cluster-metrics/kit/tools/build.py --omit-sdk cluster_metrics
           node localized/cluster-metrics/test/run_tests.js
       - name: Community application controls and offline rendering
-        run: node tools/test_community.js
+        run: |
+          node tools/test_dpf_projection.js
+          node tools/test_rear_climate.js
+          node tools/test_community.js
       - name: System monitor sampling, lifecycle and Chinese layouts
         run: |
           node tools/test_system_monitor.js

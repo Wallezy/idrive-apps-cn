@@ -1,6 +1,6 @@
 {
   "name": "dpf_monitor",
-  "version": "0.3.3",
+  "version": "0.4.1",
   "description": "只读监测柴油颗粒捕集器积碳、再生进度、温度、压差及历史记录",
   "main": "javascript/localized-entry.js",
   "private": false,

@@ -41,7 +41,7 @@ def main():
    write(package/'package.json',pkg)
    if identity=='doom':shutil.copy2(LOCAL/'apps/doom/LICENSE',package/'LICENSE')
    sourcefiles={str(f.relative_to(LOCAL)):hashlib.sha256(f.read_bytes()).hexdigest() for f in sorted((LOCAL/'apps'/identity).rglob('*')) if f.is_file()}
-   write(package/'PROVENANCE.json',dict(provenance,component=identity,upstreamVersion=spec['version'],releaseVersion=version,cnRevision=item['cnRevision'],adaptedSourceFilesSha256=sourcefiles))
+   write(package/'PROVENANCE.json',dict(provenance,commit=item.get('upstreamCommit',provenance['commit']),component=identity,upstreamVersion=spec['version'],releaseVersion=version,cnRevision=item['cnRevision'],adaptedSourceFilesSha256=sourcefiles))
    title=item['title'];changes=item['changes'];heading='## '+version+'\n\n'+''.join('- '+v+'\n' for v in changes)+'\n'
    if '## Unreleased\n' in old_changes:old_changes=re.sub(r'## Unreleased\n\s*','## Unreleased\n\n'+heading,old_changes,count=1)
    else:old_changes='# '+title+'\n\n## Unreleased\n\n'+heading+old_changes

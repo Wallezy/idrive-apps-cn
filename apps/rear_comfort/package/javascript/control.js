@@ -6,12 +6,28 @@ const stage = (value) => {
     const m = /STUFE_(\d)/.exec(String(value || ''));
     return m ? Number(m[1]) : 0;
 };
-const active = (value) => /EIN|AKTIV|ACTIVE|USER_ON|FULL_ON/.test(String(value || ''));
+const blowerStage = (value) => {
+    if (typeof value === 'number') return value >= 1 && value <= 9 ? value : null;
+    const m = /STUFE_(\d)/.exec(String(value || ''));
+    return m ? Number(m[1]) : null;
+};
+const active = (value) => {
+    const text = String(value || '').toUpperCase();
+    if (/KEINE|SIGNAL|NICHT|INAKTIV|AUS|OFF|FALSE/.test(text)) return false;
+    return /(^|_)EIN($|_)|AKTIV|ACTIVE|USER_ON|FULL_ON|TRUE/.test(text);
+};
+const rearTemperature = (value) => {
+    const raw = Number(value);
+    if (!Number.isFinite(raw) || raw === 255) return null;
+    const celsius = raw / 2;
+    return celsius >= 16 && celsius <= 32 ? celsius : null;
+};
 
 class RearControl {
     constructor(signals, log, changed) {
         this.signals = signals; this.log = log; this.changed = changed || (() => {});
         this.p = {}; this.subs = []; this.busy = false; this.seatAlive = 0;
+        this.haveACFond2 = false;
         this.state = {
             climate: { left: null, right: null, blower: null, auto: null, on: null, lock: null },
             left: { heat: 0, vent: 0, massage: 0, program: 1 },
@@ -35,14 +51,25 @@ class RearControl {
     async init() {
         await this.watch('climate', 'de.bmw.infotainment.climate.Climate', '1', {
             statusClimateFond: (v) => {
+                if (this.haveACFond2) return;
                 this.state.climate.left = Number(v.statusDisplayTemperatureLeftHandAirConditioningRearCompartment);
                 this.state.climate.right = Number(v.statusDisplayTemperatureRightHandAirConditioningRearCompartment);
-                this.state.climate.blower = stage(v.statusDisplayBlowerSettingAirConditioningRearCompartment);
+                this.state.climate.blower = blowerStage(v.statusDisplayBlowerSettingAirConditioningRearCompartment);
                 this.state.climate.auto = String(v.statusDisplayModeAirConditioningRearCompartment) === 'AUTOMATIK'; this.touch();
             },
             statusACFond2: (v) => {
-                this.state.climate.on = active(v.statusOn2Tier) || active(v.statusModeAirConditioning2Tier);
-                this.state.climate.lock = active(v.statusLock2Tier); this.touch();
+                this.haveACFond2 = true;
+                const tier3 = active(v.statusOn3Tier) || active(v.statusModeAirConditioning3Tier);
+                const left = rearTemperature(v.statusTemperatureTarget2TierDR);
+                const right = rearTemperature(v.statusTemperatureTarget2TierPS);
+                const shared = rearTemperature(v.statusTemperatureTarget3Tier);
+                this.state.climate.left = left === null ? shared : left;
+                this.state.climate.right = right === null ? shared : right;
+                this.state.climate.on = tier3 || active(v.statusOn2Tier) || active(v.statusModeAirConditioning2Tier);
+                this.state.climate.lock = active(tier3 ? v.statusLock3Tier : v.statusLock2Tier);
+                this.state.climate.auto = active(tier3 ? v.statusModeAirConditioning3Tier : v.statusModeAirConditioning2Tier);
+                this.state.climate.blower = blowerStage(tier3 ? v.statusManualBlowerLevel3RowOfSeats : v.statusManualBlowerLevel2RowOfSeats);
+                this.touch();
             },
             statusSeatHeatingDRR: (v) => { this.state.left.heat = stage(v.statusSeatHeaterDRR); this.touch(); },
             statusSeatHeatingPSR: (v) => { this.state.right.heat = stage(v.statusSeatHeaterPSR); this.touch(); },
@@ -129,27 +156,38 @@ class RearControl {
         return this.operation('Rear ' + side + ' temperature', () => this.signals.set(this.require('climate'), 'climateFond', x));
     }
     async setClimateMode(auto) {
-        const x = {
-            controlTemperatureLeftHandAirConditioningRearCompartment: 255,
-            controlTemperatureRightHandAirConditioningRearCompartment: 255,
-            controlOperationPushButtonMaximumAirconRearCompartment: 'SIGNAL_UNBEFUELLT',
-            controlOperationPushButtonAirInjectionManifoldAirConditioningRearCompartment: 'SIGNAL_UNBEFUELLT',
-            controlBlowerSettingAirConditioningRearCompartment: 'SIGNAL_UNBEFUELLT',
-            controlOperationPushButtonModeAirConditioningRearCompartment: auto ? 'AUTOMATIK' : 'MANUELL'
-        };
-        return this.operation('Rear climate mode', () => this.signals.set(this.require('climate'), 'climateFond', x));
+        const x = this.acFondCommand();
+        x.operationModeAirConditioning2Tier = auto ? 'EIN' : 'AUS';
+        return this.operation('Rear climate mode', async () => {
+            await this.signals.set(this.require('climate'), 'acFond', x);
+            this.state.climate.auto = !!auto;
+            this.touch();
+        });
     }
     async setBlower(level) {
-        const n = Math.max(0, Math.min(9, Math.round(level)));
-        const x = {
-            controlTemperatureLeftHandAirConditioningRearCompartment: 255,
-            controlTemperatureRightHandAirConditioningRearCompartment: 255,
-            controlOperationPushButtonMaximumAirconRearCompartment: 'SIGNAL_UNBEFUELLT',
-            controlOperationPushButtonAirInjectionManifoldAirConditioningRearCompartment: 'SIGNAL_UNBEFUELLT',
-            controlBlowerSettingAirConditioningRearCompartment: 'STUFE_' + n,
-            controlOperationPushButtonModeAirConditioningRearCompartment: 'MANUELL'
+        const n = Math.max(1, Math.min(9, Math.round(level)));
+        const x = this.acFondCommand();
+        x.operationModeAirConditioning2Tier = 'AUS';
+        x.operationManualBlowerLevelClimate2SeatRow = 'STUFE_' + n;
+        return this.operation('Rear blower', async () => {
+            await this.signals.set(this.require('climate'), 'acFond', x);
+            this.state.climate.auto = false;
+            this.state.climate.blower = n;
+            this.touch();
+        });
+    }
+    acFondCommand() {
+        return {
+            operationAirconRearCompartment: 'SIGNAL_UNGUELTIG',
+            operationAirConditioningDefault2Tier: 'KEINE_AUSWAHL', operationAirConditioningDefault3Tier: 'KEINE_AUSWAHL',
+            operationOn2Tier: 'KEINE_AUSWAHL', operationOn3Tier: 'KEINE_AUSWAHL',
+            operationModeAirConditioning2Tier: 'KEINE_AUSWAHL', operationModeAirConditioning3Tier: 'KEINE_AUSWAHL',
+            operationLock2Tier: 'KEINE_AUSWAHL', operationLock3Tier: 'KEINE_AUSWAHL', operationAircon3Tier: 'KEINE_AUSWAHL',
+            operationBlowerSettingAirConditionings2Tier: 'SIGNAL_UNBEFUELLT', operationBlowerSettingAirConditionings3Tier: 'SIGNAL_UNBEFUELLT',
+            operationTemperatureTarget2TierDR: 255, operationTemperatureTarget2TierPS: 255, operationTemperatureTarget3Tier: 255,
+            operationAirDistributionProgramClimate3Seat: 'SIGNAL_UNBEFUELLT', operationAirDistributionProgramClimate2Seat: 'SIGNAL_UNBEFUELLT',
+            operationManualBlowerLevelClimate3SeatRow: 'SIGNAL_UNBEFUELLT', operationManualBlowerLevelClimate2SeatRow: 'SIGNAL_UNBEFUELLT'
         };
-        return this.operation('Rear blower', () => this.signals.set(this.require('climate'), 'climateFond', x));
     }
     async climatePower(on) {
         const x = {
@@ -299,4 +337,4 @@ class RearControl {
     }
 }
 
-module.exports = { RearControl, stage, active };
+module.exports = { RearControl, stage, blowerStage, active, rearTemperature };

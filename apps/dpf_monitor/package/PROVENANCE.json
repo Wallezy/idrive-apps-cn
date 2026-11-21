@@ -8,10 +8,16 @@
     "size": 953680,
     "sha256": "92edcd5b87d868ad45a878d75b5c1ab1253d4c5f485ba0f3e2ee32921ee2e524"
   },
-  "upstreamVersion": "0.3.2",
-  "releaseVersion": "0.3.3",
+  "upstreamVersion": "0.4.0",
+  "releaseVersion": "0.4.1",
   "cnRevision": 1,
   "source": "https://github.com/alexp50/bmw-apps/pull/3",
   "license": "MIT",
-  "vehicleTested": false
+  "vehicleTested": false,
+  "originalUpstream": {
+    "repository": "https://github.com/alexp50/bmw-apps",
+    "commit": "4fb5a5dba1ec7c6a57545ae935a14cb91a194d19",
+    "version": "0.4.0",
+    "scope": "DPF next-regeneration estimate"
+  }
 }

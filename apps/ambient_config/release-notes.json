@@ -1,5 +1,14 @@
 [
   {
+    "version": "2.7.16",
+    "upstreamVersion": "2.7.15",
+    "cnRevision": 1,
+    "changes": [
+      "改进部分车型车身模块识别，减少自定义颜色无法使用的情况。",
+      "新增装饰灯分区选择，可跟随上层或下层灯光。"
+    ]
+  },
+  {
     "version": "2.7.14",
     "upstreamVersion": "2.7.13",
     "cnRevision": 1,

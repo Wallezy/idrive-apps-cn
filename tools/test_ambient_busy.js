@@ -13,7 +13,7 @@ async function scenario(answer, stop) {
     let lights;
     lights = new Lights({ log, diag: { async physical(ecu, service, data) {
         assert.strictEqual(service, 0x22, 'discovery must never write');
-        calls.push(data.join(','));
+        if (ecu === 0x40) calls.push(data.join(','));
         return answer(data, calls);
     } }, sleep: async (ms) => { waits.push(ms); if (stop) lights.stop(); } });
     try {
