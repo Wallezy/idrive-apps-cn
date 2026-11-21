@@ -112,5 +112,50 @@ function world(handler) {
     assert.strictEqual(fake.ownDown, null);
     assert.strictEqual(fake.downAt, null);
     assert.strictEqual(fake.dragging, false);
+    // The actual page's raw-touch and lifecycle handlers, with isolated motion.
+    w = world();
+    let starts = 0, stops = 0, render, rawTouch, layout, visible, focus;
+    const handlers = {}, app = new (require('events'))();
+    const pageRear = w.rear;
+    pageRear.init = async () => {};
+    pageRear.moveSeat = async () => { starts++; };
+    pageRear.stopSeatMovement = async () => { stops++; pageRear.seatCancelToken++; };
+    const cv = new Proxy({}, { get: (target, name) => name === 'clear' ? () => cv : () => {} });
+    const ctx = {
+        signals: {}, log: { warn() {} }, app,
+        ui: { isVisible: () => true, hasFocus: () => true, image: async () => {},
+            onVisible: fn => { visible = fn; }, onFocus: fn => { focus = fn; },
+            onClick: (id, fn) => { handlers[id] = fn; } },
+        theme: () => ({ text: '#fff', dim: '#aaa' }), canvas: () => cv,
+        onLayout: fn => { layout = fn; }, onTab() {}, onTap() {},
+        onTouch: fn => { rawTouch = fn; }, loop: (id, fps, fn) => { render = fn; },
+    };
+    let start;
+    const entry = fs.readFileSync(path.join(path.dirname(file), 'localized-entry.js'), 'utf8');
+    vm.runInNewContext(entry, {
+        Buffer, console, require: name => {
+            if (name === './app.js') return {};
+            if (name === './kit/mgu') return { run: impl => { start = impl.start(ctx); } };
+            if (name === './kit/gauges') return { frame() {} };
+            if (name === './kit/canvas') return { withAlpha: color => color };
+            if (name === './kit/record') return { setImage() {} };
+            if (name === './control') return { RearControl: function () { return pageRear; } };
+            if (name === './kit/pack') throw Error('offline assets');
+            return require(name);
+        },
+    }, { filename: 'rear-page.js' });
+    await start;
+    handlers.BTN_PAGE(); handlers.BTN_PAGE(); await render();
+    rawTouch(1, 1100, 435); rawTouch(3, 1100, 435);
+    for (let i = 0; i < 10; i++) await Promise.resolve();
+    assert.strictEqual(starts, 0, 'release before the queued start must cancel it');
+    rawTouch(1, 1100, 435);
+    for (let i = 0; i < 10; i++) await Promise.resolve();
+    assert.strictEqual(starts, 1);
+    rawTouch(2, 20, 20);
+    const stoppedAfterLeave = stops;
+    visible('MAIN', false); focus('MAIN', false); layout(); app.emit('shutdown');
+    assert.strictEqual(stops, stoppedAfterLeave + 4, 'all lifecycle loss paths stop seat requests');
+    assert.strictEqual(pageRear.seatVisible, false);
     console.log('Rear seats: sibling failure, late grant, cancelled phases, button release, hidden-page refusal and raw touch passed');
 })().catch(e => { console.error(e); process.exitCode = 1; });
