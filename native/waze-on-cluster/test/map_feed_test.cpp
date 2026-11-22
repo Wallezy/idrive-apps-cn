@@ -234,13 +234,6 @@ struct Rig {
                     svc->after_poll(fds, first, now);
                 }
                 const bool pending = feed->wants_write() || (other && other->wants_write());
-                // A scene-hosted map uses the same real scaling worker as the HUD.
-                // Keep simulated time still while that worker finishes, as the
-                // MapFeeds harness below does; a poll timeout is not its completion.
-                const bool scaling = feed->wake_in_ms(now) == MapFeed::kScaleWaitMs &&
-                                     feed->wake_in_ms(now + 1) == MapFeed::kScaleWaitMs;
-                if (scaling)
-                    usleep(1000);
                 feed->poll(now);
                 if (other)
                     other->poll(now);
