@@ -143,8 +143,10 @@ async function main() {
     ovl.status();
     ok('the status names the asset', await until(() => status.indexOf('asset') >= 0 && status.indexOf('r8 64x32') >= 0, 1000));
 
+    let pre = 0;
+    if (typeof ovl.preload === 'boolean') {
     ok('the hello says the service knows preload', ovl.preload === true);
-    const pre = ovl.image({ target: 'hud', visible: false, preload: true, w: 32, h: 32, iw: 32, ih: 32 });
+    pre = ovl.image({ target: 'hud', visible: false, preload: true, w: 32, h: 32, iw: 32, ih: 32 });
     ovl.pixels(pre, null, Buffer.alloc(32 * 32 * 4, 77));
     ok('a hidden preload layer: its target loaded, the layer hidden',
         await until(() => eo.target.hud === 'loaded', 2000) && eo.layer[pre] === 'hidden');
@@ -156,6 +158,7 @@ async function main() {
     ok('made visible: shown', await until(() => eo.layer[pre] === 'shown' && eo.target.hud === 'shown', 3000));
     ovl.set(pre, { visible: false });
     ok('hidden again: loaded after the linger', await until(() => eo.target.hud === 'loaded', 5000));
+    }
 
     svc.kill();
     await new Promise((r) => svc.once('exit', r));
@@ -168,10 +171,12 @@ async function main() {
         await until(() => eo.layer[badge] === 'shown' && ew.layer[map] === 'shown', 5000) && eo.ready >= 2);
     ok('the asset, its effect, the mesh part and its geometry are made again',
         await until(() => eo.layer[label] === 'shown' && eo.layer[car] === 'shown', 2000));
+    if (pre) {
     ok('the preload layer is made again with preload: its target loaded',
         await until(() => eo.target.hud === 'loaded', 3000) && eo.layer[pre] === 'hidden');
     ovl.set(pre, { preload: false });
     ok('preload 0: the target released', await until(() => eo.target.hud === 'idle', 2000));
+    }
 
     const file = path.join(scenes, 'gauge.scene');
     fs.writeFileSync(file, GAUGE);

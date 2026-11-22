@@ -78,7 +78,10 @@ function git(args) { return cp.execFileSync('git', args, { cwd: REPO, encoding: 
 
 function semver(v) { return v.split('.').map(Number); }
 function cmp(a, b) { a = semver(a); b = semver(b); for (var i = 0; i < 3; i++) if (a[i] !== b[i]) return a[i] - b[i]; return 0; }
+var CN_REF = 'b62adba497c27cfb2478cc2d54faee8d7b0d29d2', CN_VERSION = '0.10.13';
 function group(v) {
+    // This pinned CN release writes the same six disk edits as group H.
+    if (v === CN_VERSION) return 'H';
     return cmp(v, '0.6.3') <= 0 ? 'A' : cmp(v, '0.7.6') <= 0 ? 'B' : cmp(v, '0.8.4') <= 0 ? 'C' : cmp(v, '0.9.10') <= 0 ? 'D' :
         cmp(v, '0.9.11') <= 0 ? 'E' : cmp(v, '0.10.1') <= 0 ? 'F' : cmp(v, '0.10.3') <= 0 ? 'G' : cmp(v, '0.10.12') <= 0 ? 'H' : 'I';
 }
@@ -103,12 +106,8 @@ if (!list.length) process.exit(1);
 var dir = fs.mkdtempSync(path.join(os.tmpdir(), 'woc-rollback-'));
 process.on('exit', function () { try { cp.execFileSync('rm', ['-rf', dir]); } catch (e) {} });
 var RELEASES = list.map(function (t) { return t.slice('waze-on-cluster@'.length); }).filter(function (v) { return /^\d+\.\d+\.\d+$/.test(v); })
-    // This matrix runs each older release's disk writer. Memory-mode behavior
-    // is covered by inmem_test and the current-version lifecycle tests.
-    .filter(function (v) { return cmp(v, '0.10.12') <= 0; })
     .filter(function (v) { return !process.env.WOC_RELEASE_MAX || cmp(v, process.env.WOC_RELEASE_MAX) <= 0; })
     .sort(cmp).filter(function (v) { return BIN || group(v) !== 'A'; });
-var CN_REF = 'b62adba497c27cfb2478cc2d54faee8d7b0d29d2', CN_VERSION = '0.10.13';
 try { git(['cat-file', '-e', CN_REF]); }
 catch (e) { git(['fetch', '--no-tags', '--depth=1', 'origin', CN_REF]); }
 RELEASES.push(CN_VERSION);
