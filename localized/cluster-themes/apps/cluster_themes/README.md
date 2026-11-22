@@ -10,7 +10,7 @@ Redraws the whole instrument cluster in a theme of your choice. Open **Cluster T
 
 ## Themes
 
-Every theme fills the cluster and shows its own clock, range and outside temperature along the bottom, in the theme's style. Only BMW's gear letter at the bottom right stays uncovered: when a theme covers it, BMW draws a black box over the theme (issue #5). Every theme shows the drive mode (Comfort, Sport and so on) next to the gear.
+Every theme fills the cluster and shows its own clock, range and outside temperature along the bottom, in the theme's style. Only BMW's gear letter at the bottom right stays uncovered: when a theme covers it, BMW draws a black box over the theme (issue #5). Every theme shows the drive mode (Comfort, Sport and so on) next to the gear. On M cars and some others, like the G22 4 Series, BMW still draws two boxes; turn on Leave BMW's bottom strip clear and the theme ends just above BMW's strip, which then shows BMW's own clock, range and outside temperature.
 
 ### GT3
 
@@ -131,7 +131,8 @@ More themes are on the way.
 
 - **Off (BMW's own cluster):** pick it as the theme and the app draws nothing, so BMW's cluster comes back.
 - **Change with SPORT / COMFORT / ECO PRO** (on by default): the cluster follows the drive mode buttons, with a theme for each mode. Out of the box, Sport shows GT3, and Comfort and Eco Pro show BMW's own cluster. Until the car reports a mode, the plain theme setting is used.
-- **M cars:** the Efficient, Sport and Sport+ modes of M cars are not recognised yet, so the theme doesn't change with them. The last line of the Settings tab shows the value your car sends; please post it in an issue so it can be added.
+- **M cars:** Efficient, Sport and Sport+ from M Setup switch the theme too.
+- **Plug-in hybrids:** Sport and Sport Plus switch to your Sport theme; Hybrid, Electric and Battery Control count as Comfort, and Hybrid Eco Pro as Eco Pro. You can also give Hybrid and Electric themes of their own (In Hybrid, In Electric on the Themes tab); Battery Control counts as Hybrid there.
 - **With HUD Widgets:** on cluster-render 0.5.1 and newer, a cluster theme and a HUD layout show at the same time. On older cluster-render they share one screen slot and take turns: pick a theme while the HUD is on and the page asks whether to turn HUD Widgets off, and it asks the same the other way round.
 
 ## Settings
@@ -146,7 +147,7 @@ More themes are on the way.
 - **Shift lights:** Count in (the default) fills the lights over about the last second before the shift point and flashes early by your reaction time; Fixed rpm band works as before. Ported from Redline (MIT).
 - **Temperatures only when they matter** (off by default): oil and coolant turn blue while cold, yellow while warming, red over their limit; the outside temperature turns blue at 3°C (37°F) and under.
 - **Night colours:** after sunset the theme's whites and greys dim to 60% (Auto, the default), or Off.
-- **Units:** mph, °F, psi or km/h, °C, bar.
+- **Units:** mph, °F, psi or km/h, °C, bar. **Temperature** and **Pressure** can be set on their own (°C or °F, bar or psi), for example mph with °C and psi; Match speed (the default) follows Units.
 - **Clock:** 12-hour or 24-hour.
 - **Time zone (clock):** the head unit's clock runs on UTC, so pick your zone once. Named zones (US Eastern, Central, Mountain, Pacific, Alaska, Hawaii, Arizona, Canada Atlantic, Mexico, UK / Ireland / Portugal, Central Europe, Eastern Europe) change for daylight saving by themselves; for anywhere else, pick your offset from UTC. Night colours uses the same zone to work out sunset.
 - **Fuel tank size:** the fuel gauge asks the engine unit for the level in %. Where the engine unit doesn't answer, it works it out from the litres the car reports and this size (65 L on an X3, 59 L on a 3 Series).
@@ -155,6 +156,8 @@ More themes are on the way.
 - **Cold-engine rev guard:** until the oil reaches 80°C, the shift point starts at 4500 rpm and climbs as the oil warms up.
 - **Show boost.**
 - **Leave room for the driver camera** (off by default): for newer cars with a driver attention camera in the top middle of the cluster, where other cars show the model badge. The shift lights and rev bars (GT3, Track, Dyno, Rally) become two mirrored wings either side of the camera that fill from the outer ends in towards it and meet at the shift point, Track's rpm numbers are left out, M's logo is hidden, and Ribbon's ribbon dips under the camera instead. The camera's spot is taken from where the badge sits on a car without one. Not yet tested on a car with a camera; please report how it lines up on yours.
+- **Leave BMW's bottom strip clear** (off by default): for cars where BMW draws black boxes over the theme even with its gear letter uncovered (M cars, the G22 4 Series). The theme ends just above BMW's bottom strip and BMW's own clock, range and outside temperature show there instead of the theme's. Nothing is squeezed.
+- **Start with the car** (on by default): the theme comes up by itself when the car starts. Turned off, nothing is drawn until you open the app.
 - **Holiday editions:** a string of glowing holiday lights along the top of every theme, and Ribbon's own holiday edition. Auto (the default) puts them on by the date: Thanksgiving in its week (Monday to Sunday), Christmas from December 1 to 26, New Year from December 27 to January 2, and the Fourth of July from July 1 to 5, then takes them off again. Or pick one holiday to keep it on, or Off. The date follows the Time zone (clock) setting.
 - **G-meter** (its own tab): the range (0.8, 1.0, 1.2, 1.5 or 2.0 g at the edge; 1.2 by default), the trail (off, 1, 2 or 4 seconds), **Swap left / right** (if the dot goes the wrong way in a turn) and **Brake on top**, the best left, right, accelerating, braking and overall g of the drive with a Reset button, and a live copy of the meter. The g comes from the car's own acceleration sensor: parked on level ground it reads 0.00, and a hill adds a little.
 - **Demo data:** fake driving data for trying it out parked. It switches back to the car's own data as soon as the car moves faster than 5 km/h.

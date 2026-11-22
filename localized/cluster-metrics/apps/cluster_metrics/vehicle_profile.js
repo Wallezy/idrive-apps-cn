@@ -29,6 +29,12 @@ function detectAnomaly(telemetry, units, state, nowMs) {
         return (units && units.pressUnit === 'bar') ? (bar.toFixed(1) + 'b') : (Math.round(bar * 14.5038) + 'psi');
     };
 
+    const fmtPressSpaced = (bar) => {
+        if (typeof bar !== 'number' || !isFinite(bar)) return '--';
+        return (units && units.pressUnit === 'bar') ? (bar.toFixed(1) + ' bar') : (Math.round(bar * 14.5038) + ' psi');
+    };
+    const cornerName = { FL: 'Front Left', FR: 'Front Right', RL: 'Rear Left', RR: 'Rear Right' };
+
     // 1. TPMS corner under-pressure (>= 0.28 bar / ~4.1 psi below target, or < 1.72 bar) or hot tire (>= 85°C)
     if (t.tpms && typeof t.tpms === 'object') {
         const corners = ['FL', 'FR', 'RL', 'RR'];
@@ -41,17 +47,40 @@ function detectAnomaly(telemetry, units, state, nowMs) {
             const target = item.targetBar;
             const tempC = item.tempC;
             if (typeof p === 'number' && isFinite(p) && p > 0.2 && p <= 6.5) {
-                const deficit = (typeof target === 'number' && isFinite(target) && target > 0.5 && target <= 6.5)
-                    ? (target - p) : (p < 1.72 ? 1.72 - p : 0);
+                const hasTarget = typeof target === 'number' && isFinite(target) && target > 0.5 && target <= 6.5;
+                const deficit = hasTarget ? (target - p) : (p < 1.72 ? 1.72 - p : 0);
                 if (deficit >= 0.28) {
                     const sev = (deficit >= 0.50 || p < 1.50) ? 'red' : 'amber';
                     if (!worstTpms || (sev === 'red' && worstTpms.severity !== 'red')) {
-                        worstTpms = { id: 'tpms', severity: sev, label: c + ' ' + fmtPress(p) };
+                        const tgtTxt = hasTarget ? (' (Target ' + fmtPressSpaced(target) + ')') : '';
+                        worstTpms = {
+                            id: 'tpms',
+                            severity: sev,
+                            corner: c,
+                            label: c + ' ' + fmtPress(p),
+                            hudText: sev === 'red' ? 'Tire Pressure Critical' : 'Tire Pressure Low',
+                            title: sev === 'red' ? 'TIRE FLAT - CRITICAL' : 'TIRE PRESSURE LOW',
+                            heroVal: fmtPressSpaced(p),
+                            detail: cornerName[c] + ': ' + fmtPressSpaced(p) + tgtTxt,
+                            advice: sev === 'red' ? 'Stop safely & inspect tire' : 'Inflate tire when safe',
+                        };
                     }
                 }
             }
             if (!worstTpms && typeof tempC === 'number' && isFinite(tempC) && tempC >= 85) {
-                worstTpms = { id: 'tpms_temp', severity: 'amber', label: c + ' ' + fmtTemp(tempC) };
+                const hotCrit = tempC >= 98;
+                const maxTxt = (units && units.tempUnit === 'F') ? '185\u00B0F' : '85\u00B0C';
+                worstTpms = {
+                    id: 'tpms_temp',
+                    severity: hotCrit ? 'red' : 'amber',
+                    corner: c,
+                    label: c + ' ' + fmtTemp(tempC),
+                    hudText: hotCrit ? 'Tire Temp Critical' : 'Tire Temp High',
+                    title: hotCrit ? 'TIRE TEMP CRITICAL' : 'TIRE TEMP HIGH',
+                    heroVal: fmtTemp(tempC),
+                    detail: cornerName[c] + ': ' + fmtTemp(tempC) + ' (Limit ' + maxTxt + ')',
+                    advice: 'Reduce speed & let tire cool',
+                };
             }
         }
         if (worstTpms) return worstTpms;
@@ -59,10 +88,17 @@ function detectAnomaly(telemetry, units, state, nowMs) {
 
     // 2. ZF 8HP Gearbox over-temperature (> 105°C / 221°F)
     if (typeof t.gearboxOilC === 'number' && isFinite(t.gearboxOilC) && t.gearboxOilC >= 105) {
+        const gCrit = t.gearboxOilC >= 115;
+        const limTxt = (units && units.tempUnit === 'F') ? (gCrit ? '239\u00B0F' : '221\u00B0F') : (gCrit ? '115\u00B0C' : '105\u00B0C');
         return {
             id: 'gbox',
-            severity: t.gearboxOilC >= 115 ? 'red' : 'amber',
+            severity: gCrit ? 'red' : 'amber',
             label: 'GBX ' + fmtTemp(t.gearboxOilC),
+            hudText: gCrit ? 'Gearbox Critical' : 'Gearbox Hot',
+            title: gCrit ? 'GEARBOX TEMP CRITICAL' : 'GEARBOX OIL HOT',
+            heroVal: fmtTemp(t.gearboxOilC),
+            detail: 'Transmission oil > ' + limTxt,
+            advice: gCrit ? 'Pull over safely & cool down' : 'Reduce load & allow cooling',
         };
     }
 
@@ -70,10 +106,16 @@ function detectAnomaly(telemetry, units, state, nowMs) {
     if (typeof t.soc12 === 'number' && isFinite(t.soc12) && t.soc12 >= 0 && t.soc12 < 55) {
         if (!state._soc12LowSince) state._soc12LowSince = nowMs;
         if (nowMs - state._soc12LowSince >= 5000) {
+            const sCrit = t.soc12 < 40;
             return {
                 id: 'soc12',
-                severity: t.soc12 < 40 ? 'red' : 'amber',
+                severity: sCrit ? 'red' : 'amber',
                 label: '12V ' + Math.round(t.soc12) + '%',
+                hudText: sCrit ? '12V Battery Critical' : '12V Battery Low',
+                title: sCrit ? '12V BATTERY CRITICAL' : '12V BATTERY LOW',
+                heroVal: Math.round(t.soc12) + '%',
+                detail: '12V Aux State of Charge < ' + (sCrit ? '40%' : '55%'),
+                advice: 'Drive or charge to replenish 12V',
             };
         }
     } else {
@@ -84,10 +126,16 @@ function detectAnomaly(telemetry, units, state, nowMs) {
     if (typeof t.v12 === 'number' && isFinite(t.v12) && t.v12 > 5 && t.v12 < 12.1) {
         if (!state._v12LowSince) state._v12LowSince = nowMs;
         if (nowMs - state._v12LowSince >= 5000) {
+            const vCrit = t.v12 < 11.7;
             return {
                 id: 'v12',
-                severity: t.v12 < 11.7 ? 'red' : 'amber',
+                severity: vCrit ? 'red' : 'amber',
                 label: '12V ' + t.v12.toFixed(1) + 'V',
+                hudText: vCrit ? '12V Battery Critical' : '12V Battery Low',
+                title: vCrit ? '12V VOLTAGE CRITICAL' : '12V BATTERY LOW',
+                heroVal: t.v12.toFixed(1) + ' V',
+                detail: '12V Aux Voltage < ' + (vCrit ? '11.7 V' : '12.1 V'),
+                advice: vCrit ? 'Check charging system / battery' : 'Drive or charge to replenish 12V',
             };
         }
     } else {

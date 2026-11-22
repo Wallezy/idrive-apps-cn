@@ -1,7 +1,7 @@
 {
  "id": "cluster_themes",
  "title": "\u4eea\u8868\u4e3b\u9898",
- "version": "0.19.2",
+ "version": "0.19.9",
  "screens": [
   {
    "name": "MAIN",
@@ -287,6 +287,154 @@
    ]
   },
   {
+   "key": "inHybrid",
+   "label": "\u6df7\u52a8\u6a21\u5f0f",
+   "type": "choice",
+   "default": "same",
+   "options": [
+    [
+     "same",
+     "\u8ddf\u968f\u9a7e\u9a76\u6a21\u5f0f"
+    ],
+    [
+     "off",
+     "\u5173\u95ed\uff08\u539f\u8f66\u4eea\u8868\uff09"
+    ],
+    [
+     "gt3",
+     "GT3"
+    ],
+    [
+     "m",
+     "M"
+    ],
+    [
+     "mview",
+     "M view"
+    ],
+    [
+     "vector",
+     "Vector"
+    ],
+    [
+     "sport",
+     "Sport"
+    ],
+    [
+     "minimal",
+     "Minimal"
+    ],
+    [
+     "track",
+     "Track"
+    ],
+    [
+     "drag",
+     "Drag"
+    ],
+    [
+     "rally",
+     "Rally"
+    ],
+    [
+     "retro80s",
+     "Retro 80s"
+    ],
+    [
+     "cruise",
+     "Cruise"
+    ],
+    [
+     "dyno",
+     "Dyno"
+    ],
+    [
+     "ribbon",
+     "Ribbon"
+    ]
+   ]
+  },
+  {
+   "key": "inElectric",
+   "label": "\u7eaf\u7535\u6a21\u5f0f",
+   "type": "choice",
+   "default": "same",
+   "options": [
+    [
+     "same",
+     "\u8ddf\u968f\u9a7e\u9a76\u6a21\u5f0f"
+    ],
+    [
+     "off",
+     "\u5173\u95ed\uff08\u539f\u8f66\u4eea\u8868\uff09"
+    ],
+    [
+     "gt3",
+     "GT3"
+    ],
+    [
+     "m",
+     "M"
+    ],
+    [
+     "mview",
+     "M view"
+    ],
+    [
+     "vector",
+     "Vector"
+    ],
+    [
+     "sport",
+     "Sport"
+    ],
+    [
+     "minimal",
+     "Minimal"
+    ],
+    [
+     "track",
+     "Track"
+    ],
+    [
+     "drag",
+     "Drag"
+    ],
+    [
+     "rally",
+     "Rally"
+    ],
+    [
+     "retro80s",
+     "Retro 80s"
+    ],
+    [
+     "cruise",
+     "Cruise"
+    ],
+    [
+     "dyno",
+     "Dyno"
+    ],
+    [
+     "ribbon",
+     "Ribbon"
+    ]
+   ]
+  },
+  {
+   "key": "keepStrip",
+   "label": "\u4fdd\u7559\u539f\u8f66\u5e95\u90e8\u4fe1\u606f\u680f",
+   "type": "bool",
+   "default": false
+  },
+  {
+   "key": "autoStart",
+   "label": "\u968f\u8f66\u542f\u52a8",
+   "type": "bool",
+   "default": true
+  },
+  {
    "key": "mapInTheme",
    "label": "\u4e3b\u9898\u5185\u663e\u793a Waze \u5730\u56fe",
    "type": "bool",
@@ -305,6 +453,46 @@
     [
      "metric",
      "km/h, \u00b0C, bar"
+    ]
+   ]
+  },
+  {
+   "key": "tempUnits",
+   "label": "\u6e29\u5ea6\u5355\u4f4d",
+   "type": "choice",
+   "default": "speed",
+   "options": [
+    [
+     "speed",
+     "\u8ddf\u968f\u8f66\u901f"
+    ],
+    [
+     "c",
+     "\u00b0C"
+    ],
+    [
+     "f",
+     "\u00b0F"
+    ]
+   ]
+  },
+  {
+   "key": "pressureUnits",
+   "label": "\u80ce\u538b\u5355\u4f4d",
+   "type": "choice",
+   "default": "speed",
+   "options": [
+    [
+     "speed",
+     "\u8ddf\u968f\u8f66\u901f"
+    ],
+    [
+     "bar",
+     "bar"
+    ],
+    [
+     "psi",
+     "psi"
     ]
    ]
   },

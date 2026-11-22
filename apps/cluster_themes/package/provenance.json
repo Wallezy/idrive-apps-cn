@@ -1,10 +1,14 @@
 {
   "repository": "https://github.com/bimmer-lab/apps",
-  "commit": "ab81cee4d77859b531b21a118772c6b031455b78",
+  "commit": "d6a24a341858f9482fd676f1de7bc0d573eeb8b9",
   "component": "cluster_themes",
-  "upstreamVersion": "0.19.0",
-  "cnRevision": 2,
-  "releaseVersion": "0.19.2",
+  "upstreamVersion": "0.19.8",
+  "cnRevision": 1,
+  "releaseVersion": "0.19.9",
   "scope": "Chinese centre-screen controls, settings, help and catalog; original instrument themes, units, signals and defaults preserved",
-  "sdk": "Not included; linked on the head unit"
+  "sdk": "Not included; linked on the head unit",
+  "releaseChanges": [
+    "新增混动／纯电模式主题、独立温度与胎压单位。",
+    "增加随车启动和原厂底栏保留选项，改进大字显示。"
+  ]
 }

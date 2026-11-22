@@ -247,16 +247,24 @@ function pwl(pts, x) {
     return last[1];
 }
 
-// Calibrated 1920x720 right-wing Power % gauge envelope (clears all KOMBI4 telltales & POWER % label)
-const WING_TOP_Y = [[1335, 89], [1480, 95], [1565, 104], [1650, 145], [1780, 210]];
+// Calibrated 1920x720 G30 right-wing Power % gauge face (measured directly from real 530e KOMBI4 photo):
+// Includes top-left extended eyebrow handle (x=1254..1384, y=95..124), hugs the inner cyan bezel
+// along 60/40/20/0 and the lower CHARGE arc down to Power % (y=622), with zero bleed onto the center map.
+const WING_TOP_Y = [
+    [1254, 95], [1340, 98], [1420, 102], [1500, 108], [1554, 114],
+    [1592, 134], [1634, 170], [1694, 232], [1748, 325],
+];
 const WING_OUTER_X = [
-    [88, 1538], [120, 1592], [160, 1644], [200, 1688], [240, 1726], [280, 1744],
-    [320, 1768], [355, 1776], [400, 1766], [450, 1740], [500, 1702], [550, 1652], [602, 1584],
+    [95, 1554], [114, 1564], [134, 1592], [160, 1624], [200, 1664], [240, 1698],
+    [280, 1726], [320, 1744], [352, 1750], [378, 1742], [405, 1732], [440, 1718],
+    [480, 1698], [520, 1676], [560, 1648], [595, 1618], [622, 1588],
 ];
 const WING_INNER_X = [
-    [88, 1342], [180, 1404], [270, 1468], [355, 1506], [450, 1470], [540, 1424], [602, 1396],
+    [95, 1254], [112, 1258], [120, 1352], [128, 1384], [160, 1408], [200, 1435],
+    [245, 1465], [295, 1492], [340, 1508], [368, 1508], [410, 1496], [460, 1478],
+    [520, 1456], [580, 1438], [622, 1428],
 ];
-const WING_BOTTOM_Y = 601;
+const WING_BOTTOM_Y = 622;
 
 /**
  * Full-wing gauge-edge translucent album-art backdrop matching BMW's stock Media widget:
@@ -323,21 +331,24 @@ function buildStockBackdrop(cover, cw, ch, opts) {
         const rowOut = y * cw;
         const vdy = (y - vy) / ryVig;
 
-        const inYBand = wy >= 88 && wy <= WING_BOTTOM_Y;
+        const inYBand = wy >= 94 && wy <= WING_BOTTOM_Y;
         const botAa = inYBand ? smoothstep(WING_BOTTOM_Y, WING_BOTTOM_Y - 3, wy) : 0;
         const innerX = inYBand ? pwl(WING_INNER_X, wy) : 9999;
         const outerX = inYBand ? pwl(WING_OUTER_X, wy) : -1;
+        // Soft left fade only on the top-left eyebrow handle tip (y <= 116); crisp 3px AA cut along the boomerang
+        const innerFadeLo = wy <= 116 ? innerX : innerX - 2;
+        const innerFadeHi = wy <= 116 ? innerX + 14 : innerX + 2;
 
         for (let x = 0; x < cw; x++) {
             const wx = ox + x;
 
             let artR = 0, artG = 0, artB = 0, artA = 0;
-            if (inYBand && wx >= innerX - 18 && wx <= outerX) {
+            if (inYBand && wx >= innerFadeLo && wx <= outerX) {
                 const topY = pwl(WING_TOP_Y, wx);
                 if (wy >= topY) {
                     const topAa = smoothstep(topY, topY + 3, wy);
                     const rightAa = smoothstep(outerX, outerX - 3, wx);
-                    const innerFade = smoothstep(innerX - 18, innerX + 10, wx);
+                    const innerFade = smoothstep(innerFadeLo, innerFadeHi, wx);
                     const mask = topAa * botAa * rightAa * innerFade;
                     if (mask > 0.005) {
                         const sx = Math.max(0, Math.min(s - 1, (wx - artX0World) * srcSpanX));

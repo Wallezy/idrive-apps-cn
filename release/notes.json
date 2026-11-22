@@ -1,6 +1,15 @@
 {
   "cluster-render": [
     {
+      "version": "0.8.1",
+      "changes": [
+        "新增场景预加载，改善仪表内容再次显示的速度。",
+        "协调地图与主题的传输帧率，保留全屏和映射故障保护。"
+      ],
+      "upstreamVersion": "0.8.0",
+      "cnRevision": 1
+    },
+    {
       "version": "0.6.10",
       "upstreamVersion": "0.6.9",
       "cnRevision": 1,
@@ -81,6 +90,15 @@
     }
   ],
   "waze-on-cluster": [
+    {
+      "version": "0.13.1",
+      "changes": [
+        "Android Auto 使用内存补丁，保留原厂文件。",
+        "修复主题内地图再次显示时的刷新，保留全屏及 HUD 设置。"
+      ],
+      "upstreamVersion": "0.13.0",
+      "cnRevision": 1
+    },
     {
       "version": "0.11.1",
       "upstreamVersion": "0.11.0",
@@ -216,12 +234,12 @@
   ],
   "cluster_metrics": [
     {
-      "version": "0.8.1",
-      "upstreamVersion": "0.8.0",
+      "version": "0.9.1",
+      "upstreamVersion": "0.9.0",
       "cnRevision": 1,
       "changes": [
-        "新增 HUD 跟车距离、车内温度与电量信息。",
-        "改进挡位和右侧媒体、行程显示，保留中文歌名与导航路名。"
+        "改进中日韩文字清晰度，新增胎压与车辆提醒。",
+        "优化 HUD 导航避让、BC 按键和充电完成时间显示。"
       ]
     }
   ],
@@ -366,6 +384,15 @@
     }
   ],
   "ambient_config": [
+    {
+      "version": "2.7.17",
+      "changes": [
+        "改善部分车型车身模块持续忙碌时无法自定义氛围灯颜色的问题。",
+        "增加整组灯光单色模式，保留分区设置和离车停止控制。"
+      ],
+      "upstreamVersion": "2.7.16",
+      "cnRevision": 1
+    },
     {
       "version": "2.7.14",
       "upstreamVersion": "2.7.13",
@@ -809,6 +836,15 @@
     }
   ],
   "cluster_themes": [
+    {
+      "version": "0.19.9",
+      "changes": [
+        "新增混动／纯电模式主题、独立温度与胎压单位。",
+        "增加随车启动和原厂底栏保留选项，改进大字显示。"
+      ],
+      "upstreamVersion": "0.19.8",
+      "cnRevision": 1
+    },
     {
       "version": "0.19.1",
       "upstreamVersion": "0.19.0",

@@ -35,6 +35,25 @@ function reply(did) { return [0x62, ...did, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0]; }
     } });
     assert.strictEqual(await midScan._findBdc(), false);
     assert.strictEqual(scans, 1);
+    const writes = [];
+    const asleep = new Lights({ log, canProbe: () => false, diag: {
+        physical: async (...args) => { writes.push(args); return [0x6e]; },
+    } });
+    assert.strictEqual(await asleep._tryBlind('fixture'), false);
+    assert.strictEqual(writes.length, 0, 'an absent driver prevents blind write probes');
+    asleep.stop();
+    let answer;
+    const leaving = new Lights({ log, diag: {
+        physical: async (...args) => {
+            writes.push(args);
+            return new Promise(resolve => { answer = resolve; });
+        },
+    } });
+    const probing = leaving._tryBlind('fixture');
+    leaving.stop();
+    answer([0x6e, 0xda, 0x5e]);
+    assert.strictEqual(await probing, false);
+    assert.strictEqual(writes.length, 1, 'stopping during a probe prevents the next bus write');
     const light = { name: 'Dash decor driver', part: 'upper', x: 0.1, y: 0.1 };
     const scene = { kind: 'solid', upper: { rgb: [255, 0, 0], bright: 100 },
         lower: { rgb: [0, 0, 255], bright: 100 } };

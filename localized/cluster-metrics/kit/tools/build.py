@@ -446,6 +446,9 @@ def build(app_id, language='en', omit_sdk=False):
     # --- source/ (the npm package) ---
     pkg = {
         'name': app_id, 'version': ver, 'description': spec.get('description', spec['title']),
+        'main': 'javascript/app.js', 'private': False,
+        'author': spec.get('vendor', 'custom'), 'license': spec.get('license', 'MIT'),
+        'mguAppStartType': 'autostart' if spec.get('autostart') else 'manual',
         'engines': {'node': '>=8.7.0'},
         'oapAppSettings': {
             'maxDiskUsage': spec.get('maxDiskUsage', 20971520), 'cpuLimit': spec.get('cpuLimit', 60),

@@ -20,6 +20,7 @@ def write(path, value):
 def main():
     provenance = json.loads((LOCAL / 'provenance.json').read_text())
     version = provenance['releaseVersion']
+    changes = provenance.get('releaseChanges', ['支持中文设置和国内源在线更新。'])
     spec = json.loads((LOCAL / 'apps/cluster_themes/app.json').read_text())
     assert spec['version'] == provenance['upstreamVersion']
     words = json.loads((LOCAL / 'kit/runtime/locales/zh-CN.json').read_text())
@@ -61,8 +62,7 @@ def main():
         shutil.copy2(LOCAL / 'apps/cluster_themes/NOTICE', package / 'NOTICE')
         (package / 'CHANGELOG.md').write_text(
             '# 仪表主题\n\n## Unreleased\n\n## ' + version + '\n\n'
-            '- 修复部分车机因媒体服务实例名称不同而无法更新仪表主题。\n'
-            '- 保留原版主题名称、仪表风格和单位，支持国内源在线更新。\n\n'
+            + ''.join('- ' + line + '\n' for line in changes) + '\n'
             '上游版本：' + provenance['upstreamVersion'] + '；CN 修订：' + str(provenance['cnRevision']) + '。\n')
         (app / 'src').mkdir(exist_ok=True)
         shutil.copy2(ROOT / 'apps/warmup/src/sdk.js', app / 'src/sdk.js')
@@ -75,7 +75,7 @@ def main():
         write(app / 'release-notes.json', [{
             'version': version, 'upstreamVersion': provenance['upstreamVersion'],
             'cnRevision': provenance['cnRevision'],
-            'changes': ['修复部分车机因媒体服务实例名称不同而无法更新仪表主题。'],
+            'changes': changes,
         }])
     path = ROOT / 'release/repo.json'
     repo = json.loads(path.read_text())

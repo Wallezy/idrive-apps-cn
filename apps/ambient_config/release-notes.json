@@ -1,5 +1,14 @@
 [
   {
+    "version": "2.7.17",
+    "upstreamVersion": "2.7.16",
+    "cnRevision": 1,
+    "changes": [
+      "改善部分车型车身模块持续忙碌时无法自定义氛围灯颜色的问题。",
+      "增加整组灯光单色模式，保留分区设置和离车停止控制。"
+    ]
+  },
+  {
     "version": "2.7.16",
     "upstreamVersion": "2.7.15",
     "cnRevision": 1,

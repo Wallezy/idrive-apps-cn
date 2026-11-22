@@ -51,7 +51,12 @@ painter._paintRightMedia(cv, null);
 assert(rendered.includes('暂无媒体播放'));
 for (const c of '晴天周杰伦南京东路暂无媒体播放行程与车辆信息') {
     const resolved = fonts.resolveGlyph(fonts.get('bold', 21, c), c.codePointAt(0));
-    assert(resolved && resolved.font.glyphs[c.codePointAt(0)], 'missing glyph: ' + c);
+    assert(resolved && resolved.g && resolved.g[2] > 0 && resolved.g[3] > 0,
+        'missing glyph bitmap: ' + c);
+    assert(resolved.font.alpha.some(x => x !== 0), 'empty glyph atlas: ' + c);
+    const glyphCanvas = new Canvas(64, 64);
+    glyphCanvas.text(c, 0, 32, 21, '#ffffff', { font: 'bold', literal: true });
+    assert(glyphCanvas.d.some(x => x !== 0), 'Chinese glyph did not render: ' + c);
 }
 const road = new Canvas(544, 38);
 assert(drawHudRoadBanner(road, { road: '南京东路', exitBadge: '14B' }));
@@ -65,7 +70,7 @@ const rows = [], buttons = [];
 const ui = {
     cells: (name, row, value) => { rows.push(value); },
     text: (name, value) => { buttons.push(value); },
-    onClick() {}, onVisible() {}, open() {}, enabled() {}, checked() {},
+    onClick() {}, onVisible() {}, open() {}, enabled() {}, checked() {}, visible() {},
 };
 class Hub {
     constructor() { this.uds = { stats: {} }; }

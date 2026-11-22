@@ -35,10 +35,10 @@ const FUEL_GAUGE_LOWER_LEFT = [6, 418, 210, 642];
 const FUEL_RANGE_CLOCK = [126, 650, 480, 716];
 const BELT = [587, 663, 626, 700];
 const REAR_BELTS_AIRBAG = [505, 648, 760, 716];
-// Single-letter PRND selector box on G30 KOMBI4 ('D' occupies x=1400..1424, y=656..708).
-// Note: in Sport/Manual ('S1'..'S8' / 'M1'..'M8') BMW widens to x~1456, and Cluster Metrics hides gear_d completely.
-const GEAR_WIN = [1380, 656, 1426, 720];
-const DRIVE_MODE_STOCK_D = [1230, 652, 1426, 714];
+// KOMBI4 hardware gear window on G30 spans x=1380..1460, y=656..720 even in single-letter 'D'.
+// Any pixel overlapping 1380..1460 is both clipped invisible AND latches BMW's safety BLACK_BOX (1406..1597, 342..419).
+const GEAR_WIN = [1380, 656, 1460, 720];
+const DRIVE_MODE_STOCK_D = [1230, 652, 1460, 714];
 const STOCK_D_INDICATOR = GEAR_WIN;
 const AMBIENT_TEMP = [1540, 652, 1668, 712];
 const SOC_GAUGE_LOWER_RIGHT = [1782, 415, 1916, 642];

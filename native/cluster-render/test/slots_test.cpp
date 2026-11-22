@@ -4393,6 +4393,32 @@ static void preload_shared_scene()
                                                                          !w.m.loaded(1));
 }
 
+static void preload_disabled()
+{
+    const std::string path = "/tmp/crs-preload-guard-" + std::to_string(getpid()) + ".txt";
+    unlink(path.c_str());
+    Guard g;
+    g.load(path, "t", "boot-1");
+    TargetSpec spec;
+    spec.name = "hud"; spec.slot = kHudSlot; spec.scene_id = kPanelScene;
+    spec.width = 800; spec.height = 480; spec.strike_limit = 2;
+    g.strike(spec, "fixture");
+    g.strike(spec, "fixture");
+    FakePort port;
+    port.preloads_ok = true;
+    FakeScenes scenes;
+    SlotManager manager(&port, &scenes);
+    manager.add(spec);
+    manager.set_guard(&g);
+    joined();
+    manager.want(0, false, false, true, true, true);
+    manager.tick(100000);
+    manager.tick(110000);
+    ok("preload: a disabled target cannot be loaded by a new preload layer",
+       manager.disabled(0) && calls_are("") && !manager.loaded(0));
+    unlink(path.c_str());
+}
+
 static void preload_lock()
 {
     PreloadRig r;
@@ -4651,6 +4677,7 @@ int main()
     preload_dropped();
     preload_shared_scene();
     preload_lock();
+    preload_disabled();
     shared_id_ladder_no_preload();
     preload_popup();
     preload_unmap_table();

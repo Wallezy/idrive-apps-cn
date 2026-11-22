@@ -13,7 +13,7 @@ const { foldAscii } = require('./hud_nav_renderer');
 const COVER_SIDE = 144;
 const META_KEYS = { 3: 'TITLE', 5: 'ARTIST', 7: 'ALBUM', 9: 'ALBUM_ARTIST', 17: 'COVER_FILE', 32: 'PERFORMER', 40: 'EPISODE', 47: 'SERIES' };
 const ITEM_TYPES = { 0: 'UNDEFINED', 1: 'ARTIST', 2: 'ALBUM', 3: 'TITLE', ARTIST: 'ARTIST', ALBUM: 'ALBUM', TITLE: 'TITLE', UNDEFINED: 'UNDEFINED' };
-const PAGES = ['media', 'trip', 'off'];
+const PAGES = ['media', 'trip', 'tpms', 'off'];
 const BOLD_OPTS = { font: 'bold' };
 
 function isObj(v) { return Boolean(v && typeof v === 'object' && !Array.isArray(v)); }
@@ -81,7 +81,9 @@ function cleanMediaText(raw, maxLen) {
         .replace(/\uFF1A/g, ':')
         .replace(/\uFF5E/g, '~');
     if (typeof mapped.normalize === 'function') {
-        mapped = mapped.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        // Strip Latin combining diacritics (U+0300..U+036F) then re-compose NFC so Japanese
+        // dakuten/handakuten (e.g. 'で', 'が', 'ぱ') and Korean Hangul stay intact!
+        mapped = mapped.normalize('NFD').replace(/[\u0300-\u036f]/g, '').normalize('NFC');
     }
     let kept = '';
     for (const ch of mapped) {
@@ -839,8 +841,9 @@ class MediaTracker {
         };
     }
 
-    start(ctx, log) {
+    start(ctx, log, opts) {
         this._stopped = false;
+        const o = opts || {};
         if (!ctx || !ctx.signals || typeof ctx.signals.watch !== 'function') return;
 
         const addSub = (p, onReady) => {
@@ -887,18 +890,20 @@ class MediaTracker {
             ), (r) => { this._mpSub = r; });
         } catch (e) { /* optional */ }
 
-        try {
-            addSub(ctx.signals.watch(
-                'de.bmw.body.Light',
-                '1',
-                {
-                    StatusFunctionsIndicators: (v) => this.feedTurnSignal(v, Date.now()),
-                    IndicatorSteeringColumn: (v) => this.feedStalk(v, Date.now()),
-                    IndicatorSteeringColumnComplete: (v) => this.feedStalk(v, Date.now()),
-                },
-                log
-            ));
-        } catch (e) { /* optional */ }
+        if (!o.skipStalk) {
+            try {
+                addSub(ctx.signals.watch(
+                    'de.bmw.body.Light',
+                    '1',
+                    {
+                        StatusFunctionsIndicators: (v) => this.feedTurnSignal(v, Date.now()),
+                        IndicatorSteeringColumn: (v) => this.feedStalk(v, Date.now()),
+                        IndicatorSteeringColumnComplete: (v) => this.feedStalk(v, Date.now()),
+                    },
+                    log
+                ));
+            } catch (e) { /* optional */ }
+        }
     }
 
     stop() {
@@ -924,29 +929,34 @@ class MediaTracker {
     }
 }
 
-function resolveRightWidgetPage(settingsObj, media, isCharging) {
-    if (isCharging) return 'charging';
+function resolveRightWidgetPage(settingsObj, media, isCharging, bcBase) {
     const s = settingsObj || {};
-    if (s.rightWidgetMode && s.widgetMedia === undefined && s.widgetTrip === undefined) {
+    if (!isCharging && s.rightWidgetMode && s.widgetMedia === undefined && s.widgetTrip === undefined && s.widgetTpms === undefined) {
         const legacyMode = s.rightWidgetMode;
         if (legacyMode === 'off') return 'off';
         if (legacyMode === 'media') return 'media';
         if (legacyMode === 'trip') return 'trip';
+        if (legacyMode === 'tpms') return 'tpms';
     }
     const allowMedia = s.widgetMedia !== false;
     const allowTrip = s.widgetTrip !== false;
+    const allowTpms = Boolean(s.widgetTpms);
     const enabled = [];
+    if (isCharging) enabled.push('charging');
     if (allowMedia) enabled.push('media');
     if (allowTrip) enabled.push('trip');
+    if (allowTpms) enabled.push('tpms');
     if (!enabled.length) return 'off';
 
     const cycle = enabled.concat(['off']);
     const stepRaw = (media && typeof media.bcStep === 'number') ? media.bcStep
         : (media && typeof media.bcClicks === 'number' ? media.bcClicks
             : (media && media.page ? Math.max(0, PAGES.indexOf(media.page)) : 0));
-    const idx = ((stepRaw % cycle.length) + cycle.length) % cycle.length;
+    const base = (typeof bcBase === 'number' && isFinite(bcBase)) ? bcBase : 0;
+    const relStep = stepRaw - base;
+    const idx = ((relStep % cycle.length) + cycle.length) % cycle.length;
     const picked = cycle[idx];
-    if (idx === 0 && picked === 'media' && !(media && media.active) && enabled.indexOf('trip') >= 0) {
+    if (!isCharging && idx === 0 && picked === 'media' && !(media && media.active) && enabled.indexOf('trip') >= 0) {
         return 'trip';
     }
     return picked;

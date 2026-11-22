@@ -127,5 +127,16 @@
   "Right widget: Media playback": "右侧信息：媒体播放",
   "Right widget: Trip & powertrain": "右侧信息：行程与车辆",
   "Time + distance + closing speed": "时距、距离与接近速度",
-  "Time + distance only": "仅时距与距离"
+  "Time + distance only": "仅时距与距离",
+  "12V Battery Critical V (Red)": "12V 电压过低（红色）",
+  "12V Battery Low % (Amber)": "12V 电量偏低（黄色）",
+  "Active Alert Preview": "当前提醒预览",
+  "Clear Active Preview": "结束提醒预览",
+  "Gearbox Critical (Red)": "变速箱温度过高（红色）",
+  "Gearbox Hot (Amber)": "变速箱温度偏高（黄色）",
+  "Right widget: Tire pressure & alerts": "右侧信息：胎压与提醒",
+  "Smart Alert Previews": "车辆提醒预览",
+  "TPMS Critical Flat (Red)": "轮胎严重缺气（红色）",
+  "TPMS Hot Tire (Amber)": "轮胎温度偏高（黄色）",
+  "TPMS Low Pressure (Amber)": "胎压偏低（黄色）"
 }

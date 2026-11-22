@@ -17,7 +17,6 @@
 const fs = require('fs');
 const {
     decodeEvent: baseDecodeEvent,
-    decodeLanes,
     metres,
     straightOn,
     staleThen,
@@ -35,6 +34,7 @@ const CALL_BACKOFF_MS = 2000;
 const FAILS_RECONNECT = 5;
 const LANES_MINIMAP_MAX_MS = 18000;
 const NO_TURN_FALLBACK_MS = 5000;
+const LANE_PROMO_MS = 420;
 
 const DEFAULT_CR_STATUS = '/run/cluster-render/status.txt';
 const DEFAULT_WAZE_STATUS = '/run/waze-on-cluster/status.json';
@@ -58,9 +58,99 @@ function safeStr(t) {
     return String(t || '').replace(/[\u0000-\u001f\u007f]/g, '').replace(/[\s\u00a0\u2000-\u200b\u202f\u205f\u3000]+/g, ' ').trim();
 }
 
+const US_STATE_CODES = 'CA|SR|WA|OR|NV|AZ|TX|NY|FL|IL|PA|OH|MI|GA|NC|VA|MA|NJ|CO|UT|MD|MN|WI|IN|MO|TN|SC|AL|LA|KY|OK|CT|IA|KS|AR|MS|NE|NM|ID|HI|NH|ME|RI|MT|DE|SD|ND|AK|VT|WY|WV|DC';
+
+function iconMetaStr(icon) {
+    if (!isObj(icon)) return '';
+    return [icon.type, icon.iconType, icon.category, icon.style, icon.shieldType, icon.roadClass]
+        .filter((v) => v !== null && v !== undefined)
+        .map((v) => String(v).toUpperCase())
+        .join(' ');
+}
+
+function classifyShieldToken(rawText, meta, fromIcon) {
+    const s = safeStr(rawText);
+    if (!s) return null;
+    const mInt = /^(?:INTERSTATE|I)[-\s]?(\d{1,3}[A-Z]?)$/i.exec(s);
+    if (mInt) return { kind: 'interstate', num: mInt[1].toUpperCase() };
+    const mUs = /^(?:U\.?S\.?(?:\s*(?:HWY|HIGHWAY|ROUTE|RTE))?)[-\s]?(\d{1,3}[A-Z]?)$/i.exec(s);
+    if (mUs) return { kind: 'us', num: mUs[1].toUpperCase() };
+    const stRe = new RegExp('^(?:' + US_STATE_CODES + '|STATE\\s+ROUTE|HWY|HIGHWAY)[\\-\\s](\\d{1,3}[A-Z]?)$', 'i');
+    const mSt = stRe.exec(s);
+    if (mSt) return { kind: 'state', num: mSt[1].toUpperCase() };
+    if (fromIcon) {
+        const mEuE = /^E[-\s]?(\d{1,3})$/i.exec(s);
+        if (mEuE) return { kind: 'eu_green', num: 'E' + mEuE[1] };
+        const mEuA = /^([AM])[-\s]?(\d{1,3})$/i.exec(s);
+        if (mEuA) return { kind: 'eu_blue', num: mEuA[1].toUpperCase() + mEuA[2] };
+        if (/^\d{1,3}[A-Z]?$/i.test(s)) {
+            if (/INTERSTATE/.test(meta)) return { kind: 'interstate', num: s.toUpperCase() };
+            if (/STATE/.test(meta)) return { kind: 'state', num: s.toUpperCase() };
+            if (/AUTOBAHN|MOTORWAY|FREEWAY/.test(meta)) return { kind: 'eu_blue', num: s.toUpperCase() };
+            return { kind: 'us', num: s.toUpperCase() };
+        }
+    }
+    return null;
+}
+
+function pushShieldUnique(list, sh) {
+    if (!sh || !sh.num || list.length >= 2) return;
+    for (let i = 0; i < list.length; i++) {
+        if (list[i].kind === sh.kind && list[i].num === sh.num) return;
+    }
+    list.push(sh);
+}
+
+function extractInlineShields(roadStr, shields) {
+    if (!roadStr) return '';
+    let s = roadStr;
+    const patterns = [
+        { kind: 'interstate', re: /\b(?:Interstate|I)[-\s](\d{1,3}[A-Z]?)\b/gi },
+        { kind: 'us', re: /\bU\.?S\.?(?:\s*(?:Hwy|Highway|Route|Rte))?[-\s](\d{1,3}[A-Z]?)\b/gi },
+        { kind: 'state', re: new RegExp('\\b(?:' + US_STATE_CODES + '|State\\s+Route|Hwy)[\\-\\s](\\d{1,3}[A-Z]?)\\b', 'gi') },
+    ];
+    // Collect matches with their string positions so left-to-right highway order is preserved
+    const hits = [];
+    for (let p = 0; p < patterns.length; p++) {
+        const pat = patterns[p];
+        pat.re.lastIndex = 0;
+        let m;
+        while ((m = pat.re.exec(s)) !== null) {
+            hits.push({ idx: m.index, end: m.index + m[0].length, kind: pat.kind, num: m[1].toUpperCase() });
+        }
+    }
+    if (!hits.length) return s;
+    hits.sort((a, b) => a.idx - b.idx);
+    const chosen = [];
+    let lastEnd = -1;
+    for (let i = 0; i < hits.length; i++) {
+        if (hits[i].idx < lastEnd) continue;
+        const prevLen = shields.length;
+        pushShieldUnique(shields, { kind: hits[i].kind, num: hits[i].num });
+        if (shields.length > prevLen || shields.some((x) => x.kind === hits[i].kind && x.num === hits[i].num)) {
+            chosen.push(hits[i]);
+            lastEnd = hits[i].end;
+        }
+    }
+    if (!chosen.length) return s;
+    let rebuilt = '';
+    let cursor = 0;
+    for (let i = 0; i < chosen.length; i++) {
+        rebuilt += s.slice(cursor, chosen[i].idx);
+        cursor = chosen[i].end;
+    }
+    rebuilt += s.slice(cursor);
+    return rebuilt
+        .replace(/\s*([\/,&\-])\s*\1+/g, ' $1 ')
+        .replace(/^[\s\/,&\-:]+|[\s\/,&\-:]+$/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
 function decodeDescription(b, isHighwayExit) {
     const els = b && b.description && Array.isArray(b.description.elements) ? b.description.elements : [];
     let exitBadge = null;
+    const shields = [];
     const parts = [];
 
     for (let i = 0; i < els.length; i++) {
@@ -69,16 +159,23 @@ function decodeDescription(b, isHighwayExit) {
         if (isObj(el.icon) && typeof el.icon.text === 'string') {
             const ic = safeStr(el.icon.text);
             if (!ic) continue;
+            const meta = iconMetaStr(el.icon);
             const exMatch = /^(?:EXIT|AUSFAHRT|SORTIE)\s+([0-9]{1,4}[A-Z]?)$/i.exec(ic);
-            if (!exitBadge && exMatch) {
-                exitBadge = exMatch[1].toUpperCase();
-            } else if (!exitBadge && i === 0 && (
+            const isExplicitExit = Boolean(exMatch || /EXIT|AUSFAHRT/.test(meta));
+            if (!exitBadge && isExplicitExit) {
+                exitBadge = (exMatch ? exMatch[1] : ic).toUpperCase();
+            } else if (!exitBadge && i === 0 && !/INTERSTATE|HIGHWAY|ROUTE|SHIELD|AUTOBAHN|MOTORWAY/.test(meta) && (
                 (isHighwayExit && /^[0-9]{1,4}[A-Z]?$/i.test(ic)) ||
                 /^[0-9]{1,4}[A-Z]$/i.test(ic)
             )) {
                 exitBadge = ic.toUpperCase();
-            } else if (parts[parts.length - 1] !== ic) {
-                parts.push(ic);
+            } else {
+                const sh = classifyShieldToken(ic, meta, true);
+                if (sh) {
+                    pushShieldUnique(shields, sh);
+                } else if (parts[parts.length - 1] !== ic) {
+                    parts.push(ic);
+                }
             }
         } else if (typeof el.text === 'string') {
             const tx = safeStr(el.text);
@@ -94,7 +191,10 @@ function decodeDescription(b, isHighwayExit) {
             road = leadExit[2].trim();
         }
     }
-    return { road, exitBadge };
+    if (road) {
+        road = extractInlineShields(road, shields);
+    }
+    return { road, exitBadge, shields };
 }
 
 function decodeEvent(e) {
@@ -122,6 +222,7 @@ function decodeEvent(e) {
             uk: d.uk,
             road: desc.road,
             exitBadge: desc.exitBadge,
+            shields: desc.shields,
             unreliable: b.unreliable === true,
             dtd: isFinite(dtd) && dtd >= 0 ? dtd : null,
         };
@@ -134,6 +235,7 @@ function decodeEvent(e) {
     base.passive = false;
     base.road = desc.road;
     base.exitBadge = desc.exitBadge;
+    base.shields = desc.shields;
     return base;
 }
 
@@ -186,8 +288,87 @@ function decodeNextIntersection(v) {
         uk: d.uk,
         road: desc.road,
         exitBadge: desc.exitBadge,
+        shields: desc.shields,
         unreliable: false,
         dtd: null,
+    };
+}
+
+function decodeLaneRow(row) {
+    if (!isObj(row) || !Array.isArray(row.lanes) || !row.lanes.length) return null;
+    const list = (a) => (Array.isArray(a) ? a : []).map((x) => enumOf('TurnDirection', x)).filter((s) => s && s !== 'NONE');
+    const lanes = row.lanes.slice(0, 16).map((l) => {
+        const lane = isObj(l) ? l : {};
+        let follows = list(lane.directionsToFollow);
+        const one = enumOf('TurnDirection', lane.directionToFollow) || 'NONE';
+        if (one !== 'NONE' && follows.indexOf(one) < 0) follows = [one].concat(follows);
+        const others = list(lane.otherDirections).filter((s) => follows.indexOf(s) < 0);
+        const rawHi = lane.isHighlighted !== undefined ? lane.isHighlighted : lane.highlight;
+        const hi = rawHi === true || Boolean(follows.length && rawHi !== false && rawHi !== 0);
+        return {
+            follow: follows[0] || 'NONE',
+            follows,
+            others,
+            hi,
+            info: enumOf('AdditionalLaneInfo', lane.additionalLaneInfo) || 'NONE',
+        };
+    });
+    const rawRec = row.recommendedCarPositionLaneIndex !== undefined ? row.recommendedCarPositionLaneIndex : row.recommendedLaneIndex;
+    const rec = Number(rawRec);
+    const dtd = Number(row.distanceToDestination);
+    const len = Number(row.length);
+    const uid = (row.uid !== undefined && row.uid !== null && String(row.uid) !== '') ? String(row.uid) : null;
+    return {
+        uid,
+        lanes,
+        rec: isFinite(rec) && rec >= 0 && rec < lanes.length ? rec : null,
+        markers: Array.isArray(row.laneMarkers) ? row.laneMarkers.map((x) => enumOf('LaneMarker', x)) : [],
+        dtd: isFinite(dtd) && dtd >= 0 ? dtd : null,
+        len: isFinite(len) && len >= 0 ? len : null,
+    };
+}
+
+function laneRowSig(row) {
+    if (!row || !Array.isArray(row.lanes)) return '';
+    return row.lanes.map((l) => (l.hi ? '*' : '') + (l.follows || [l.follow]).join('+') + '/' + (l.others || []).join('+') + '/' + l.info).join(',');
+}
+
+function isSameLaneRow(a, b, ignoreUid) {
+    if (!a || !b) return false;
+    if (!ignoreUid && a.uid !== null && b.uid !== null && a.uid === b.uid) return true;
+    const sa = laneRowSig(a);
+    return Boolean(sa && sa === laneRowSig(b));
+}
+
+/**
+ * Multi-row currentLaneGuiding decoder:
+ *   - Supports both single-row (CarPlay/standard) and BMW's 2-level stacked lane guidance (`rows[0]` immediate
+ *     lower row + `rows[1]` upcoming upper tucked row).
+ *   - Self-orders by `distanceToDestination` when both rows report distinct valid `dtd` (larger dtd = nearer to car).
+ */
+function decodeLanes(v) {
+    if (!isObj(v) || !Array.isArray(v.rows) || !v.rows.length) return null;
+    const rows = [];
+    for (let i = 0; i < v.rows.length && rows.length < 2; i++) {
+        const dec = decodeLaneRow(v.rows[i]);
+        if (dec) rows.push(dec);
+    }
+    if (!rows.length) return null;
+    let primary = rows[0];
+    let nextRow = rows.length >= 2 ? rows[1] : null;
+    if (nextRow && typeof primary.dtd === 'number' && typeof nextRow.dtd === 'number' && nextRow.dtd > primary.dtd) {
+        const tmp = primary;
+        primary = nextRow;
+        nextRow = tmp;
+    }
+    return {
+        uid: primary.uid,
+        lanes: primary.lanes,
+        rec: primary.rec,
+        markers: primary.markers,
+        dtd: primary.dtd,
+        len: primary.len,
+        next: nextRow,
     };
 }
 
@@ -287,6 +468,7 @@ class NavTracker {
         this.nextIntAt = -Infinity;
         this.lanes = null;
         this.lanesAt = -Infinity;
+        this.lanePromo = null;
         this.turnKey = '';
         this.lanesSeenForTurn = false;
         this.lanesSwitchedToMiniMap = false;
@@ -361,6 +543,7 @@ class NavTracker {
             this.nextInt = null;
         }
         this.lanes = null;
+        this.lanePromo = null;
         this.turnKey = '';
         this.lanesSeenForTurn = false;
         this.lanesSwitchedToMiniMap = false;
@@ -477,6 +660,23 @@ class NavTracker {
             }
             const decoded = decodeLanes(v);
             if (decoded) {
+                const prev = this.lanes;
+                if (prev && prev.next) {
+                    const genericUid = prev.uid !== null && prev.next.uid !== null && prev.uid === prev.next.uid;
+                    const sameAsOldPrimary = isSameLaneRow(prev, decoded, genericUid);
+                    const promotedFromUpper = isSameLaneRow(prev.next, decoded, genericUid);
+                    if (promotedFromUpper && !sameAsOldPrimary) {
+                        this.lanePromo = {
+                            startMono: now,
+                            durationMs: LANE_PROMO_MS,
+                            droppedRow: {
+                                lanes: prev.lanes,
+                                rec: prev.rec,
+                                markers: prev.markers,
+                            },
+                        };
+                    }
+                }
                 this.lanes = decoded;
                 this.lanesAt = now;
                 if (this.turnKey !== '') this.lanesSeenForTurn = true;
@@ -493,6 +693,7 @@ class NavTracker {
                     }
                 }
                 this.lanes = null;
+                this.lanePromo = null;
                 this.lanesAt = now;
             }
         } else if (name === 'nextIntersection') {
@@ -548,7 +749,21 @@ class NavTracker {
                 : (renOk ? this.renderedTurn
                     : (niOk ? this.nextInt : null)));
         if (!m) return null;
-        return Object.assign({}, m, { lanes: this.lanes });
+        let lanesOut = this.lanes;
+        if (lanesOut && this.lanePromo) {
+            const elapsed = now - this.lanePromo.startMono;
+            if (elapsed >= 0 && elapsed < this.lanePromo.durationMs) {
+                lanesOut = Object.assign({}, lanesOut, {
+                    anim: {
+                        t: elapsed / this.lanePromo.durationMs,
+                        droppedRow: this.lanePromo.droppedRow,
+                    },
+                });
+            } else if (elapsed >= this.lanePromo.durationMs) {
+                this.lanePromo = null;
+            }
+        }
+        return Object.assign({}, m, { lanes: lanesOut });
     }
 
     _pollStatusFiles(nowWallMs) {
@@ -584,6 +799,8 @@ class NavTracker {
             this.lanesMiniMapSince = 0;
         }
         const hasLanes = Boolean(show && show.lanes && show.lanes.lanes && show.lanes.lanes.length > 0);
+        const hasStackedLanes = Boolean(hasLanes && show.lanes.next && show.lanes.next.lanes && show.lanes.next.lanes.length > 0);
+        const laneAnimating = Boolean(hasLanes && show.lanes.anim && show.lanes.anim.t >= 0 && show.lanes.anim.t < 1);
         const guide = routeActive ? this.guideSource() : 'NONE';
 
         let miniMapActive = false;
@@ -610,9 +827,11 @@ class NavTracker {
             summary = 'Waze HUD map (overlaying metrics)';
         } else if (routeActive) {
             if (show) {
+                const laneTag = hasStackedLanes
+                    ? (' [' + show.lanes.lanes.length + '+' + show.lanes.next.lanes.length + ' lanes]')
+                    : (hasLanes ? ' [' + show.lanes.lanes.length + ' lanes]' : '');
                 summary = guide + ': ' + show.kind + ' ' + (show.dir || (show.exit ? 'exit ' + show.exit : '')) +
-                    (show.dist ? ' ' + show.dist + (show.unit || '') : '') +
-                    (hasLanes ? ' [' + show.lanes.lanes.length + ' lanes]' : '');
+                    (show.dist ? ' ' + show.dist + (show.unit || '') : '') + laneTag;
             } else {
                 summary = guide + ': route active (' + (this.lastErr ? ('err: ' + this.lastErr) : 'waiting for turn') + ')';
             }
@@ -625,6 +844,8 @@ class NavTracker {
             guide,
             show,
             hasLanes,
+            hasStackedLanes,
+            laneAnimating,
             miniMapActive,
             miniMapReason,
             noTurnFallback,
@@ -831,6 +1052,7 @@ class NavTracker {
 
 module.exports = {
     NavTracker,
+    decodeDescription,
     decodeEvent,
     decodeEvents,
     decodeLanes,

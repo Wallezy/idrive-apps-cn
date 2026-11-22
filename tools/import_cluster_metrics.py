@@ -54,7 +54,7 @@ def main():
         shutil.copy2(LOCAL / 'kit/LICENSE', package / 'KIT-LICENSE')
         shutil.copy2(ROOT / 'LICENSES/MPL-2.0.txt', package / 'MPL-2.0.txt')
         shutil.copy2(LOCAL / 'apps/cluster_metrics/NOTICE', package / 'NOTICE')
-        changes = ['新增 HUD 跟车距离、车内温度与电量信息。', '改进挡位和右侧媒体、行程显示，保留中文歌名与导航路名。']
+        changes = provenance.get('releaseChanges', ['改进仪表与抬头数据显示，保留中文设置。'])
         (package / 'CHANGELOG.md').write_text(
             '# 组合仪表数据\n\n## Unreleased\n\n## ' + version + '\n\n' +
             '\n'.join('- ' + x for x in changes) + '\n\n上游：' +

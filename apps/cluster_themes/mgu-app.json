@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "id": "cluster_themes",
-  "version": "0.19.2",
+  "version": "0.19.9",
   "tree": "package",
   "modules": [
     "src/sdk.js"

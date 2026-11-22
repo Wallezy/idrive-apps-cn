@@ -1,7 +1,7 @@
 {
  "id": "cluster_metrics",
  "title": "\u7ec4\u5408\u4eea\u8868\u6570\u636e",
- "version": "0.8.1",
+ "version": "0.9.1",
  "screens": [
   {
    "name": "MAIN",
@@ -46,6 +46,11 @@
     "enabled",
     "displayTarget",
     "smartAlerts",
+    [
+     "button",
+     "BTN_ALERTS_MENU",
+     "Preview smart alerts..."
+    ],
     "unitSystem",
     "tempUnit",
     "evEffUnit",
@@ -57,6 +62,59 @@
    ]
   },
   {
+   "name": "ALERTS",
+   "kind": "menu",
+   "title": "\u8f66\u8f86\u63d0\u9192\u9884\u89c8",
+   "repoLink": false,
+   "items": [
+    [
+     "tworow",
+     "ALERT_PREVIEW_STATUS",
+     "\u5f53\u524d\u63d0\u9192\u9884\u89c8"
+    ],
+    [
+     "button",
+     "ALERT_TPMS_LOW",
+     "\u80ce\u538b\u504f\u4f4e\uff08\u9ec4\u8272\uff09"
+    ],
+    [
+     "button",
+     "ALERT_TPMS_CRIT",
+     "\u8f6e\u80ce\u4e25\u91cd\u7f3a\u6c14\uff08\u7ea2\u8272\uff09"
+    ],
+    [
+     "button",
+     "ALERT_TPMS_HOT",
+     "\u8f6e\u80ce\u6e29\u5ea6\u504f\u9ad8\uff08\u9ec4\u8272\uff09"
+    ],
+    [
+     "button",
+     "ALERT_GBX_WARN",
+     "\u53d8\u901f\u7bb1\u6e29\u5ea6\u504f\u9ad8\uff08\u9ec4\u8272\uff09"
+    ],
+    [
+     "button",
+     "ALERT_GBX_CRIT",
+     "\u53d8\u901f\u7bb1\u6e29\u5ea6\u8fc7\u9ad8\uff08\u7ea2\u8272\uff09"
+    ],
+    [
+     "button",
+     "ALERT_12V_SOC",
+     "12V \u7535\u91cf\u504f\u4f4e\uff08\u9ec4\u8272\uff09"
+    ],
+    [
+     "button",
+     "ALERT_12V_VOLT",
+     "12V \u7535\u538b\u8fc7\u4f4e\uff08\u7ea2\u8272\uff09"
+    ],
+    [
+     "button",
+     "ALERT_CLEAR",
+     "\u7ed3\u675f\u63d0\u9192\u9884\u89c8"
+    ]
+   ]
+  },
+  {
    "name": "CLUSTER",
    "kind": "menu",
    "title": "\u4eea\u8868\u76d8",
@@ -65,13 +123,11 @@
     "clusterSlotMode",
     "widgetMedia",
     "widgetTrip",
+    "widgetTpms",
     [
      "checkbox",
      "WIDGET_CHARGING",
-     "Right widget: Charging finish time (auto)",
-     {
-      "1": 0
-     }
+     "Right widget: Charging finish time (auto)"
     ],
     "gearDisplay",
     "cabinTempDisplay",
@@ -225,6 +281,12 @@
   {
    "key": "widgetTrip",
    "label": "\u53f3\u4fa7\u4fe1\u606f\uff1a\u884c\u7a0b\u4e0e\u8f66\u8f86",
+   "type": "bool",
+   "default": true
+  },
+  {
+   "key": "widgetTpms",
+   "label": "\u53f3\u4fa7\u4fe1\u606f\uff1a\u80ce\u538b\u4e0e\u63d0\u9192",
    "type": "bool",
    "default": true
   },
@@ -1008,8 +1070,9 @@
  "stateIds": {
   "MAIN": 1,
   "GENERAL": 10,
-  "CLUSTER": 26,
-  "HUD": 42,
-  "DIAG": 53
+  "ALERTS": 27,
+  "CLUSTER": 40,
+  "HUD": 57,
+  "DIAG": 68
  }
 }

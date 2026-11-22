@@ -1,8 +1,9 @@
 {
   "id": "cluster_metrics",
   "title": "Cluster Metrics",
-  "description": "Real-time efficiency, HV battery %, powertrain temperatures, gear in D, full-wing Right-Wing Media/Charging/Trip widget, HUD turn-by-turn nav, and live DSC hydraulic brake indicator for BMW iDrive 7",
-  "version": "0.8.0",
+  "description": "Real-time efficiency, HV battery %, powertrain temperatures, gear in D, full-wing Right-Wing Media/Charging/Trip/TPMS & Alerts widget, HUD turn-by-turn nav, and live DSC hydraulic brake indicator for BMW iDrive 7",
+  "version": "0.9.0",
+  "autostart": true,
   "license": "GPL-3.0-only",
   "vendor": "chyiz",
   "bundleNotices": [
@@ -14,7 +15,7 @@
     "- cluster_render_client.js: MPL-2.0, Copyright (C) 2026 Robert Nisipeanu",
     "- jpeg_decoder.js (jpeg-js 0.4.4): Apache-2.0 / BSD-3-Clause",
     "- kit/fonts/{bold,gear,label,light,num}.json: Ubuntu Font Licence 1.0 (LICENSE-UbuntuFont.txt)",
-    "- kit/fonts/cjk.json: SIL Open Font License 1.1 (LICENSE-NotoSansCJK.txt)"
+    "- latin_auto.pack, kit/fonts/cjk.json & cjk_gothic.pack: Noto Sans & Noto Sans CJK (SC/JP/TC/KR), SIL Open Font License 1.1 (LICENSE-NotoSansCJK.txt)"
   ],
   "repoTitle": "GitHub Repository",
   "repoLink": "github.com/chyiz/mgu-apps",
@@ -145,14 +146,26 @@
       "UnitBN2020": "rs"
     },
     "de.bmw.infotainment.KombiIF": {
-      "_optional": "trip consumption, fuel & electric range, BC selection, and electrical power distribution",
+      "_optional": "trip consumption, fuel & electric range, BC selection, local clock, and electrical power distribution",
       "statusRangeTankStatus": "rs",
       "displayRangeElectricVehicle": "rs",
       "statusBordcomputerAverage": "rs",
       "statusBordcomputerTravelData": "rs",
       "statusBordcomputerElectricData": "rs",
       "statusKombiSelection": "rs",
-      "statusDisplayElectricalPowerDistribution": "rs"
+      "statusDisplayElectricalPowerDistribution": "rs",
+      "statusShowTimeDate": "rs",
+      "timeDateUTC": "rs"
+    },
+    "com.harman.infotainment.systeminfrastructure.autotime.autotime.AutoTime": {
+      "_optional": "head-unit local clock and timezone offset for charging finish time",
+      "_instances": "Inst1",
+      "current": "rs"
+    },
+    "de.bmw.infotainment.hmi.hmicontext.HMIContext": {
+      "_optional": "active CID HMI timezone enum fallback for charging finish time",
+      "_instances": "HMI_CID",
+      "currentTimeZone": "rs"
     },
     "de.bmw.infotainment.hmi.hmimediastate.HmiMediaState": {
       "_optional": "active media title, artist, playback position, and JPEG/PNG album art across CarPlay/Bluetooth/USB/Radio",
@@ -182,8 +195,19 @@
       "statusTargetTyrePressure": "rs"
     },
     "de.bmw.infotainment.climate.Climate2": {
-      "_optional": "interior cabin temperature",
-      "statusTemperatureInside": "rs"
+      "_optional": "interior cabin temperature and HVAC cooling/heating/fan state",
+      "statusTemperatureInside": "rs",
+      "statusACFront": "rs",
+      "statusACFrontFunctions": "rs",
+      "statusAirConditionDRStatus": "rs",
+      "statusActualValuePowerACCompressor": "rs"
+    },
+    "de.bmw.infotainment.climate.climatemaster.ClimateMaster": {
+      "_optional": "HVAC system on/off, A/C button, and target temperature setpoint",
+      "statusClimateSystemOn": "rs",
+      "statusAirCondAC": "rs",
+      "statusAirCondMaxAC": "rs",
+      "statusTemperature": "rs"
     },
     "de.bmw.dass.GapVehicleAhead": {
       "_optional": "radar/camera lead vehicle distance, headway, and relative speed",
@@ -246,6 +270,11 @@
         "enabled",
         "displayTarget",
         "smartAlerts",
+        [
+          "button",
+          "BTN_ALERTS_MENU",
+          "Preview smart alerts..."
+        ],
         "unitSystem",
         "tempUnit",
         "evEffUnit",
@@ -257,6 +286,59 @@
       ]
     },
     {
+      "name": "ALERTS",
+      "kind": "menu",
+      "title": "Smart Alert Previews",
+      "repoLink": false,
+      "items": [
+        [
+          "tworow",
+          "ALERT_PREVIEW_STATUS",
+          "Active Alert Preview"
+        ],
+        [
+          "button",
+          "ALERT_TPMS_LOW",
+          "TPMS Low Pressure (Amber)"
+        ],
+        [
+          "button",
+          "ALERT_TPMS_CRIT",
+          "TPMS Critical Flat (Red)"
+        ],
+        [
+          "button",
+          "ALERT_TPMS_HOT",
+          "TPMS Hot Tire (Amber)"
+        ],
+        [
+          "button",
+          "ALERT_GBX_WARN",
+          "Gearbox Hot (Amber)"
+        ],
+        [
+          "button",
+          "ALERT_GBX_CRIT",
+          "Gearbox Critical (Red)"
+        ],
+        [
+          "button",
+          "ALERT_12V_SOC",
+          "12V Battery Low % (Amber)"
+        ],
+        [
+          "button",
+          "ALERT_12V_VOLT",
+          "12V Battery Critical V (Red)"
+        ],
+        [
+          "button",
+          "ALERT_CLEAR",
+          "Clear Active Preview"
+        ]
+      ]
+    },
+    {
       "name": "CLUSTER",
       "kind": "menu",
       "title": "Cluster",
@@ -265,13 +347,11 @@
         "clusterSlotMode",
         "widgetMedia",
         "widgetTrip",
+        "widgetTpms",
         [
           "checkbox",
           "WIDGET_CHARGING",
-          "Right widget: Charging finish time (auto)",
-          {
-            "1": 0
-          }
+          "Right widget: Charging finish time (auto)"
         ],
         "gearDisplay",
         "cabinTempDisplay",
@@ -425,6 +505,12 @@
     {
       "key": "widgetTrip",
       "label": "Right widget: Trip & powertrain",
+      "type": "bool",
+      "default": true
+    },
+    {
+      "key": "widgetTpms",
+      "label": "Right widget: Tire pressure & alerts",
       "type": "bool",
       "default": true
     },

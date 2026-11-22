@@ -12,6 +12,8 @@ require('./app.js');
 
 const mgu = require('./kit/mgu');
 const cnText = require('./cn_text').text;
+const fontsMod = require('./kit/fonts');
+const { installStockBmwFonts, getFontStatus } = require('./bmw_font');
 const { SignalHub } = require('./signals');
 const { EfficiencyTracker } = require('./efficiency');
 const { VehicleProfile } = require('./vehicle_profile');
@@ -26,47 +28,272 @@ function fmtTempAscii(tempC, units) {
     return asciiOnly(formatTemp(tempC, units).text);
 }
 
+function buildPreviewTpms(liveTpms, overrideCorner, overrideVal) {
+    const base = {
+        FL: { pressureBar: 2.41, targetBar: 2.41, tempC: 24 },
+        FR: { pressureBar: 2.41, targetBar: 2.41, tempC: 24 },
+        RL: { pressureBar: 2.62, targetBar: 2.62, tempC: 23 },
+        RR: { pressureBar: 2.62, targetBar: 2.62, tempC: 23 },
+    };
+    const src = liveTpms && typeof liveTpms === 'object' ? liveTpms : {};
+    ['FL', 'FR', 'RL', 'RR'].forEach((k) => {
+        if (src[k] && typeof src[k].pressureBar === 'number') {
+            base[k] = Object.assign({}, base[k], src[k]);
+        }
+    });
+    if (overrideCorner && base[overrideCorner]) {
+        base[overrideCorner] = Object.assign({}, base[overrideCorner], overrideVal);
+    }
+    return base;
+}
+
+function buildPreviewAlertByKey(key, units, seq, liveTpms) {
+    const isBar = units && units.pressUnit === 'bar';
+    const isF = units && units.tempUnit === 'F';
+    if (key === 'tpms_low') {
+        return {
+            id: 'tpms', severity: 'amber', corner: 'FL', seq,
+            label: isBar ? 'FL 1.9b' : 'FL 28psi',
+            hudText: 'Tire Pressure Low',
+            title: 'TIRE PRESSURE LOW',
+            heroVal: isBar ? '1.9 bar' : '28 psi',
+            detail: isBar ? 'Front Left: 1.9 bar (Target 2.4 bar)' : 'Front Left: 28 psi (Target 35 psi)',
+            advice: 'Inflate tire when safe',
+            previewTpms: buildPreviewTpms(liveTpms, 'FL', { pressureBar: 1.93, targetBar: 2.41 }),
+            desc: 'TPMS Low Pressure (Amber)',
+        };
+    }
+    if (key === 'tpms_crit') {
+        return {
+            id: 'tpms', severity: 'red', corner: 'FL', seq,
+            label: isBar ? 'FL 1.4b' : 'FL 21psi',
+            hudText: 'Tire Pressure Critical',
+            title: 'TIRE FLAT - CRITICAL',
+            heroVal: isBar ? '1.4 bar' : '21 psi',
+            detail: isBar ? 'Front Left: 1.4 bar (Target 2.4 bar)' : 'Front Left: 21 psi (Target 35 psi)',
+            advice: 'Stop safely & inspect tire',
+            previewTpms: buildPreviewTpms(liveTpms, 'FL', { pressureBar: 1.44, targetBar: 2.41 }),
+            desc: 'TPMS Critical Flat (Red)',
+        };
+    }
+    if (key === 'tpms_hot') {
+        return {
+            id: 'tpms_temp', severity: 'amber', corner: 'FR', seq,
+            label: isF ? 'FR 187\u00B0F' : 'FR 86\u00B0C',
+            hudText: 'Tire Temp High',
+            title: 'TIRE TEMP HIGH',
+            heroVal: isF ? '187\u00B0F' : '86\u00B0C',
+            detail: isF ? 'Front Right: 187\u00B0F (Limit 185\u00B0F)' : 'Front Right: 86\u00B0C (Limit 85\u00B0C)',
+            advice: 'Reduce speed & let tire cool',
+            previewTpms: buildPreviewTpms(liveTpms, 'FR', { tempC: 86 }),
+            desc: 'TPMS Hot Tire (Amber)',
+        };
+    }
+    if (key === 'gbx_warn') {
+        return {
+            id: 'gbox', severity: 'amber', seq,
+            label: isF ? 'GBX 226\u00B0F' : 'GBX 108\u00B0C',
+            hudText: 'Gearbox Hot',
+            title: 'GEARBOX OIL HOT',
+            heroVal: isF ? '226\u00B0F' : '108\u00B0C',
+            detail: isF ? 'Transmission oil > 221\u00B0F' : 'Transmission oil > 105\u00B0C',
+            advice: 'Reduce load & allow cooling',
+            desc: 'Gearbox Hot (Amber)',
+        };
+    }
+    if (key === 'gbx_crit') {
+        return {
+            id: 'gbox', severity: 'red', seq,
+            label: isF ? 'GBX 244\u00B0F' : 'GBX 118\u00B0C',
+            hudText: 'Gearbox Critical',
+            title: 'GEARBOX TEMP CRITICAL',
+            heroVal: isF ? '244\u00B0F' : '118\u00B0C',
+            detail: isF ? 'Transmission oil > 239\u00B0F' : 'Transmission oil > 115\u00B0C',
+            advice: 'Pull over safely & cool down',
+            desc: 'Gearbox Critical (Red)',
+        };
+    }
+    if (key === 'soc12') {
+        return {
+            id: 'soc12', severity: 'amber', seq,
+            label: '12V 52%',
+            hudText: '12V Battery Low',
+            title: '12V BATTERY LOW',
+            heroVal: '52%',
+            detail: '12V Aux State of Charge < 55%',
+            advice: 'Drive or charge to replenish 12V',
+            desc: '12V Battery Low % (Amber)',
+        };
+    }
+    if (key === 'v12') {
+        return {
+            id: 'v12', severity: 'red', seq,
+            label: '12V 11.5V',
+            hudText: '12V Battery Critical',
+            title: '12V VOLTAGE CRITICAL',
+            heroVal: '11.5 V',
+            detail: '12V Aux Voltage < 11.7 V',
+            advice: 'Check charging system / battery',
+            desc: '12V Battery Critical V (Red)',
+        };
+    }
+    return null;
+}
+
+function createBackgroundRuntime(bg) {
+    const { settings, log, dataDir } = bg;
+    installStockBmwFonts(fontsMod, { cacheDir: dataDir, log, bundledOnly: true });
+
+    // Migrate legacy v0.6/v0.7.0 rightWidgetMode dropdown into widgetMedia + widgetTrip checkboxes once
+    if (settings.values && settings.values.rightWidgetMode !== undefined) {
+        const leg = settings.values.rightWidgetMode;
+        delete settings.values.rightWidgetMode;
+        if (leg === 'media') {
+            settings.set('widgetMedia', true);
+            settings.set('widgetTrip', false);
+        } else if (leg === 'trip') {
+            settings.set('widgetMedia', false);
+            settings.set('widgetTrip', true);
+        } else if (leg === 'off') {
+            settings.set('widgetMedia', false);
+            settings.set('widgetTrip', false);
+        } else {
+            settings.set('widgetMedia', true);
+            settings.set('widgetTrip', true);
+        }
+    }
+
+    const hub = new SignalHub(bg);
+    const effTracker = new EfficiencyTracker();
+    const profileEval = new VehicleProfile();
+    const renderer = new OverlayRenderer({ log, dataDir });
+    let prevEnabled = settings.get('enabled') !== false;
+
+    const state = {
+        hub,
+        effTracker,
+        profileEval,
+        renderer,
+        diagVisible: false,
+        alertPreviewKey: null,
+        alertPreviewSeq: 0,
+        alertPreviewUntilMs: 0,
+        onUiTick: null,
+        setAlertPreview(key, nowMs) {
+            const now = typeof nowMs === 'number' ? nowMs : Date.now();
+            if (!key) {
+                state.alertPreviewKey = null;
+                state.alertPreviewUntilMs = 0;
+                return false;
+            }
+            state.alertPreviewKey = key;
+            state.alertPreviewSeq = (state.alertPreviewSeq + 1) % 1000000;
+            state.alertPreviewUntilMs = now + 30000;
+            return true;
+        },
+        computeModel(nowMs) {
+            const now = typeof nowMs === 'number' ? nowMs : Date.now();
+            const telemetry = hub.snapshot(now);
+            const units = hub.resolvedUnits();
+            const profile = profileEval.evaluate(telemetry, settings.values, units, now);
+            const efficiency = effTracker.update({
+                speedKmh: telemetry.speedKmh,
+                rpm: telemetry.rpm,
+                engineOn: profile.engineOn,
+                hvKw: telemetry.hvKw,
+                dmeFuelLh: telemetry.dmeFuelLh,
+                injVolumeRaw: telemetry.injVolumeRaw,
+                bcFuelLPer100km: telemetry.bcFuelLPer100km,
+            }, now);
+            let previewAlert = null;
+            let alertPreviewRemSec = 0;
+            if (state.alertPreviewKey && state.alertPreviewUntilMs > now) {
+                previewAlert = buildPreviewAlertByKey(state.alertPreviewKey, units, state.alertPreviewSeq, telemetry.tpms);
+                alertPreviewRemSec = Math.ceil((state.alertPreviewUntilMs - now) / 1000);
+            } else if (state.alertPreviewUntilMs > 0) {
+                state.alertPreviewKey = null;
+                state.alertPreviewUntilMs = 0;
+            }
+            return { telemetry, units, profile, efficiency, previewAlert, alertPreviewRemSec };
+        },
+        tick(nowMs, forceUi) {
+            const now = typeof nowMs === 'number' ? nowMs : Date.now();
+            const model = state.computeModel(now);
+            renderer.render(model, settings.values, now);
+            const animating = Boolean(model.telemetry && model.telemetry.hudNav && model.telemetry.hudNav.laneAnimating);
+            syncLaneAnimTimer(animating);
+            if (typeof state.onUiTick === 'function') {
+                state.onUiTick(model, now, Boolean(forceUi));
+            }
+            return model;
+        },
+        cleanup() {
+            clearInterval(timer);
+            syncLaneAnimTimer(false);
+            hub.stop();
+            renderer.close();
+        },
+    };
+
+    let laneAnimTimer = null;
+    function syncLaneAnimTimer(active) {
+        if (active && !laneAnimTimer) {
+            laneAnimTimer = setInterval(() => {
+                try { state.tick(Date.now(), false); } catch (e) { log.warn('anim tick: ' + (e.message || e)); }
+            }, 50);
+            if (laneAnimTimer && typeof laneAnimTimer.unref === 'function') laneAnimTimer.unref();
+        } else if (!active && laneAnimTimer) {
+            clearInterval(laneAnimTimer);
+            laneAnimTimer = null;
+        }
+    }
+
+    hub.start();
+    renderer.connect();
+    hub.syncDemand(settings.values, { diagVisible: false });
+
+    settings.onChange(() => {
+        hub.syncDemand(settings.values, { diagVisible: state.diagVisible });
+        const nowEnabled = settings.get('enabled') !== false;
+        if (!prevEnabled && nowEnabled) {
+            if (hub.mediaTracker && typeof hub.mediaTracker.refresh === 'function') {
+                hub.mediaTracker.refresh();
+            }
+            hub.pollNow().then(() => state.tick(Date.now(), true)).catch(() => {});
+        }
+        prevEnabled = nowEnabled;
+        state.tick(Date.now(), true);
+    });
+
+    const timer = setInterval(() => {
+        try { state.tick(Date.now(), false); } catch (e) { log.warn('tick: ' + (e.message || e)); }
+    }, 250);
+    state.tick(Date.now(), false);
+
+    return state;
+}
+
 mgu.run({
+    async background(bg) {
+        return createBackgroundRuntime(bg);
+    },
     async start(ctx) {
         const { ui, settings, log } = ctx;
         // Translate dynamic button labels too; StringBundle handles Unicode.
         const originalText = ui.text.bind(ui);
         ui.text = (name, value, row, cell) => originalText(name, cnText(value), row, cell);
-        const hub = new SignalHub(ctx);
-        const effTracker = new EfficiencyTracker();
-        const profileEval = new VehicleProfile();
-        const renderer = new OverlayRenderer({ log });
-
-        hub.start();
-        renderer.connect();
-
-        // Migrate legacy v0.6/v0.7.0 rightWidgetMode dropdown into widgetMedia + widgetTrip checkboxes once
-        if (settings.values && settings.values.rightWidgetMode !== undefined) {
-            const leg = settings.values.rightWidgetMode;
-            delete settings.values.rightWidgetMode;
-            if (leg === 'media') {
-                settings.set('widgetMedia', true);
-                settings.set('widgetTrip', false);
-            } else if (leg === 'trip') {
-                settings.set('widgetMedia', false);
-                settings.set('widgetTrip', true);
-            } else if (leg === 'off') {
-                settings.set('widgetMedia', false);
-                settings.set('widgetTrip', false);
-            } else {
-                settings.set('widgetMedia', true);
-                settings.set('widgetTrip', true);
-            }
-        }
+        const runtime = ctx.background || createBackgroundRuntime(ctx);
+        const { hub, renderer, computeModel, tick } = runtime;
 
         let mainVisible = true;
         let clusterVisible = false;
+        let alertsVisible = false;
         let diagVisible = false;
         let lastProbeActive = false;
         let lastMainUpdate = 0;
         let lastDiagUpdate = 0;
-        let prevEnabled = settings.get('enabled') !== false;
         let lastChargingActive = null;
+        let lastPanelModeVis = null;
         const lastRowCache = Object.create(null);
 
         function setTwoRow(name, row1, row2) {
@@ -78,6 +305,23 @@ mgu.run({
             ui.cells(name, 0, { Text1stRow: r1, Text2ndRow: r2 });
         }
 
+        function syncClusterModeVisibility(force) {
+            const isPanel = (settings.get('clusterSlotMode') || 'panel_only') !== 'map_only';
+            if (!force && lastPanelModeVis === isPanel) return;
+            lastPanelModeVis = isPanel;
+            const panelOnlyComps = [
+                'SET_WIDGETMEDIA',
+                'SET_WIDGETTRIP',
+                'SET_WIDGETTPMS',
+                'WIDGET_CHARGING',
+                'SET_CABINTEMPDISPLAY',
+                'SET_HVSOCGAUGE',
+            ];
+            for (let i = 0; i < panelOnlyComps.length; i++) {
+                ui.visible(panelOnlyComps[i], isPanel);
+            }
+        }
+
         function syncChargingWidgetCheckbox(model, force) {
             const active = Boolean(model && model.telemetry && model.telemetry.charging && model.telemetry.charging.active);
             if (!force && lastChargingActive === active) return;
@@ -86,20 +330,23 @@ mgu.run({
             ui.checked('WIDGET_CHARGING', active);
         }
 
-        function computeModel(nowMs) {
-            const telemetry = hub.snapshot(nowMs);
-            const units = hub.resolvedUnits();
-            const profile = profileEval.evaluate(telemetry, settings.values, units, nowMs);
-            const efficiency = effTracker.update({
-                speedKmh: telemetry.speedKmh,
-                rpm: telemetry.rpm,
-                engineOn: profile.engineOn,
-                hvKw: telemetry.hvKw,
-                dmeFuelLh: telemetry.dmeFuelLh,
-                injVolumeRaw: telemetry.injVolumeRaw,
-                bcFuelLPer100km: telemetry.bcFuelLPer100km,
-            }, nowMs);
-            return { telemetry, units, profile, efficiency };
+        function syncAlertPreviewStatus(model) {
+            const pa = model && model.previewAlert;
+            const rem = model && model.alertPreviewRemSec ? model.alertPreviewRemSec : 0;
+            const dismissed = Boolean(renderer.lastSummary && renderer.lastSummary.alertDismissed);
+            if (pa && rem > 0) {
+                setTwoRow(
+                    'ALERT_PREVIEW_STATUS',
+                    (dismissed ? 'Dismissed via BC: ' : 'Showing: ') + (pa.hudText || pa.label) + ' (' + rem + 's left)',
+                    (pa.desc || 'Preview active') + (dismissed ? ' - tap any alert to re-trigger' : ' - press BC to dismiss')
+                );
+            } else {
+                setTwoRow(
+                    'ALERT_PREVIEW_STATUS',
+                    'No Alert Preview Active',
+                    'Tap any alert below to auto-switch Right Widget & HUD for 30s'
+                );
+            }
         }
 
         function updateMainSummary(model) {
@@ -147,6 +394,7 @@ mgu.run({
             const rwParts = [];
             if (settings.get('widgetMedia') !== false) rwParts.push('Media');
             if (settings.get('widgetTrip') !== false) rwParts.push('Trip');
+            if (settings.get('widgetTpms') !== false) rwParts.push('Tires');
             if (sum.isCharging) rwParts.push('Charging');
             const clusExtras = [];
             if (settings.get('cabinTempDisplay') !== false) clusExtras.push('Cabin');
@@ -183,10 +431,16 @@ mgu.run({
             const hudNote = sum.hudYieldedToNav ? ('HUD yielded (' + (sum.hudYieldReason || 'nav') + ')')
                 : (sum.wocHudOverlay ? 'HUD 3-line over Waze'
                     : (sum.showOwnHudNav ? ('HUD ' + (sum.showHudRoad ? 'RoadBanner+Nav' : 'FullNav')) : (sum.showHud ? 'HUD 3-line' : 'HUD off')));
+            const fSt = getFontStatus();
+            const fontTag = fSt.source === 'bmw_stock_ttf'
+                ? 'BMW TTF'
+                : (fSt.source === 'bundled_vector_sans'
+                    ? 'Vector Sans'
+                    : ('Ubuntu' + (fSt.error ? ' (' + fSt.error + ')' : '')));
             const refusedNote = renderer.refused.length ? (' | Refused: ' + renderer.refused[renderer.refused.length - 1]) : '';
             setTwoRow(
                 'DIAG_RENDER',
-                'Cluster & HUD Renderer (' + connState + ')',
+                'Cluster & HUD Renderer (' + connState + ' - Font: ' + fontTag + ')',
                 clusterModeNote + ' | ' + hudNote + ' | Layers: ' + renderer.layerCount() + '/64 (' +
                     (renderer.pixelBytesTotal() / 1048576).toFixed(2) + ' MiB)' + refusedNote
             );
@@ -247,9 +501,14 @@ mgu.run({
             const chgKw = (typeof chg.chargeKw === 'number' && isFinite(chg.chargeKw)) ? (chg.chargeKw.toFixed(1) + ' kW') : '-- kW';
             const chgAmps = chg.maxAmps ? (' (' + Math.round(chg.maxAmps) + 'A)') : '';
             const chgRem = chg.remainText ? (' (' + chg.remainText + ' left)') : '';
+            const chgHvV = (typeof t.hvVolts === 'number' && isFinite(t.hvVolts)) ? (' | Pack: ' + Math.round(t.hvVolts) + 'V') : '';
+            const tzOff = typeof t.localClockOffsetMin === 'number'
+                ? (' | TZ: UTC' + (t.localClockOffsetMin >= 0 ? '+' : '') + (t.localClockOffsetMin / 60).toFixed(t.localClockOffsetMin % 60 === 0 ? 0 : 1) +
+                    (t.carClockSource ? ' (' + t.carClockSource + ')' : ''))
+                : '';
             const chgDetail = chg.active
-                ? ('Speed: ' + chgKw + chgAmps + ' | Finish: ' + (chg.finishTimeText || '--:--') + chgRem + ' | Target: ' + (chg.targetSoc || 100) + '%')
-                : ('Plug: ' + (chg.plugConnected ? 'Connected (' + (chg.source || 'idle') + ')' : 'Unplugged') + ' | Auto widget idle');
+                ? ('Finish: ' + (chg.finishTimeText || '--:--') + chgRem + chgHvV + ' | ' + chgKw + chgAmps + tzOff)
+                : ('Plug: ' + (chg.plugConnected ? 'Connected (' + (chg.source || 'idle') + ')' : 'Unplugged') + tzOff);
             setTwoRow(
                 'DIAG_CHARGING',
                 'Plug-In Charging (' + (chg.active ? 'ACTIVE - ' + (chg.source || 'charging') : 'Inactive') + ')',
@@ -297,13 +556,18 @@ mgu.run({
                 'SoC: ' + socStr + ' | Power: ' + kwStr + ' | Temp: ' + fmtTempAscii(t.battTempC, units) + ' | EV Range: ' + erangeStr
             );
 
+            const hvacTag = t.cabinHvacMode === 'cooling' ? ' [AC]'
+                : (t.cabinHvacMode === 'heating' ? ' [HEAT]'
+                    : (t.cabinHvacMode === 'fan' ? ' [FAN]'
+                        : (t.cabinHvacMode === 'off' ? ' [OFF]' : '')));
+            const rawCabinTag = typeof t.rawCabinTemp === 'number' ? (' (raw=' + t.rawCabinTemp + ')') : '';
             setTwoRow(
                 'DIAG_TEMPS',
                 'Engine, Gearbox & Cabin Temperatures',
                 'Oil: ' + fmtTempAscii(t.oilTempC, units) +
                     ' | Cool: ' + fmtTempAscii(t.coolantTempC, units) +
                     ' | GBX: ' + fmtTempAscii(t.gearboxOilC, units) +
-                    ' | Cabin: ' + fmtTempAscii(t.cabinTempC, units) +
+                    ' | Cabin: ' + fmtTempAscii(t.cabinTempC, units) + rawCabinTag + hvacTag +
                     ' | IAT: ' + fmtTempAscii(t.iatC, units)
             );
 
@@ -340,11 +604,7 @@ mgu.run({
             );
         }
 
-        function tick(nowMs, forceUi) {
-            const now = typeof nowMs === 'number' ? nowMs : Date.now();
-            const model = computeModel(now);
-            renderer.render(model, settings.values, now);
-
+        runtime.onUiTick = (model, now, forceUi) => {
             const sum = renderer.lastSummary || {};
             const heroStr = sum.hero ? (sum.hero.value + ' ' + sum.hero.unit) : '--';
             if (process.env.CLUSTER_METRICS_BENCH === '1') {
@@ -355,6 +615,8 @@ mgu.run({
             }
 
             syncChargingWidgetCheckbox(model, clusterVisible || forceUi);
+            syncClusterModeVisibility(clusterVisible || forceUi);
+            if (alertsVisible || forceUi) syncAlertPreviewStatus(model);
 
             if ((mainVisible || forceUi) && (forceUi || now - lastMainUpdate >= 1000)) {
                 lastMainUpdate = now;
@@ -364,14 +626,38 @@ mgu.run({
                 lastDiagUpdate = now;
                 try { updateDiagRows(model); } catch (e) { log.warn('diag update: ' + (e.message || e)); }
             }
-        }
+        };
 
         ui.onClick('TAB_GENERAL', () => {
             ui.open('GENERAL');
         });
 
+        ui.onClick('BTN_ALERTS_MENU', () => {
+            alertsVisible = true;
+            syncAlertPreviewStatus(computeModel(Date.now()));
+            ui.open('ALERTS');
+        });
+
+        const alertButtons = [
+            ['ALERT_TPMS_LOW', 'tpms_low'],
+            ['ALERT_TPMS_CRIT', 'tpms_crit'],
+            ['ALERT_TPMS_HOT', 'tpms_hot'],
+            ['ALERT_GBX_WARN', 'gbx_warn'],
+            ['ALERT_GBX_CRIT', 'gbx_crit'],
+            ['ALERT_12V_SOC', 'soc12'],
+            ['ALERT_12V_VOLT', 'v12'],
+            ['ALERT_CLEAR', null],
+        ];
+        alertButtons.forEach((pair) => {
+            ui.onClick(pair[0], () => {
+                runtime.setAlertPreview(pair[1], Date.now());
+                tick(Date.now(), true);
+            });
+        });
+
         ui.onClick('TAB_CLUSTER', () => {
             clusterVisible = true;
+            syncClusterModeVisibility(true);
             syncChargingWidgetCheckbox(computeModel(Date.now()), true);
             ui.open('CLUSTER');
         });
@@ -388,6 +674,7 @@ mgu.run({
 
         ui.onClick('BTN_DIAG', () => {
             diagVisible = true;
+            runtime.diagVisible = true;
             hub.syncDemand(settings.values, { diagVisible: true });
             tick(Date.now(), true);
             ui.open('DIAG');
@@ -417,40 +704,24 @@ mgu.run({
                 if (shown) tick(Date.now(), true);
             } else if (name === 'CLUSTER') {
                 clusterVisible = shown;
-                if (shown) syncChargingWidgetCheckbox(computeModel(Date.now()), true);
+                if (shown) {
+                    syncClusterModeVisibility(true);
+                    syncChargingWidgetCheckbox(computeModel(Date.now()), true);
+                }
+            } else if (name === 'ALERTS') {
+                alertsVisible = shown;
+                if (shown) syncAlertPreviewStatus(computeModel(Date.now()));
             } else if (name === 'DIAG') {
                 diagVisible = shown;
+                runtime.diagVisible = shown;
                 hub.syncDemand(settings.values, { diagVisible: shown });
                 if (shown) tick(Date.now(), true);
             }
         });
 
-        settings.onChange(() => {
-            hub.syncDemand(settings.values, { diagVisible });
-            const nowEnabled = settings.get('enabled') !== false;
-            if (!prevEnabled && nowEnabled) {
-                if (hub.mediaTracker && typeof hub.mediaTracker.refresh === 'function') {
-                    hub.mediaTracker.refresh();
-                }
-                hub.pollNow().then(() => tick(Date.now(), true)).catch(() => {});
-            }
-            prevEnabled = nowEnabled;
-            tick(Date.now(), true);
-        });
-
-        hub.syncDemand(settings.values, { diagVisible });
-
-        const timer = setInterval(() => {
-            try { tick(Date.now(), false); } catch (e) { log.warn('tick: ' + (e.message || e)); }
-        }, 250);
         tick(Date.now(), true);
 
-        const cleanup = () => {
-            clearInterval(timer);
-            hub.stop();
-            renderer.close();
-        };
-        ctx.stop = cleanup;
-        return cleanup;
+        ctx.stop = runtime.cleanup;
+        return runtime.cleanup;
     },
 });

@@ -2077,5 +2077,14 @@
   "Lever start: On": "拨杆启动：开启",
   "Lever start: Off": "拨杆启动：关闭",
   "Decor lights (dash, under the door trim) with": "装饰灯跟随分区",
-  "Lower lights (like BMW)": "下层灯光（原厂方式）"
+  "Lower lights (like BMW)": "下层灯光（原厂方式）",
+  "On in the car: one colour on all lights": "已开启：整组灯光单色模式",
+  "4": "4",
+  "3": "3",
+  "2": "2",
+  "1": "1",
+  "50 ms": "50 ms",
+  "80 ms": "80 ms",
+  "100 ms": "100 ms",
+  "150 ms": "150 ms"
 }

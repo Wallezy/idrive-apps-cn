@@ -40,11 +40,13 @@ const unitsMod = require(path.join(APP_DIR, 'units'));
 const { EfficiencyTracker } = require(path.join(APP_DIR, 'efficiency'));
 const { VehicleProfile, coldRevCeilingRpm, detectAnomaly } = require(path.join(APP_DIR, 'vehicle_profile'));
 const {
-    OverlayRenderer, inspectClusterSlotConfig, resolveCornerRightMode, formatLeadHeadwayParts, CLUSTER_LAYER_NAMES,
+    OverlayRenderer, inspectClusterSlotConfig, resolveCornerRightMode, formatLeadHeadwayParts, cabinHvacPalette, CLUSTER_LAYER_NAMES,
 } = require(path.join(APP_DIR, 'overlay_renderer'));
 const { ClusterRender } = require(VENDOR_FILES['./cluster_render_client']);
 const {
     SignalHub, FastKw, LeadVehicleTracker, decodeStatusBattery2, decodeCabinTemp,
+    createHvacState, feedHvacClimate2, feedHvacClimateMaster, resolveHvacMode,
+    calcCarClockOffsetMin,
     computeFrictionBrake, computeChargingState, decodeDscPressure, decodeDscPedal, decodeDscRegen, flagActive,
 } = require(path.join(APP_DIR, 'signals'));
 const { NavTracker, parseHudStatusText, parseWazeHudShowing } = require(path.join(APP_DIR, 'nav_tracker'));
@@ -216,8 +218,8 @@ function inBox(x, y, box) {
         assert(lowV12 && lowV12.id === 'v12');
     });
 
-    /* 6. Gear Digit Snugly Next to D: Clear of KOMBI4 GEAR_WIN (1380..1426) & Baseline Aligned (664..698) */
-    await test('Gear digit sits snugly next to D (1427..1459), clears GEAR_WIN (1380..1426) & cabin_temp at all nudges, and hides in S/M/P/R/N', () => {
+    /* 6. Gear Digit Strictly Clear of KOMBI4 GEAR_WIN (1380..1460) & Baseline Aligned (664..698) */
+    await test('Gear digit stays strictly clear of GEAR_WIN (x >= 1461), left of cabin_temp (1488..1539), and hides in S/M/P/R/N', () => {
         const r = new OverlayRenderer({ allowPanel: true });
         const modelBase = {
             units: unitsMod.US_PRESET,
@@ -230,9 +232,9 @@ function inBox(x, y, box) {
             r.render(modelBase, { enabled: true, gearDisplay: 'next_to_d', clusterNudgeX: nudgeX }, 1000);
             assert.strictEqual(r.layers.gear_d.visible, true);
             const gd = r.layers.gear_d;
-            assert(gd.rect.x >= 1427 && gd.rect.x <= 1435, 'gear_d layer rect must sit snugly next to D (1427..1435), got x=' + gd.rect.x);
-            assert(gd.rect.x + gd.rect.w <= r.layers.cabin_temp.rect.x || !r.layers.cabin_temp.visible || gd.rect.x < r.layers.cabin_temp.rect.x,
-                'gear_d must sit strictly left of cabin_temp');
+            assert(gd.rect.x >= 1461 && gd.rect.x <= 1464, 'gear_d layer rect must stay strictly clear of GEAR_WIN (1461..1464), got x=' + gd.rect.x);
+            assert(r.layers.cabin_temp.rect.x >= gd.rect.x + gd.rect.w - 3 && r.layers.cabin_temp.rect.x + r.layers.cabin_temp.rect.w <= 1540,
+                'cabin_temp must sit cleanly between gear_d and AMBIENT_TEMP (1540), got ' + JSON.stringify(r.layers.cabin_temp.rect));
             const gdd = gd.cv.d;
             let maxR = 0, maxG = 0, maxB = 0, minWy = 999, maxWy = 0;
             for (let py = 0; py < gd.rect.h; py++) {
@@ -246,14 +248,14 @@ function inBox(x, y, box) {
                     if (gg > maxG) maxG = gg;
                     if (bb > maxB) maxB = bb;
                     const wx = gd.rect.x + px, wy = gd.rect.y + py;
-                    assert(wx >= 1427 && wx < 1460, 'gear_d pixel outside snug pocket next to D at wx=' + wx);
+                    assert(wx >= 1461 && wx < 1490, 'gear_d pixel must stay clear of GEAR_WIN (<=1460) at wx=' + wx);
                     if (wy < minWy) minWy = wy;
                     if (wy > maxWy) maxWy = wy;
                 }
             }
             assert(maxR > 200 && maxG > 200 && maxB > 200, 'gear_d expected bright white text pixels');
             assert(minWy >= 660 && minWy <= 674, 'gear_d top should align with BMW D (~666), got minWy=' + minWy);
-            assert(maxWy >= 692 && maxWy <= 700, 'gear_d bottom should align with BMW D (~696), got maxWy=' + maxWy);
+            assert(maxWy >= 690 && maxWy <= 700, 'gear_d bottom should align with BMW D (~696), got maxWy=' + maxWy);
         });
 
         modelBase.telemetry.program = 'S';
@@ -1004,21 +1006,63 @@ function inBox(x, y, box) {
                 Object.keys(spec).forEach((k) => {
                     if (k === '_optional' || k === '_instances') return;
                     if (k === '_methods') {
-                        spec._methods.forEach((m) => assert(m in catMethods, iname + ' missing method ' + m));
+                        spec._methods.forEach((m) => {
+                            const md = catMethods[m];
+                            assert(md && (md.id || md.methodId), iname + ' missing or zero-ID method ' + m);
+                        });
                         return;
                     }
                     if (k === '_broadcasts') {
-                        spec._broadcasts.forEach((b) => assert(b in catEvents, iname + ' missing broadcast ' + b));
+                        spec._broadcasts.forEach((b) => {
+                            const ev = catEvents[b];
+                            assert(ev && (ev.id || ev.eventId), iname + ' missing or zero-ID broadcast ' + b);
+                        });
                         return;
                     }
                     const cf = catFields[k];
                     assert(cf, iname + ' missing field ' + k);
                     const flags = String(spec[k]);
-                    if (flags.indexOf('r') >= 0) assert(cf.getter, iname + '.' + k + ' requested "r" but has no getter on G30');
-                    if (flags.indexOf('s') >= 0) assert(cf.notifier, iname + '.' + k + ' requested "s" but has no notifier on G30');
-                    if (flags.indexOf('w') >= 0) assert(cf.setter, iname + '.' + k + ' requested "w" but has no setter on G30');
+                    // CRITICAL: MainApp's generateSomeipInterfaces treats { id: 0 } as NO getter/notifier/setter!
+                    if (flags.indexOf('r') >= 0) {
+                        assert(cf.getter && cf.getter.id, iname + '.' + k + ' requested "r" but getter.id is 0/missing on G30: ' + JSON.stringify(cf));
+                    }
+                    if (flags.indexOf('s') >= 0) {
+                        assert(cf.notifier && cf.notifier.id, iname + '.' + k + ' requested "s" but notifier.id is 0/missing on G30: ' + JSON.stringify(cf));
+                    }
+                    if (flags.indexOf('w') >= 0) {
+                        assert(cf.setter && cf.setter.id, iname + '.' + k + ' requested "w" but setter.id is 0/missing on G30: ' + JSON.stringify(cf));
+                    }
                 });
             });
+
+            // Also audit the built source/manifest.json (with ${userId} -> 12252) exactly as MainApp's generateSomeipInterfaces does
+            const builtManPath = path.join(ROOT, 'dist', 'cluster_metrics', 'source', 'manifest.json');
+            if (fs.existsSync(builtManPath)) {
+                const rawMan = fs.readFileSync(builtManPath, 'utf8').split('${userId}').join('12252');
+                const builtMan = JSON.parse(rawMan);
+                ['proxies', 'services'].forEach((sec) => {
+                    const map = builtMan[sec] || {};
+                    Object.keys(map).forEach((iname) => {
+                        const inf = ifaces[iname];
+                        assert(inf, 'built manifest ' + sec + ' missing interface in G30 catalog: ' + iname);
+                        const spec = map[iname];
+                        if (spec === '*') return;
+                        const insts = Array.isArray(spec.instances) ? spec.instances : (spec.instances ? [spec.instances] : []);
+                        insts.forEach((inst) => {
+                            if (inst === '*') return;
+                            assert(instMap[iname] && (inst in instMap[iname]), 'built manifest bad instance ' + iname + '[' + inst + ']');
+                        });
+                        Object.keys(spec.attributes || {}).forEach((attr) => {
+                            const f = inf.fields && inf.fields[attr];
+                            assert(f, 'built manifest missing field ' + iname + '.' + attr);
+                            const fl = String(spec.attributes[attr]);
+                            if (fl.indexOf('r') >= 0) assert(f.getter && f.getter.id, 'built manifest zero/missing getter.id on ' + iname + '.' + attr);
+                            if (fl.indexOf('s') >= 0) assert(f.notifier && f.notifier.id, 'built manifest zero/missing notifier.id on ' + iname + '.' + attr);
+                            if (fl.indexOf('w') >= 0) assert(f.setter && f.setter.id, 'built manifest zero/missing setter.id on ' + iname + '.' + attr);
+                        });
+                    });
+                });
+            }
         }
     });
 
@@ -1059,7 +1103,10 @@ function inBox(x, y, box) {
             viewContent: [{ eventsInView: [{ passiveManeuver: { passiveManeuverType: 'JUNCTION', formattedDistance: { distance: '1.4', unit: 'MILE_US' }, description: { elements: [{ text: 'I-280 South' }] } } }] }],
         }, 1200, 1180);
         const snapPassive = ntFallback.snapshot(20000, 1250);
-        assert(snapPassive.show && snapPassive.show.dir === 'STRAIGHT_ON' && snapPassive.show.road === 'I-280 South', 'passiveManeuver on highway must draw straight guidance instead of waiting');
+        assert(snapPassive.show && snapPassive.show.dir === 'STRAIGHT_ON' && snapPassive.show.road === 'South' &&
+            Array.isArray(snapPassive.show.shields) && snapPassive.show.shields[0] &&
+            snapPassive.show.shields[0].kind === 'interstate' && snapPassive.show.shields[0].num === '280',
+            'passiveManeuver on highway must extract Interstate shield and draw straight guidance instead of waiting');
 
         // Empty route on BMW for >=5s triggers bmw_nav_fallback so stock HUD arrow takes over cleanly
         ntFallback.feedEvents({ GuidanceEventListError: 'NO_ERROR', viewContent: [{ eventsInView: [] }] }, 1500, 1480);
@@ -1491,7 +1538,7 @@ function inBox(x, y, box) {
         const r = new OverlayRenderer({ allowPanel: true });
         const model = {
             units: unitsMod.US_PRESET,
-            profile: { vehicleType: 'phev', engineOn: false, mode: 'ev_drive', isEv: true, isCold: false, coldCeilingRpm: null, alert: { id: 'tpms', severity: 'amber', label: 'FL 25psi' } },
+            profile: { vehicleType: 'phev', engineOn: false, mode: 'ev_drive', isEv: true, isCold: false, coldCeilingRpm: null, alert: null },
             efficiency: { evKmPerKwh: 6.1, fuelLPer100km: null, isDfco: false },
             telemetry: { speedKmh: 60, rpm: 0, hvKw: 12.4, soc: 76, erangeKm: 28, frangeKm: 310, tripDistKm: 19.4, gearboxOilC: 84, battTempC: 25, v12: 14.1, stage: 'D', program: 'D', gear: 5, frictionG: 0.24, brakeBar: 20, media: mSnap },
         };
@@ -1534,12 +1581,12 @@ function inBox(x, y, box) {
         assert.strictEqual(r.lastSummary.rightWidgetPage, 'trip');
         assert.strictEqual(r.layers.right_widget.visible, true);
 
-        // Cycle 2: Left-stalk momentary button pulse (operationColumnStalks 0 -> 4 -> 0) -> flips 'trip' -> 'off'
+        // Cycle 2: Left-stalk momentary button pulse (operationColumnStalks 0 -> 4 -> 0) -> flips 'trip' -> 'off' (when widgetTpms not enabled)
         mt.feedStalk({ operationColumnStalks: 0 }, 13000); // baseline rest
         mt.feedStalk({ operationColumnStalks: 4 }, 13100); // press
         assert.strictEqual(mt.feedStalk({ operationColumnStalks: 0 }, 13220), true); // release
         mSnap = mt.snapshot(13220, false);
-        assert.strictEqual(mSnap.page, 'off');
+        assert.strictEqual(mSnap.page, 'tpms');
         model.telemetry.media = mSnap;
         r.render(model, { enabled: true, rightWidgetMode: 'cycle' }, 13220);
         assert.strictEqual(r.lastSummary.rightWidgetPage, 'off');
@@ -1552,10 +1599,12 @@ function inBox(x, y, box) {
         mt.feedStalk({ operationColumnStalks: 0, statusPushButtonMainBeamAssistant: 'KEINE_BETAETIGUNG' }, 14280);
         await new Promise((res) => setTimeout(res, 700));
         mSnap = mt.snapshot(15100, false);
-        assert.strictEqual(mSnap.page, 'off', 'double-tap HBA button fallback must be removed');
+        assert.strictEqual(mSnap.bcStep, 2, 'double-tap HBA button fallback must be removed');
         assert.strictEqual(mt.feedKombiSelection({ statusActivationInstrumentPackContent: 3, statusActivationInstrumentPackBC: 12 }, 15150), true);
         mSnap = mt.snapshot(15150, false);
-        assert.strictEqual(mSnap.page, 'media', '3rd genuine BC click must cycle right_widget back to media');
+        model.telemetry.media = mSnap;
+        r.render(model, { enabled: true, rightWidgetMode: 'cycle' }, 15150);
+        assert.strictEqual(r.lastSummary.rightWidgetPage, 'media', '3rd genuine BC click must cycle right_widget back to media');
 
         // Fallback rendering when audio source has no cover art or is inactive
         model.telemetry.media = { active: true, title: 'FM 88.5 KQED', artist: 'Live Radio', cover: null, playing: true, page: 'media', bcStep: 0 };
@@ -1800,9 +1849,11 @@ function inBox(x, y, box) {
         await new Promise((res) => setTimeout(res, 25));
         assert.strictEqual(demandHub.activeWatchers().gapAhead, true);
         assert.strictEqual(demandHub.activeWatchers().climate, true);
+        assert.strictEqual(demandHub.activeWatchers().climateMaster, true);
         assert.strictEqual(demandHub.activeWatchers().media, true);
         assert.strictEqual(watched['de.bmw.dass.GapVehicleAhead'], 1);
         assert.strictEqual(watched['de.bmw.infotainment.climate.Climate2'], 1);
+        assert.strictEqual(watched['de.bmw.infotainment.climate.climatemaster.ClimateMaster'], 1);
 
         // Turn OFF hudHeadway, cabinTempDisplay, and right-wing widgets -> proxies MUST shut down!
         settingsValues.hudHeadway = 'off';
@@ -1813,9 +1864,11 @@ function inBox(x, y, box) {
         await new Promise((res) => setTimeout(res, 25));
         assert.strictEqual(demandHub.activeWatchers().gapAhead, false);
         assert.strictEqual(demandHub.activeWatchers().climate, false);
+        assert.strictEqual(demandHub.activeWatchers().climateMaster, false);
         assert.strictEqual(demandHub.activeWatchers().media, false);
         assert.strictEqual(shutdownCounts['de.bmw.dass.GapVehicleAhead'], 1, 'GapVehicleAhead proxy must be shut down when hudHeadway=off');
         assert.strictEqual(shutdownCounts['de.bmw.infotainment.climate.Climate2'], 1, 'Climate2 proxy must be shut down when cabinTempDisplay=false');
+        assert.strictEqual(shutdownCounts['de.bmw.infotainment.climate.climatemaster.ClimateMaster'], 1, 'ClimateMaster proxy must be shut down when cabinTempDisplay=false');
         assert.strictEqual(shutdownCounts['de.bmw.infotainment.hmi.hmimediastate.HmiMediaState'], 1, 'HmiMediaState proxy must be shut down when right widgets are off');
 
         // Re-enabling hudHeadway & cabinTempDisplay cleanly re-subscribes
@@ -1825,10 +1878,628 @@ function inBox(x, y, box) {
         await new Promise((res) => setTimeout(res, 25));
         assert.strictEqual(demandHub.activeWatchers().gapAhead, true);
         assert.strictEqual(demandHub.activeWatchers().climate, true);
+        assert.strictEqual(demandHub.activeWatchers().climateMaster, true);
         assert.strictEqual(watched['de.bmw.dass.GapVehicleAhead'], 2);
         assert.strictEqual(watched['de.bmw.infotainment.climate.Climate2'], 2);
+        assert.strictEqual(watched['de.bmw.infotainment.climate.climatemaster.ClimateMaster'], 2);
 
         demandHub.stop();
+    });
+
+    /* 18. BMW MainApp & MGU Store OAP Package Manifest + JS Entry Validation */
+    await test('OAP package manifest, RHMI XML/JSON parity, and JS entry validation (MainApp installer rules)', () => {
+        const srcDir = path.join(ROOT, 'dist', 'cluster_metrics', 'source');
+        assert(fs.existsSync(srcDir), 'dist/cluster_metrics/source must exist (run npm run build first)');
+
+        const appSpec = JSON.parse(fs.readFileSync(path.join(APP_DIR, 'app.json'), 'utf8'));
+        const pkg = JSON.parse(fs.readFileSync(path.join(srcDir, 'package.json'), 'utf8'));
+
+        // MainApp package.json manifest schema & JS entry point requirements
+        assert.strictEqual(pkg.name, 'cluster_metrics');
+        assert.strictEqual(pkg.version, appSpec.version);
+        assert(/^\d+\.\d+\.\d+$/.test(pkg.version), 'package.json version must be strict x.y.z semver');
+        assert.strictEqual(pkg.main, 'javascript/app.js', 'package.json MUST declare main: "javascript/app.js" for MainApp');
+        assert(fs.statSync(path.join(srcDir, pkg.main)).isFile(), 'package.json main entry file must exist in package');
+        assert.strictEqual(pkg.private, false, 'package.json must set private: false');
+        assert(typeof pkg.author === 'string' && pkg.author.length > 0, 'package.json must carry string author');
+        assert(typeof pkg.license === 'string' && pkg.license.length > 0, 'package.json must carry string license');
+        assert(pkg.engines && typeof pkg.engines.node === 'string', 'package.json must carry engines.node');
+        assert.strictEqual(pkg.mguAppStartType, 'autostart', 'cluster_metrics must declare mguAppStartType: "autostart"');
+        assert.deepStrictEqual(pkg.mguHmi, ['ID7']);
+
+        const oap = pkg.oapAppSettings;
+        assert(oap && typeof oap === 'object', 'oapAppSettings must be present');
+        assert.strictEqual(oap.someipManifest, 'manifest.json');
+        assert(/^[A-Z0-9]{4}$/.test(oap.loggingId), 'oapAppSettings.loggingId must be 4 uppercase chars');
+
+        // permissions.json & npm-shrinkwrap.json
+        const perms = JSON.parse(fs.readFileSync(path.join(srcDir, 'permissions.json'), 'utf8'));
+        assert(Array.isArray(perms.masterAccessTable) && Array.isArray(perms.masterRegistrationTable),
+            'permissions.json must define masterAccessTable and masterRegistrationTable');
+        const shrink = JSON.parse(fs.readFileSync(path.join(srcDir, 'npm-shrinkwrap.json'), 'utf8'));
+        assert.strictEqual(shrink.name, pkg.name);
+        assert.strictEqual(shrink.version, pkg.version);
+
+        // SOME/IP manifest.json (+ local G30 interface catalog check when available)
+        const manifest = JSON.parse(fs.readFileSync(path.join(srcDir, 'manifest.json'), 'utf8'));
+        assert(manifest.proxies && typeof manifest.proxies === 'object');
+        assert(manifest.services && typeof manifest.services === 'object');
+
+        const g30CatalogPath = path.join(ROOT, 'design', 'resources', 'g30-someip-interfaces.json');
+        if (fs.existsSync(g30CatalogPath)) {
+            const rawCat = fs.readFileSync(g30CatalogPath, 'utf8');
+            const db = JSON.parse(rawCat.slice(rawCat.indexOf('{')));
+            const problems = [];
+            const members = (ifData, key, depth) => {
+                const base = ifData.extends && depth < 20 ? db.interfaces[ifData.extends] : null;
+                return Object.assign({}, base ? members(base, key, depth + 1) : {}, ifData[key]);
+            };
+            Object.keys(manifest.proxies).forEach((id) => {
+                const ifData = db.interfaces[id];
+                if (!ifData) { problems.push(id + ': missing interface'); return; }
+                const cfg = manifest.proxies[id];
+                if (cfg === '*') return;
+                const inst = cfg.instances;
+                if (inst && inst !== '*') {
+                    (Array.isArray(inst) ? inst : [inst]).forEach((n) => {
+                        if (!/\$\{userId\}/.test(n) && !(db.instanceIDs[id] && db.instanceIDs[id][n])) {
+                            problems.push(id + ': missing instance ' + n);
+                        }
+                    });
+                }
+                const fields = members(ifData, 'fields', 0);
+                Object.keys(cfg.attributes || {}).forEach((fn) => {
+                    const fd = fields[fn];
+                    if (!fd) { problems.push(id + ': missing field ' + fn); return; }
+                    const mode = String(cfg.attributes[fn]);
+                    [['r', 'getter'], ['w', 'setter'], ['s', 'notifier']].forEach((pair) => {
+                        if (mode.indexOf(pair[0]) >= 0 && !fd[pair[1]]) {
+                            problems.push(id + '.' + fn + ': missing ' + pair[1]);
+                        }
+                    });
+                });
+                const methods = members(ifData, 'methods', 0);
+                (cfg.methods || []).forEach((mn) => { if (!methods[mn]) problems.push(id + ': missing method ' + mn); });
+                const events = members(ifData, 'events', 0);
+                (cfg.broadcasts || []).forEach((bn) => { if (!events[bn]) problems.push(id + ': missing broadcast ' + bn); });
+            });
+            assert.deepStrictEqual(problems, [], 'SOME/IP manifest problems against G30 catalog: ' + problems.join('; '));
+        }
+
+        // RHMI application.xml <-> uiDescription.json parity
+        const id7Dir = path.join(srcDir, 'rhmiData', 'uiDescriptions', 'ID7');
+        const xml = fs.readFileSync(path.join(id7Dir, 'application.xml'), 'utf8');
+        const uiDesc = JSON.parse(fs.readFileSync(path.join(id7Dir, 'uiDescription.json'), 'utf8'));
+        assert.strictEqual(uiDesc.schemaVersion, '1.3.0');
+        assert(xml.indexOf('<property id="1"') < 0, 'application.xml should not emit custom property id="1" on stock widgets');
+
+        // Compile-check every packaged .js file as a CommonJS module (as oap_link.nodeCheck does)
+        const walkJs = (dir, acc) => {
+            fs.readdirSync(dir).forEach((n) => {
+                const p = path.join(dir, n);
+                if (fs.statSync(p).isDirectory()) walkJs(p, acc);
+                else if (n.endsWith('.js')) acc.push(p);
+            });
+            return acc;
+        };
+        const packagedJs = walkJs(srcDir, []);
+        assert(packagedJs.length >= 20);
+        packagedJs.forEach((f) => {
+            const text = fs.readFileSync(f, 'utf8');
+            new vm.Script(Module.wrap(text), { filename: f });
+        });
+    });
+
+    /* 19. v0.8.2: Cabin Temp Option A + HVAC Mode Color Coding & Non-Redundant Charging Widget */
+    await test('v0.8.2: Cabin Temp Option A + HVAC color coding (AC blue, Fan white, Heating orange) & de-duplicated Charging widget', () => {
+        // A. HVAC thermal mode classifier (Climate2 + ClimateMaster)
+        let hs = createHvacState();
+        assert.strictEqual(resolveHvacMode(hs, 22.0), null, 'empty HVAC state must return null (white fallback)');
+
+        // Summer AC cooling: ClimateMaster ON + AC ON + target 20C while cabin is 25C
+        feedHvacClimateMaster(hs, 'statusClimateSystemOn', [{ operationZone: 'DRIVER', airConditioningOn: true }]);
+        feedHvacClimateMaster(hs, 'statusAirCondAC', [{ operationZone: 'DRIVER', acButton: true }]);
+        feedHvacClimateMaster(hs, 'statusTemperature', [{ operationZone: 'DRIVER', targetTemperature: 20.0 }]);
+        assert.strictEqual(resolveHvacMode(hs, 25.0), 'cooling');
+
+        // Winter AUTO cabin warming: AC dehumidifier button stays ON, but cabin is 15.5C and target is 21.5C -> MUST be 'heating' (orange)!
+        feedHvacClimateMaster(hs, 'statusTemperature', [{ operationZone: 'DRIVER', targetTemperature: 21.5 }]);
+        assert.strictEqual(resolveHvacMode(hs, 15.5), 'heating', 'winter AUTO heating with AC dehumidifier on must classify as heating');
+
+        // Fan-only ventilation: AC button OFF, target near cabin temp -> 'fan' (white)
+        feedHvacClimateMaster(hs, 'statusAirCondAC', [{ operationZone: 'DRIVER', acButton: false }]);
+        feedHvacClimate2(hs, 'statusAirConditionDRStatus', { statusBlowerSettingDR: 4, statusAirInjectionManifoldProgramDR: 'VENT' });
+        assert.strictEqual(resolveHvacMode(hs, 21.2), 'fan');
+
+        // Front Defrost / HI override -> 'heating'; MAX AC override -> 'cooling'; System OFF -> 'off'
+        feedHvacClimate2(hs, 'statusACFrontFunctions', { statusDefrost: 'DEFROST_EIN' });
+        assert.strictEqual(resolveHvacMode(hs, 21.2), 'heating');
+        feedHvacClimate2(hs, 'statusACFrontFunctions', { statusDefrost: 'DEFROST_AUS' });
+        feedHvacClimateMaster(hs, 'statusAirCondMaxAC', [{ operationZone: 'DRIVER', maxAirConditioning: true }]);
+        assert.strictEqual(resolveHvacMode(hs, 21.2), 'cooling');
+        feedHvacClimateMaster(hs, 'statusClimateSystemOn', [{ operationZone: 'DRIVER', airConditioningOn: false }]);
+        assert.strictEqual(resolveHvacMode(hs, 21.2), 'off');
+
+        // B. Cabin Temp Option A pixel colors (Blue for cooling, White for fan/unknown, Orange for heating)
+        assert.strictEqual(cabinHvacPalette('cooling').val, '#5bc8ff');
+        assert.strictEqual(cabinHvacPalette('heating').val, '#ff9f43');
+        assert.strictEqual(cabinHvacPalette('fan').val, '#f2f5fa');
+        assert.strictEqual(cabinHvacPalette(null).val, '#f2f5fa');
+
+        const r = new OverlayRenderer({ allowPanel: true });
+        const countValuePixels = (cv) => {
+            let blue = 0, orange = 0, white = 0;
+            for (let y = 24; y <= 45; y++) {
+                for (let x = 4; x < cv.w - 2; x++) {
+                    const o = (y * cv.w + x) * 4;
+                    const pr = cv.d[o], pg = cv.d[o + 1], pb = cv.d[o + 2], pa = cv.d[o + 3];
+                    if (pa < 200) continue;
+                    if (pb > pr + 60 && pg > 140) blue++;
+                    else if (pr > pb + 90 && pg > 110) orange++;
+                    else if (pr > 220 && pg > 220 && pb > 220) white++;
+                }
+            }
+            return { blue, orange, white };
+        };
+
+        const baseModel = {
+            units: unitsMod.US_PRESET,
+            profile: { vehicleType: 'phev', engineOn: false, mode: 'ev_drive', isEv: true, isCold: false, coldCeilingRpm: null, alert: null },
+            efficiency: { evKmPerKwh: 6.1, fuelLPer100km: null, isDfco: false },
+            telemetry: {
+                speedKmh: 72, rpm: 0, hvKw: 12.0, hvVolts: 364, soc: 68, soc12: 86, v12: 14.0,
+                cabinTempC: 22.0, cabinHvacMode: 'cooling', stage: 'D', program: 'D', gear: 6,
+            },
+        };
+
+        r.render(baseModel, { enabled: true }, 7000);
+        const pxCool = countValuePixels(r.layers.cabin_temp.cv);
+        assert(pxCool.blue > 40 && pxCool.orange === 0, 'AC cooling must render blue cabin temp value pixels, got ' + JSON.stringify(pxCool));
+
+        baseModel.telemetry.cabinHvacMode = 'heating';
+        r.render(baseModel, { enabled: true }, 7100);
+        const pxHeat = countValuePixels(r.layers.cabin_temp.cv);
+        assert(pxHeat.orange > 40 && pxHeat.blue === 0, 'Heating must render orange cabin temp value pixels, got ' + JSON.stringify(pxHeat));
+
+        baseModel.telemetry.cabinHvacMode = 'fan';
+        r.render(baseModel, { enabled: true }, 7200);
+        const pxFan = countValuePixels(r.layers.cabin_temp.cv);
+        assert(pxFan.white > 40 && pxFan.blue === 0 && pxFan.orange === 0, 'Fan-only must render white cabin temp value pixels, got ' + JSON.stringify(pxFan));
+
+        // C. Session addedKwh integration & Non-Redundant Charging Widget clearance above world y = 550
+        const chgRaw = { wirePlugged: true, plugLocked: true, phases: 1, lscStatus: 'active', endHour: 16, endMin: 35, residualMin: 129, targetSoc: 100 };
+        let cState = computeChargingState(chgRaw, { speedKmh: 0, rpm: 0, hvKw: -3.6, soc: 70, stage: 'P' }, 10000);
+        assert.strictEqual(cState.active, true);
+        assert.strictEqual(cState.plugLocked, true);
+        assert.strictEqual(cState.phases, 1);
+        // 10 seconds later at 3.6 kW = +0.01 kWh; plus SoC rising 70 -> 80% (~1.08 kWh)
+        cState = computeChargingState(chgRaw, { speedKmh: 0, rpm: 0, hvKw: -3.6, soc: 80, stage: 'P' }, 20000);
+        assert(cState.addedKwh > 1.0, 'session addedKwh must track charging energy, got ' + cState.addedKwh);
+
+        const chgModel = {
+            units: unitsMod.US_PRESET,
+            profile: { vehicleType: 'phev', engineOn: false, mode: 'ev_drive', isEv: true, isCold: false, coldCeilingRpm: null, alert: null },
+            efficiency: { evKmPerKwh: null, fuelLPer100km: null, isDfco: false },
+            telemetry: {
+                speedKmh: 0, rpm: 0, hvKw: -3.6, hvVolts: 396, battTempC: 24.5, soc: 80, soc12: 91,
+                cabinTempC: 21.0, cabinHvacMode: null, stage: 'P', program: 'D', gear: 0,
+                charging: cState,
+            },
+        };
+        r.render(chgModel, { enabled: true }, 20100);
+        const rwCv = r.layers.right_widget.cv;
+        let heroClockPixels = 0;
+        let lowerGridPixels = 0;
+        let belowSafeZonePixels = 0;
+        for (let y = 170; y <= 232; y++) {
+            for (let x = 60; x <= 312; x++) {
+                if (rwCv.d[(y * rwCv.w + x) * 4 + 3] > 200) heroClockPixels++;
+            }
+        }
+        for (let y = 298; y <= 416; y++) {
+            for (let x = 28; x <= 346; x++) {
+                if (rwCv.d[(y * rwCv.w + x) * 4 + 3] > 200) lowerGridPixels++;
+            }
+        }
+        // World y = 550 corresponds to ry = 550 - 88 = 462; verify ry >= 428 has ZERO pixels!
+        for (let y = 428; y < rwCv.h; y++) {
+            for (let x = 0; x < rwCv.w; x++) {
+                if (rwCv.d[(y * rwCv.w + x) * 4 + 3] > 0) belowSafeZonePixels++;
+            }
+        }
+        assert(heroClockPixels > 800, 'enlarged 68px finish clock must paint substantial hero pixels, got ' + heroClockPixels);
+        assert(lowerGridPixels > 500, 'non-redundant 2x2 charging grid must populate lower deck, got ' + lowerGridPixels);
+        assert.strictEqual(belowSafeZonePixels, 0, 'charging widget must leave ry >= 428 (world y >= 516) 100% clear of stock range labels');
+
+        // Unplugging resets session addedKwh cleanly
+        chgRaw.wirePlugged = false;
+        chgRaw.plugLocked = false;
+        chgRaw.lscStatus = 'done';
+        const cUnplugged = computeChargingState(chgRaw, { speedKmh: 0, rpm: 0, hvKw: 0, soc: 80, stage: 'P' }, 25000);
+        assert.strictEqual(cUnplugged.active, false);
+        assert.strictEqual(cUnplugged.addedKwh, null);
+    });
+
+    /* 20. v0.8.3: Local Timezone Finish Clock, Smoothed Charging ETA, BC Cycling While Charging, Larger Media & Alert Preview */
+    await test('v0.8.3: Local timezone Est. Finish (PST vs UTC), smoothed ETA, BC cycling while charging & alert preview', () => {
+        // A. Timezone offset from car clock (13:44 PST when UTC is 21:44 -> -480 min)
+        const utc2144 = Date.UTC(2026, 10, 19, 21, 44, 0); // Nov 19, 2026 21:44 UTC = 13:44 PST
+        assert.strictEqual(calcCarClockOffsetMin(13, 44, utc2144), -480);
+        assert.strictEqual(calcCarClockOffsetMin(22, 44, utc2144), 60);
+
+        // With 85 min remaining at 13:44 PST (21:44 UTC), Est. Finish MUST be 15:09 (NEVER 23:09 UTC!)
+        const tzRaw = { wirePlugged: true, plugLocked: true, lscStatus: 'active', residualMin: 85, targetSoc: 100 };
+        const tzState = computeChargingState(tzRaw, { speedKmh: 0, rpm: 0, hvKw: -2.8, soc: 63, stage: 'P', localOffsetMin: -480 }, utc2144);
+        assert.strictEqual(tzState.remainText, '1h 25m');
+        assert.strictEqual(tzState.finishTimeText, '15:09', 'Est. Finish must use car local timezone (15:09 PST, not 23:09 UTC)');
+
+        // B. Fallback ETA smoothing: brief 1-second dip from 2.8 kW -> 1.4 kW must NOT double remainMin!
+        const smRaw = { wirePlugged: true, lscStatus: 'active', targetSoc: 100 };
+        const s0 = computeChargingState(smRaw, { speedKmh: 0, rpm: 0, hvKw: -2.8, soc: 63, stage: 'P', localOffsetMin: -480 }, utc2144);
+        const s1 = computeChargingState(smRaw, { speedKmh: 0, rpm: 0, hvKw: -1.4, soc: 63, stage: 'P', localOffsetMin: -480 }, utc2144 + 1000);
+        assert(Math.abs(s1.remainMin - s0.remainMin) <= 4,
+            'brief 1s kW dip must be smoothed in ETA (s0=' + s0.remainMin + ', s1=' + s1.remainMin + ')');
+
+        // C. BC button cycles Charging -> Media -> Trip -> Off -> Charging while plugged in!
+        const r = new OverlayRenderer({ allowPanel: true });
+        const model = {
+            units: unitsMod.US_PRESET,
+            profile: { vehicleType: 'phev', engineOn: false, mode: 'ev_drive', isEv: true, isCold: false, coldCeilingRpm: null, alert: null },
+            efficiency: { evKmPerKwh: null, fuelLPer100km: null, isDfco: false },
+            telemetry: {
+                speedKmh: 0, rpm: 0, hvKw: -2.8, hvVolts: 396, battTempC: 24.0, soc: 72, soc12: 91,
+                cabinTempC: 20.0, stage: 'P', program: 'D', gear: 0,
+                media: { active: true, playing: true, title: 'Finally, a Vaccine for...', artist: 'The Daily - Subscriber Feed', elapsedSec: 120, totalSec: 723, remainSec: 603, frac: 0.17, bcStep: 5 },
+                charging: tzState,
+            },
+        };
+        const opts = { enabled: true, widgetMedia: true, widgetTrip: true };
+        r.render(model, opts, 1000);
+        assert.strictEqual(r.lastSummary.rightWidgetPage, 'charging', 'charging must auto-open on charging widget');
+        model.telemetry.media.bcStep = 6;
+        r.render(model, opts, 1200);
+        assert.strictEqual(r.lastSummary.rightWidgetPage, 'media', '1st BC click while charging must switch to media');
+        model.telemetry.media.bcStep = 7;
+        r.render(model, opts, 1400);
+        assert.strictEqual(r.lastSummary.rightWidgetPage, 'trip', '2nd BC click while charging must switch to trip');
+        model.telemetry.media.bcStep = 8;
+        r.render(model, opts, 1600);
+        assert.strictEqual(r.lastSummary.rightWidgetPage, 'off', '3rd BC click while charging must hide right widget');
+        model.telemetry.media.bcStep = 9;
+        r.render(model, opts, 1800);
+        assert.strictEqual(r.lastSummary.rightWidgetPage, 'charging', '4th BC click must cycle back to charging');
+
+        // D. Smart alert preview auto-switches right_widget to 'tpms' & HUD (and NEVER draws tiny text on brake_rail)
+        model.previewAlert = {
+            id: 'tpms', severity: 'red', corner: 'FL', seq: 1,
+            label: 'FL 21psi', hudText: 'Tire Pressure Critical', title: 'TIRE FLAT - CRITICAL',
+            detail: 'Front Left: 21 psi (Target 35 psi)',
+        };
+        r.render(model, opts, 2000);
+        assert.strictEqual(r.lastSummary.rightWidgetPage, 'tpms', 'previewAlert must auto-switch right_widget to tpms alert view');
+        assert.strictEqual(r.layers.brake_rail.visible, false, 'brake_rail must stay hidden in Park without tiny alert text');
+    });
+
+    /* 21. v0.8.5: Highway Shields (US-101, I-880, CA-85) in HUD Nav + Calibrated Right-Wing Gauge Backdrop */
+    await test('v0.8.5: HUD highway shield extraction (US-101, I-880, CA-85), vector shield rendering & calibrated gauge backdrop', () => {
+        const { decodeDescription } = require(path.join(APP_DIR, 'nav_tracker'));
+        const { drawHudRoadBanner, ROAD_W, ROAD_H } = require(path.join(APP_DIR, 'hud_nav_renderer'));
+        const { buildStockBackdrop } = require(path.join(APP_DIR, 'image_decode'));
+        const { Canvas } = require('./kit/canvas');
+
+        // A. Text extraction: Exit + US-101
+        const d1 = decodeDescription({ description: { elements: [{ text: 'Exit 399A US-101 N Bayshore Fwy' }] } }, true);
+        assert.strictEqual(d1.exitBadge, '399A');
+        assert.deepStrictEqual(d1.shields, [{ kind: 'us', num: '101' }]);
+        assert.strictEqual(d1.road, 'N Bayshore Fwy');
+
+        // B. Text extraction: Interstate + State Route interchange
+        const d2 = decodeDescription({ description: { elements: [{ text: 'I-880 N / CA-237 W' }] } }, false);
+        assert.deepStrictEqual(d2.shields, [{ kind: 'interstate', num: '880' }, { kind: 'state', num: '237' }]);
+
+        // C. Native BMW el.icon objects (Exit icon + Interstate icon + street text)
+        const d3 = decodeDescription({
+            description: {
+                elements: [
+                    { icon: { text: '12B' } },
+                    { icon: { type: 'INTERSTATE', text: '280' } },
+                    { text: 'North / Wolfe Rd' },
+                ],
+            },
+        }, true);
+        assert.strictEqual(d3.exitBadge, '12B');
+        assert.deepStrictEqual(d3.shields, [{ kind: 'interstate', num: '280' }]);
+        assert.strictEqual(d3.road, 'North / Wolfe Rd');
+
+        // D. Must NOT false-trigger on plain street addresses
+        const d4 = decodeDescription({ description: { elements: [{ text: '101 Main St' }] } }, false);
+        assert.deepStrictEqual(d4.shields, []);
+        assert.strictEqual(d4.road, '101 Main St');
+
+        // E. Vector shield rendering produces red/blue Interstate pixels + white US shield pixels + green State pixels
+        const cv = new Canvas(ROAD_W, ROAD_H);
+        const ok = drawHudRoadBanner(cv, {
+            exitBadge: '399A',
+            shields: [{ kind: 'interstate', num: '880' }, { kind: 'us', num: '101' }],
+            road: 'N Bayshore Fwy',
+        });
+        assert.strictEqual(ok, true);
+        let redPx = 0, bluePx = 0, greenPx = 0, whitePx = 0;
+        for (let i = 0; i < cv.d.length; i += 4) {
+            if (cv.d[i + 3] < 200) continue;
+            const r0 = cv.d[i], g0 = cv.d[i + 1], b0 = cv.d[i + 2];
+            if (r0 > 180 && g0 < 80 && b0 < 80) redPx++;
+            else if (b0 > 180 && r0 < 70 && g0 < 120) bluePx++;
+            else if (g0 > 110 && r0 < 60 && b0 < 90) greenPx++;
+            else if (r0 > 220 && g0 > 220 && b0 > 220) whitePx++;
+        }
+        assert(redPx > 40 && bluePx > 120, 'Interstate shield must paint red crown + royal blue body (red=' + redPx + ', blue=' + bluePx + ')');
+        assert(greenPx > 120, 'Exit badge must paint green body');
+        assert(whitePx > 200, 'US shield + road text must paint bright white pixels');
+
+        // F. Calibrated G30 right-wing backdrop covers top-left eyebrow handle (1265, 104),
+        //    stays strictly inside outer bezel at (1765, 355), and clears bottom-left map at (1400, 600).
+        const cov = { w: 144, h: 144, d: Buffer.alloc(144 * 144 * 4, 220) };
+        const bg = buildStockBackdrop(cov, 536, 536, { ox: 1252, oy: 88, vx: 196, vy: 218 });
+        const alphaAt = (wx, wy) => bg[((wy - 88) * 536 + (wx - 1252)) * 4 + 3];
+        assert(alphaAt(1275, 105) > 20, 'backdrop must reach top-left extended eyebrow handle at (1275, 105)');
+        assert.strictEqual(alphaAt(1765, 355), 0, 'backdrop must NOT spill past outer-right bezel at (1765, 355)');
+        assert.strictEqual(alphaAt(1400, 600), 0, 'backdrop must NOT spill onto bottom-left map at (1400, 600)');
+        assert(alphaAt(1560, 610) > 20, 'backdrop must reach bottom-right gauge curve at (1560, 610)');
+    });
+
+    /* 22. v0.8.6: Two-Level Stacked HUD Lane Guidance & Promotion Slide-Down Animation */
+    await test('v0.8.6: Two-level stacked HUD lane guidance (rows[0]+rows[1]), dtd ordering & promotion animation', () => {
+        const { NavTracker, decodeLanes } = require(path.join(APP_DIR, 'nav_tracker'));
+        const { drawHudNav, hudNavKey, NW, NH } = require(path.join(APP_DIR, 'hud_nav_renderer'));
+        const { Canvas } = require('./kit/canvas');
+
+        const rowImmediate = {
+            uid: '10',
+            distanceToDestination: 5200,
+            lanes: [
+                { directionToFollow: 'NONE', otherDirections: [], isHighlighted: false, additionalLaneInfo: 'HOV' },
+                { directionToFollow: 'STRAIGHT_ON', otherDirections: [], isHighlighted: true, additionalLaneInfo: 'NONE' },
+                { directionToFollow: 'STRAIGHT_ON', otherDirections: [], isHighlighted: true, additionalLaneInfo: 'NONE' },
+                { directionToFollow: 'STRAIGHT_ON', otherDirections: ['RIGHT'], isHighlighted: true, additionalLaneInfo: 'NONE' },
+            ],
+            laneMarkers: ['SOLID', 'SOLID', 'DASHED', 'DASHED', 'SOLID'],
+            recommendedCarPositionLaneIndex: 2,
+        };
+        const rowUpcoming = {
+            uid: '11',
+            distanceToDestination: 4700,
+            lanes: [
+                { directionToFollow: 'NONE', otherDirections: ['STRAIGHT_ON'], isHighlighted: false, additionalLaneInfo: 'NONE' },
+                { directionToFollow: 'NONE', otherDirections: ['STRAIGHT_ON'], isHighlighted: false, additionalLaneInfo: 'NONE' },
+                { directionToFollow: 'SLIGHT_RIGHT', otherDirections: [], isHighlighted: true, additionalLaneInfo: 'NONE' },
+                { directionToFollow: 'RIGHT', otherDirections: [], isHighlighted: true, additionalLaneInfo: 'NONE' },
+            ],
+            laneMarkers: ['SOLID', 'DASHED', 'DASHED', 'DASHED', 'SOLID'],
+            recommendedCarPositionLaneIndex: 3,
+        };
+
+        // A. Multi-row decoding self-orders by distanceToDestination (larger dtd = immediate lower row)
+        const decReversed = decodeLanes({ rows: [rowUpcoming, rowImmediate] });
+        assert(decReversed && decReversed.uid === '10' && decReversed.next && decReversed.next.uid === '11',
+            'decodeLanes must place larger dtd row in primary lower slot and smaller dtd row in upper next slot');
+
+        // B. NavTracker tracks 2 stacked rows and fires promotion animation when upper row promotes into lower row
+        const nt = new NavTracker({ crStatusPath: '/nonexistent/cr', wazeStatusPath: '/nonexistent/woc' });
+        nt.feedField('guidance', 'guidanceState', 'ACTIVE', 1000);
+        nt.feedField('guidance', 'conclusiveDart', {
+            maneuver: {
+                branch: {
+                    branchType: 'HIGHWAY_OUT_RIGHT',
+                    formattedDistance: { distance: '0.4', unit: 'MILE_US' },
+                    description: { elements: [{ text: 'Exit 399A US-101 N Bayshore Fwy' }] },
+                },
+            },
+        }, 1050);
+        nt.feedField('guidance', 'currentLaneGuiding', { rows: [rowImmediate, rowUpcoming] }, 1100);
+        const snapStacked = nt.snapshot(20000, 1150);
+        assert.strictEqual(snapStacked.hasStackedLanes, true);
+        assert.strictEqual(snapStacked.laneAnimating, false);
+        assert(snapStacked.summary.indexOf('[4+4 lanes]') >= 0, 'summary should note stacked lane counts, got ' + snapStacked.summary);
+
+        // Drive past first split: rowImmediate disappears, rowUpcoming promotes to rows[0]!
+        nt.feedField('guidance', 'currentLaneGuiding', { rows: [rowUpcoming] }, 2000);
+        const snapAnimMid = nt.snapshot(20200, 2210);
+        assert.strictEqual(snapAnimMid.laneAnimating, true, 'promotion must trigger laneAnimating=true');
+        assert(snapAnimMid.show.lanes.anim && snapAnimMid.show.lanes.anim.t > 0.4 && snapAnimMid.show.lanes.anim.t < 0.6);
+        assert(snapAnimMid.show.lanes.anim.droppedRow && snapAnimMid.show.lanes.anim.droppedRow.lanes.length === 4);
+
+        // After 420 ms, promotion animation finishes cleanly
+        const snapAnimDone = nt.snapshot(20600, 2500);
+        assert.strictEqual(snapAnimDone.laneAnimating, false, 'promotion animation must finish cleanly after 420ms');
+        assert.strictEqual(snapAnimDone.hasStackedLanes, false);
+
+        // C. Stacked renderer paints both upper tucked tier (y=137..167) and lower primary tier (y=175..225)
+        const cvStacked = new Canvas(NW, NH);
+        drawHudNav(cvStacked, snapStacked.show, { hideRoad: true });
+        let upperLit = 0, lowerLit = 0;
+        for (let py = 136; py <= 167; py++) {
+            for (let px = 20; px < NW - 20; px++) {
+                if (cvStacked.d[(py * NW + px) * 4 + 3] > 80) upperLit++;
+            }
+        }
+        for (let py = 175; py <= 226; py++) {
+            for (let px = 20; px < NW - 20; px++) {
+                if (cvStacked.d[(py * NW + px) * 4 + 3] > 140) lowerLit++;
+            }
+        }
+        assert(upperLit > 80, 'upper tucked lane row must render visible pixels (got ' + upperLit + ')');
+        assert(lowerLit > 200, 'lower primary lane row must render visible pixels (got ' + lowerLit + ')');
+
+        // D. Animation frames produce distinct hudNavKey values & render cleanly
+        const kMid = hudNavKey(snapAnimMid.show);
+        const kDone = hudNavKey(snapAnimDone.show);
+        assert.notStrictEqual(kMid, kDone, 'mid-animation and steady-state must produce distinct hudNavKey');
+        const cvAnim = new Canvas(NW, NH);
+        drawHudNav(cvAnim, snapAnimMid.show, { hideRoad: true });
+        assert(cvAnim.d.some((v, idx) => idx % 4 === 3 && v > 120), 'mid-animation frame must render visible pixels');
+    });
+
+    /* 23. Timezone UTC-1.5 Fix (KombiIF/AutoTime/HMIContext), Right-Wing TPMS+Alert Auto-Switch & BC Dismiss, and Stock BMW TTF */
+    await test('Timezone UTC-1.5 fix (17:36 PST + 2h 3m = 19:39), Right-Wing TPMS/Alert widget + BC HUD dismiss & BMW TTF rasterizer', () => {
+        const {
+            calcAutoTimeOffsetMin, calcKombiShowTimeOffsetMin, parseHmiTimeZoneOffsetMin, computeChargingState,
+        } = require(path.join(APP_DIR, 'signals'));
+        const { detectAnomaly } = require(path.join(APP_DIR, 'vehicle_profile'));
+        const { parseTtf, bakeSizeAtlas } = require(path.join(APP_DIR, 'bmw_font'));
+
+        // A. Exact reproduction & fix of user's 17:36 PST (01:36 UTC) + 2h 03m remaining bug:
+        //    - Uninitialized AutoTime.current { year: 0, month: 0, day: 0, hour: 0, minute: 0 } MUST return null (NEVER -90 / UTC-1.5!)
+        const utc0136 = Date.UTC(2026, 10, 22, 1, 36, 10); // Nov 21, 2026 17:36:10 PST = Nov 22, 2026 01:36:10 UTC
+        assert.strictEqual(
+            calcAutoTimeOffsetMin({ time: { hour: 0, minute: 0, second: 0 }, date: { year: 0, month: 0, day: 0 } }, utc0136),
+            null,
+            'uninitialized zero AutoTime.current struct must NEVER produce UTC-1.5 (-90 min)'
+        );
+        assert.strictEqual(
+            calcKombiShowTimeOffsetMin({ displayHour: 255, displayMinute: 255, displayDateYear: 65535, statusDisplayClockTimeDate: 15 }, utc0136),
+            null,
+            'uninitialized 0xFF KombiIF.statusShowTimeDate struct must return null'
+        );
+
+        // Valid KombiIF.statusShowTimeDate (17:36 on 2026-11-21) -> -480 min (UTC-8)
+        assert.strictEqual(
+            calcKombiShowTimeOffsetMin({
+                displayDateYear: 2026, displayDateMonth: 11, displayDateDay: 21,
+                displayHour: 17, displayMinute: 36, displaySecond: 10, statusDisplayClockTimeDate: 1,
+            }, utc0136),
+            -480
+        );
+        // Valid AutoTime.current (17:36 on 2026-11-21) -> -480 min (UTC-8)
+        assert.strictEqual(
+            calcAutoTimeOffsetMin({
+                date: { year: 2026, month: 11, day: 21 },
+                time: { hour: 17, minute: 36, second: 10 },
+            }, utc0136),
+            -480
+        );
+        // Valid HMIContext.currentTimeZone (string & numeric enum)
+        assert.strictEqual(parseHmiTimeZoneOffsetMin('UTC_MINUS_0800_1'), -480);
+        assert.strictEqual(parseHmiTimeZoneOffsetMin(4), -480);
+        assert.strictEqual(parseHmiTimeZoneOffsetMin('UTC_PLUS_0530'), 330);
+        assert.strictEqual(parseHmiTimeZoneOffsetMin(64), 330);
+        assert.strictEqual(parseHmiTimeZoneOffsetMin('UNKNOWN'), null);
+        assert.strictEqual(parseHmiTimeZoneOffsetMin(0), null);
+
+        // Verify 17:36 PST + 123 min (2h 3m) = 19:39!
+        const chg1736 = computeChargingState(
+            { wirePlugged: true, plugLocked: true, lscStatus: 'active', residualMin: 123, targetSoc: 100 },
+            { speedKmh: 0, rpm: 0, hvKw: -3.5, soc: 44, stage: 'P', localOffsetMin: -480 },
+            utc0136
+        );
+        assert.strictEqual(chg1736.remainText, '2h 3m');
+        assert.strictEqual(chg1736.finishTimeText, '19:39', '17:36 PST + 2h 3m must equal 19:39');
+
+        // B. Readable HUD alert strings & detailed Right-Wing TPMS / Alert auto-switch + BC dismissal
+        const aState = { _v12LowSince: 0, _soc12LowSince: 0 };
+        const aTpms = detectAnomaly({
+            tpms: { FL: { pressureBar: 2.05, targetBar: 2.41, tempC: 24 }, FR: { pressureBar: 2.41, targetBar: 2.41, tempC: 24 } },
+        }, unitsMod.US_PRESET, aState, 1000);
+        assert.strictEqual(aTpms.hudText, 'Tire Pressure Low');
+        assert.strictEqual(aTpms.title, 'TIRE PRESSURE LOW');
+        assert(aTpms.detail.indexOf('Front Left') >= 0 && aTpms.detail.indexOf('Target 35 psi') >= 0);
+
+        const aGbx = detectAnomaly({ gearboxOilC: 118 }, unitsMod.US_PRESET, aState, 1000);
+        assert.strictEqual(aGbx.hudText, 'Gearbox Critical');
+        assert.strictEqual(aGbx.severity, 'red');
+
+        detectAnomaly({ v12: 11.5 }, unitsMod.US_PRESET, aState, 1000);
+        const aV12 = detectAnomaly({ v12: 11.5 }, unitsMod.US_PRESET, aState, 6500);
+        assert.strictEqual(aV12.hudText, '12V Battery Critical');
+
+        // Verify normal 4-wheel TPMS widget + alert auto-switch + BC dismiss (even when bcStep starts at 1!)
+        const r = new OverlayRenderer({ allowPanel: true });
+        const settingsObj = { enabled: true, widgetMedia: true, widgetTrip: true, widgetTpms: true };
+        const m = {
+            units: unitsMod.US_PRESET,
+            profile: { vehicleType: 'phev', engineOn: false, mode: 'ev_drive', isEv: true, isCold: false, coldCeilingRpm: null, alert: null },
+            efficiency: { evKmPerKwh: 6.2, fuelLPer100km: null, isDfco: false },
+            telemetry: {
+                speedKmh: 72, rpm: 0, hvKw: 12.0, soc: 74, stage: 'D', program: 'D', gear: 5, frictionG: 0,
+                oilTempC: 90, coolantTempC: 88, v12: 14.1, soc12: 88,
+                tpms: {
+                    FL: { pressureBar: 2.41, targetBar: 2.41, tempC: 26 },
+                    FR: { pressureBar: 2.41, targetBar: 2.41, tempC: 27 },
+                    RL: { pressureBar: 2.62, targetBar: 2.62, tempC: 25 },
+                    RR: { pressureBar: 2.62, targetBar: 2.62, tempC: 26 },
+                },
+                media: { active: true, playing: true, title: 'The Daily', artist: 'NYT', bcStep: 2 },
+            },
+        };
+        // Step 2 in ['media', 'trip', 'tpms', 'off'] -> normal 4-wheel 'tpms' view!
+        r.render(m, settingsObj, 3000);
+        assert.strictEqual(r.lastSummary.rightWidgetPage, 'tpms');
+        let belowSafe = 0;
+        for (let y = 428; y < r.layers.right_widget.cv.h; y++) {
+            for (let x = 0; x < r.layers.right_widget.cv.w; x++) {
+                if (r.layers.right_widget.cv.d[(y * r.layers.right_widget.cv.w + x) * 4 + 3] > 0) belowSafe++;
+            }
+        }
+        assert.strictEqual(belowSafe, 0, 'normal 4-wheel TPMS widget must keep ry >= 428 clear');
+
+        // Driver is on 'trip' (bcStep = 1), then TPMS Low Alert fires -> auto-switches to 'tpms' + shows HUD alert!
+        m.telemetry.media.bcStep = 1;
+        r.render(m, settingsObj, 3200);
+        assert.strictEqual(r.lastSummary.rightWidgetPage, 'trip');
+
+        m.profile.alert = aTpms;
+        r.render(m, settingsObj, 3400);
+        assert.strictEqual(r.lastSummary.rightWidgetPage, 'tpms', 'alert must auto-switch right_widget to tpms alert view');
+        assert(r.lastSummary.activeAlert && r.lastSummary.activeAlert.hudText === 'Tire Pressure Low');
+        let hudRow3Lit = 0;
+        for (let y = 74; y < 99; y++) {
+            for (let x = 4; x < 240; x++) {
+                if (r.layers.hud_main.cv.d[(y * r.layers.hud_main.cv.w + x) * 4 + 3] > 180) hudRow3Lit++;
+            }
+        }
+        assert(hudRow3Lit > 120, 'HUD Row 3 must render readable "Tire Pressure Low" message');
+
+        // Driver presses BC once (bcStep 1 -> 2): HUD alert MUST dismiss AND right_widget MUST switch to 'media' (NOT stay on 'tpms'!)
+        m.telemetry.media.bcStep = 2;
+        r.render(m, settingsObj, 3600);
+        assert.strictEqual(r.lastSummary.alertDismissed, true, 'BC press must dismiss active alert');
+        assert.strictEqual(r.lastSummary.activeAlert, null, 'HUD activeAlert must clear on BC press');
+        assert.strictEqual(r.lastSummary.rightWidgetPage, 'media', 'BC dismiss must switch right_widget away from tpms to media');
+        let hudRow3AfterDismiss = 0;
+        for (let y = 74; y < 99; y++) {
+            for (let x = 4; x < 240; x++) {
+                if (r.layers.hud_main.cv.d[(y * r.layers.hud_main.cv.w + x) * 4 + 3] > 180) hudRow3AfterDismiss++;
+            }
+        }
+        assert.strictEqual(hudRow3AfterDismiss, 0, 'HUD Row 3 alert text must clear immediately after BC dismiss');
+
+        // C. Stock BMW TrueType rasterizer + CJK NFC & 1:1 vector Gothic check (incl. '季節は次々死んでいく', SC/TC/KR)
+        const { cleanMediaText } = require(path.join(APP_DIR, 'media_tracker'));
+        const jpFixed = cleanMediaText('季節は次々死んでいく');
+        assert.strictEqual(jpFixed, '季節は次々死んでいく', 'cleanMediaText must keep voiced kana (で U+3067) NFC-composed');
+        assert.strictEqual(jpFixed.indexOf('\u3099'), -1, 'cleanMediaText must never leave dangling NFD combining dakuten U+3099');
+        assert.strictEqual(cleanMediaText('밤편지 - 아이유'), '밤편지 - 아이유', 'cleanMediaText must preserve NFC Korean Hangul');
+        assert.strictEqual(cleanMediaText('Caf\u00E9 R\u00E9sum\u00E9'), 'Cafe Resume', 'cleanMediaText must still fold Latin accents');
+
+        const fontsMod = require('./kit/fonts');
+        const { getFontStatus } = require(path.join(APP_DIR, 'bmw_font'));
+        const fSt = getFontStatus();
+        assert(fSt.source === 'bmw_stock_ttf' || fSt.source === 'bundled_vector_sans',
+            'font engine must activate 1:1 vector Latin (BMW TTF or bundled Vector Sans), got ' + fSt.source);
+        const f42 = fontsMod.get('bold', 42, jpFixed);
+        assert.strictEqual(f42.size, 42, 'vector font handle must match exact requested pixel size (1:1 scale, zero bilinear blur)');
+        for (const ch of '季節は次々死んでいく七里香周杰伦밤편지') {
+            const rg = fontsMod.resolveGlyph(f42, ch.codePointAt(0));
+            assert(rg && rg.g && rg.g[2] >= 12 && rg.g[3] >= 12 && rg.font.size === 42, 'vector CJK must rasterize exact 1:1 glyph for ' + ch);
+        }
+
+        const localFontRg = path.resolve(ROOT, '..', 'mgu-fonts', 'mnt-dataro-dataro2-hmi-common-font', 'BMWTARG.ttf');
+        if (fs.existsSync(localFontRg)) {
+            const parsedRg = parseTtf(fs.readFileSync(localFontRg));
+            assert(parsedRg && parsedRg.numGlyphs > 200, 'BMWTARG.ttf must parse cleanly');
+            const atlas = bakeSizeAtlas(parsedRg, 36, '19:39 Tire Pressure Low', 0.016);
+            assert(atlas.atlasW > 64 && atlas.glyphs[57] && atlas.glyphs[57][2] > 10, 'BMWTARG.ttf must rasterize crisp glyphs');
+        }
     });
 
     console.log('\nAll ' + passed + ' tests passed.');

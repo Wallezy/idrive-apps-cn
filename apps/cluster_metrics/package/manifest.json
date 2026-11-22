@@ -273,7 +273,21 @@
         "statusBordcomputerTravelData": "rs",
         "statusBordcomputerElectricData": "rs",
         "statusKombiSelection": "rs",
-        "statusDisplayElectricalPowerDistribution": "rs"
+        "statusDisplayElectricalPowerDistribution": "rs",
+        "statusShowTimeDate": "rs",
+        "timeDateUTC": "rs"
+      }
+    },
+    "com.harman.infotainment.systeminfrastructure.autotime.autotime.AutoTime": {
+      "instances": "Inst1",
+      "attributes": {
+        "current": "rs"
+      }
+    },
+    "de.bmw.infotainment.hmi.hmicontext.HMIContext": {
+      "instances": "HMI_CID",
+      "attributes": {
+        "currentTimeZone": "rs"
       }
     },
     "de.bmw.infotainment.hmi.hmimediastate.HmiMediaState": {
@@ -312,7 +326,20 @@
     "de.bmw.infotainment.climate.Climate2": {
       "instances": "1",
       "attributes": {
-        "statusTemperatureInside": "rs"
+        "statusTemperatureInside": "rs",
+        "statusACFront": "rs",
+        "statusACFrontFunctions": "rs",
+        "statusAirConditionDRStatus": "rs",
+        "statusActualValuePowerACCompressor": "rs"
+      }
+    },
+    "de.bmw.infotainment.climate.climatemaster.ClimateMaster": {
+      "instances": "1",
+      "attributes": {
+        "statusClimateSystemOn": "rs",
+        "statusAirCondAC": "rs",
+        "statusAirCondMaxAC": "rs",
+        "statusTemperature": "rs"
       }
     },
     "de.bmw.dass.GapVehicleAhead": {

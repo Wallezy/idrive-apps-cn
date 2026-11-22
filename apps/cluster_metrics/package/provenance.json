@@ -1,9 +1,9 @@
 {
   "schema": 1,
   "repository": "chyiz/idrive7-cluster-metrics",
-  "commit": "baf5b88a91706e0285a0663d03f91f4659d542ff",
-  "upstreamVersion": "0.8.0",
-  "releaseVersion": "0.8.1",
+  "commit": "93e6a13e441368eb8a7d5b9a5a957c1ab4a7d30f",
+  "upstreamVersion": "0.9.0",
+  "releaseVersion": "0.9.1",
   "cnRevision": 1,
   "channel": "beta-and-stable",
   "authorization": "Owner reports author permission; current upstream application source is GPL-3.0-only.",
@@ -13,5 +13,11 @@
     "Source package links the head unit SDK; no BMW SDK redistributed",
     "Full license files and provenance accompany the package",
     "Fix upstream missing Canvas.disc calls when media art is absent; use supported filled circle"
-  ]
+  ],
+  "releaseChanges": [
+    "改进中日韩文字清晰度，新增胎压与车辆提醒。",
+    "优化 HUD 导航避让、BC 按键和充电完成时间显示。"
+  ],
+  "kitCommit": "83977e43f766508709404ebd0d1a20454626901b",
+  "kitScope": "Retained CN runtime with compatible background lifecycle; open bundled fonts selected"
 }
