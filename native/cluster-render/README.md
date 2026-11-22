@@ -117,6 +117,17 @@ Every client's layers on a target are drawn in that target's scene.
     into the locked slot is answered `E_DCSM_OK` and never shown. Once it
     is free again, the first to ask is shown: the HMI's map, which stays
     fetched through the lock and only needs mapping, is there before ours.
+- **Preloading** (iDrive 7). While a layer on a target has `preload` 1,
+  visible or not, the cluster keeps the target's scene loaded without
+  showing it (`loaded`), and the service keeps drawing into it. A layer
+  that then wants the target is shown with no load of the scene, which
+  otherwise takes the cluster a moment before anything shows. When nothing
+  wants it any more, after the linger, the scene goes off screen and stays
+  loaded; with no `preload` layer left, it is released. A loaded scene is
+  not on screen: its slot shows other content. While `panel` is shown the
+  cluster takes the stock HMI's media widget (slot 0x200) off screen, and
+  puts it back as soon as `panel` goes off screen, before its scene is
+  released (seen on the car). On iDrive 8 `preload` has no effect.
 - **Warnings** (iDrive 7). During a warning or with a door open, the cluster
   locks a group of slots (the middle, the right side or the HUD), takes
   everything in it off screen and keeps what it has loaded. A shown target
