@@ -16,6 +16,8 @@ for (const id of ids) {
     assert.strictEqual(text('Save clip in 12 s'), '12 秒后可保存');
     assert.strictEqual(text('2 clips · 10 MB of 4 GB · newest first'), '2 段视频 · 10 MB / 4 GB · 最新在前');
     assert.strictEqual(text('de.bmw.infotainment.vehicle.Vehicle2'), 'de.bmw.infotainment.vehicle.Vehicle2');
+    assert.strictEqual(text('BMW 地图、CarPlay 或 Android Auto'), 'BMW 地图、CarPlay 或 Android Auto');
+    assert.strictEqual(text('DRIVE RECORDER'), 'DRIVE RECORDER');
     assert.strictEqual(text('Developed by IterioDev'), 'Developed by IterioDev');
     const manifest = JSON.parse(fs.readFileSync(path.join(pkg, 'manifest.json')));
     assert(!manifest.proxies['de.bmw.infotainment.hmi.hmicontext2.HMIContext2']);

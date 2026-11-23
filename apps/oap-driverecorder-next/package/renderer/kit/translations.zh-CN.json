@@ -236,5 +236,12 @@
   "Copied to the USB stick": "已复制到 USB 存储",
   "On this screen": "显示在此屏幕",
   "Left + right · each 1280 × 480": "左右摄像头 · 每路 1280 × 480",
-  "Front + rear · each 1280 × 480": "前后摄像头 · 每路 1280 × 480"
+  "Front + rear · each 1280 × 480": "前后摄像头 · 每路 1280 × 480",
+  "ALL": "全部",
+  "It is removed from the head unit.": "此片段将从车机删除。",
+  "Gates open": "条件已满足",
+  "the video buffer service is there.": "视频缓存服务可用。",
+  "Provisioning data state": "授权数据状态",
+  "Camera ECU": "摄像头模块",
+  "or newer": "或更高版本"
 }
