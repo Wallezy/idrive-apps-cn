@@ -1,7 +1,7 @@
 {
  "id": "draggy",
  "title": "\u52a0\u901f\u8ba1\u65f6",
- "version": "2.6.1",
+ "version": "2.7.1",
  "screens": [
   {
    "name": "MAIN",
@@ -46,21 +46,24 @@
   },
   {
    "key": "distance",
-   "label": "\u8ddd\u79bb\u5206\u6bb5",
+   "label": "\u6700\u957f\u8ddd\u79bb",
    "type": "choice",
    "default": "qm",
+   "aliases": {
+    "em": "qm"
+   },
    "options": [
     [
      "qm",
      "1/4 \u82f1\u91cc"
     ],
     [
-     "em",
-     "1/8 \u82f1\u91cc"
-    ],
-    [
      "m1000",
      "1000 m"
+    ],
+    [
+     "hm",
+     "1/2 \u82f1\u91cc"
     ]
    ]
   },
@@ -69,6 +72,110 @@
    "label": "\u4e00\u82f1\u5c3a\u8d77\u6b65\u8c41\u514d",
    "type": "bool",
    "default": false
+  },
+  {
+   "key": "slopeLimit",
+   "label": "\u6700\u4f73\u6210\u7ee9\u4e0b\u5761\u9650\u5236",
+   "type": "choice",
+   "default": "2",
+   "options": [
+    [
+     "1",
+     "1 %"
+    ],
+    [
+     "2",
+     "2 %"
+    ],
+    [
+     "off",
+     "\u5173\u95ed"
+    ]
+   ]
+  },
+  {
+   "key": "air",
+   "label": "\u6bcf\u6b21\u6d4b\u8bd5\u8bb0\u5f55\u8f66\u5916\u7a7a\u6c14",
+   "type": "choice",
+   "default": "show",
+   "options": [
+    [
+     "show",
+     "\u663e\u793a\uff08\u5927\u6c14\u538b\u529b\u53d6\u81ea\u53d1\u52a8\u673a\u63a7\u5236\u5355\u5143\uff09"
+    ],
+    [
+     "sae",
+     "\u663e\u793a\uff0c\u65f6\u95f4\u4fee\u6b63\u81f3\u6807\u51c6\u7a7a\u6c14\uff08SAE J1349\uff09"
+    ],
+    [
+     "off",
+     "\u5173\u95ed\uff08\u4e0d\u67e5\u8be2\u53d1\u52a8\u673a\u63a7\u5236\u5355\u5143\uff09"
+    ]
+   ]
+  },
+  {
+   "key": "highSpeed",
+   "label": "250-300 km/h \u533a\u95f4\uff08160-190 mph\uff09",
+   "type": "bool",
+   "default": false
+  },
+  {
+   "key": "custom",
+   "label": "\u81ea\u5b9a\u4e49\u901f\u5ea6\u533a\u95f4",
+   "type": "bool",
+   "default": false
+  },
+  {
+   "key": "customFrom",
+   "label": "\u81ea\u5b9a\u4e49\u533a\u95f4\u8d77\u70b9\uff08km/h \u6216 mph\uff09",
+   "type": "number",
+   "default": 0,
+   "steps": [
+    0,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    100,
+    120,
+    130,
+    150,
+    200
+   ],
+   "when": {
+    "custom": true
+   }
+  },
+  {
+   "key": "customTo",
+   "label": "\u81ea\u5b9a\u4e49\u533a\u95f4\u7ec8\u70b9\uff08km/h \u6216 mph\uff09",
+   "type": "number",
+   "default": 150,
+   "steps": [
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    100,
+    110,
+    120,
+    130,
+    150,
+    160,
+    180,
+    200,
+    220,
+    250,
+    300
+   ],
+   "when": {
+    "custom": true
+   }
   },
   {
    "key": "advanced",
@@ -173,7 +280,30 @@
   }
  ],
  "config": {
-  "comment": "BMW's own scalings (M Laptimer TypeConverters)",
+  "comment": "BMW's own scalings (M Laptimer TypeConverters). baro: the outside air pressure, kPa, read from the engine unit (baroEcu, decimal: 18 = DME 0x12) as Car Vitals does, every 5 min at most and never during a run; candidates in order, the first plausible one wins.",
+  "baroEcu": 18,
+  "baro": [
+   {
+    "did": "F433",
+    "bytes": 1,
+    "at": 0,
+    "factor": 1,
+    "offset": 0,
+    "min": 50,
+    "max": 115,
+    "note": "OBD PID 0x33 barometric pressure, kPa"
+   },
+   {
+    "obd": "33",
+    "bytes": 1,
+    "at": 0,
+    "factor": 1,
+    "offset": 0,
+    "min": 50,
+    "max": 115,
+    "note": "OBD service 01 PID 0x33 (same as F433)"
+   }
+  ],
   "scaling": {
    "speed": {
     "factor": 0.015625,

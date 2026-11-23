@@ -3,7 +3,30 @@
   "entryPointLoadingEnabled": true,
   "settings": {
     "draggy": {
-      "comment": "BMW's own scalings (M Laptimer TypeConverters)",
+      "comment": "BMW's own scalings (M Laptimer TypeConverters). baro: the outside air pressure, kPa, read from the engine unit (baroEcu, decimal: 18 = DME 0x12) as Car Vitals does, every 5 min at most and never during a run; candidates in order, the first plausible one wins.",
+      "baroEcu": 18,
+      "baro": [
+        {
+          "did": "F433",
+          "bytes": 1,
+          "at": 0,
+          "factor": 1,
+          "offset": 0,
+          "min": 50,
+          "max": 115,
+          "note": "OBD PID 0x33 barometric pressure, kPa"
+        },
+        {
+          "obd": "33",
+          "bytes": 1,
+          "at": 0,
+          "factor": 1,
+          "offset": 0,
+          "min": 50,
+          "max": 115,
+          "note": "OBD service 01 PID 0x33 (same as F433)"
+        }
+      ],
       "scaling": {
         "speed": {
           "factor": 0.015625,

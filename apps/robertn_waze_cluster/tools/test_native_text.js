@@ -61,9 +61,9 @@ control.renderStatus = Object.assign({}, raw, { state: 'starting', reason: 'the 
 eq(control.mapText(), '仪表盘地图：启动中…：原厂地图正在占用显示区域');
 eq(control.hudPositionText(), '位置：向右 20 像素，向上 10 像素');
 control.patchStatus = { state: 'error', reason: 'remount rw: EBUSY' };
-eq(control.statusText(), '状态：失败：切换文件系统为可写失败：EBUSY');
+eq(control.statusText(), '状态：失败，切换文件系统为可写失败：EBUSY');
 control.patchStatus = { state: 'patched', aa: { state: 'error', reason: 'new firmware diagnostic: 0x10' } };
-eq(control.aaStatusText(), '状态：失败：原始详情：new firmware diagnostic: 0x10');
+eq(control.aaStatusText(), '状态：失败，原始详情：new firmware diagnostic: 0x10');
 control.captureState = { state: 'error', error: 'disk descriptor lost' };
 eq(control.captureText(), '采集：失败：原始详情：disk descriptor lost');
 const logs = new LogsControl({});

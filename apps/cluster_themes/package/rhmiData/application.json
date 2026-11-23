@@ -5,7 +5,7 @@
     "type": "OnlineApp",
     "name": "cluster_themes",
     "vendor": "custom",
-    "version": "0.19.9",
+    "version": "0.19.10",
     "defaultLanguage": "en_GB",
     "stringBundleUuid": "6d257bb9-3140-58e2-b55d-c9018ec0e530",
     "resourceBundleUuid": "2ce5d2d3-194e-50c6-83b2-a98a035403da",

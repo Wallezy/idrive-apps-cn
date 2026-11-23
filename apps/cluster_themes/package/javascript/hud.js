@@ -1977,7 +1977,9 @@ class HudApp {
         // the holiday light string (garland.js): its own image layers on a connection with room for them
         const gk = this._garlandHoliday(name, shown);
         if (gk) {
-            const gs = Garland.place(this.target, shown, { camera: this._cameraOn(), colors: hudHoliday.garland(gk, this.target, this.nightOn),
+            // an empty model badge (Badge tab "none") is not in the string's way
+            const noBadge = !this._token('badge');
+            const gs = Garland.place(this.target, shown.filter((w) => !(noBadge && w.type === 'text' && w.text === '{{badge}}')), { camera: this._cameraOn(), colors: hudHoliday.garland(gk, this.target, this.nightOn),
                 cost: (l) => ({ counts: this._connCounts(this._plan(l, Math.floor(area / SHEET_AREA_FRAC), waste)) }) });
             gs.forEach((g) => shown.push(g));
             this.log.info('holiday lights (' + gk + '): ' + (gs.length ? gs.length + ' stretch' + (gs.length > 1 ? 'es' : '') + ', ' +
@@ -2164,19 +2166,28 @@ class HudApp {
             c.uniform(ref, 'u_topEnd', [w.topEnd]);
             c.uniform(ref, 'u_road', w.road ? [w.road[0], w.road[1], 0, 1] : [0, 1, 0, 0]);
         } else if (w.type === 'mview') {
-            // the left scale's line: points (layer px) and the arc length at each (the shader mirrors it for the right)
-            const pts = [], cum = [];
+            // the left scale's line: the points where its pieces meet (layer px), each piece straight or an arc ("arcs":
+            // [centre x, y, radius, sweep radians], radius 0 = straight), and the arc length at each point (the shader
+            // mirrors it for the right)
+            const path = w.path.slice(0, 16), pts = [], arc = [], cum = [];
             let acc = 0;
-            w.path.slice(0, 32).forEach((pt, i) => {
-                if (i) acc += Math.hypot(pt[0] - w.path[i - 1][0], pt[1] - w.path[i - 1][1]);
+            path.forEach((pt, i) => {
+                if (i) {
+                    const g = (w.arcs || [])[i - 1];
+                    acc += g && g[2] ? Math.abs(g[2] * g[3]) : Math.hypot(pt[0] - path[i - 1][0], pt[1] - path[i - 1][1]);
+                }
+                const g = (w.arcs || [])[i];
                 pts.push(pt[0] - w.x, pt[1] - w.y); cum.push(acc);
+                arc.push(g && g[2] ? g[0] - w.x : 0, g && g[2] ? g[1] - w.y : 0, g && g[2] ? g[2] : 0, g && g[2] ? g[3] : 0);
             });
-            while (pts.length < 64) pts.push(0);
-            while (cum.length < 32) cum.push(0);
+            while (pts.length < 32) pts.push(0);
+            while (arc.length < 64) arc.push(0);
+            while (cum.length < 16) cum.push(0);
             c.uniform(ref, 'u_size', [w.w, w.h]);
             c.uniform(ref, 'u_path', pts, { type: 'vec2' });
+            c.uniform(ref, 'u_arc', arc, { type: 'vec4' });
             c.uniform(ref, 'u_cum', cum, { type: 'float' });
-            c.uniform(ref, 'u_n', [Math.min(32, w.path.length)]);
+            c.uniform(ref, 'u_n', [path.length]);
             c.uniform(ref, 'u_scale', [w.scale[0], w.scale[1], 0, acc]);
             const us = this.setting('units') === 'us';
             c.uniform(ref, 'u_ticks', us ? [10, 2, 8, 2] : [11, 3, 8, 2]);   // a mark every 10 mph / 10 km/h; every 500 rpm

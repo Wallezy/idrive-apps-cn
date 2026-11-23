@@ -1,5 +1,14 @@
 [
   {
+    "version": "2.7.1",
+    "upstreamVersion": "2.7.0",
+    "cnRevision": 1,
+    "changes": [
+      "新增滚动起步、自定义测速区间和坡度判定。",
+      "增加环境条件、换挡记录与历史成绩详情。"
+    ]
+  },
+  {
     "version": "2.6.1",
     "upstreamVersion": "2.6.0",
     "cnRevision": 1,

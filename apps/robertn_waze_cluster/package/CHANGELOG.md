@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 0.6.20
+
+- 完善投屏补丁状态与兼容提示。
+- 保留仪表全屏、位置和 HUD 设置。
+
 - 准确区分 Android Auto 异常退出与主机重启后的补丁恢复提示。
 
 ## 0.6.18
@@ -51,6 +56,17 @@
 - Check page control IDs before packaging to prevent conflicting controls from breaking app startup.
 
 - The CN app defaults to Simplified Chinese while the HMI language is unavailable and follows explicit display-language selections. Chinese status rows translate known renderer and patch messages, frame counts and transfer limits; unknown diagnostics retain their original detail. Native protocol fields and logs are unchanged.
+## 0.6.14
+
+A Patch or Remove patch that fails shows the reason.
+
+## 0.6.13
+
+`Untested version` is gone from CarPlay's and Android Auto's Status: Maps
+on cluster patches every software version of the car it can check, and
+removes the patch by itself if the head unit then fails to start. Requires
+the next waze-on-cluster.
+
 ## 0.6.12
 
 The cluster's safe area is back to 504x368 at (286, 72); a smaller area made

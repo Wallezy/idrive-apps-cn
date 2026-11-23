@@ -45,18 +45,25 @@ The Store installs it with the app `robertn_waze_cluster`; it requires
 `cluster-render` and `mgu-deploy` (`component.json`, `"requires"`).
 
 **Install.** The deploy tool runs `patchd.js activate` as root. On a car
-coded `KI_KOMBI_VARIANT` 7 with a proven carplay build, it plans the patch
-in memory and arms CarPlay's next start, and never stops, kills or
+coded `KI_KOMBI_VARIANT` 7 with any carplay build whose edit sites the
+patcher finds and verifies, it plans the patch in memory and arms
+CarPlay's next start, on trial until it has run healthy on that car (see
+Boot recovery), and never stops, kills or
 restarts CarPlay: the Store shows a restart pending, the app `Status:
 Patched after restart`, and one head-unit start runs CarPlay with the
 patch. Over an earlier release's patch of `/usr/bin/carplay` it puts the
 shipped file back in the same step; the earlier patch keeps running until
 CarPlay next starts, which then applies the patch in memory, so no restart
-is needed for it. It then does the same for Android Auto on a proven aapd
-build: an earlier release's patch of `/usr/bin/aapd` and `/etc/aapd.conf`
-goes back as they ship, and the patch is armed in aapd's memory. Anywhere
-else it leaves everything as it is, and the app's Status says why (PATCH.md
-"Install-time activation", "In memory").
+is needed for it. It then does the same for Android Auto on any aapd build
+it can plan: an earlier release's patch of `/usr/bin/aapd` and `/etc/aapd.conf`
+goes back as they ship, and the patch is armed in aapd's memory. Where the
+sites are not found, the coding is another, or another tool's change is
+found at a site (one that holds neither the shipped bytes nor our edit) or
+beside our own edits, it leaves everything as it is, and the app's Status
+says why; bytes away from the sites do not count. A patch you turned off
+with Remove patch stays off across updates, car software updates and
+restarts, until you press Patch (PATCH.md "Install-time activation", "In
+memory").
 
 **Remove.** In the Store, remove the app, then the tool (refused while the
 app is installed). `patchd.js deactivate` turns both patches in memory
@@ -85,7 +92,9 @@ unit kept restarting`, and its Patch button applies the patch again
 (PATCH.md "Boot recovery"). Android Auto's patch is removed at the first
 crash of the patched aapd, and aapd is started again after every end, so
 Android Auto comes back without the cluster map; the patch stays off until
-its Patch button applies it or an update brings a newer patch.
+its Patch button applies it, an update brings a newer patch, or a car
+software update replaces aapd or aapd.conf (then it is tried again, on
+trial).
 
 To break a loop by hand: keep the phone from connecting (unplug it, or turn
 off its Wi-Fi and Bluetooth), then over SSH run
@@ -134,10 +143,17 @@ target until the service restarts and prints the status.
 
 **Inside another app's scene.** An app that shows a scene file on a target
 with `layers` 1 can host the map there (cluster-render PROTOCOL.md
-"Hosting another target"): the map is then drawn only in the rect it
-names, scaled on the head unit to that part of the picture. With
+"Hosting another target"), and so can an app that draws a target with
+layers only, a cluster theme on the panel for example, with no scene file
+(PROTOCOL.md "Hosting from layers", cluster-render releases after 0.8.1): the map
+is then drawn only in the rect it names, scaled on the head unit to that
+part of the picture, under the theme's layers (the map's layer is marked
+as the hosted map, so cluster-render knows it). With
 `hosted_vpp_scale = 1` the GPU does that scaling instead ("Experimental:
-hosted_vpp_scale and always_packed" below).
+hosted_vpp_scale and always_packed" below). The app hiding its layers,
+ending the host or exiting puts the map back on its own slot, and so does
+any host whose place the map cannot be drawn in (its part misses the map,
+or lands smaller than 64x32), a scene's host included.
 
 CarPlay starts the cluster stream as soon as the phone connects (PATCH.md
 Edit 3), and, where Edit 5's sites are found, gives the cluster display the
@@ -777,9 +793,9 @@ Their edits go into a plan that `preload/wocpatch.c` (`libwocpatch.so`,
 preloaded into carplay or aapd) applies in memory; aapd also reads a copy
 of aapd.conf with the cluster geometry, in `/run`. Neither file on `/` is
 written but to put back a patch an earlier release wrote, from verified
-backups, by atomic rename. The install patches only
-a proven build; another build whose sites are all found is patched once a
-Patch button asks. Edits, sites and proven builds:
+backups, by atomic rename. The install patches any build whose sites are
+all found and verify, on trial until it has run healthy on that car; no
+list of builds decides it. Edits and sites:
 [patch/PATCH.md](patch/PATCH.md).
 
 `woc-patch.sh` (in `/var/opt/waze-on-cluster/current/`) is the shell path,

@@ -1,7 +1,7 @@
 {
   "build": "node tools/build.js",
   "requires": {
-    "waze-on-cluster": "0.10.12",
+    "waze-on-cluster": "0.14.6",
     "cluster-render": "0.6.5"
   },
   "uninstallable": true,

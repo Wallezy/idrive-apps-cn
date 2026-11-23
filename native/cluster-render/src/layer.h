@@ -58,6 +58,9 @@ struct LayerParams {
     /* While it is shown, every other client's video at most this many
      * updates a second (Compositor::fps_cap); 0: no request. */
     uint32_t others_fps = 0;
+    /* The target whose host placed this layer here (its producer's mark,
+     * PROTOCOL.md "Hosting from layers"); empty: none. */
+    std::string hosted;
     Rect rect;
     float opacity = 1.0f;
     /* A quad turned (degrees clockwise) and scaled about its pivot: px, py
@@ -367,6 +370,10 @@ public:
     bool set_uniform(const std::string &name, UniformType t, const float *v, uint32_t elements);
     /* u_time from the renderer's clock. */
     void cluster_time();
+    /* How its quad blends and which channels it writes (PROTOCOL.md
+     * "Render state"); applied with the next flush. */
+    const PartLook &look() const { return look_; }
+    void set_look(const PartLook &look);
 
     bool ready(int64_t) const override { return true; }
     bool attach(Graph *g, int64_t now_ms, std::string *err) override;
@@ -394,6 +401,8 @@ private:
     int64_t born_ms_;
     Uniforms uniforms_;
     bool staged_ = false;
+    PartLook look_ = quad_look();
+    bool look_dirty_ = false;   /* the quad does not have look_ yet */
 };
 
 }  // namespace crs

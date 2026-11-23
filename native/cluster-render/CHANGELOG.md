@@ -2,7 +2,34 @@
 
 ## Unreleased
 
+## 0.8.3
+
+- 支持纯图层主题嵌入地图，保留全屏与原厂告警避让。
+- 完善图层混合及纹理显示。
+
 ## 0.8.1
+## 0.8.2
+
+An app that draws the cluster with layers only, such as a cluster theme,
+can show another app's picture (Waze's map) inside it with no scene file:
+`host` with `into`. The picture is drawn under the app's layers, and goes
+back to its own place when the app hides its layers, ends the host
+(`unhost`) or exits, or the panel is taken. Of several such apps the one
+drawn highest over the picture wins, and an app showing a scene file that
+hosts the picture wins over them; the `hosting` event tells each app why it
+waits.
+
+## 0.8.1
+
+Effect layers and mesh parts choose how they blend (presets such as
+`premultiplied`, `max` and `subtract`, or their own factors and
+operations) and which colour channels they write, and a part its depth
+test. Assets can be sampled with mipmaps (the service makes the levels of
+`rgba8` and `r8` assets; a compressed one brings its own), mirrored, with
+each axis wrapped its own way and anisotropically. A shader is at most
+64 KB.
+
+## 0.8.0
 
 ## 0.6.6 (CN)
 

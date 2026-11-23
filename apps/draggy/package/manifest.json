@@ -121,10 +121,10 @@
       "instances": "1"
     },
     "de.bmw.infrastructure.EnvironmentalInformation": {
+      "instances": "1",
       "attributes": {
-        "UnitBN2020": "rs"
-      },
-      "instances": "1"
+        "ExteriorTemperature": "s"
+      }
     },
     "org.genivi.nodestatemanager.Consumer": {
       "broadcasts": [
@@ -155,6 +155,22 @@
       "attributes": {
         "statusEngineSpeed2": "rs"
       }
+    },
+    "de.bmw.infrastructure.VehicleInformation": {
+      "instances": "1",
+      "attributes": {
+        "statusGearboxDrive": "s",
+        "DataPowerTrain2": "s"
+      }
+    },
+    "com.harman.infotainment.systemfunctions.tasu.tasu.InternalTasu": {
+      "instances": "SystemFunctionsInternalTasuInst1",
+      "methods": [
+        "sendTasuRequest"
+      ],
+      "broadcasts": [
+        "sendTasuResponse"
+      ]
     }
   },
   "services": {

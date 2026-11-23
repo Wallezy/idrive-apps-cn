@@ -1,5 +1,14 @@
 [
   {
+    "version": "2.7.18",
+    "upstreamVersion": "2.7.17",
+    "cnRevision": 1,
+    "changes": [
+      "修正部分 G30 车型下层灯带的分区。",
+      "保留自定义颜色、模块查找与离车停止控制。"
+    ]
+  },
+  {
     "version": "2.7.17",
     "upstreamVersion": "2.7.16",
     "cnRevision": 1,
