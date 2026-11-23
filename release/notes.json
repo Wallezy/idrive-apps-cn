@@ -2,12 +2,12 @@
   "cluster-render": [
     {
       "version": "0.8.3",
-      "upstreamVersion": "0.8.2",
-      "cnRevision": 1,
       "changes": [
         "支持纯图层主题嵌入地图，保留全屏与原厂告警避让。",
         "完善图层混合及纹理显示。"
-      ]
+      ],
+      "upstreamVersion": "0.8.2",
+      "cnRevision": 1
     },
     {
       "version": "0.8.1",
@@ -101,12 +101,12 @@
   "waze-on-cluster": [
     {
       "version": "0.14.6",
-      "upstreamVersion": "0.14.5",
-      "cnRevision": 1,
       "changes": [
         "改善安卓投屏重连与固件兼容识别。",
         "支持纯图层主题显示地图，保留全屏和恢复保护。"
-      ]
+      ],
+      "upstreamVersion": "0.14.5",
+      "cnRevision": 1
     },
     {
       "version": "0.13.1",
@@ -216,12 +216,12 @@
   "robertn_waze_cluster": [
     {
       "version": "0.6.20",
-      "upstreamVersion": "0.6.14",
-      "cnRevision": 1,
       "changes": [
         "完善投屏补丁状态与兼容提示。",
         "保留仪表全屏、位置和 HUD 设置。"
-      ]
+      ],
+      "upstreamVersion": "0.6.14",
+      "cnRevision": 1
     },
     {
       "version": "0.6.19",
@@ -262,22 +262,22 @@
   "cluster_metrics": [
     {
       "version": "0.9.1",
-      "upstreamVersion": "0.9.0",
-      "cnRevision": 1,
       "changes": [
         "改进中日韩文字清晰度，新增胎压与车辆提醒。",
         "优化 HUD 导航避让、BC 按键和充电完成时间显示。"
-      ]
+      ],
+      "upstreamVersion": "0.9.0",
+      "cnRevision": 1
     }
   ],
   "ram_mic_calibration": [
     {
       "version": "0.4.1",
-      "upstreamVersion": "0.4.0",
-      "cnRevision": 1,
       "changes": [
         "校准前检查当前音频故障，保留停车确认与倒计时。"
-      ]
+      ],
+      "upstreamVersion": "0.4.0",
+      "cnRevision": 1
     },
     {
       "version": "0.1.5",
@@ -390,35 +390,35 @@
   "sys_monitor": [
     {
       "version": "1.0.9",
-      "upstreamVersion": "1.0.8",
-      "cnRevision": 1,
       "changes": [
         "新增系统监控：查看车机内存、处理器、温度和进程占用。",
         "支持排序、进程详情和近三分钟趋势，离开应用后停止采集。",
         "简体中文界面，兼容国内版渲染和旋钮输入。"
-      ]
+      ],
+      "upstreamVersion": "1.0.8",
+      "cnRevision": 1
     }
   ],
   "mgu-inputgate": [
     {
       "version": "1.2.2",
-      "upstreamVersion": "1.2.1",
-      "cnRevision": 1,
       "changes": [
         "修复唤醒或切换界面后旋钮偶发跳动。",
         "保留退出应用及异常时的原厂输入恢复。"
-      ]
+      ],
+      "upstreamVersion": "1.2.1",
+      "cnRevision": 1
     }
   ],
   "ambient_config": [
     {
       "version": "2.7.18",
-      "upstreamVersion": "2.7.17",
-      "cnRevision": 1,
       "changes": [
         "修正部分 G30 车型下层灯带的分区。",
         "保留自定义颜色、模块查找与离车停止控制。"
-      ]
+      ],
+      "upstreamVersion": "2.7.17",
+      "cnRevision": 1
     },
     {
       "version": "2.7.17",
@@ -477,11 +477,11 @@
   "brake_test": [
     {
       "version": "1.5.22",
-      "upstreamVersion": "1.5.21",
-      "cnRevision": 1,
       "changes": [
         "同步上游兼容性更新，保留简体中文界面。"
-      ]
+      ],
+      "upstreamVersion": "1.5.21",
+      "cnRevision": 1
     },
     {
       "version": "1.5.21",
@@ -504,11 +504,11 @@
   "car_vitals": [
     {
       "version": "2.27.10",
-      "upstreamVersion": "2.27.9",
-      "cnRevision": 1,
       "changes": [
         "完善双发动机控制模块数据读取，增加车辆状态信息。"
-      ]
+      ],
+      "upstreamVersion": "2.27.9",
+      "cnRevision": 1
     },
     {
       "version": "2.27.5",
@@ -539,11 +539,11 @@
   "doom": [
     {
       "version": "1.7.23",
-      "upstreamVersion": "1.7.22",
-      "cnRevision": 1,
       "changes": [
         "同步上游兼容性更新，保留简体中文界面。"
-      ]
+      ],
+      "upstreamVersion": "1.7.22",
+      "cnRevision": 1
     },
     {
       "version": "1.7.22",
@@ -566,12 +566,12 @@
   "draggy": [
     {
       "version": "2.7.1",
-      "upstreamVersion": "2.7.0",
-      "cnRevision": 1,
       "changes": [
         "新增滚动起步、自定义测速区间和坡度判定。",
         "增加环境条件、换挡记录与历史成绩详情。"
-      ]
+      ],
+      "upstreamVersion": "2.7.0",
+      "cnRevision": 1
     },
     {
       "version": "2.6.1",
@@ -602,11 +602,11 @@
   "dtc_scanner": [
     {
       "version": "2.9.10",
-      "upstreamVersion": "2.9.8",
-      "cnRevision": 1,
       "changes": [
         "同步上游兼容性更新，保留简体中文界面。"
-      ]
+      ],
+      "upstreamVersion": "2.9.8",
+      "cnRevision": 1
     },
     {
       "version": "2.9.9",
@@ -638,11 +638,11 @@
   "dyno": [
     {
       "version": "1.6.4",
-      "upstreamVersion": "1.6.3",
-      "cnRevision": 1,
       "changes": [
         "同步上游兼容性更新，保留简体中文界面。"
-      ]
+      ],
+      "upstreamVersion": "1.6.3",
+      "cnRevision": 1
     },
     {
       "version": "1.6.3",
@@ -665,11 +665,11 @@
   "edrive": [
     {
       "version": "2.11.1",
-      "upstreamVersion": "2.11.0",
-      "cnRevision": 1,
       "changes": [
         "完善纯电与混动车型电量、续航及电池数据显示。"
-      ]
+      ],
+      "upstreamVersion": "2.11.0",
+      "cnRevision": 1
     },
     {
       "version": "2.9.4",
@@ -701,11 +701,11 @@
   "gforce": [
     {
       "version": "1.6.23",
-      "upstreamVersion": "1.6.22",
-      "cnRevision": 1,
       "changes": [
         "同步上游兼容性更新，保留简体中文界面。"
-      ]
+      ],
+      "upstreamVersion": "1.6.22",
+      "cnRevision": 1
     },
     {
       "version": "1.6.22",
@@ -728,11 +728,11 @@
   "live_adjustments": [
     {
       "version": "0.9.11",
-      "upstreamVersion": "0.9.10",
-      "cnRevision": 1,
       "changes": [
         "改进控制模块重新识别与连接恢复。"
-      ]
+      ],
+      "upstreamVersion": "0.9.10",
+      "cnRevision": 1
     },
     {
       "version": "0.9.7",
@@ -747,11 +747,11 @@
   "live_data": [
     {
       "version": "1.0.19",
-      "upstreamVersion": "1.0.18",
-      "cnRevision": 1,
       "changes": [
         "完善双控制模块数据与常用指标显示。"
-      ]
+      ],
+      "upstreamVersion": "1.0.18",
+      "cnRevision": 1
     },
     {
       "version": "1.0.14",
@@ -766,11 +766,11 @@
   "redline": [
     {
       "version": "2.0.46",
-      "upstreamVersion": "2.0.45",
-      "cnRevision": 1,
       "changes": [
         "改进燃油、爆震与电气数据兼容。"
-      ]
+      ],
+      "upstreamVersion": "2.0.45",
+      "cnRevision": 1
     },
     {
       "version": "2.0.43",
@@ -802,11 +802,11 @@
   "service": [
     {
       "version": "1.6.4",
-      "upstreamVersion": "1.6.3",
-      "cnRevision": 1,
       "changes": [
         "完善保养数据识别与展示。"
-      ]
+      ],
+      "upstreamVersion": "1.6.3",
+      "cnRevision": 1
     },
     {
       "version": "1.6.2",
@@ -829,11 +829,11 @@
   "warmup": [
     {
       "version": "1.9.1",
-      "upstreamVersion": "1.9.0",
-      "cnRevision": 1,
       "changes": [
         "新增冷启动记录，完善暖机状态判断。"
-      ]
+      ],
+      "upstreamVersion": "1.9.0",
+      "cnRevision": 1
     },
     {
       "version": "1.8.2",
@@ -856,11 +856,11 @@
   "zf8hp": [
     {
       "version": "1.5.9",
-      "upstreamVersion": "1.5.8",
-      "cnRevision": 1,
       "changes": [
         "改进变速箱识别与诊断数据兼容。"
-      ]
+      ],
+      "upstreamVersion": "1.5.8",
+      "cnRevision": 1
     },
     {
       "version": "1.5.8",
@@ -883,12 +883,12 @@
   "cluster_themes": [
     {
       "version": "0.19.10",
-      "upstreamVersion": "0.19.9",
-      "cnRevision": 1,
       "changes": [
         "改善 M 视图圆弧刻度与节日灯带。",
         "保留中文设置、地图和原厂底栏选项。"
-      ]
+      ],
+      "upstreamVersion": "0.19.9",
+      "cnRevision": 1
     },
     {
       "version": "0.19.9",
@@ -907,6 +907,50 @@
         "新增 Vector、M View 布局，改进全屏排列与音乐显示。",
         "保留原版主题名称、仪表风格和单位，支持国内源在线更新。"
       ]
+    }
+  ],
+  "iteriodev_turnview": [
+    {
+      "version": "1.7.1",
+      "changes": [
+        "新增 转向影像（Turn View），提供简体中文界面与状态提示。",
+        "在仪表或中控显示前摄像头与导航转向。需前摄像头；每次随车启动后关闭。仪表中央画面不能与 Waze 仪表地图同时使用，请将 Waze 设为仅 HUD。"
+      ],
+      "upstreamVersion": "1.7.0",
+      "cnRevision": 1
+    }
+  ],
+  "oap-driverecorder-next": [
+    {
+      "version": "2.5.2",
+      "changes": [
+        "新增 行车记录（Drive Recorder），提供简体中文界面与状态提示。",
+        "录制车载摄像头，保存、锁定和导出片段，支持旋钮与触控。仅停车时播放，超过 4 GB 循环覆盖未锁定片段；需要支持行车记录的摄像头。"
+      ],
+      "upstreamVersion": "2.5.1",
+      "cnRevision": 1
+    }
+  ],
+  "iteriodev-turnview": [
+    {
+      "version": "0.10.2",
+      "changes": [
+        "为 Turn View 提供前摄像头、夜视及仪表导航画面。",
+        "保留原作者组件与服务路径，适配国内版依赖。"
+      ],
+      "upstreamVersion": "0.10.1",
+      "cnRevision": 1
+    }
+  ],
+  "iteriodev-drplay": [
+    {
+      "version": "1.2.7",
+      "changes": [
+        "为 Drive Recorder 提供摄像头接收、片段播放和 USB 导出。",
+        "保留原作者组件与服务路径，适配国内版依赖。"
+      ],
+      "upstreamVersion": "1.2.6",
+      "cnRevision": 1
     }
   ]
 }

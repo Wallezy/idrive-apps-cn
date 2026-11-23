@@ -1,0 +1,257 @@
+{
+  "id": "iteriodev-turnview",
+  "kind": "tool",
+  "version": "0.10.2",
+  "title": "转向影像服务",
+  "description": "为 Turn View 提供前摄像头、夜视及仪表导航画面。",
+  "optional": true,
+  "uninstallable": true,
+  "mguHmi": [
+    "ID7"
+  ],
+  "requires": {
+    "cluster-render": "0.8.3",
+    "mgu-deploy": "0.8.28",
+    "mgu-render": "0.6.28"
+  },
+  "files": [
+    {
+      "path": "turnview.js",
+      "from": "turnview.js",
+      "mode": "0644"
+    },
+    {
+      "path": "wire.js",
+      "from": "wire.js",
+      "mode": "0644"
+    },
+    {
+      "path": "nav.js",
+      "from": "nav.js",
+      "mode": "0644"
+    },
+    {
+      "path": "track.js",
+      "from": "track.js",
+      "mode": "0644"
+    },
+    {
+      "path": "scene.js",
+      "from": "scene.js",
+      "mode": "0644"
+    },
+    {
+      "path": "nv.js",
+      "from": "nv.js",
+      "mode": "0644"
+    },
+    {
+      "path": "shaders.js",
+      "from": "shaders.js",
+      "mode": "0644"
+    },
+    {
+      "path": "card.js",
+      "from": "card.js",
+      "mode": "0644"
+    },
+    {
+      "path": "cluster_render_client.js",
+      "from": "cluster_render_client.js",
+      "mode": "0644"
+    },
+    {
+      "path": "kit/canvas.js",
+      "from": "kit/canvas.js",
+      "mode": "0644"
+    },
+    {
+      "path": "kit/fonts.js",
+      "from": "kit/fonts.js",
+      "mode": "0644"
+    },
+    {
+      "path": "kit/LICENSE",
+      "from": "kit/LICENSE",
+      "mode": "0644"
+    },
+    {
+      "path": "kit/SOURCE",
+      "from": "kit/SOURCE",
+      "mode": "0644"
+    },
+    {
+      "path": "kit/fonts/num.json",
+      "from": "kit/fonts/num.json",
+      "mode": "0644"
+    },
+    {
+      "path": "kit/fonts/bold.json",
+      "from": "kit/fonts/bold.json",
+      "mode": "0644"
+    },
+    {
+      "path": "kit/fonts/label.json",
+      "from": "kit/fonts/label.json",
+      "mode": "0644"
+    },
+    {
+      "path": "schemas/guidance-conclusiveDart.json",
+      "from": "schemas/guidance-conclusiveDart.json",
+      "mode": "0644"
+    },
+    {
+      "path": "schemas/guidance-state.json",
+      "from": "schemas/guidance-state.json",
+      "mode": "0644"
+    },
+    {
+      "path": "schemas/guidance-provider.json",
+      "from": "schemas/guidance-provider.json",
+      "mode": "0644"
+    },
+    {
+      "path": "schemas/vehicle2-speed.json",
+      "from": "schemas/vehicle2-speed.json",
+      "mode": "0644"
+    },
+    {
+      "path": "schemas/eventlist-query-in.json",
+      "from": "schemas/eventlist-query-in.json",
+      "mode": "0644"
+    },
+    {
+      "path": "schemas/eventlist-query-out.json",
+      "from": "schemas/eventlist-query-out.json",
+      "mode": "0644"
+    },
+    {
+      "path": "schemas/id7/guidance-conclusiveDart.json",
+      "from": "schemas/id7/guidance-conclusiveDart.json",
+      "mode": "0644"
+    },
+    {
+      "path": "schemas/id7/guidance-state.json",
+      "from": "schemas/id7/guidance-state.json",
+      "mode": "0644"
+    },
+    {
+      "path": "schemas/id7/guidance-provider.json",
+      "from": "schemas/id7/guidance-provider.json",
+      "mode": "0644"
+    },
+    {
+      "path": "schemas/id7/vehicle2-speed.json",
+      "from": "schemas/id7/vehicle2-speed.json",
+      "mode": "0644"
+    },
+    {
+      "path": "schemas/id7/eventlist-query-in.json",
+      "from": "schemas/id7/eventlist-query-in.json",
+      "mode": "0644"
+    },
+    {
+      "path": "schemas/id7/eventlist-query-out.json",
+      "from": "schemas/id7/eventlist-query-out.json",
+      "mode": "0644"
+    },
+    {
+      "path": "hmictl",
+      "from": "hmictl",
+      "mode": "0755"
+    },
+    {
+      "path": "cluster-render.d/turnview.conf",
+      "from": "cluster-render.d/turnview.conf",
+      "mode": "0644"
+    },
+    {
+      "path": "cluster-render.d/turnview.png",
+      "from": "cluster-render.d/turnview.png",
+      "mode": "0644"
+    },
+    {
+      "path": "mgu-camcluster",
+      "from": "mgu-camcluster",
+      "mode": "0755"
+    },
+    {
+      "path": "mgu-nvcap",
+      "from": "mgu-nvcap",
+      "mode": "0755"
+    },
+    {
+      "path": "LICENSE.camcluster",
+      "from": "LICENSE.camcluster",
+      "mode": "0644"
+    },
+    {
+      "path": "LICENSE.ffmpeg",
+      "from": "LICENSE.ffmpeg",
+      "mode": "0644"
+    },
+    {
+      "path": "LICENSE.md",
+      "from": "LICENSE.md",
+      "mode": "0644"
+    },
+    {
+      "path": "PROVENANCE.json",
+      "from": "PROVENANCE.json",
+      "mode": "0644"
+    },
+    {
+      "path": "kit/fonts/OFL-NotoSansSC.txt",
+      "from": "kit/fonts/OFL-NotoSansSC.txt",
+      "mode": "0644"
+    },
+    {
+      "path": "kit/cn_text.js",
+      "from": "kit/cn_text.js",
+      "mode": "0644"
+    },
+    {
+      "path": "kit/translations.zh-CN.json",
+      "from": "kit/translations.zh-CN.json",
+      "mode": "0644"
+    },
+    {
+      "path": "kit/fonts/cjk.json",
+      "from": "kit/fonts/cjk.json",
+      "mode": "0644"
+    },
+    {
+      "path": "kit/fonts/LICENSE-UbuntuFont.txt",
+      "from": "kit/fonts/LICENSE-UbuntuFont.txt",
+      "mode": "0644"
+    },
+    {
+      "path": "kit/fonts/OFL-Barlow.txt",
+      "from": "kit/fonts/OFL-Barlow.txt",
+      "mode": "0644"
+    }
+  ],
+  "units": [
+    {
+      "name": "iteriodev-turnview.service",
+      "from": "iteriodev-turnview.service"
+    }
+  ],
+  "enable": [
+    {
+      "unit": "iteriodev-turnview.service",
+      "target": "multi-user.target"
+    }
+  ],
+  "recmgr": [
+    "iteriodev-turnview"
+  ],
+  "crashNames": [
+    "hmictl",
+    "mgu-camcluster",
+    "mgu-nvcap"
+  ],
+  "restart": [
+    "iteriodev-turnview.service"
+  ]
+}

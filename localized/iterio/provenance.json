@@ -1,0 +1,15 @@
+{
+  "repository": "IterioDev/car-apps",
+  "commit": "f67a602df54f3e31cc10387aca453e4cfdee3c9e",
+  "authorization": {
+    "date": "2026-11-23",
+    "basis": "Owner confirms author permission for the Chinese port and redistribution.",
+    "preserve": [
+      "author credit",
+      "original application names and icons",
+      "upstream license"
+    ]
+  },
+  "runtimeValidation": "pending; no car connected or changed",
+  "nativeBinaryRebuild": false
+}

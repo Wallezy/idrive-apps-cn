@@ -1,0 +1,22 @@
+{
+  "repository": "IterioDev/car-apps",
+  "commit": "f67a602df54f3e31cc10387aca453e4cfdee3c9e",
+  "authorization": {
+    "date": "2026-11-23",
+    "basis": "Owner confirms author permission for the Chinese port and redistribution.",
+    "preserve": [
+      "author credit",
+      "original application names and icons",
+      "upstream license"
+    ]
+  },
+  "runtimeValidation": "pending; no car connected or changed",
+  "nativeBinaryRebuild": false,
+  "upstreamVersion": "0.10.1",
+  "releaseVersion": "0.10.2",
+  "binarySha256": {
+    "hmictl": "908369103f3a1f1997686f0d8a1bbc0e4a81113f5e1965d1a34f1c6ad9d86ef5",
+    "mgu-camcluster": "0d9f489b055c4e382816cff798c9f23ce5cbb7de3b570c0c3eaefd05d878b8e4",
+    "mgu-nvcap": "3dba6772b1d0f940d47f6ca0d6c3ac8b364f010f560f6d38e9232fd0ccc5e013"
+  }
+}

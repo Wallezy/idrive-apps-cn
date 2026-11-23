@@ -232,9 +232,9 @@ async function main() {
             eo.refused.some((r) => r.indexOf('edit: \'--show ^nothing$\' changed nothing') === 0), 1000));
     ovl.drop(gauge);
     ok('dropped: the layers there shown again', await until(() => eo.layer[label] === 'shown', 3000));
-    if (typeof ovl.host === 'function') {
     const hosted = [];
     waze.on('host', (t, ev) => hosted.push(t + ':' + (ev.into || '-') + (ev.into ? ':' + ev.shown + ':' + ev.w : '')));
+    if (typeof ovl.host === 'function') {
     const over = ovl.scene({ target: 'panel', file: file, sha256: [sha256], layers: true });
     ok('a scene with layers: shown, the layers there drawn over it',
         await until(() => eo.layer[over] === 'shown' && eo.layer[label] === 'shown', 3000));

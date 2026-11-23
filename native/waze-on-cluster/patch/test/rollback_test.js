@@ -104,6 +104,7 @@ process.on('exit', function () { try { cp.execFileSync('rm', ['-rf', dir]); } ca
 var RELEASES = list.map(function (t) { return t.slice('waze-on-cluster@'.length); }).filter(function (v) { return /^\d+\.\d+\.\d+$/.test(v); })
     .filter(function (v) { return !process.env.WOC_RELEASE_MAX || cmp(v, process.env.WOC_RELEASE_MAX) <= 0; })
     .sort(cmp).filter(function (v) { return BIN || group(v) !== 'A'; });
+function git(args) { return cp.execFileSync('git', args, { cwd: REPO, stdio: ['ignore', 'pipe', 'pipe'] }).toString(); }
 try { git(['cat-file', '-e', CN_REF]); }
 catch (e) { git(['fetch', '--no-tags', '--depth=1', 'origin', CN_REF]); }
 RELEASES.push(CN_VERSION);

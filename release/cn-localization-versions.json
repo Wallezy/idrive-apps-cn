@@ -33,7 +33,11 @@
     "road_trip_computer": "1.0.1",
     "start_stop_insight": "0.1.4",
     "xdrive_studio": "0.1.6",
-    "sys_monitor": "1.0.9"
+    "sys_monitor": "1.0.9",
+    "iteriodev_turnview": "1.7.1",
+    "oap-driverecorder-next": "2.5.2",
+    "iteriodev-turnview": "0.10.2",
+    "iteriodev-drplay": "1.2.7"
   },
   "applicationSourceCommit": "35bca28bc82b30482d73782877ebaf92c69dcb8c"
 }

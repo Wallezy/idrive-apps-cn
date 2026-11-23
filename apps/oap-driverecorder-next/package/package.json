@@ -1,0 +1,50 @@
+{
+  "name": "oap-driverecorder-next",
+  "version": "2.5.2",
+  "description": "录制车载摄像头，保存、锁定和导出片段，支持旋钮与触控。仅停车时播放，超过 4 GB 循环覆盖未锁定片段；需要支持行车记录的摄像头。",
+  "private": false,
+  "main": "javascript/runner.js",
+  "mguHmi": [
+    "ID7"
+  ],
+  "mguRequires": {
+    "mgu-deploy": "0.8.28",
+    "mgu-render": "0.6.28",
+    "iteriodev-drplay": "1.2.7"
+  },
+  "oapAppSettings": {
+    "maxDiskUsage": 20971520,
+    "cpuLimit": 60,
+    "memoryThresholdKB": 196608,
+    "priority": "PRIO_LOW",
+    "visibility": "FOREGROUND",
+    "latencyClass": "FOREGROUND",
+    "loggingId": "OA93",
+    "userLoginRequired": false,
+    "backgroundPriority": 150,
+    "someipManifest": "manifest.json"
+  },
+  "files": [
+    "icon.png",
+    "javascript",
+    "manifest.json",
+    "package.json",
+    "permissions.json",
+    "renderer",
+    "rhmiData",
+    "npm-shrinkwrap.json",
+    "LICENSE.md",
+    "NOTICE.zh-CN.md",
+    "PROVENANCE.json",
+    "CHANGELOG.md"
+  ],
+  "dependencies": {
+    "oap-sdk": "24.10.2"
+  },
+  "mguLocalOnly": true,
+  "productName": "Drive Recorder",
+  "author": "IterioDev",
+  "store": {
+    "description": "Keeps the car's cameras recording and saves a clip when you ask; watch, lock, delete and copy clips to a USB stick while the car stands still. Works by touch or with the iDrive controller. Over 4 GB the oldest unlocked clips are replaced. The Store installs the Drive Recorder player with it. The car must be coded for the Drive Recorder."
+  }
+}

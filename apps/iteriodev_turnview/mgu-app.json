@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "id": "iteriodev_turnview",
+  "version": "1.7.1",
+  "tree": "package",
+  "modules": [
+    "src/main.js",
+    "src/online-host.js",
+    "src/camreq.js"
+  ],
+  "sdk": [
+    "oap-sdk/src/core/OnlineApp.js",
+    "oap-sdk/src/logging/logging",
+    "oap-sdk/src/someip/someipBuilders"
+  ]
+}

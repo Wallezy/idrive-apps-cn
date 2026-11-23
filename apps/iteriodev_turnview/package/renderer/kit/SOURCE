@@ -1,0 +1,4 @@
+Canvas / recorder / font runtime: cauliflowermossgrape/idrive7-apps (MIT).
+App renderer and source-drawn vector icons: IterioDev/car-apps, pinned in PROVENANCE.json.
+Text atlases: Ubuntu, Barlow and Noto Sans SC; licenses in fonts/. No HMI glyph atlas.
+Chinese text and measured layout use the CN display dictionary.

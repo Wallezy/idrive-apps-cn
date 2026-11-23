@@ -1,0 +1,51 @@
+{
+  "name": "iteriodev_turnview",
+  "version": "1.7.1",
+  "description": "在仪表或中控显示前摄像头与导航转向。需前摄像头；每次随车启动后关闭。仪表中央画面不能与 Waze 仪表地图同时使用，请将 Waze 设为仅 HUD。",
+  "private": false,
+  "main": "javascript/runner.js",
+  "mguHmi": [
+    "ID7"
+  ],
+  "mguRequires": {
+    "mgu-deploy": "0.8.28",
+    "mgu-render": "0.6.28",
+    "iteriodev-turnview": "0.10.2",
+    "cluster-render": "0.8.3"
+  },
+  "oapAppSettings": {
+    "maxDiskUsage": 20971520,
+    "cpuLimit": 60,
+    "memoryThresholdKB": 196608,
+    "priority": "PRIO_LOW",
+    "visibility": "FOREGROUND",
+    "latencyClass": "FOREGROUND",
+    "loggingId": "OAA5",
+    "userLoginRequired": false,
+    "backgroundPriority": 150,
+    "someipManifest": "manifest.json"
+  },
+  "files": [
+    "icon.png",
+    "javascript",
+    "manifest.json",
+    "package.json",
+    "permissions.json",
+    "renderer",
+    "rhmiData",
+    "npm-shrinkwrap.json",
+    "LICENSE.md",
+    "NOTICE.zh-CN.md",
+    "PROVENANCE.json",
+    "CHANGELOG.md"
+  ],
+  "dependencies": {
+    "oap-sdk": "24.10.2"
+  },
+  "mguLocalOnly": true,
+  "productName": "Turn View",
+  "author": "IterioDev",
+  "store": {
+    "description": "The front camera in the instrument cluster with a turn card and, near each turn, a blue turn sign (three chevrons pointing the way), from BMW Maps, Apple CarPlay or Android Auto; the camera shows with or without a route. Or on the head unit instead: the Camera button opens the camera's whole picture with the same card and sign, at any speed (Picture on: Head unit), for kerbs and tight gaps. Cars with BMW Night Vision (1.7.0): Camera Night Vision shows its picture instead, in the cluster or here (read from the head unit's own video input; BMW's Night Vision screen then stays black). iDrive 8: pick \"Turn View AR\" in the cluster's widget menu (from the car's next start after installing). iDrive 7: off at every start of the car; switch it on in this app and set Instrument cluster > Central display area to Map view. Do not use it together with Waze on cluster on the cluster: set Waze on cluster to HUD only (the cluster and the HUD show 2 videos at most). Calibrate the camera once on a straight road. Needs the Turn View tool from the same source and Cluster renderer from robertnisipeanu/idrive-apps (0.5.10 or newer). Does not need Drive Recorder."
+  }
+}

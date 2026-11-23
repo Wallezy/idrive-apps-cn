@@ -12,6 +12,7 @@ const root = path.resolve(__dirname, '..');
 const ids = require('../release/repo.json').unprefixedAppIds;
 const imports = require('../release/community-import-plan.json').apps;
 const community = new Set(imports.map(x => x.id));
+const iterio = new Set(['iteriodev_turnview', 'oap-driverecorder-next']);
 const linkedUnits = new Set(imports.filter(x => x.format === 'unit').map(x => x.id));
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'mgu-localized-'));
 try {
@@ -26,8 +27,8 @@ try {
         assert.strictEqual(pkg.mguLocalOnly, true);
         assert.deepStrictEqual(release.mguHmi, ['ID7']);
         assert.strictEqual(release.requires['mgu-deploy'], id === 'sys_monitor' ? '0.8.25' :
-            id === 'cluster_metrics' ? '0.8.23' : '0.8.18');
-        if (linkedUnits.has(id)) {
+            id === 'cluster_metrics' ? '0.8.23' : iterio.has(id) ? '0.8.28' : '0.8.18');
+        if (linkedUnits.has(id) || iterio.has(id)) {
             assert(['javascript/app.js', 'javascript/runner.js'].includes(pkg.main));
             assert(manifest.modules.length > 0);
             for (const module of manifest.modules) assert(fs.existsSync(path.join(app, module)));
@@ -42,10 +43,10 @@ try {
         assert(first.equals(fs.readFileSync(path.join(tmp, id + '.tgz'))), 'deterministic source package');
         assert(zlib.gunzipSync(first).length > 0);
         const kit = path.join(tree, 'javascript/kit');
-        const suite = id === 'sys_monitor' ? 'tools/test_system_monitor.js' :
+        const suite = iterio.has(id) ? 'tools/test_iterio.js' : id === 'sys_monitor' ? 'tools/test_system_monitor.js' :
             community.has(id) ? 'tools/test_community_locale.js' : id === 'ambient_config' ? 'tools/test_ambient.js' :
             id === 'cluster_themes' ? 'tools/test_cluster_themes.js' : id === 'cluster_metrics' ? 'tools/test_cluster_metrics.js' : 'localized/kit/tools/test_zh.js';
-        const result = cp.spawnSync(process.execPath, [path.join(root, suite), community.has(id) ? app : kit],
+        const result = cp.spawnSync(process.execPath, [path.join(root, suite), community.has(id) || iterio.has(id) ? app : kit],
             { encoding: 'utf8', timeout: 30000 });
         assert.strictEqual(result.status, 0, id + ': ' + result.stdout + result.stderr);
         if (fs.existsSync(kit)) assert.strictEqual(require(path.join(kit, 'i18n')).getLanguage(), 'zh-CN');
