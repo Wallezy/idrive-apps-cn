@@ -9,6 +9,7 @@ const root = path.resolve(__dirname, '../..');
 const read = (name) => JSON.parse(fs.readFileSync(path.join(root, name), 'utf8'));
 const baseline = read('release/cn-localization-versions.json');
 const chinese = read('release/texts/zh-CN.json');
+const notes = read('release/notes.json');
 const found = {};
 const checked = [];
 
@@ -52,6 +53,17 @@ for (const [id, text] of Object.entries(chinese)) {
         const value = text[field];
         assert(typeof value === 'string' && value.trim() === value && value.length <= maximum, `${id}.${field}: release limits`);
         assert(/[\u4e00-\u9fff]/.test(value) && !/\ufffd|[\r\n]/.test(value), `${id}.${field}: valid Chinese single-line text`);
+    }
+    const historyFile = `apps/${id}/release-notes.json`;
+    const history = fs.existsSync(path.join(root, historyFile)) ? read(historyFile) : notes[id];
+    if (history && history.length) {
+        const latest = history[0];
+        assert.strictEqual(latest.version, found[id], `${id}: current release notes`);
+        assert(latest.changes.length >= 1 && latest.changes.length <= 3, `${id}: bounded release notes`);
+        for (const line of latest.changes) {
+            assert(typeof line === 'string' && line.trim() && line.length <= 32 &&
+                !/[\x00-\x1f\x7f]/.test(line), `${id}: Store-compatible release note line`);
+        }
     }
 }
 console.log(`CN catalog: ${Object.keys(found).length} components translated; ${checked.length} version fields consistent`);
