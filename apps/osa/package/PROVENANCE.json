@@ -2,8 +2,8 @@
   "repository": "dzooky/bmrmodz",
   "commit": "a12105d46eccf5de2eaeb9a3800446fd17992074",
   "upstreamVersion": "0.2.63",
-  "releaseVersion": "0.2.64",
-  "cnRevision": 1,
+  "releaseVersion": "0.2.65",
+  "cnRevision": 2,
   "runtimeValidation": "pending; no vehicle contacted",
   "sourceFilesSha256": {
     "apps/osa/qr_report_bug.png": "63885f13f52d731c528e097ea3edbf551e4d373bc6e15f587471744b7d92184c",

@@ -1,6 +1,6 @@
 {
   "name": "osa",
-  "version": "0.2.64",
+  "version": "0.2.65",
   "description": "查看机油、冷却液和变速箱油温，估算暖机时间并保存本地历史。",
   "main": "javascript/localized-entry.js",
   "private": false,

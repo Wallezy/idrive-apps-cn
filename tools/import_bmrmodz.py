@@ -17,8 +17,9 @@ import build
 import localize
 
 PLAN = {
-    "osa": ("0.2.64", "油温助手", "查看机油、冷却液和变速箱油温，估算暖机时间并保存本地历史。",
-            ["新增油温助手，支持暖机估算与本地历史。", "简体中文界面，适配商店渲染器和仪表通知。"]),
+    "osa": ("0.2.65", "油温助手", "查看机油、冷却液和变速箱油温，估算暖机时间并保存本地历史。",
+            ["新增油温助手，支持暖机估算与本地历史。", "简体中文界面，适配商店渲染器和仪表通知。",
+             "兼容旧版车机运行时的油温通知。"]),
     "dpf": ("0.1.76", "DPF 状态", "只读查看支持的 B47、B57 柴油机颗粒过滤器数据、再生状态与距离；保留原有 DPF 监测应用。",
             ["新增 DPF 状态，查看积碳、灰分与再生信息。", "采用上游直接诊断路径，不启用实验数据服务。"]),
     "spritmonitor": ("0.1.46", "加油记录", "记录加油与 AdBlue 补充，支持关联 Spritmonitor.de 账户；联网同步需要该服务可访问。",
@@ -86,6 +87,11 @@ def main():
         kit = package / "javascript/kit"
         runtime = kit / "mgu.js"
         runtime.write_text(runtime.read_text().replace("require('oap-sdk')", "global.__mguLocalizedSdk"))
+        if identity == "osa":
+            notification = package / "javascript/oil-notification.js"
+            notification.write_text(notification.read_text().replace(
+                ".finally(() => { sending = false; });",
+                ".then(() => { sending = false; }, () => { sending = false; });"))
         # Use the maintained CN wire dialect, glyph identities and shared atlas pieces.
         for name in ["canvas.js", "record.js", "renderd.js", "fonts.js", "credits.js", "text-layout.js"]:
             shutil.copy2(CN / name, kit / name)
@@ -119,7 +125,8 @@ def main():
         shutil.copy2(LOCAL / "LICENSE", package / "LICENSE")
         write(package / "PROVENANCE.json", {
             "repository": provenance["repository"], "commit": provenance["commit"],
-            "upstreamVersion": original["version"], "releaseVersion": version, "cnRevision": 1,
+            "upstreamVersion": original["version"], "releaseVersion": version,
+            "cnRevision": 2 if identity == "osa" else 1,
             "runtimeValidation": "pending; no vehicle contacted",
             "sourceFilesSha256": {k: v for k, v in provenance["sourceFilesSha256"].items()
                                   if k.startswith("apps/" + identity + "/")},
@@ -149,7 +156,7 @@ def main():
             "uninstallable": True, "mguHmi": ["ID7"],
         })
         note = {"version": version, "upstreamVersion": original["version"],
-                "cnRevision": 1, "changes": changes}
+                "cnRevision": 2 if identity == "osa" else 1, "changes": changes}
         write(app / "release-notes.json", [note])
         notes[identity] = [note]
         baseline["components"][identity] = version

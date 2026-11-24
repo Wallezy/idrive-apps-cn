@@ -92,7 +92,7 @@ function start(log, getSample, getLanguage) {
                     deliveryExhausted = true;
                     log.warn('OSA oil notification delivery failed: ' + String(error && error.message || error));
                 })
-                .finally(() => { sending = false; });
+                .then(() => { sending = false; }, () => { sending = false; });
         } catch (error) {
             log.warn('OSA oil notification polling: ' + String(error && error.message || error));
         }

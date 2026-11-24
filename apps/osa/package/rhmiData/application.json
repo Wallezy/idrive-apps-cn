@@ -5,7 +5,7 @@
     "type": "OnlineApp",
     "name": "osa",
     "vendor": "custom",
-    "version": "0.2.64",
+    "version": "0.2.65",
     "defaultLanguage": "en_GB",
     "stringBundleUuid": "4cea38b5-efd3-52c8-8181-550815f370d5",
     "resourceBundleUuid": "ec6d7b86-3711-51bd-86cd-a5d0d4b70d93",

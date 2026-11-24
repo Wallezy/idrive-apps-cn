@@ -79,3 +79,4 @@ jobs:
           node native/bmrmodz-notification/test.js
           node --test localized/bmrmodz/apps/dpf/*.test.js
           node localized/bmrmodz/apps/osa/test-oil-notification-delivery.js
+          node tools/test_bmrmodz_notification.js
