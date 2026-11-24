@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "1.3.0",
+  "application": {
+    "uuid": "0581f108-13a8-5b41-a102-e739ada437bd",
+    "type": "OnlineApp",
+    "name": "osa",
+    "vendor": "custom",
+    "version": "0.2.64",
+    "defaultLanguage": "en_GB",
+    "stringBundleUuid": "4cea38b5-efd3-52c8-8181-550815f370d5",
+    "resourceBundleUuid": "ec6d7b86-3711-51bd-86cd-a5d0d4b70d93",
+    "entryPoints": [
+      {
+        "name": "OSA_ENTRY",
+        "uuid": "1cc2787f-3673-5f01-a85d-82e18259a02f",
+        "textId": "SID_OSA_TITLE",
+        "icon": "osa_icon.png",
+        "insertionStateId": 20974,
+        "insertionFocusId": 2,
+        "insertionMode": "INSERT_BELOW",
+        "insertionOrder": 0,
+        "insertionPriority": 0,
+        "previewType": "NONE",
+        "bookmarkable": true,
+        "private": false,
+        "appearance": "DEFAULT",
+        "isGroupHeader": false,
+        "insertionGroup": 0
+      }
+    ],
+    "uiDescriptions": [
+      {
+        "applicationFilePath": "./uiDescriptions/ID7/application.xml",
+        "uiDescriptionFilePath": "./uiDescriptions/ID7/uiDescription.json",
+        "hmi": [
+          "ID7"
+        ]
+      }
+    ],
+    "variantGroups": [
+      {
+        "stringsPath": "./variantGroups/Common/texts",
+        "resourcesPath": "./variantGroups/Common/images",
+        "hmi": [
+          "ID7"
+        ],
+        "brands": [
+          "BMW"
+        ]
+      }
+    ]
+  }
+}

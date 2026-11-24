@@ -1,0 +1,15 @@
+{
+  "build": "node ../../tools/build_localized.js",
+  "requires": {
+    "mgu-deploy": "0.8.28",
+    "mgu-render": "0.6.28",
+    "mgu-inputgate": "1.2.2",
+    "robertn_store": "0.9.48",
+    "bmrmodz-car-equipment": "0.1.6",
+    "bmrmodz-notification": "0.1.2"
+  },
+  "uninstallable": true,
+  "mguHmi": [
+    "ID7"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "rhmiLoadingEnabled": true,
+  "entryPointLoadingEnabled": true,
+  "settings": {
+    "dpf": {
+      "customSettings": true
+    }
+  }
+}

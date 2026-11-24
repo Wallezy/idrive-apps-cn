@@ -952,5 +952,58 @@
       "upstreamVersion": "1.2.6",
       "cnRevision": 1
     }
+  ],
+  "osa": [
+    {
+      "version": "0.2.64",
+      "upstreamVersion": "0.2.63",
+      "cnRevision": 1,
+      "changes": [
+        "新增油温助手，支持暖机估算与本地历史。",
+        "简体中文界面，适配商店渲染器和仪表通知。"
+      ]
+    }
+  ],
+  "dpf": [
+    {
+      "version": "0.1.76",
+      "upstreamVersion": "0.1.75",
+      "cnRevision": 1,
+      "changes": [
+        "新增 DPF 状态，查看积碳、灰分与再生信息。",
+        "采用上游直接诊断路径，不启用实验数据服务。"
+      ]
+    }
+  ],
+  "spritmonitor": [
+    {
+      "version": "0.1.46",
+      "upstreamVersion": "0.1.45",
+      "cnRevision": 1,
+      "changes": [
+        "新增加油记录，支持燃油与 AdBlue 补充。",
+        "提供中文界面，账户关联和联网同步由用户发起。"
+      ]
+    }
+  ],
+  "bmrmodz-car-equipment": [
+    {
+      "version": "0.1.6",
+      "upstreamVersion": "0.1.5",
+      "cnRevision": 1,
+      "changes": [
+        "为油温助手与 DPF 状态提供只读车辆选装配置缓存。"
+      ]
+    }
+  ],
+  "bmrmodz-notification": [
+    {
+      "version": "0.1.2",
+      "upstreamVersion": "0.1.1",
+      "cnRevision": 1,
+      "changes": [
+        "为油温助手与 DPF 状态显示短时仪表通知，保留原厂告警避让。"
+      ]
+    }
   ]
 }

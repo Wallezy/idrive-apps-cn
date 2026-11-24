@@ -138,5 +138,25 @@
   "iteriodev-drplay": {
     "title": "行车记录播放服务",
     "description": "为 Drive Recorder 提供摄像头接收、片段播放和 USB 导出。"
+  },
+  "osa": {
+    "title": "油温助手",
+    "description": "查看机油、冷却液和变速箱油温，估算暖机时间并保存本地历史。"
+  },
+  "dpf": {
+    "title": "DPF 状态",
+    "description": "只读查看支持的 B47、B57 柴油机颗粒过滤器数据、再生状态与距离；保留原有 DPF 监测应用。"
+  },
+  "spritmonitor": {
+    "title": "加油记录",
+    "description": "记录加油与 AdBlue 补充，支持关联 Spritmonitor.de 账户；联网同步需要该服务可访问。"
+  },
+  "bmrmodz-car-equipment": {
+    "title": "车辆配置缓存",
+    "description": "为油温助手与 DPF 状态提供只读车辆选装配置缓存。"
+  },
+  "bmrmodz-notification": {
+    "title": "仪表通知服务",
+    "description": "为油温助手与 DPF 状态显示短时仪表通知，保留原厂告警避让。"
   }
 }

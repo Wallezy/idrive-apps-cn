@@ -1,0 +1,38 @@
+{
+  "name": "osa",
+  "version": "0.2.64",
+  "description": "查看机油、冷却液和变速箱油温，估算暖机时间并保存本地历史。",
+  "main": "javascript/localized-entry.js",
+  "private": false,
+  "author": "BMRMODZ / dzooky",
+  "license": "MIT",
+  "engines": {
+    "node": ">=8.7.0"
+  },
+  "oapAppSettings": {
+    "maxDiskUsage": 20971520,
+    "cpuLimit": 60,
+    "memoryThresholdKB": 196608,
+    "priority": "PRIO_LOW",
+    "visibility": "FOREGROUND",
+    "latencyClass": "FOREGROUND",
+    "loggingId": "OAA1",
+    "userLoginRequired": false,
+    "backgroundPriority": 200,
+    "someipManifest": "manifest.json"
+  },
+  "mguLocalOnly": true,
+  "files": [
+    "package.json",
+    "npm-shrinkwrap.json",
+    "manifest.json",
+    "permissions.json",
+    "config",
+    "javascript",
+    "rhmiData",
+    "LICENSE",
+    "NOTICE.zh-CN.md",
+    "PROVENANCE.json",
+    "CHANGELOG.md"
+  ]
+}

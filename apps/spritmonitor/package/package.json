@@ -1,0 +1,39 @@
+{
+  "name": "spritmonitor",
+  "version": "0.1.46",
+  "description": "记录加油与 AdBlue 补充，支持关联 Spritmonitor.de 账户；联网同步需要该服务可访问。",
+  "main": "javascript/localized-entry.js",
+  "private": false,
+  "author": "BMRMODZ / dzooky",
+  "license": "MIT",
+  "engines": {
+    "node": ">=8.7.0"
+  },
+  "oapAppSettings": {
+    "maxDiskUsage": 20971520,
+    "cpuLimit": 60,
+    "memoryThresholdKB": 196608,
+    "priority": "PRIO_LOW",
+    "visibility": "FOREGROUND",
+    "latencyClass": "FOREGROUND",
+    "loggingId": "SPR1",
+    "userLoginRequired": false,
+    "backgroundPriority": 200,
+    "someipManifest": "manifest.json"
+  },
+  "mguInternet": true,
+  "mguLocalOnly": true,
+  "files": [
+    "package.json",
+    "npm-shrinkwrap.json",
+    "manifest.json",
+    "permissions.json",
+    "config",
+    "javascript",
+    "rhmiData",
+    "LICENSE",
+    "NOTICE.zh-CN.md",
+    "PROVENANCE.json",
+    "CHANGELOG.md"
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "id": "bmrmodz-notification",
+  "kind": "tool",
+  "version": "0.1.2",
+  "title": "仪表通知服务",
+  "description": "为油温助手与 DPF 状态显示短时仪表通知，保留原厂告警避让。",
+  "optional": true,
+  "uninstallable": true,
+  "mguHmi": [
+    "ID7"
+  ],
+  "requires": {
+    "mgu-deploy": "0.8.28",
+    "cluster-render": "0.8.3"
+  },
+  "files": [
+    {
+      "path": "service.js",
+      "from": "service.js",
+      "mode": "0644"
+    },
+    {
+      "path": "LICENSE",
+      "from": "LICENSE",
+      "mode": "0644"
+    },
+    {
+      "path": "PROVENANCE.json",
+      "from": "PROVENANCE.json",
+      "mode": "0644"
+    }
+  ],
+  "units": [
+    {
+      "name": "bmrmodz-notification.service",
+      "from": "bmrmodz-notification.service"
+    }
+  ],
+  "enable": [
+    {
+      "unit": "bmrmodz-notification.service",
+      "target": "multi-user.target"
+    }
+  ],
+  "restart": [
+    "bmrmodz-notification.service"
+  ],
+  "recmgr": [
+    "bmrmodz-notification"
+  ]
+}

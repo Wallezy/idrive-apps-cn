@@ -73,3 +73,9 @@ jobs:
           node tools/test_system_monitor.js
           node localized/system-monitor/tests/test_sys_monitor.js
           node localized/system-monitor/tests/test_sys_monitor_layout.js
+      - name: BMRMODZ read-only diagnostics and notification services
+        run: |
+          node native/bmrmodz-car-equipment/test.js
+          node native/bmrmodz-notification/test.js
+          node --test localized/bmrmodz/apps/dpf/*.test.js
+          node localized/bmrmodz/apps/osa/test-oil-notification-delivery.js

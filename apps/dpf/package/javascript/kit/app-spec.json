@@ -1,0 +1,75 @@
+{
+ "id": "dpf",
+ "title": "DPF \u72b6\u6001",
+ "version": "0.1.76",
+ "screens": [
+  {
+   "name": "MAIN",
+   "kind": "canvas",
+   "title": "DPF \u72b6\u6001",
+   "buttons": [
+    [
+     "BTN_SETTINGS",
+     "\u8bbe\u7f6e"
+    ]
+   ]
+  }
+ ],
+ "settings": [
+  {
+   "key": "language",
+   "label": "\u8bed\u8a00",
+   "type": "choice",
+   "default": "zh-CN",
+   "options": [
+    [
+     "zh-CN",
+     "\u7b80\u4f53\u4e2d\u6587"
+    ]
+   ]
+  },
+  {
+   "key": "cluster6wbAvailable",
+   "label": "6WB or 6U3 cluster detected",
+   "type": "bool",
+   "default": false,
+   "hidden": true
+  },
+  {
+   "key": "regenCluster",
+   "label": "\u4eea\u8868\u76d8 DPF \u901a\u77e5",
+   "type": "bool",
+   "default": true,
+   "notification": true,
+   "when": {
+    "cluster6wbAvailable": true
+   }
+  },
+  {
+   "key": "regenClusterTest",
+   "label": "\u6d4b\u8bd5\u4eea\u8868\u76d8 DPF \u6d88\u606f",
+   "type": "action",
+   "hint": "Four alerts: Requested (yellow), Started and In Progress (red), Finished (green)",
+   "when": {
+    "cluster6wbAvailable": true
+   }
+  },
+  {
+   "key": "reloadEquipment",
+   "label": "\u91cd\u65b0\u52a0\u8f7d\u8f66\u8f86\u914d\u7f6e",
+   "actionLabel": "Reload",
+   "type": "action",
+   "hint": "Read vehicle equipment again"
+  }
+ ],
+ "settingsBeforeLast": true,
+ "settingsTabInStandard": false,
+ "config": {
+  "customSettings": true
+ },
+ "startWidget": null,
+ "stateIds": {
+  "MAIN": 1,
+  "SETTINGS": 8
+ }
+}

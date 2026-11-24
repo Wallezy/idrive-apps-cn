@@ -1,0 +1,66 @@
+{
+  "id": "bmrmodz-car-equipment",
+  "kind": "tool",
+  "version": "0.1.6",
+  "title": "车辆配置缓存",
+  "description": "为油温助手与 DPF 状态提供只读车辆选装配置缓存。",
+  "optional": true,
+  "uninstallable": true,
+  "mguHmi": [
+    "ID7"
+  ],
+  "requires": {
+    "mgu-deploy": "0.8.28",
+    "iteriodev-turnview": "0.10.2"
+  },
+  "files": [
+    {
+      "path": "service.js",
+      "from": "service.js",
+      "mode": "0644"
+    },
+    {
+      "path": "vehicle-order.js",
+      "from": "vehicle-order.js",
+      "mode": "0644"
+    },
+    {
+      "path": "equipment.js",
+      "from": "equipment.js",
+      "mode": "0644"
+    },
+    {
+      "path": "transport.js",
+      "from": "transport.js",
+      "mode": "0644"
+    },
+    {
+      "path": "LICENSE",
+      "from": "LICENSE",
+      "mode": "0644"
+    },
+    {
+      "path": "PROVENANCE.json",
+      "from": "PROVENANCE.json",
+      "mode": "0644"
+    }
+  ],
+  "units": [
+    {
+      "name": "bmrmodz-car-equipment.service",
+      "from": "bmrmodz-car-equipment.service"
+    }
+  ],
+  "enable": [
+    {
+      "unit": "bmrmodz-car-equipment.service",
+      "target": "multi-user.target"
+    }
+  ],
+  "restart": [
+    "bmrmodz-car-equipment.service"
+  ],
+  "recmgr": [
+    "bmrmodz-car-equipment"
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "repository": "dzooky/bmrmodz",
+  "commit": "a12105d46eccf5de2eaeb9a3800446fd17992074",
+  "upstreamVersion": "0.1.75",
+  "releaseVersion": "0.1.76",
+  "cnRevision": 1,
+  "runtimeValidation": "pending; no vehicle contacted",
+  "sourceFilesSha256": {
+    "apps/dpf/translations.js": "8d22e686f0c5aff5c6e1da8230186ace593bf13b66731aceaad17b260d2eb088",
+    "apps/dpf/notification-preview.test.js": "e5437a8e5023d74d076514ebfc14a4563b6bfff6f13f62ceac037fa4bb1ecb9d",
+    "apps/dpf/qr_report_bug.png": "fec7682ab3932f73f744e42a71a06aa332899a23375a1e15c7dc7d7403d97f4b",
+    "apps/dpf/icon.png": "53dee72e738103245d989bc3e100d80113d0234c8c3eef4d81ab55b18be168e9",
+    "apps/dpf/qr_instagram.png": "88b480b38f3fb75efda5e1d2e6125db85edbc2a58894db722b179cc8d37294d3",
+    "apps/dpf/DDE_DID_RESEARCH.md": "7664fdd1fc6aaa5eb925cd9943bc9085cffd2874884c4e0de221076669a89256",
+    "apps/dpf/dde-profiles.js": "f113b687808c184a819d4f057dde2f0f4842dff74e6ad1cf9bc8decdbbacf00c",
+    "apps/dpf/app.json": "493c91b0acdf94c36e423eee0c62de01200352f70b20754eabebdd7a0ea75562",
+    "apps/dpf/translations.test.js": "4461e08483a1fbc2a3132ccccb528fd640f57fc5904313a6ec2790434c384da1",
+    "apps/dpf/idrive-language.js": "bb58dac8833032fd17fe921c0937fccd268069fd04d6381ce3702eebdb7072d2",
+    "apps/dpf/PROGRESS.md": "b9038083c76fac75c81ab8bb19753667067f8b9c7d5715756dbca81228c6c5df",
+    "apps/dpf/distance-record.test.js": "5c953e2f4e06c662e9670778face7c05f6694bdcd995a165c6c3d7b7f6deee59",
+    "apps/dpf/main.js": "1421590a45d9ae09e83daa258bb67a644dbd72b919aca57946e20a0d8c451be9",
+    "apps/dpf/qr_facebook.png": "611aee2d6cff2a2f302038c34db1ef6c687c4a0c0deb1e843a9a1e0405a6040a",
+    "apps/dpf/brmodz_logo.png": "4649798fa5c0fc2d87cf6b32f65baf30fff07c067cff04d746b85c3742b7c3f4",
+    "apps/dpf/distance-record.js": "39e467d7c7a73045c27fe5f4cadcf4a2a10179a6db7f291e304450ca077da850",
+    "apps/dpf/regen-message.test.js": "f7ace0fde71db35ef44efe3a67c45c8600cd84688ded0875d145cdfe88005a4d",
+    "apps/dpf/png.js": "554da825575a0069e1939146c4f5010759315f210ee84b6e47201f6e09db1967",
+    "apps/dpf/qr_request_feature.png": "cd3f803dcd3c685ff0c56a88518fb7c1e8e3a1e60b3c9d6a49c700c648bceb10",
+    "apps/dpf/dde-profiles.test.js": "680ab9d3fed5671352e8f85370abb984cda317858334b3b20490ac2f89f44882",
+    "apps/dpf/regen-message.js": "c8f48443cb6068884a739a16ea990116a2ecf92955315328c88ac998dc4857c5",
+    "apps/dpf/language.js": "a97fce0d7aa63b5529541c3fbcd82344424e3ae19e5bdb6eb3a4dfe12884a1b1"
+  }
+}

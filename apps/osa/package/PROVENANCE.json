@@ -1,0 +1,28 @@
+{
+  "repository": "dzooky/bmrmodz",
+  "commit": "a12105d46eccf5de2eaeb9a3800446fd17992074",
+  "upstreamVersion": "0.2.63",
+  "releaseVersion": "0.2.64",
+  "cnRevision": 1,
+  "runtimeValidation": "pending; no vehicle contacted",
+  "sourceFilesSha256": {
+    "apps/osa/qr_report_bug.png": "63885f13f52d731c528e097ea3edbf551e4d373bc6e15f587471744b7d92184c",
+    "apps/osa/icon.png": "61dab93c58e77b324413175baf311ff4d173ca78779b02a4ba977329f8606be8",
+    "apps/osa/osa_about_overlay_128.png": "bd433cc00ed01943b5d237b49b8cd1406d9bc146932879a3716657bd98dc2a36",
+    "apps/osa/test-oil-notification-delivery.js": "caeaab818b62d4c2c892a1cd0e50f4f85384a941812d5d73c1e527f49aef3f0d",
+    "apps/osa/qr_instagram.png": "88b480b38f3fb75efda5e1d2e6125db85edbc2a58894db722b179cc8d37294d3",
+    "apps/osa/app.json": "2ef09faaf33d8ecc03a81fd57f71d704e64ad65c914e2a18a7f15be000e185e1",
+    "apps/osa/PROGRESS.md": "3da121c4728263aaba9f6b434ad2211c6fac6d3b9bc2311080d1d7a2b10cb895",
+    "apps/osa/main.js": "1bb3ae487cf9fee9903139c8d973012eb01d5beabddc57e1888904e1d21bfdaf",
+    "apps/osa/qr_facebook.png": "611aee2d6cff2a2f302038c34db1ef6c687c4a0c0deb1e843a9a1e0405a6040a",
+    "apps/osa/brmodz_logo.png": "4649798fa5c0fc2d87cf6b32f65baf30fff07c067cff04d746b85c3742b7c3f4",
+    "apps/osa/oil-notification.test.js": "c8d320c5794b7685a0397242973481bd051401b03078d48ec362b4f05cfe3f9f",
+    "apps/osa/transmission.js": "5ac0ef1cc488916249b6a205496009d3adc194d07ce67d7dea8ca97a736f150a",
+    "apps/osa/oil-notification.js": "a24bbf1e645815408c0ee8a59ce7a6e06e247215410716700fbd238aad4cc3c5",
+    "apps/osa/png.js": "554da825575a0069e1939146c4f5010759315f210ee84b6e47201f6e09db1967",
+    "apps/osa/qr_request_feature.png": "14d6bf7a165798466c3b438b1572c82d211db5b6dda80326b008a5c51a71acc0",
+    "apps/osa/cluster-locales.js": "84b6a4bcbb411587bbc9b2bd0b95a6382774d13f6267b1f33a7d953bbf524a2c",
+    "apps/osa/locales.js": "e5ac39e157da9968ea1a55067ca26a4a948f2445f04bbc597e5c41b95a3e86ab",
+    "apps/osa/language.js": "41f9cacd4ae3aba2067697592d45e361e494f7aab9cf454a9ef08d165274d9c9"
+  }
+}

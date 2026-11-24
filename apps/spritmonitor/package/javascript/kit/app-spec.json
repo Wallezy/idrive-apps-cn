@@ -1,0 +1,298 @@
+{
+ "id": "spritmonitor",
+ "title": "\u52a0\u6cb9\u8bb0\u5f55",
+ "version": "0.1.46",
+ "screens": [
+  {
+   "name": "MAIN",
+   "kind": "canvas",
+   "title": "\u52a0\u6cb9\u8bb0\u5f55",
+   "buttons": [
+    [
+     "BTN_FUEL",
+     "\u6dfb\u52a0\u52a0\u6cb9\u8bb0\u5f55"
+    ],
+    [
+     "BTN_ADBLUE",
+     "\u6dfb\u52a0 AdBlue \u8bb0\u5f55"
+    ],
+    [
+     "BTN_SETTINGS",
+     "\u8bbe\u7f6e"
+    ]
+   ]
+  }
+ ],
+ "settings": [
+  {
+   "key": "language",
+   "label": "\u8bed\u8a00",
+   "type": "choice",
+   "default": "zh-CN",
+   "options": [
+    [
+     "zh-CN",
+     "\u7b80\u4f53\u4e2d\u6587"
+    ]
+   ]
+  },
+  {
+   "key": "theme",
+   "label": "\u914d\u8272\u4e3b\u9898",
+   "type": "choice",
+   "default": "m_tricolour",
+   "options": [
+    [
+     "m_red",
+     "M \u7ea2\u8272"
+    ],
+    [
+     "m_tricolour",
+     "M \u4e09\u8272"
+    ],
+    [
+     "ice",
+     "\u51b0\u767d"
+    ],
+    [
+     "amber",
+     "\u591c\u95f4\u7425\u73c0\u8272"
+    ]
+   ]
+  },
+  {
+   "key": "layout",
+   "label": "\u5c4f\u5e55\u5e03\u5c40",
+   "type": "choice",
+   "default": "full",
+   "options": [
+    [
+     "full",
+     "\u5168\u5c4f"
+    ],
+    [
+     "standard",
+     "\u6807\u51c6"
+    ]
+   ]
+  },
+  {
+   "key": "renderer",
+   "label": "\u6e32\u67d3\u6a21\u5f0f",
+   "type": "choice",
+   "default": "auto",
+   "options": [
+    [
+     "auto",
+     "\u81ea\u52a8"
+    ],
+    [
+     "software",
+     "\u8f6f\u4ef6"
+    ]
+   ]
+  },
+  {
+   "key": "fullTankThreshold",
+   "label": "\u6ee1\u7bb1\u5224\u5b9a\u9608\u503c\uff08\u71c3\u6cb9\uff09",
+   "type": "number",
+   "unit": "%",
+   "default": 95,
+   "steps": [
+    90,
+    91,
+    92,
+    93,
+    94,
+    95,
+    96,
+    97,
+    98,
+    99,
+    100
+   ]
+  },
+  {
+   "key": "fullTankThresholdLitres",
+   "label": "\u81ea\u5b9a\u4e49\u6ee1\u7bb1\u9608\u503c",
+   "type": "number",
+   "unit": "L",
+   "default": 0,
+   "labels": {
+    "0": "Use percentage"
+   },
+   "steps": [
+    0,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    67,
+    68,
+    69,
+    70,
+    71,
+    72,
+    73,
+    74,
+    75,
+    76,
+    77,
+    78,
+    79,
+    80,
+    81,
+    82,
+    83,
+    84,
+    85,
+    86,
+    87,
+    88,
+    89,
+    90,
+    91,
+    92,
+    93,
+    94,
+    95,
+    96,
+    97,
+    98,
+    99,
+    100
+   ]
+  },
+  {
+   "key": "fuelTankCapacity",
+   "label": "\u6cb9\u7bb1\u5bb9\u91cf",
+   "type": "number",
+   "unit": "L",
+   "default": 0,
+   "labels": {
+    "0": "Auto (Spritmonitor)"
+   },
+   "steps": [
+    0,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    67,
+    68,
+    69,
+    70,
+    71,
+    72,
+    73,
+    74,
+    75,
+    76,
+    77,
+    78,
+    79,
+    80,
+    81,
+    82,
+    83,
+    84,
+    85,
+    86,
+    87,
+    88,
+    89,
+    90,
+    91,
+    92,
+    93,
+    94,
+    95,
+    96,
+    97,
+    98,
+    99,
+    100
+   ]
+  },
+  {
+   "key": "resetTripAfterFuelUpload",
+   "label": "\u4e0a\u4f20\u52a0\u6cb9\u8bb0\u5f55\u540e\u91cd\u7f6e\u884c\u7a0b\u3001\u5e73\u5747\u8f66\u901f\u548c\u6cb9\u8017\uff08\u5b9e\u9a8c\u6027\uff09",
+   "type": "bool",
+   "default": false
+  }
+ ],
+ "settingsBeforeLast": true,
+ "settingsTabInStandard": null,
+ "config": null,
+ "startWidget": null,
+ "stateIds": {
+  "MAIN": 1,
+  "SETTINGS": 10
+ }
+}

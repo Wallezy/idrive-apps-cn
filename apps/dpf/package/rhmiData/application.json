@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "1.3.0",
+  "application": {
+    "uuid": "0cf4c027-c8c4-5274-8e5c-f83a06a52307",
+    "type": "OnlineApp",
+    "name": "dpf",
+    "vendor": "custom",
+    "version": "0.1.76",
+    "defaultLanguage": "en_GB",
+    "stringBundleUuid": "37d24b37-cdc5-562f-a6ca-d152175f30c9",
+    "resourceBundleUuid": "5c38e166-2fce-5fe6-b0fd-038177a7eeed",
+    "entryPoints": [
+      {
+        "name": "DPF_ENTRY",
+        "uuid": "bd0b7acf-6218-525d-bef8-dfe217c9108e",
+        "textId": "SID_DPF_TITLE",
+        "icon": "dpf_icon.png",
+        "insertionStateId": 20974,
+        "insertionFocusId": 2,
+        "insertionMode": "INSERT_BELOW",
+        "insertionOrder": 0,
+        "insertionPriority": 0,
+        "previewType": "NONE",
+        "bookmarkable": true,
+        "private": false,
+        "appearance": "DEFAULT",
+        "isGroupHeader": false,
+        "insertionGroup": 0
+      }
+    ],
+    "uiDescriptions": [
+      {
+        "applicationFilePath": "./uiDescriptions/ID7/application.xml",
+        "uiDescriptionFilePath": "./uiDescriptions/ID7/uiDescription.json",
+        "hmi": [
+          "ID7"
+        ]
+      }
+    ],
+    "variantGroups": [
+      {
+        "stringsPath": "./variantGroups/Common/texts",
+        "resourcesPath": "./variantGroups/Common/images",
+        "hmi": [
+          "ID7"
+        ],
+        "brands": [
+          "BMW"
+        ]
+      }
+    ]
+  }
+}
