@@ -1,73 +1,82 @@
 [
   {
+    "version": "2.7.24",
+    "changes": [
+      "新增可拖动的车内灯光预览，优化灯带分区提示。",
+      "对开灯前报告异常的灯带自动复查，保留模块查找和离车停止。"
+    ],
+    "upstreamVersion": "2.7.23",
+    "cnRevision": 1
+  },
+  {
     "version": "2.7.18",
-    "upstreamVersion": "2.7.17",
-    "cnRevision": 1,
     "changes": [
       "修正部分 G30 车型下层灯带的分区。",
       "保留自定义颜色、模块查找与离车停止控制。"
-    ]
+    ],
+    "upstreamVersion": "2.7.17",
+    "cnRevision": 1
   },
   {
     "version": "2.7.17",
-    "upstreamVersion": "2.7.16",
-    "cnRevision": 1,
     "changes": [
       "改善部分车型车身模块持续忙碌时无法自定义氛围灯颜色的问题。",
       "增加整组灯光单色模式，保留分区设置和离车停止控制。"
-    ]
+    ],
+    "upstreamVersion": "2.7.16",
+    "cnRevision": 1
   },
   {
     "version": "2.7.16",
-    "upstreamVersion": "2.7.15",
-    "cnRevision": 1,
     "changes": [
       "改进部分车型车身模块识别，减少自定义颜色无法使用的情况。",
       "新增装饰灯分区选择，可跟随上层或下层灯光。"
-    ]
+    ],
+    "upstreamVersion": "2.7.15",
+    "cnRevision": 1
   },
   {
     "version": "2.7.14",
-    "upstreamVersion": "2.7.13",
-    "cnRevision": 1,
     "changes": [
       "改进自定义灯色、门灯控制与颜色恢复，增强车身模块忙时兼容。"
-    ]
+    ],
+    "upstreamVersion": "2.7.13",
+    "cnRevision": 1
   },
   {
     "version": "2.5.2",
-    "upstreamVersion": "2.5.0",
-    "cnRevision": 2,
     "changes": [
       "车身模块暂忙时自动重试读取，减少无法自定义颜色的情况。"
-    ]
+    ],
+    "upstreamVersion": "2.5.0",
+    "cnRevision": 2
   },
   {
     "version": "2.5.1",
-    "upstreamVersion": "2.5.0",
-    "cnRevision": 1,
     "changes": [
       "同步新版灯光控制与模式设置。",
       "完善简体中文显示，保留无水印界面。"
-    ]
+    ],
+    "upstreamVersion": "2.5.0",
+    "cnRevision": 1
   },
   {
     "version": "2.4.6",
-    "upstreamVersion": "2.4.4",
-    "cnRevision": 2,
     "changes": [
       "修复部分车机按钮无响应及连续点击预览后页面消失的问题。",
       "自动选择兼容的渲染服务，连接恢复后自动恢复操作。",
       "移除界面角落水印。"
-    ]
+    ],
+    "upstreamVersion": "2.4.4",
+    "cnRevision": 2
   },
   {
     "version": "2.4.5",
-    "upstreamVersion": "2.4.4",
-    "cnRevision": 1,
     "changes": [
       "新增完整简体中文界面与状态提示。",
       "支持从国内商店安装和在线更新。"
-    ]
+    ],
+    "upstreamVersion": "2.4.4",
+    "cnRevision": 1
   }
 ]

@@ -57,13 +57,12 @@ CarPlay next starts, which then applies the patch in memory, so no restart
 is needed for it. It then does the same for Android Auto on any aapd build
 it can plan: an earlier release's patch of `/usr/bin/aapd` and `/etc/aapd.conf`
 goes back as they ship, and the patch is armed in aapd's memory. Where the
-sites are not found, the coding is another, or another tool's change is
-found at a site (one that holds neither the shipped bytes nor our edit) or
-beside our own edits, it leaves everything as it is, and the app's Status
-says why; bytes away from the sites do not count. A patch you turned off
-with Remove patch stays off across updates, car software updates and
-restarts, until you press Patch (PATCH.md "Install-time activation", "In
-memory").
+sites are not found or not recognised, the coding is another, or another
+tool's change is found beside our own edits, it leaves everything as it is,
+and the app's Status says why; bytes away from the sites do not count. A
+patch you turned off with Remove patch stays off across updates, car
+software updates and restarts, until you press Patch (PATCH.md
+"Install-time activation", "In memory").
 
 **Remove.** In the Store, remove the app, then the tool (refused while the
 app is installed). `patchd.js deactivate` turns both patches in memory
@@ -77,8 +76,10 @@ CarPlay and aapd.
 The app's **Patch** and **Remove patch** buttons, for CarPlay and for
 Android Auto, apply and revert the patches through the root patch daemon
 `patchd`. A change takes effect when CarPlay (or aapd) next starts: `patchd`
-restarts it at once only where that cannot restart the head unit (PATCH.md
-"Activation"); otherwise the app shows **Restart head unit**.
+restarts CarPlay at once only where that cannot restart the head unit
+(PATCH.md "Activation"); otherwise, and for Android Auto always (an aapd
+started on its own gets no touch input), the app shows **Restart head
+unit**.
 
 **Never `systemctl stop` or `restart` carplay or aapd**: CarPlay dumps core
 on SIGTERM, which restarts the head unit.
@@ -750,8 +751,9 @@ and reporting a problem"), or run as root on the unit
 `sh /var/opt/waze-on-cluster/current/collect-logs.sh [-o <folder>]`: it
 writes `woc-logs-<UTC date and time>.tar.gz` into the folder (`/tmp` by
 default) and prints its path. The archive holds both tools' logs, the kept
-journal, patchd's CarPlay and DLT lines (`patchd-logs.json`), the status
-files, the patchers' state and the head unit's restart records.
+journal, patchd's CarPlay and DLT lines and the DLT capture's own log
+(`patchd-logs.json`), the status files, the patchers' state and the head
+unit's restart records.
 `incidents.txt` lists the tools' `INCIDENT` lines (each time the map was
 lost), the boots and the time of the export, oldest first. Every file is
 scrubbed before it goes in: VINs, MAC addresses, IP addresses outside the
@@ -784,6 +786,28 @@ sources are left out.
 - **Save logs** keeps at most 5 archives in `/var/opt/waze-on-cluster/saved`.
   The Logs page serves them to a phone on the car's Wi-Fi hotspot, at the
   address it shows, while the page is open and for 15 minutes after a save.
+
+### Processes
+
+Each Node process costs the head unit about 10 MB of RAM, so the tool runs
+as few as it safely can:
+
+| Service | Runs | As |
+|---|---|---|
+| `waze-on-cluster` | the render (C++) | `hmi_5000` |
+| `waze-on-cluster-patchd` | the patches and settings (`patchd.js`) and the DLT capture (`dlt_capture.js`) | root |
+| `waze-on-cluster-recovery` | boot recovery's watcher (`recovery.js`) | root |
+| `waze-on-cluster-journal` | the journal keeper (`journal_keep.js`), from 10 s after boot | dynamic user |
+| `waze-on-cluster-logs`, `-logs-fw` | Save logs, only while the Logs page needs them | dynamic user, root |
+
+The DLT capture runs inside patchd: both run as root, and a failure of the
+capture restarts the capture, not patchd. Boot recovery stays a process of
+its own, so a hang, crash or out-of-memory in any other part can never
+delay or stop it from recording a crash and turning a patch off. The journal
+keeper stays unprivileged, so it never runs as root. A downgrade lays a
+`waze-on-cluster-capture.service` that runs the capture on its own; while
+that unit is installed or runs, it serves the capture and patchd doesn't.
+The capture's own log is in Save logs' `patchd-logs.json` (`capture`).
 
 ### The patches
 

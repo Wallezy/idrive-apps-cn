@@ -1,7 +1,7 @@
 {
  "id": "ambient_config",
  "title": "\u6c1b\u56f4\u706f\u8bbe\u7f6e",
- "version": "2.7.18",
+ "version": "2.7.24",
  "screens": [
   {
    "name": "MAIN",

@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/cauliflowermossgrape/idrive7-apps",
-  "commit": "35bca28bc82b30482d73782877ebaf92c69dcb8c",
+  "commit": "454e47f8b6aec5b2e0d7335257d7cc3644d9d858",
   "language": "zh-CN",
   "sdk": "Excluded; donor-linked by mgu-deploy",
   "adaptations": [
@@ -9,12 +9,12 @@
     "Numeric three-part CN versions"
   ],
   "component": "live_data",
-  "upstreamVersion": "1.0.18",
-  "releaseVersion": "1.0.19",
+  "upstreamVersion": "1.0.20",
+  "releaseVersion": "1.0.21",
   "cnRevision": 1,
   "adaptedSourceFilesSha256": {
     "apps/live_data/README.md": "1a822fb9b1db6b577832ccf4e47eadf1dff67089ab55f42ca0fb4c16d25d61f3",
-    "apps/live_data/app.json": "4f2d822f473c62969724c97f57708309a2d373472a2be648fb938dae99186e3d",
+    "apps/live_data/app.json": "0e36b81a59946757a3ee0687a9bc592bd9bdd73962bb0fa5e6f46a404426f43c",
     "apps/live_data/builtin/BATT48.json": "8d0cbc48d8003eac3eaae6fc718a48498ba3a4a25bd41054442a390aad44e305",
     "apps/live_data/builtin/BATT48.meta.json": "376299d8de8429395933eda93303bb6b4336c51b1b3a40884e8cb94430511a42",
     "apps/live_data/builtin/DME8FF_R.en.json": "607bc2affd6160eda4f1938995c1e2ce6d71161dadbf406a0ba57be058f06ce8",

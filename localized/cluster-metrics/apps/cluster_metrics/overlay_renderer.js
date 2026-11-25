@@ -39,9 +39,62 @@ const {
 } = require('./hud_nav_renderer');
 const { buildStockBackdrop } = require('./image_decode');
 const { COVER_SIDE, paginateTitle, resolveRightWidgetPage } = require('./media_tracker');
+const { computeIceBatteryCharge } = require('./signals');
 
 const DEFAULT_CONF_DIR = '/var/opt/cluster-render';
 const DEFAULT_WAZE_STATUS = '/run/waze-on-cluster/status.json';
+const ICE_CHARGE_MAX_KW = 15.0;
+const BOLT_ROWS = [
+    [4, 3], [3, 4], [3, 3], [2, 4], [1, 4],
+    [0, 8], [0, 8],
+    [3, 4], [3, 3], [2, 4], [2, 3], [1, 3], [1, 2],
+];
+
+function boltWidth(heightPx) {
+    const h = typeof heightPx === 'number' && heightPx > 0 ? heightPx : 13;
+    return h <= 14 ? 8 : Math.max(8, Math.round(h * 0.60));
+}
+
+function drawLightningBolt(cv, x0, y0, col, heightPx) {
+    const h = typeof heightPx === 'number' && heightPx > 0 ? heightPx : 13;
+    if (h <= 14) {
+        cv.fillRect(x0 + 3, y0 - 1, 5, 1, COL.outline);
+        for (let r = 0; r < BOLT_ROWS.length; r++) {
+            const dx = BOLT_ROWS[r][0];
+            const w = BOLT_ROWS[r][1];
+            cv.fillRect(x0 + dx - 1, y0 + r, w + 2, 1, COL.outline);
+        }
+        cv.fillRect(x0, y0 + BOLT_ROWS.length, 4, 1, COL.outline);
+        for (let r = 0; r < BOLT_ROWS.length; r++) {
+            cv.fillRect(x0 + BOLT_ROWS[r][0], y0 + r, BOLT_ROWS[r][1], 1, col);
+        }
+        return 8;
+    }
+    const w = boltWidth(h);
+    const drawPair = (ox, oy, c) => {
+        const x = x0 + ox;
+        const y = y0 + oy;
+        cv.triangle([
+            [x + w * 0.66, y],
+            [x, y + h * 0.55],
+            [x + w * 0.54, y + h * 0.55],
+        ], c);
+        cv.triangle([
+            [x + w, y + h * 0.45],
+            [x + w * 0.34, y + h],
+            [x + w * 0.46, y + h * 0.45],
+        ], c);
+    };
+    const r = h >= 24 ? 1.5 : 1;
+    drawPair(-r, 0, COL.outline);
+    drawPair(r, 0, COL.outline);
+    drawPair(0, -r, COL.outline);
+    drawPair(0, r, COL.outline);
+    drawPair(-1, -1, COL.outline);
+    drawPair(1, 1, COL.outline);
+    drawPair(0, 0, col);
+    return w;
+}
 
 // Shifted +16px down so there is generous breathing room under the main digital speed digits while clearing the traffic light sign (>=536)
 const BELOW_SPEED_BASE = { x: 392, y: 445, w: 214, h: 84 };
@@ -56,9 +109,9 @@ const CORNER_LEFT_BASE = { x: 8, y: 643, w: 116, h: 66 };
 const CORNER_RIGHT_BASE = { x: 1816, y: 646, w: 98, h: 66 };
 // PHEV-only HV Battery SoC % overlay centered inside the upper dark pocket of the bottom-right HV battery sub-gauge (well above the 50 mark)
 const HV_SOC_GAUGE_BASE = { x: 1796, y: 452, w: 92, h: 56 };
-// Right-Wing Gauge & Widget pocket (1252..1788, 88..624): full-wing calibrated gauge-face artwork backdrop
-// (including top-left eyebrow handle & full bottom-right CHARGE curve) with foreground cover & text at world x=1448
-const RIGHT_WIDGET_BASE = { x: 1252, y: 88, w: 536, h: 536 };
+// Right-Wing Gauge & Widget pocket (1244..1780, 88..608): full-wing calibrated gauge-face artwork backdrop
+// (including pointed top-left eyebrow handle & full outer-right bezel curve down to y=601) with cover top-left at world (1376, 164)
+const RIGHT_WIDGET_BASE = { x: 1244, y: 88, w: 536, h: 520 };
 
 // Strictly y=100..200 (<= 202 Assisted Driving / ACC set-speed & green car keep-out)
 const HUD_BASE = { x: 136, y: 100, w: 268, h: 100 };
@@ -292,9 +345,9 @@ function fillSlantBar(cv, x0, y, w, h, fillW, col) {
     for (let row = 0; row < h; row++) {
         const py = y + row;
         if (py < 0 || py >= cv.h) continue;
-        // BMW 45-degree slant on right end: upper rows extend slightly further right than lower rows
-        const slant = Math.min(Math.max(0, h - 1 - row), w - 1);
-        const rowEnd = Math.min(x0 + w, Math.max(x0 + 1, x0 + maxW - (h - 1 - row)));
+        // BMW '/' forward-slash slant on right end: top row (row=0) extends furthest right; lower rows step left
+        const slant = Math.min(Math.max(0, row), w - 1);
+        const rowEnd = Math.min(x0 + w, Math.max(x0 + 1, x0 + maxW - row));
         for (let px = x0; px < rowEnd; px++) {
             if (px < 0 || px >= cv.w) continue;
             const o = (py * cv.w + px) * 4;
@@ -479,6 +532,7 @@ class OverlayRenderer {
         this._activeAlertKey = '';
         this._alertBcBase = 0;
         this._alertDismissed = false;
+        this._iceChgState = {};
         this.lastSummary = {};
     }
 
@@ -683,6 +737,10 @@ class OverlayRenderer {
         const cy = clamp(Number(s.clusterNudgeY) || 0, -12, 12);
 
         const gearDisplay = s.gearDisplay === 'left_of_speed' ? 'below_speed' : (s.gearDisplay || 'next_to_d');
+        const belowSpeedLine1 = s.belowSpeedLine1 || 'efficiency';
+        const belowSpeedLine2 = s.belowSpeedLine2 || 'power';
+        const showBsLine1 = belowSpeedLine1 !== 'off';
+        const showBsLine2 = belowSpeedLine2 !== 'off';
         const brakeMode = s.brakeIndicator || 'bar_num';
         const cornerLeftMode = s.cornerLeftDisplay || 'oil_cool';
         const hvSocGaugeEnabled = s.hvSocGauge !== false;
@@ -732,13 +790,17 @@ class OverlayRenderer {
 
         let hero;
         let heroCol;
+        let heroUnitCol = COL.softBlue;
         let subText = '';
         let subCol = COL.softBlue;
+        let subBolt = false;
 
         if (isCharging) {
+            const hasChgKw = typeof chg.chargeKw === 'number' && isFinite(chg.chargeKw);
             hero = {
-                value: (typeof chg.chargeKw === 'number' && isFinite(chg.chargeKw)) ? chg.chargeKw.toFixed(1) : '--',
+                value: hasChgKw ? ('+' + chg.chargeKw.toFixed(1)) : '--',
                 unit: 'kW',
+                bolt: hasChgKw,
             };
             heroCol = COL.cyan;
             subText = chg.maxAmps ? ('CHARGING ' + Math.round(chg.maxAmps) + 'A') : 'CHARGING';
@@ -747,23 +809,31 @@ class OverlayRenderer {
             hero = profile.isEv
                 ? formatEvEff(eff.evKmPerKwh, units)
                 : formatFuelEff(eff.fuelLPer100km, eff.isDfco, units);
-            heroCol = profile.mode === 'ev_regen' ? COL.cyan
-                : profile.isEv ? COL.white
-                : (eff.isDfco ? COL.cyan : (profile.isCold ? COL.icyBlue : COL.white));
+            heroCol = profile.mode === 'ev_regen' ? COL.cyan : COL.white;
+            heroUnitCol = profile.isEv ? COL.softBlue : COL.white;
 
             if (profile.isEv) {
                 const pFmt = formatPowerKw(t.hvKw);
                 subText = pFmt.text;
+                subBolt = Boolean(pFmt.charging);
                 subCol = (t.hvKw !== null && t.hvKw > 55) ? COL.amber : COL.cyan;
-            } else if (profile.isCold && profile.coldCeilingRpm) {
-                subText = '<' + (profile.coldCeilingRpm / 1000).toFixed(1) + 'k RPM';
-                subCol = COL.icyBlue;
-            } else if (typeof t.boostBar === 'number' && isFinite(t.boostBar)) {
-                const bFmt = formatPress(t.boostBar, true, units);
-                subText = bFmt.text;
-                subCol = t.boostBar > 0.8 ? COL.amber : COL.cyan;
             } else {
-                subText = (t.rpm ? Math.round(t.rpm) + ' rpm' : '--');
+                const rpmLive = (typeof t.rpm === 'number' && isFinite(t.rpm) && t.rpm > 0)
+                    ? Math.round(t.rpm)
+                    : null;
+                const rpmStr = rpmLive !== null ? String(rpmLive) : '--';
+                if (profile.isCold && profile.coldCeilingRpm) {
+                    const ceilRpm = Math.round(profile.coldCeilingRpm);
+                    subText = rpmStr + ' / ' + ceilRpm + ' RPM';
+                    subCol = (rpmLive !== null && rpmLive >= ceilRpm) ? COL.amber : COL.white;
+                } else if (typeof t.boostBar === 'number' && isFinite(t.boostBar)) {
+                    const bFmt = formatPress(t.boostBar, true, units);
+                    subText = rpmStr + ' RPM  ' + bFmt.value + ' ' + String(bFmt.unit || 'psi').toUpperCase();
+                    subCol = COL.white;
+                } else {
+                    subText = rpmStr + ' RPM';
+                    subCol = COL.white;
+                }
             }
         }
 
@@ -779,6 +849,32 @@ class OverlayRenderer {
         const brakeHold = !isParked && Boolean(t.brakeHold) && fg <= 0.02;
         const brakeLit = (!isParked && fg > 0.02) ? clamp(Math.round((fg / 0.55) * 20), 1, 20) : (brakeHold ? 1 : 0);
         const showBrakeRail = brakeMode !== 'off' && !isParked;
+
+        const iceChargeBarEnabled = s.iceChargeBar !== false;
+        const isPhevForIceChg = Boolean(profile && profile.vehicleType === 'phev');
+        const iceChgEval = (iceChargeBarEnabled && isPhevForIceChg && !isCharging && !isParked && brakeLit === 0)
+            ? computeIceBatteryCharge({
+                rpm: t.rpm,
+                engineOn: Boolean(profile && profile.engineOn),
+                speedKmh: t.speedKmh,
+                hvKw: t.hvKw,
+                pedalPct: t.pedalPct,
+                torqueNm: t.torqueNm,
+                recupPct: t.recupPct,
+                gLong: t.gLong,
+                driverBraking: t.driverBraking,
+                absActive: t.absActive,
+                frictionG: fg,
+                brakeBar: t.brakeBar,
+                isDfco: Boolean(eff.isDfco),
+                pureRegen: Boolean(t.pureRegen),
+                plugConnected: Boolean(chg && chg.plugConnected),
+                chargingActive: isCharging,
+            }, this._iceChgState, now)
+            : computeIceBatteryCharge({ chargingActive: true }, this._iceChgState, now);
+        const iceChargeActive = Boolean(iceChgEval && iceChgEval.active && brakeLit === 0);
+        const iceChargeKw = iceChargeActive ? iceChgEval.chargeKw : 0;
+        const iceChargeLit = iceChargeActive ? clamp(Math.round((iceChargeKw / ICE_CHARGE_MAX_KW) * 20), 1, 20) : 0;
 
         const showHvSocGauge = Boolean(
             panelAllowed &&
@@ -797,9 +893,14 @@ class OverlayRenderer {
             t.leadVehicle && t.leadVehicle.active
         );
 
+        const bsGearStr = gearDisplay === 'below_speed' ? dGearText : '';
+        const showBelowSpeed = showBsLine1 || showBsLine2 || Boolean(bsGearStr);
+
         this.lastSummary = {
-            hero, heroCol, subText, subCol, inNormalD, dGearText,
+            hero, heroCol, heroUnitCol, subText, subCol, subBolt, inNormalD, dGearText,
             isParked, isCharging, showBrakeRail, brakeHold,
+            belowSpeedLine1, belowSpeedLine2, showBelowSpeed,
+            iceChargeActive, iceChargeKw, iceChargeLit,
             panelAllowed, showHud, showOwnHudNav, showHudRoad, showHudHeadway, hudHeadwayMode,
             showHvSocGauge, showCabinTemp,
             wocHudOverlay, hudYieldedToNav, hudYieldReason,
@@ -814,16 +915,20 @@ class OverlayRenderer {
         // 1. CLUSTER PANEL LAYERS (slot 0x203)
         if (panelAllowed) {
             // 1a. Zone 1: Below Speed Indicator (392..606, 445..529; clear gap under speed & above traffic light sign)
-            const bsRect = {
-                x: clamp(BELOW_SPEED_BASE.x + cx, 387, 412),
-                y: clamp(BELOW_SPEED_BASE.y + cy, 433, 452),
-                w: BELOW_SPEED_BASE.w,
-                h: BELOW_SPEED_BASE.h,
-            };
-            const lBs = this._ensureOrLocal('below_speed', Object.assign({ target: 'panel', visible: true, z: 12 }, bsRect));
-            this._paintBelowSpeed(lBs.cv, hero, heroCol, subText, subCol, gearDisplay === 'below_speed' ? dGearText : '', gearDisplay === 'below_speed', 108);
-            this._setVisible('below_speed', true);
-            this._upload('below_speed');
+            if (showBelowSpeed) {
+                const bsRect = {
+                    x: clamp(BELOW_SPEED_BASE.x + cx, 387, 412),
+                    y: clamp(BELOW_SPEED_BASE.y + cy, 433, 452),
+                    w: BELOW_SPEED_BASE.w,
+                    h: BELOW_SPEED_BASE.h,
+                };
+                const lBs = this._ensureOrLocal('below_speed', Object.assign({ target: 'panel', visible: true, z: 12 }, bsRect));
+                this._paintBelowSpeed(lBs.cv, hero, heroCol, heroUnitCol, subText, subCol, subBolt, bsGearStr, gearDisplay === 'below_speed', 108, showBsLine1, showBsLine2);
+                this._setVisible('below_speed', true);
+                this._upload('below_speed');
+            } else {
+                this._setVisible('below_speed', false);
+            }
 
             // 1b. Zone 2: Shift Position Strictly Clear of KOMBI4 GEAR_WIN (1461..1487, 650..706; NEVER <= 1460)
             const showGearDigit = gearDisplay === 'next_to_d' && inNormalD;
@@ -867,7 +972,11 @@ class OverlayRenderer {
             };
             const lBr = this._ensureOrLocal('brake_rail', Object.assign({ target: 'panel', visible: showBrakeRail, z: 13 }, brRect));
             if (showBrakeRail) {
-                this._paintBrakeRail(lBr.cv, fg, brakeLit, Boolean(t.absActive), brakeMode === 'bar_num' && !brakeHold, t.brakeBar);
+                this._paintBrakeRail(
+                    lBr.cv, fg, brakeLit, Boolean(t.absActive),
+                    brakeMode === 'bar_num' && (brakeLit === 0 || !brakeHold),
+                    t.brakeBar, iceChargeKw, iceChargeLit
+                );
                 this._setVisible('brake_rail', true);
                 this._upload('brake_rail');
             } else {
@@ -922,10 +1031,10 @@ class OverlayRenderer {
                 this._setVisible('hv_soc_gauge', false);
             }
 
-            // 1f. Zone 6: Right-Wing Charging / Media / Trip Widget (1252..1788, 88..604)
+            // 1f. Zone 6: Right-Wing Charging / Media / Trip / TPMS Widget (1244..1780, 88..608)
             if (rightWidgetPage !== 'off') {
                 const rwRect = {
-                    x: clamp(RIGHT_WIDGET_BASE.x + cx, 1244, 1260),
+                    x: clamp(RIGHT_WIDGET_BASE.x + cx, 1232, 1256),
                     y: clamp(RIGHT_WIDGET_BASE.y + cy, 86, 96),
                     w: RIGHT_WIDGET_BASE.w,
                     h: RIGHT_WIDGET_BASE.h,
@@ -1024,8 +1133,8 @@ class OverlayRenderer {
             this._setVisible('hud_road', false);
         }
 
-        // 2b. HUD TELEMETRY LAYER (260x100 at y=100..200 <= 202 ACC; shifts metrics cleanly into Row 2 when showHudRoad is true!)
-        const hudX = clamp(HUD_BASE.x + hx, 120, 144);
+        // 2b. HUD TELEMETRY LAYER (268x100 at y=100..200 <= 202 ACC; uniform non-jumping layout below hud_road & strictly left of hud_headway)
+        const hudX = clamp(HUD_BASE.x + hx, 120, 140);
         const lHud = this._ensureOrLocal('hud_main', {
             target: 'hud', klass: 'overlay', x: hudX, y: hudTopY, w: HUD_BASE.w, h: HUD_BASE.h, visible: showHud, z: 12,
         });
@@ -1033,10 +1142,10 @@ class OverlayRenderer {
             this._paintHud(
                 lHud.cv,
                 [hudLine1, hudLine2, hudLine3],
-                hero, heroCol, subText, subCol,
+                hero, heroCol, heroUnitCol, subText, subCol, subBolt,
                 gearDisplay !== 'off' ? dGearText : '',
                 t, profile, units, fg, brakeLit, brakeHold, activeAlert,
-                showHudRoad
+                showHudRoad, showHudHeadway, iceChargeKw
             );
             this._setVisible('hud_main', true);
             this._upload('hud_main');
@@ -1044,10 +1153,10 @@ class OverlayRenderer {
             this._setVisible('hud_main', false);
         }
 
-        // 2b2. HUD LEAD-CAR HEADWAY BADGE (124x45 at x=280..404 < 405 nav, y=140..185 > 138 road & < 202 ACC)
+        // 2b2. HUD LEAD-CAR HEADWAY BADGE (120x41 at x=284..404 < 405 nav, y=139..180 > 138 road & < 202 ACC)
         if (showHudHeadway) {
             const hwX = clamp(HUD_HEADWAY_BASE.x + hx, 268, 404 - HUD_HEADWAY_BASE.w);
-            const hwMinY = showHudRoad ? (hudTopY + HUD_ROAD_H + 1) : 104;
+            const hwMinY = hudTopY + HUD_ROAD_H + 1;
             const hwY = clamp(HUD_HEADWAY_BASE.y + hy, hwMinY, 201 - HUD_HEADWAY_BASE.h);
             const lHudHw = this._ensureOrLocal('hud_headway', {
                 target: 'hud', klass: 'overlay', x: hwX, y: hwY, w: HUD_HEADWAY_BASE.w, h: HUD_HEADWAY_BASE.h, visible: true, z: 13,
@@ -1080,20 +1189,24 @@ class OverlayRenderer {
 
         // 3. MAP SLOT SIDE-BOTTOM OVERLAYS (0x100, contend: false — optional Map-Slot-Only mode)
         if (showMapOverlay) {
-            const msRect = {
-                x: clamp(MAP_SPEED_RECT.x + cx, 8, 32),
-                y: clamp(MAP_SPEED_RECT.y + cy, 313, 335),
-                w: MAP_SPEED_RECT.w,
-                h: MAP_SPEED_RECT.h,
-            };
-            const lMapSpd = this._ensureOrLocal('map_speed', {
-                target: 'map', klass: 'overlay', contend: false,
-                x: msRect.x, y: msRect.y, w: msRect.w, h: msRect.h,
-                visible: true, z: 20,
-            });
-            this._paintBelowSpeed(lMapSpd.cv, hero, heroCol, subText, subCol, gearDisplay === 'below_speed' ? dGearText : '', gearDisplay === 'below_speed', 84);
-            this._setVisible('map_speed', true);
-            this._upload('map_speed');
+            if (showBelowSpeed) {
+                const msRect = {
+                    x: clamp(MAP_SPEED_RECT.x + cx, 8, 32),
+                    y: clamp(MAP_SPEED_RECT.y + cy, 313, 335),
+                    w: MAP_SPEED_RECT.w,
+                    h: MAP_SPEED_RECT.h,
+                };
+                const lMapSpd = this._ensureOrLocal('map_speed', {
+                    target: 'map', klass: 'overlay', contend: false,
+                    x: msRect.x, y: msRect.y, w: msRect.w, h: msRect.h,
+                    visible: true, z: 20,
+                });
+                this._paintBelowSpeed(lMapSpd.cv, hero, heroCol, heroUnitCol, subText, subCol, subBolt, bsGearStr, gearDisplay === 'below_speed', 84, showBsLine1, showBsLine2);
+                this._setVisible('map_speed', true);
+                this._upload('map_speed');
+            } else {
+                this._setVisible('map_speed', false);
+            }
 
             const mlRect = {
                 x: clamp(MAP_LEFT_RECT.x + cx, 176, 204),
@@ -1131,7 +1244,8 @@ class OverlayRenderer {
             if (showMapRight) {
                 this._paintMapRight(
                     lMapRight.cv, gearOnMapRight, t, units, cornerRightMode,
-                    showBrakeRail, brakeMode === 'bar_num' && !brakeHold, fg, brakeLit, Boolean(t.absActive), alertMap
+                    showBrakeRail, brakeMode === 'bar_num' && (brakeLit === 0 || !brakeHold),
+                    fg, brakeLit, Boolean(t.absActive), alertMap, iceChargeKw
                 );
                 this._setVisible('map_right', true);
                 this._upload('map_right');
@@ -1161,19 +1275,54 @@ class OverlayRenderer {
         return this.layers[name];
     }
 
-    _paintBelowSpeed(cv, hero, heroCol, subText, subCol, gearStr, reserveGearSlot, heroRightX) {
+    _paintBelowSpeed(cv, hero, heroCol, heroUnitCol, subText, subCol, subBolt, gearStr, reserveGearSlot, heroRightX, showLine1, showLine2) {
         cv.clear(COL.clear);
-        const rx = typeof heroRightX === 'number' ? heroRightX : 108;
-        drawTextOutline(cv, hero.value, rx, 43, 44, heroCol, { font: 'num', align: 'right' });
-        const unitSize = String(hero.unit || '').length > 6 ? 17 : 21;
-        drawTextOutline(cv, hero.unit, rx + 7, 39, unitSize, COL.softBlue, { font: 'bold', align: 'left' });
-        if (reserveGearSlot) {
-            drawTextOutline(cv, subText, rx + 22, 75, 22, subCol, { font: 'bold', align: 'right' });
-            if (gearStr) {
-                drawTextOutline(cv, gearStr, rx + 32, 75, 22, COL.white, { font: 'bold', align: 'left' });
+        const drawL1 = showLine1 !== false;
+        const drawL2 = showLine2 !== false;
+        const baseRx = typeof heroRightX === 'number' ? heroRightX : 108;
+        const heroValStr = String(hero.value || '');
+        const heroValW = cv.textWidth(heroValStr, 44, { font: 'num' });
+        const heroBoltH = 28;
+        const heroBoltW = hero.bolt ? (boltWidth(heroBoltH) + 5) : 0;
+        const rx = drawL1 ? Math.max(baseRx, 6 + heroBoltW + Math.ceil(heroValW)) : baseRx;
+        if (drawL1) {
+            if (hero.bolt) {
+                const bx = Math.max(4, Math.round(rx - heroValW - heroBoltW));
+                drawLightningBolt(cv, bx, 13, heroCol, heroBoltH);
             }
-        } else {
-            drawTextOutline(cv, subText, rx - 8, 75, 23, subCol, { font: 'bold', align: 'center' });
+            drawTextOutline(cv, heroValStr, rx, 43, 44, heroCol, { font: 'num', align: 'right' });
+            const unitSize = String(hero.unit || '').length > 6 ? 17 : 21;
+            drawTextOutline(cv, hero.unit, rx + 7, 39, unitSize, heroUnitCol || COL.softBlue, { font: 'bold', align: 'left' });
+        }
+
+        const line2Y = drawL1 ? 75 : 44;
+        if (drawL2) {
+            const subBoltH = 17;
+            const subBoltPad = subBolt ? (boltWidth(subBoltH) + 4) : 0;
+            if (reserveGearSlot) {
+                const sFit = fitTextLine(cv, subText, Math.max(40, rx + 16 - subBoltPad), [21, 19, 17, 15], 'bold');
+                const sw = drawTextOutline(cv, sFit.text, rx + 22, line2Y, sFit.size, subCol, { font: 'bold', align: 'right' });
+                if (subBolt) {
+                    const bx = Math.max(2, Math.round(rx + 22 - sw - subBoltPad));
+                    drawLightningBolt(cv, bx, line2Y - subBoltH + 1, subCol, subBoltH);
+                }
+                if (gearStr) {
+                    drawTextOutline(cv, gearStr, rx + 32, line2Y, 22, COL.white, { font: 'bold', align: 'left' });
+                }
+            } else {
+                const sFit = fitTextLine(cv, subText, Math.max(40, cv.w - 12 - subBoltPad), [22, 20, 18, 16], 'bold');
+                if (subBolt) {
+                    const tw = cv.textWidth(sFit.text, sFit.size, { font: 'bold' });
+                    const totalW = subBoltPad + tw;
+                    const x0 = Math.max(4, Math.round((cv.w - totalW) / 2));
+                    drawLightningBolt(cv, x0, line2Y - subBoltH + 1, subCol, subBoltH);
+                    drawTextOutline(cv, sFit.text, x0 + subBoltPad, line2Y, sFit.size, subCol, { font: 'bold', align: 'left' });
+                } else {
+                    drawTextOutline(cv, sFit.text, Math.round(cv.w / 2), line2Y, sFit.size, subCol, { font: 'bold', align: 'center' });
+                }
+            }
+        } else if (gearStr) {
+            drawTextOutline(cv, gearStr, Math.round(cv.w / 2), line2Y, 24, COL.white, { font: 'bold', align: 'center' });
         }
     }
 
@@ -1229,12 +1378,13 @@ class OverlayRenderer {
         drawTextOutline(cv, pct + '%', 46, 47, 29, col, { font: 'num', align: 'center' });
     }
 
-    _paintBrakeRail(cv, fg, litCount, absActive, showNum, brakeBar) {
+    _paintBrakeRail(cv, fg, litCount, absActive, showNum, brakeBar, iceChargeKw, iceChargeLit) {
         cv.clear(COL.clear);
         const SEG_N = 20;
         const barX0 = 2;
         const barX1 = 294;
         const segW = (barX1 - barX0) / SEG_N;
+        const chgLit = (litCount === 0 && typeof iceChargeLit === 'number' && iceChargeLit > 0) ? iceChargeLit : 0;
 
         for (let i = 0; i < SEG_N; i++) {
             const sx1 = Math.round(barX1 - i * segW) - 1;
@@ -1242,6 +1392,8 @@ class OverlayRenderer {
             let col = COL.railDim;
             if (litCount > 0 && i < litCount) {
                 col = i >= 13 ? COL.red : (i >= 6 ? COL.orange : COL.amber);
+            } else if (chgLit > 0 && (SEG_N - 1 - i) < chgLit) {
+                col = COL.cyan;
             }
             cv.fillRect(sx0, 21, Math.max(2, sx1 - sx0), 7, col);
         }
@@ -1252,6 +1404,9 @@ class OverlayRenderer {
             const lbl = (absActive ? 'ABS ' : '') + valStr;
             const col = (fg >= 0.36 || absActive) ? COL.red : COL.amber;
             drawTextOutline(cv, lbl, 3, 15, 15, col, { font: 'bold', align: 'left' });
+        } else if (chgLit > 0 && showNum && typeof iceChargeKw === 'number' && isFinite(iceChargeKw)) {
+            drawLightningBolt(cv, 3, 2, COL.cyan);
+            drawTextOutline(cv, 'CHG +' + iceChargeKw.toFixed(1) + ' kW', 14, 15, 15, COL.cyan, { font: 'bold', align: 'left' });
         }
     }
 
@@ -1282,65 +1437,65 @@ class OverlayRenderer {
     }
 
     /**
-     * Re-implemented OEM-scale Right-Wing Media Playback Widget (536x516 at 1252,88):
-     *   - Gauge-edge translucent album-art backdrop filling the right-wing face cleanly with zero darkened edge
-     *   - Crisp 144x144 album artwork centered at x=196 (world x=1448, y=164..308)
-     *   - Stock-matched large track title (Latin + CJK: 40 -> 36 -> 32 -> 28px bold) + large artist (31 -> 28 -> 25px)
-     *   - Large right-aligned remaining time (27px) above a wider slanted BMW cyan progress bar (324x12)
+     * Re-implemented OEM-scale Right-Wing Media Playback Widget (536x520 at 1244,88):
+     *   - Gauge-edge translucent album-art backdrop filling the right-wing face cleanly (y=91..599, out to x=1772)
+     *   - Enlarged 176x176 album artwork centered vertically at world (1376, 186) -> (1552, 362) for balanced margins
+     *   - Track title (42 -> 38 -> 35 -> 32px bold) + artist (31 -> 28 -> 25px) below artwork
+     *   - Compact right-aligned remaining/PAUSED time (22px) above a '/' forward-slash cyan progress bar (356x12)
      */
     _paintRightMedia(cv, media, titleInfoPre, ox, oy) {
         cv.clear(COL.clear);
-        const fgCx = 196; // world x = 1448 (matching BMW stock Now Playing visual center)
-        const coverSide = COVER_SIDE; // 144
-        const coverX = fgCx - Math.round(coverSide / 2); // 124 (world x = 1376..1520)
-        const coverY = 76; // world y = 164..308
+        const coverSide = COVER_SIDE; // 176
+        const coverX = 132; // world x = 1244 + 132 = 1376
+        const coverY = 98;  // world y = 88 + 98 = 186 -> 362 (balanced top/bottom margins inside wing)
+        const fgCx = coverX + Math.round(coverSide / 2); // 220 (world x = 1464)
 
         const hasMedia = Boolean(media && media.active && media.title);
         const cover = hasMedia ? media.cover : null;
 
         if (cover && cover.d && cover.w === coverSide && cover.h === coverSide) {
             const bgBuf = buildStockBackdrop(cover, cv.w, cv.h, {
-                ox: typeof ox === 'number' ? ox : 1252,
+                ox: typeof ox === 'number' ? ox : 1244,
                 oy: typeof oy === 'number' ? oy : 88,
                 vx: fgCx,
-                vy: 218,
+                vy: 274,
             });
             if (bgBuf && bgBuf.length === cv.d.length) {
                 bgBuf.copy(cv.d);
             }
             blitCoverArt(cv, coverX, coverY, cover, 4);
         } else {
-            paintRadialGlow(cv, fgCx, coverY + 72, 128, [56, 178, 246], hasMedia ? 38 : 24);
+            paintRadialGlow(cv, fgCx, coverY + Math.round(coverSide / 2), 138, [56, 178, 246], hasMedia ? 38 : 24);
             cv.roundRect(coverX, coverY, coverSide, coverSide, 4, COL.tileBg);
             cv.strokeRoundRect(coverX, coverY, coverSide, coverSide, 4, 2, COL.tileRim);
-            cv.roundRect(fgCx - 27, coverY + 82, 24, 20, 10, COL.icyBlue);
-            cv.roundRect(fgCx + 5, coverY + 74, 24, 20, 10, COL.icyBlue);
-            cv.fillRect(fgCx - 8, coverY + 42, 5, 50, COL.icyBlue);
-            cv.fillRect(fgCx + 24, coverY + 36, 5, 48, COL.icyBlue);
-            cv.fillRect(fgCx - 8, coverY + 36, 37, 8, COL.icyBlue);
+            cv.roundRect(fgCx - 29, coverY + 98, 26, 22, 11, COL.icyBlue);
+            cv.roundRect(fgCx + 7, coverY + 90, 26, 22, 11, COL.icyBlue);
+            cv.fillRect(fgCx - 8, coverY + 52, 5, 56, COL.icyBlue);
+            cv.fillRect(fgCx + 28, coverY + 46, 5, 54, COL.icyBlue);
+            cv.fillRect(fgCx - 8, coverY + 46, 41, 8, COL.icyBlue);
         }
 
         if (!hasMedia) {
-            drawTextClean(cv, '暂无媒体播放', fgCx, 286, 30, COL.mediaSub, { font: 'bold', align: 'center' });
-            drawTextClean(cv, '按 BC 键查看行程', fgCx, 324, 21, COL.tagGray, { font: 'label', align: 'center' });
+            drawTextClean(cv, '暂无媒体播放', fgCx, 338, 30, COL.mediaSub, { font: 'bold', align: 'center' });
+            drawTextClean(cv, '按 BC 键查看行程', fgCx, 376, 21, COL.tagGray, { font: 'label', align: 'center' });
             return;
         }
 
         const tInfo = titleInfoPre || paginateTitle(cv, media.title, 392, [42, 38, 35, 32], 32, 0);
         if (tInfo && tInfo.text) {
-            drawTextClean(cv, tInfo.text, fgCx, 286, tInfo.size, COL.white, { font: 'bold', align: 'center' });
+            drawTextClean(cv, tInfo.text, fgCx, 338, tInfo.size, COL.white, { font: 'bold', align: 'center' });
         }
 
         const subRaw = media.artist || media.source || '';
         if (subRaw) {
             const aFit = fitTextLine(cv, subRaw, 388, [31, 28, 25], 'label');
-            drawTextClean(cv, aFit.text, fgCx, 330, aFit.size, '#dde3ec', { font: 'label', align: 'center' });
+            drawTextClean(cv, aFit.text, fgCx, 382, aFit.size, '#dde3ec', { font: 'label', align: 'center' });
         }
 
-        const barX0 = 34; // world x = 1286
-        const barW = 324; // world x1 = 1610
+        const barW = 356;
+        const barX0 = fgCx - Math.round(barW / 2); // 42 -> world x = 1286..1642
         const barX1 = barX0 + barW;
-        const barY = 386; // world y = 474..486
+        const barY = 440; // world y = 528..540 (balanced top/bottom clearance above stock '20 mi' at y=556 & 'Power %' at y=586)
         const barH = 12;
 
         if (typeof media.totalSec === 'number' && media.totalSec > 0 && typeof media.elapsedSec === 'number') {
@@ -1363,9 +1518,9 @@ class OverlayRenderer {
      */
     _paintRightTrip(cv, t, hero, profile, units) {
         cv.clear(COL.clear);
-        const midX = 186;
-        const leftX = 40;
-        const rightX = 332;
+        const midX = 194;
+        const leftX = 48;
+        const rightX = 340;
         const isMi = units.distUnit === 'mi';
         const dUnit = isMi ? ' mi' : ' km';
         const dScale = isMi ? 0.621371 : 1;
@@ -1437,10 +1592,10 @@ class OverlayRenderer {
      */
     _paintRightTpmsAlerts(cv, t, alertObj, units) {
         cv.clear(COL.clear);
-        const midX = 190;
-        const leftX = 34;
-        const rightX = 346;
-        const bannerX0 = 40;
+        const midX = 198;
+        const leftX = 42;
+        const rightX = 354;
+        const bannerX0 = 48;
         const bannerW = 300;
         const isBar = units && units.pressUnit === 'bar';
         const pUnit = isBar ? ' bar' : ' psi';
@@ -1609,16 +1764,16 @@ class OverlayRenderer {
     _paintRightCharging(cv, chg, t, units) {
         cv.clear(COL.clear);
         const c = chg || {};
-        const midX = 198;
-        const leftX = 44;
-        const rightX = 352;
+        const midX = 206;
+        const leftX = 52;
+        const rightX = 360;
 
         paintRadialGlow(cv, midX, 232, 172, [56, 178, 246], 38);
         const hdr = c.preconActive
             ? 'CHARGING  -  PRECOND'
             : (c.plugLocked ? 'CHARGING  -  LOCKED' : 'CHARGING');
         drawTextOutline(cv, hdr, midX, 108, 20, COL.cyan, { font: 'bold', align: 'center' });
-        cv.fillRect(54, 122, 288, 2, COL.divider);
+        cv.fillRect(62, 122, 288, 2, COL.divider);
 
         const cards = [];
         if (t && typeof t.hvVolts === 'number' && isFinite(t.hvVolts)) {
@@ -1704,12 +1859,12 @@ class OverlayRenderer {
         }
     }
 
-    _paintHud(cv, lineModes, hero, heroCol, subText, subCol, gearStr, t, profile, units, fg, brakeLit, brakeHold, alertObj, compactBelowRoad) {
+    _paintHud(cv, lineModes, hero, heroCol, heroUnitCol, subText, subCol, subBolt, gearStr, t, profile, units, fg, brakeLit, brakeHold, alertObj, compactBelowRoad, headwayShown, iceChargeKw) {
         cv.clear(COL.clear); // Borderless 3-line black-outlined text (strictly y=100..200 <= 202 ACC)
-        const compact = Boolean(compactBelowRoad);
         const modes = Array.isArray(lineModes) ? lineModes.slice(0, 3) : ['efficiency_gear', 'power', 'brake'];
-        // When `hud_road` occupies Row 1 (py=0..38), shift compact metrics into Row 2 (py=57, 77, 95) while staying <= py=99!
-        const baselines = compact ? [57, 77, 95] : [35, 65, 92];
+        // Always use one uniform, non-jumping layout below hud_road (py >= 38) and strictly left of hud_headway
+        // (local x <= 144 < 148 on Rows 1-2; Row 3 sits cleanly below hud_headway at py=82..97).
+        const baselines = [56, 72, 95];
         const socStr = (typeof t.soc === 'number' && isFinite(t.soc)) ? ('SOC ' + Math.round(t.soc) + '%') : 'SOC --%';
         const socCol = (typeof t.soc === 'number' && t.soc <= 10) ? COL.red : ((typeof t.soc === 'number' && t.soc <= 20) ? COL.amber : COL.white);
         const oilStr = 'OIL ' + formatTemp(t.oilTempC, units).text;
@@ -1719,85 +1874,126 @@ class OverlayRenderer {
         for (let idx = 0; idx < 3; idx++) {
             const by = baselines[idx];
             const m = modes[idx] || 'off';
+            const rowMaxW = idx <= 1 ? 138 : (cv.w - 12);
             // Never let a passive alert overwrite Line 3 while the driver is actively pressing the brake!
             const hudAlertTxt = alertObj && cnText(alertObj.hudText || alertObj.label);
             if (idx === 2 && hudAlertTxt && !(m === 'brake' && brakeLit > 0)) {
                 const aCol = alertObj.severity === 'red' ? COL.red : COL.amber;
-                const hFit = fitTextLine(cv, hudAlertTxt, cv.w - 10, compact ? [18, 16, 14] : [21, 19, 17], 'bold');
+                const hFit = fitTextLine(cv, hudAlertTxt, cv.w - 10, [16, 15, 14], 'bold');
                 drawTextOutline(cv, hFit.text, 6, by, hFit.size, aCol, { font: 'bold', align: 'left' });
                 continue;
             }
             if (m === 'off') continue;
             if (m === 'efficiency_gear' || m === 'efficiency') {
-                // Fixed non-shifting horizontal anchors for value (right-aligned), unit (left-aligned), and gear (left-aligned)
-                const valRightX = compact ? 44 : 64;
-                const unitX = compact ? 49 : 70;
-                const gearX = compact ? 132 : 166;
-                const nSize = compact ? (idx === 0 ? 24 : 18) : (idx === 0 ? 38 : 24);
-                const uLong = String(hero.unit || '').length > 7;
-                const uSize = compact ? (uLong ? 13 : 14) : (uLong ? 16 : (idx === 0 ? 18 : 15));
-                drawTextOutline(cv, hero.value, valRightX, by, nSize, heroCol, { font: 'num', align: 'right' });
-                drawTextOutline(cv, hero.unit, unitX, by - 1, uSize, COL.softBlue, { font: 'bold', align: 'left' });
-                if (m === 'efficiency_gear' && gearStr) {
-                    const gSize = compact ? (idx === 0 ? 22 : 18) : (idx === 0 ? 30 : 22);
-                    drawTextOutline(cv, gearStr, gearX, by, gSize, COL.white, { font: 'bold', align: 'left' });
+                const nSize = idx === 0 ? 23 : 17;
+                const uLen = String(hero.unit || '').length;
+                const uSize = uLen >= 8 ? 10 : (uLen >= 6 ? 12 : 14);
+                if (hero.bolt) {
+                    const bH = idx === 0 ? 17 : 13;
+                    const bPad = boltWidth(bH) + 3;
+                    const vW = cv.textWidth(String(hero.value || ''), nSize, { font: 'num' });
+                    const rx = Math.max(55, 6 + bPad + Math.ceil(vW));
+                    drawLightningBolt(cv, Math.max(4, Math.round(rx - vW - bPad)), by - bH + 1, heroCol, bH);
+                    drawTextOutline(cv, hero.value, rx, by, nSize, heroCol, { font: 'num', align: 'right' });
+                    drawTextOutline(cv, hero.unit, rx + 5, by - 1, uSize, heroUnitCol || COL.softBlue, { font: 'bold', align: 'left' });
+                } else {
+                    // Fixed non-shifting horizontal anchors wide enough for 2-digit '34.6' and strictly clear of hud_headway (x < 148)
+                    const valRightX = 55;
+                    const unitX = 59;
+                    const gearX = 113;
+                    drawTextOutline(cv, hero.value, valRightX, by, nSize, heroCol, { font: 'num', align: 'right' });
+                    drawTextOutline(cv, hero.unit, unitX, by - 1, uSize, heroUnitCol || COL.softBlue, { font: 'bold', align: 'left' });
+                    if (m === 'efficiency_gear' && gearStr) {
+                        const gSize = idx === 0 ? 21 : 16;
+                        drawTextOutline(cv, gearStr, gearX, by, gSize, COL.white, { font: 'bold', align: 'left' });
+                    }
                 }
             } else if (m === 'power_gear') {
-                const sz = compact ? (idx === 0 ? 19 : 17) : (idx === 0 ? 26 : (idx === 1 ? 22 : 19));
-                const gx = compact ? 132 : 166;
-                drawTextOutline(cv, subText, 6, by, sz, subCol, { font: 'bold', align: 'left' });
+                const sz = idx === 0 ? 18 : 15;
+                const gx = 113;
+                const bH = 13;
+                const bPad = subBolt ? (boltWidth(bH) + 3) : 0;
+                const sFit = fitTextLine(cv, subText, Math.max(40, gx - 10 - bPad), [sz, Math.max(13, sz - 2), Math.max(11, sz - 4)], 'bold');
+                if (subBolt) {
+                    drawLightningBolt(cv, 6, by - bH + 1, subCol, bH);
+                    drawTextOutline(cv, sFit.text, 6 + bPad, by, sFit.size, subCol, { font: 'bold', align: 'left' });
+                } else {
+                    drawTextOutline(cv, sFit.text, 6, by, sFit.size, subCol, { font: 'bold', align: 'left' });
+                }
                 if (gearStr) {
-                    drawTextOutline(cv, gearStr, gx, by, sz, COL.white, { font: 'bold', align: 'left' });
+                    drawTextOutline(cv, gearStr, gx, by, idx === 0 ? 20 : 16, COL.white, { font: 'bold', align: 'left' });
                 }
             } else if (m === 'power') {
-                const sz = compact ? (idx === 0 ? 19 : 17) : (idx === 0 ? 26 : (idx === 1 ? 22 : 19));
-                drawTextOutline(cv, subText, 6, by, sz, subCol, { font: 'bold', align: 'left' });
+                const sz = idx === 0 ? 18 : 15;
+                const bH = 13;
+                const bPad = subBolt ? (boltWidth(bH) + 3) : 0;
+                const sFit = fitTextLine(cv, subText, Math.max(40, rowMaxW - bPad), [sz, Math.max(13, sz - 1), Math.max(12, sz - 2), Math.max(11, sz - 3)], 'bold');
+                if (subBolt) {
+                    drawLightningBolt(cv, 6, by - bH + 1, subCol, bH);
+                    drawTextOutline(cv, sFit.text, 6 + bPad, by, sFit.size, subCol, { font: 'bold', align: 'left' });
+                } else {
+                    drawTextOutline(cv, sFit.text, 6, by, sFit.size, subCol, { font: 'bold', align: 'left' });
+                }
             } else if (m === 'gear') {
                 if (gearStr) {
-                    const sz = compact ? (idx === 0 ? 22 : 18) : (idx === 0 ? 34 : (idx === 1 ? 24 : 20));
+                    const sz = idx === 0 ? 21 : 16;
                     drawTextOutline(cv, gearStr, 6, by, sz, COL.white, { font: 'bold', align: 'left' });
                 }
             } else if (m === 'soc') {
-                const sz = compact ? (idx === 0 ? 20 : 17) : (idx === 0 ? 28 : (idx === 1 ? 22 : 19));
+                const sz = idx === 0 ? 19 : 16;
                 drawTextOutline(cv, socStr, 6, by, sz, socCol, { font: 'bold', align: 'left' });
             } else if (m === 'soc12') {
                 const s12Str = (typeof t.soc12 === 'number' && isFinite(t.soc12)) ? ('12V ' + Math.round(t.soc12) + '%') : '12V --%';
                 const s12Col = (typeof t.soc12 === 'number' && t.soc12 < 40) ? COL.red : ((typeof t.soc12 === 'number' && t.soc12 < 55) ? COL.amber : COL.white);
-                const sz = compact ? (idx === 0 ? 20 : 17) : (idx === 0 ? 26 : (idx === 1 ? 22 : 19));
+                const sz = idx === 0 ? 19 : 16;
                 drawTextOutline(cv, s12Str, 6, by, sz, s12Col, { font: 'bold', align: 'left' });
             } else if (m === 'headway') {
                 const hp = formatLeadHeadwayParts(t.leadVehicle, units, 'full');
                 if (hp) {
-                    const sz = compact ? 16 : (idx === 0 ? 22 : 19);
                     const hwTxt = hp.primaryStr + (hp.secDistStr ? ('  ' + hp.secDistStr) : '') + (hp.deltaStr ? ('  ' + hp.deltaStr) : '');
-                    drawTextOutline(cv, hwTxt, 6, by, sz, hp.primaryCol, { font: 'bold', align: 'left' });
+                    const hFit = fitTextLine(cv, hwTxt, rowMaxW, [16, 14, 13], 'bold');
+                    drawTextOutline(cv, hFit.text, 6, by, hFit.size, hp.primaryCol, { font: 'bold', align: 'left' });
                 }
             } else if (m === 'soc_oil') {
-                const sz = compact ? 16 : (idx === 0 ? 22 : 19);
-                drawTextOutline(cv, socStr + '  ' + oilStr, 6, by, sz, COL.softBlue, { font: 'bold', align: 'left' });
+                const f = fitTextLine(cv, socStr + '  ' + oilStr, rowMaxW, [16, 14, 13], 'bold');
+                drawTextOutline(cv, f.text, 6, by, f.size, COL.softBlue, { font: 'bold', align: 'left' });
             } else if (m === 'temps') {
-                const sz = compact ? 16 : (idx === 0 ? 22 : 19);
-                drawTextOutline(cv, oilStr + '  ' + coolStr, 6, by, sz, tempCol, { font: 'bold', align: 'left' });
+                const f = fitTextLine(cv, oilStr + '  ' + coolStr, rowMaxW, [16, 14, 13], 'bold');
+                drawTextOutline(cv, f.text, 6, by, f.size, tempCol, { font: 'bold', align: 'left' });
             } else if (m === 'brake') {
+                const hSegs = 12;
+                const stepX = 14;
+                const segH = 6;
+                const segY = by - 9;
                 if (brakeLit > 0) {
-                    const hSegs = compact ? 10 : 12;
-                    const stepX = compact ? 13 : 14;
                     const hLit = brakeHold ? 1 : clamp(Math.round((fg / 0.55) * hSegs), 1, hSegs);
-                    const segH = compact ? 5 : 6;
-                    const segY = compact ? (by - 7) : (by - 11);
+                    // Grow RIGHT-to-LEFT (amber -> orange -> red), matching instrument cluster _paintBrakeRail
                     for (let i = 0; i < hSegs; i++) {
                         const sx = 6 + i * stepX;
-                        const redIdx = compact ? 7 : 8;
-                        const orgIdx = compact ? 3 : 4;
-                        const sc = i < hLit ? (i >= redIdx ? COL.red : (i >= orgIdx ? COL.orange : COL.amber)) : COL.mapRailDim;
+                        const fromRight = hSegs - 1 - i;
+                        const sc = fromRight < hLit
+                            ? (fromRight >= 8 ? COL.red : (fromRight >= 4 ? COL.orange : COL.amber))
+                            : COL.mapRailDim;
                         cv.fillRect(sx - 1, segY - 1, stepX - 1, segH + 2, COL.outline);
                         cv.fillRect(sx, segY, stepX - 3, segH, sc);
                     }
                     if (!brakeHold && fg > 0.02) {
                         const hasBar = typeof t.brakeBar === 'number' && isFinite(t.brakeBar) && t.brakeBar >= 1.5;
                         const bStr = hasBar ? (Math.round(t.brakeBar) + ' bar') : (fg.toFixed(2) + 'g');
-                        drawTextOutline(cv, bStr, 6 + hSegs * stepX + 6, compact ? by : (by - 3), compact ? 14 : 15, fg >= 0.36 ? COL.red : COL.amber, { font: 'bold', align: 'left' });
+                        drawTextOutline(cv, bStr, 6 + hSegs * stepX + 4, by, 14, fg >= 0.36 ? COL.red : COL.amber, { font: 'bold', align: 'left' });
                     }
+                } else if (typeof iceChargeKw === 'number' && isFinite(iceChargeKw) && iceChargeKw > 0) {
+                    const hChgLit = clamp(Math.round((iceChargeKw / ICE_CHARGE_MAX_KW) * hSegs), 1, hSegs);
+                    // Grow LEFT-to-RIGHT in cyan, matching instrument cluster _paintBrakeRail
+                    for (let i = 0; i < hSegs; i++) {
+                        const sx = 6 + i * stepX;
+                        const sc = i < hChgLit ? COL.cyan : COL.mapRailDim;
+                        cv.fillRect(sx - 1, segY - 1, stepX - 1, segH + 2, COL.outline);
+                        cv.fillRect(sx, segY, stepX - 3, segH, sc);
+                    }
+                    const boltX = 6 + hSegs * stepX + 3;
+                    drawLightningBolt(cv, boltX, by - 12, COL.cyan, 13);
+                    drawTextOutline(cv, '+' + iceChargeKw.toFixed(1) + ' kW', boltX + 11, by, 14, COL.cyan, { font: 'bold', align: 'left' });
                 }
             }
         }
@@ -1825,7 +2021,7 @@ class OverlayRenderer {
         }
     }
 
-    _paintMapRight(cv, gearStr, t, units, cornerRightMode, showBrakeRail, showBrakeNum, fg, litCount, absActive, alertObj) {
+    _paintMapRight(cv, gearStr, t, units, cornerRightMode, showBrakeRail, showBrakeNum, fg, litCount, absActive, alertObj, iceChargeKw) {
         cv.clear(COL.clear);
 
         const mapAlertTxt = alertObj && cnText(alertObj.hudText || alertObj.label);
@@ -1838,10 +2034,18 @@ class OverlayRenderer {
             const mLit = litCount > 0
                 ? (litCount === 1 && fg <= 0.02 ? 1 : clamp(Math.round((fg / 0.55) * segN), 1, segN))
                 : 0;
+            const mChgLit = (mLit === 0 && typeof iceChargeKw === 'number' && isFinite(iceChargeKw) && iceChargeKw > 0)
+                ? clamp(Math.round((iceChargeKw / ICE_CHARGE_MAX_KW) * segN), 1, segN)
+                : 0;
             const rightX = cv.w - 6;
             for (let i = 0; i < segN; i++) {
                 const sx = rightX - (i + 1) * 10 + 3;
-                const sc = i < mLit ? (i >= 9 ? COL.red : (i >= 4 ? COL.orange : COL.amber)) : COL.mapRailDim;
+                let sc = COL.mapRailDim;
+                if (i < mLit) {
+                    sc = i >= 9 ? COL.red : (i >= 4 ? COL.orange : COL.amber);
+                } else if (mChgLit > 0 && (segN - 1 - i) < mChgLit) {
+                    sc = COL.cyan;
+                }
                 cv.fillRect(sx - 1, 9, 9, 10, COL.outline);
                 cv.fillRect(sx, 10, 7, 8, sc);
             }
@@ -1851,6 +2055,11 @@ class OverlayRenderer {
                 const lbl = (absActive ? 'ABS ' : '') + valStr;
                 const bCol = (fg >= 0.36 || absActive) ? COL.red : COL.amber;
                 drawTextOutline(cv, lbl, rightX - segN * 10 - 6, 20, 16, bCol, { font: 'bold', align: 'right' });
+            } else if (mChgLit > 0 && showBrakeNum) {
+                const chgStr = '+' + iceChargeKw.toFixed(1) + ' kW';
+                const txRight = rightX - segN * 10 - 6;
+                const tw = drawTextOutline(cv, chgStr, txRight, 20, 15, COL.cyan, { font: 'bold', align: 'right' });
+                drawLightningBolt(cv, Math.max(2, Math.round(txRight - tw - 11)), 8, COL.cyan, 13);
             }
         }
 
@@ -1876,6 +2085,7 @@ class OverlayRenderer {
         this.lastHudNavKey = '';
         this.lastHudRoadKey = '';
         this.lastRightWidgetKey = '';
+        this._iceChgState = {};
         this.layers = {};
     }
 }

@@ -5,8 +5,7 @@
 /* The Android Auto patch end to end on temporary copies of the unit's aapd
  * (AAPD_BIN, aapd 22.39.3) and aapd.conf (AAPD_CONF). This version applies
  * it in aapd's memory (PATCH.md "In memory"): the plan's refusals (the
- * coding, a site not found, a site of a build whose shipped file is known
- * holding neither its shipped bytes nor the edit,
+ * coding, a site not found,
  * an aapd.conf without what the geometry needs; any other build is
  * planned), the plan and the copy of aapd.conf it points aapd at, the byte-exact
  * undo of a patch an earlier release wrote to the files (waze-on-cluster
@@ -24,15 +23,15 @@
 var headUnit = require('./head_unit_env.js');   /* a HIGH head unit for every patcher and patchd this runs */
 
 var fs = require('fs');
-var os = require('os');
 var net = require('net');
 var path = require('path');
+var tmp = require('./tmp.js');
 var cp = require('child_process');
 var crypto = require('crypto');
 
 /* The records the watcher tests below read (inmem.js) live in a folder of
  * this test. */
-process.env.WOC_STATE_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'woc-aa-state-'));
+process.env.WOC_STATE_DIR = tmp.dir();
 
 var PATCH = path.join(__dirname, '..');
 var BIN = process.env.AAPD_BIN || '', CONF = process.env.AAPD_CONF || '', CARPLAY = process.env.CARPLAY_BIN || '';
@@ -54,15 +53,11 @@ var UNPROVEN = (function () {
     b[at] ^= 0xff;
     return b;
 })();
-var fails = 0, dirs = [process.env.WOC_STATE_DIR], children = [];
+var fails = 0;
 function ok(name, cond, detail) {
     process.stdout.write((cond ? 'ok   ' : 'FAIL ') + name + (detail !== undefined && !cond ? '  — ' + detail : '') + '\n');
     if (!cond) fails++;
 }
-process.on('exit', function () {
-    children.forEach(function (c) { try { c.kill('SIGKILL'); } catch (e) {} });
-    dirs.forEach(function (d) { try { cp.execFileSync('rm', ['-rf', d]); } catch (e) {} });
-});
 function sha(x) { return crypto.createHash('sha256').update(Buffer.isBuffer(x) ? x : fs.readFileSync(x)).digest('hex'); }
 /* The waits below are for a condition, each bounded by HANG_MS only so that
  * a hang ends the run: no wait depends on how fast the host is. */
@@ -73,11 +68,6 @@ function until(cond) {
     return new Promise(function (r) {
         (function check() { if (cond()) r(true); else if (Date.now() > end) r(false); else setTimeout(check, 20); })();
     });
-}
-/* What promise p resolves to, or undefined if it did not within HANG_MS. */
-function within(p) {
-    var tm;
-    return Promise.race([p, new Promise(function (r) { tm = setTimeout(r, HANG_MS); })]).then(function (v) { clearTimeout(tm); return v; });
 }
 function exited(c) {
     return c.exitCode !== null || c.signalCode !== null ? Promise.resolve() : new Promise(function (r) { c.once('exit', function () { r(); }); });
@@ -93,8 +83,7 @@ function coding(v, flags) {
 
 /* A fresh unit: aapd, aapd.conf, the coding, a df reporting plenty. */
 function unit(bin) {
-    var d = fs.mkdtempSync(path.join(os.tmpdir(), 'woc-aa-'));
-    dirs.push(d);
+    var d = tmp.dir();
     var t = { d: d, bin: path.join(d, 'aapd'), conf: path.join(d, 'aapd.conf'), coding: path.join(d, 'coding'), df: path.join(d, 'df') };
     fs.writeFileSync(t.bin, bin || SRC);
     fs.chmodSync(t.bin, 0o755);
@@ -221,15 +210,13 @@ function density(text) { return JSON.parse(text).SCREENS.KOMBI_DISPLAY.CODEC_DEF
             sha(u.bin) === sha(m[1]), x.out + s);
         ok('aapd 22.39.3 with ' + m[0] + ': probe names the part that differs', m[2].test(pr), pr);
     });
-    /* a gate byte the locator still reads as stock, so only the shipped
-     * bytes tell it from aapd 22.39.3's */
+    /* a gate byte the locator reads as stock, though not the shipped byte:
+     * the locator's checks decide, so it is planned, aapd untouched */
     var fb = Buffer.from(SRC);
     fb[0x998be] ^= 1;
-    var fu = unit(fb), fx = plan(fu, ['--unproven']), fs2 = status(fu);
-    ok('a site holding neither the shipped bytes nor the edit: status a modified build naming it, the plan refused, also with --unproven, aapd untouched',
-        /known:\s+yes, modified build \(neither the shipped bytes nor our edit at 0x998bd\)/.test(fs2) && /^gate:\s+ORIGINAL$/m.test(fs2) &&
-        fx.code === 1 && /in memory needs the pristine build on disk: neither the shipped bytes nor our edit at 0x998bd/.test(fx.out) &&
-        !fs.existsSync(fx.plan) && sha(fu.bin) === sha(fb), fx.out + fs2);
+    var fu = unit(fb), fx = plan(fu), fs2 = status(fu);
+    ok('a gate byte the locator reads as stock, not the shipped one: status pristine, planned, aapd untouched',
+        /known:\s+yes, pristine/.test(fs2) && /^gate:\s+ORIGINAL$/m.test(fs2) && fx.code === 0 && fs.existsSync(fx.plan) && sha(fu.bin) === sha(fb), fx.out + fs2);
     var text = SRCCONF.toString('utf8');
     [['not JSON', text.slice(0, -10), /not JSON/],
      ['a number the edit sets missing', text.replace(/"SA_WIDTHPIXELS": 612/, '"SA_WIDTHPIXELS": "612"'), /no number SCREENS\/KOMBI_DISPLAY\/DIMENSIONS\/12\.3\/SA_WIDTHPIXELS/],
@@ -544,7 +531,6 @@ function patchdUnit(opts) {
     t.proc = path.join(d, 'proc');
     t.run = path.join(d, 'run');
     t.runConf = path.join(d, 'run-aapd.conf');
-    t.dropin = path.join(d, 'aapd-dropin.conf');
     var mount = path.join(d, 'bin', 'mount');
     /* remount,ro fails while a process runs a file no name links any more,
      * as the kernel refuses it. */
@@ -559,16 +545,18 @@ function patchdUnit(opts) {
         "}",
     ].join('\n') + '\n');
     fs.chmodSync(mount, 0o755);
-    /* systemctl: show answers from unit.json (its DropInPaths name the
-     * tool's aapd drop-in), start starts aapd in the fake /proc, every call
-     * recorded. */
+    /* systemctl: show answers from unit.json (waze-on-cluster.service's
+     * main PID from render.pid, 0 without one), start starts aapd in the
+     * fake /proc, every call recorded. */
     t.unitState = path.join(d, 'unit.json');
+    t.renderPid = path.join(d, 'render.pid');
     fs.writeFileSync(t.unitState, JSON.stringify({ pid: 0 }));
     fs.writeFileSync(path.join(d, 'bin', 'systemctl'), '#!' + process.execPath + '\n' + [
         "var fs = require('fs'), a = process.argv.slice(2), u = JSON.parse(fs.readFileSync(" + JSON.stringify(t.unitState) + ", 'utf8'));",
         "var proc = require(" + JSON.stringify(path.join(__dirname, 'carplay_proc.js')) + ");",
         "fs.appendFileSync(" + JSON.stringify(t.calls) + ", 'systemctl ' + a.join(' ') + '\\n');",
-        "if (a[0] === 'show') process.stdout.write('MainPID=' + u.pid + '\\nInvocationID=run-' + u.pid + '\\nExecMainStartTimestampMonotonic=1\\nActiveState=active\\nDropInPaths=' + " + JSON.stringify(t.dropin) + " + '\\nEnvironment=\\nUser=cia_13002\\n');",
+        "if (a[0] === 'show' && a[1] === 'waze-on-cluster.service') { var r = 0; try { r = parseInt(fs.readFileSync(" + JSON.stringify(t.renderPid) + ", 'utf8'), 10); } catch (e) {} process.stdout.write('MainPID=' + r + '\\n'); }",
+        "else if (a[0] === 'show') process.stdout.write('MainPID=' + u.pid + '\\nInvocationID=run-' + u.pid + '\\nExecMainStartTimestampMonotonic=1\\nActiveState=active\\nEnvironment=\\nUser=cia_13002\\n');",
         "else if (a[0] === 'start' && a[1] === 'aapd.service') proc.start(" + JSON.stringify(t.proc) + ", u.pid, " + JSON.stringify(t.bin) + ", " + JSON.stringify(t.run) + ", 'aapd');",
         "else if (a[0] === 'is-active') process.stdout.write('active\\n');",
     ].join('\n') + '\n');
@@ -595,7 +583,7 @@ function patchdUnit(opts) {
         WOC_RECMGR_AT_BOOT: path.join(d, 'none.json'), WOC_PROC_STAT: path.join(d, 'stat'), WOC_BOOT_ID: path.join(d, 'none'),
         WOC_UNIT_DIRS: path.join(d, 'units'), WOC_CAPTURE_SOCK: path.join(d, 'none.sock'), WOC_DLT_RECEIVE: path.join(d, 'none'),
         WOC_DLT_RETRY_MS: '600000', WOC_REBOOT_CMD: t.reboot, WOC_REMOUNT_LOCK: path.join(t.shm, 'remount.lock'),
-        WOC_STATE_DIR: path.join(d, 'var'), WOC_RESTART_POLL_MS: '20', WOC_CARPLAY_DROPIN: path.join(d, 'dropin.conf'), WOC_AAPD_DROPIN: t.dropin,
+        WOC_STATE_DIR: path.join(d, 'var'), WOC_RESTART_POLL_MS: '20', WOC_CARPLAY_DROPIN: path.join(d, 'dropin.conf'),
         WOC_RECOVERY_STATE: path.join(d, 'var', 'boot-recovery.json'),
     });
     return t;
@@ -618,11 +606,24 @@ function aapdStarts(t, pid) {
     fs.writeFileSync(t.unitState, JSON.stringify({ pid: pid }));
     return proc.start(t.proc, pid, t.bin, t.run, 'aapd');
 }
-/* The next head-unit start: /dev/shm emptied, the boot step arms, aapd starts. */
+/* A running render (waze-on-cluster.service) in the fake /proc, with the
+ * crop override it read at its start (null for none). */
+var RENDER_PID = 999999;
+function renderStarts(t) {
+    var crop = null;
+    try { crop = fs.readFileSync(path.join(t.d, 'var', 'aa-crop.env'), 'utf8'); } catch (e) {}
+    fs.mkdirSync(path.join(t.proc, String(RENDER_PID)), { recursive: true });
+    fs.writeFileSync(path.join(t.proc, String(RENDER_PID), 'environ'), 'PATH=/usr/bin\0' + (crop ? crop.trim() + '\0' : ''));
+    fs.writeFileSync(t.renderPid, String(RENDER_PID));
+}
+/* The next head-unit start: /dev/shm emptied, the boot step arms, aapd
+ * starts, and a running render reads the crop override again. */
 function nextStart(t, pid) {
     ['aa-pending', 'activation-pending'].forEach(function (n) { try { fs.unlinkSync(path.join(t.shm, n)); } catch (e) {} });
     cp.spawnSync(process.execPath, [path.join(PATCH, 'recovery.js'), 'boot', 'aapd'], { env: t.env, encoding: 'utf8', timeout: HANG_MS });
-    return aapdStarts(t, pid);
+    var started = aapdStarts(t, pid);   /* the fake /proc holds the new aapd only */
+    if (fs.existsSync(t.renderPid)) renderStarts(t);
+    return started;
 }
 
 (function hooks() {
@@ -844,7 +845,6 @@ function nextStart(t, pid) {
 function daemon(t) {
     try { fs.unlinkSync(t.env.WOC_PATCH_SOCK); } catch (e) {}
     var c = cp.spawn(process.execPath, [path.join(PATCH, 'patchd.js')], { env: t.env, stdio: ['ignore', 'pipe', 'pipe'] });
-    children.push(c);
     var log = '';
     c.stdout.on('data', function (b) { log += b; });
     c.stderr.on('data', function (b) { log += b; });
@@ -882,11 +882,9 @@ function daemon(t) {
 }
 function cropEnv(t) { try { return fs.readFileSync(path.join(t.d, 'var', 'aa-crop.env'), 'utf8'); } catch (e) { return null; } }
 function aaDone(m) { return m.ev === 'status' && m.aa && m.aa.state !== 'busy' && !/^(applying|reverting)$/.test(m.aa.reason || ''); }
-/* A dummy aapd main process for patchd's SIGKILL, as unit.json's pid. */
+/* A dummy aapd main process, as unit.json's pid. */
 function dummyAapd(t) {
     var c = cp.spawn('sleep', ['300']);
-    children.push(c);
-    c.died = new Promise(function (r) { c.on('exit', function (code, sig) { r(sig); }); });
     aapdStarts(t, c.pid);
     return c;
 }
@@ -967,43 +965,117 @@ async function socketTests() {
     await pf.next(function (m) { return m.ev === 'reboot-reply' && m.ok === false; });
     pf.proc.kill('SIGKILL');
 
-    /* With recmgr's aapd entry and the drop-in loaded: SIGKILL, start, the
-     * killed run recorded; the started aapd runs the plan. */
+    /* With recmgr's aapd entry loaded, aapd is still never restarted on its
+     * own (it would get no touch input): Patch, Zoom, the card and Remove
+     * patch each wait for the next head-unit start. */
     var r = patchdUnit({ recmgr: ['aapd'] });
+    r.env.WOC_DENSITY_SPACING_MS = '1';
     var victim = dummyAapd(r);
+    function alive(c) { return c.exitCode === null && c.signalCode === null; }
+    function noAapdCall(from) { return !calls(r).slice(from).some(function (l) { return /aapd/.test(l) && !/^systemctl show/.test(l); }); }
     var pr = await daemon(r);
     await pr.next(function (m) { return m.ev === 'status'; });
     pr.send({ cmd: 'aa-apply' });
     st = await pr.next(function (m) { return aaDone(m) && m.aa.aapd; });
-    var sig = await within(victim.died);
-    ok('aa-apply with recmgr\'s aapd entry: aapd SIGKILLed and started armed, nothing pending, the files as they ship', st.aa.aapd === 'restarted' && sig === 'SIGKILL' &&
-        calls(r).indexOf('systemctl start aapd.service') >= 0 && !marker(r, 'aa-pending') && ro(r) && untouched(r), JSON.stringify(st.aa) + calls(r).join(';'));
-    pr.send({ cmd: 'status' });
-    st = await pr.next(function (m) { return aaDone(m); });
-    ok('status: Patched, 180 dpi, card shown', st.aa.state === 'patched' && st.aa.dpi === 180 && st.aa.diskCard === 'shown' && !st.aa.pending, JSON.stringify(st.aa));
-    ok('aa-apply: the killed run is recorded for the watcher', fs.readFileSync(path.join(r.shm, 'aapd-killed'), 'utf8').trim() === 'run-' + victim.pid);
+    ok('aa-apply with recmgr\'s aapd entry: armed, deferred, pending marker, aapd neither killed nor started, the files as they ship', st.aa.aapd === 'deferred' &&
+        st.aa.pending === 'apply' && marker(r, 'aa-pending').action === 'apply' && armedAa(r) && alive(victim) && noAapdCall(0) &&
+        !fs.existsSync(path.join(r.shm, 'aapd-killed')) && ro(r) && untouched(r), JSON.stringify(st.aa) + calls(r).join(';'));
     ok('aa-apply: never a systemctl stop, restart or reboot', !calls(r).some(function (l) { return /systemctl (stop|restart)|reboot/.test(l); }), calls(r).join(';'));
     ok('aa-apply: carplay untouched', !calls(r).some(function (l) { return /carplay/.test(l) && !/^systemctl show carplay/.test(l); }) && (HAVE_CP ? sha(r.carplay) === sha(CARPLAY) : true));
+    nextStart(r, victim.pid);
+    pr.send({ cmd: 'status' });
+    st = await pr.next(function (m) { return aaDone(m); });
+    ok('after the head-unit start: Patched, 180 dpi, card shown, nothing pending', st.aa.state === 'patched' && st.aa.dpi === 180 && st.aa.diskCard === 'shown' && !st.aa.pending,
+        JSON.stringify(st.aa));
+    /* Zoom plans a new copy of aapd.conf, which also waits. */
+    var before = calls(r).length;
+    pr.send({ cmd: 'aa-density', value: 240 });
+    st = await pr.next(function (m) { return aaDone(m) && m.aa.aapd; });
+    ok('aa-density 240: planned again, deferred, aapd not restarted; aapd runs 180 dpi until then', st.aa.aapd === 'deferred' && st.aa.pending === 'apply' &&
+        st.aa.dpi === 240 && st.aa.runDpi === 180 && alive(victim) && noAapdCall(before), JSON.stringify(st.aa) + calls(r).slice(before).join(';'));
+    nextStart(r, victim.pid);
     /* Hiding the card changes the render's crop, which it reads at start:
      * the copy and the crop wait for the next head-unit start. */
-    var before = calls(r).length;
+    before = calls(r).length;
     pr.send({ cmd: 'aa-card', value: 'hidden' });
     st = await pr.next(function (m) { return aaDone(m) && m.aa.aapd; });
     ok('aa-card hidden: planned again, the crop override written, deferred, aapd not restarted', st.aa.aapd === 'deferred' && st.aa.card === 'hidden' &&
-        cropEnv(r) === 'WOC_SRC_CROP=-s src_crop=1280x720:0,156,1280,564\n' && marker(r, 'aa-pending').action === 'apply' && aaRecord(r).writes.card === 'hidden' &&
-        !calls(r).slice(before).some(function (l) { return /aapd/.test(l) && !/^systemctl show/.test(l); }), JSON.stringify(st.aa) + calls(r).slice(before).join(';'));
-    ok('aa-card hidden: what aapd runs until then is the card shown', st.aa.runDpi === 180 && st.aa.runCard === 'shown' && st.aa.diskCard === 'hidden', JSON.stringify(st.aa));
-    dummyAapd(r);
-    nextStart(r, JSON.parse(fs.readFileSync(r.unitState, 'utf8')).pid);
+        cropEnv(r) === 'WOC_SRC_CROP=-s src_crop=1280x720:4,160,1270,560\n' && marker(r, 'aa-pending').action === 'apply' && aaRecord(r).writes.card === 'hidden' &&
+        alive(victim) && noAapdCall(before), JSON.stringify(st.aa) + calls(r).slice(before).join(';'));
+    ok('aa-card hidden: what aapd runs until then is the card shown', st.aa.runDpi === 240 && st.aa.runCard === 'shown' && st.aa.diskCard === 'hidden', JSON.stringify(st.aa));
+    nextStart(r, victim.pid);
     pr.send({ cmd: 'status' });
     st = await pr.next(function (m) { return aaDone(m); });
     ok('after the head-unit start: aapd runs the hidden card\'s plan, nothing pending', st.aa.state === 'patched' && st.aa.diskCard === 'hidden' && !st.aa.pending, JSON.stringify(st.aa));
-    var v2 = dummyAapd(r);
+    before = calls(r).length;
     pr.send({ cmd: 'aa-revert' });
-    st = await pr.next(function (m) { return aaDone(m) && (m.aa.state === 'original' || m.aa.pending === 'revert'); });
-    var sig2 = await within(v2.died);
-    ok('aa-revert: aapd restarted stock, the files as they ship, the crop override gone', st.aa.state === 'original' && st.aa.aapd === 'restarted' && sig2 === 'SIGKILL' &&
-        untouched(r) && cropEnv(r) === null && !armedAa(r), JSON.stringify(st.aa));
+    st = await pr.next(function (m) { return aaDone(m) && m.aa.aapd; });
+    ok('aa-revert: disarmed, deferred, aapd not restarted, the files as they ship, the crop override gone', st.aa.aapd === 'deferred' && st.aa.pending === 'revert' &&
+        marker(r, 'aa-pending').action === 'revert' && !armedAa(r) && alive(victim) && noAapdCall(before) && untouched(r) && cropEnv(r) === null,
+        JSON.stringify(st.aa) + calls(r).slice(before).join(';'));
+    nextStart(r, victim.pid);
+    pr.send({ cmd: 'status' });
+    st = await pr.next(function (m) { return aaDone(m); });
+    ok('after the head-unit start: Android Auto original, nothing pending', st.aa.state === 'original' && !st.aa.pending, JSON.stringify(st.aa));
+
+    /* Several changes before one head-unit start: each is taken while the
+     * one before waits, aapd keeps running, and that start runs the last. */
+    async function send(cmd, value, what) {
+        var m = value === undefined ? { cmd: cmd } : { cmd: cmd, value: value };
+        pr.send(m);
+        return pr.next(function (x) { return aaDone(x) && what(x.aa); });
+    }
+    function after() { nextStart(r, victim.pid); pr.send({ cmd: 'status' }); return pr.next(function (m) { return aaDone(m); }); }
+    before = calls(r).length;
+    st = await send('aa-card', 'shown', function (aa) { return aa.card === 'shown'; });
+    ok('the card chosen with the patch off: saved, nothing planned or waiting', st.aa.state === 'original' && !st.aa.pending && !armedAa(r), JSON.stringify(st.aa));
+    st = await send('aa-apply', undefined, function (aa) { return aa.pending === 'apply'; });
+    st = await send('aa-revert', undefined, function (aa) { return !aa.pending || aa.pending === 'revert'; });
+    ok('Patch, then Remove patch before the restart: nothing waits, aapd runs as it ships', st.aa.state === 'original' && !st.aa.pending && !armedAa(r),
+        JSON.stringify(st.aa));
+    st = await send('aa-apply', undefined, function (aa) { return aa.pending === 'apply'; });
+    st = await after();
+    ok('Patch, then the restart: patched at 240 dpi, the card shown', st.aa.state === 'patched' && st.aa.dpi === 240 && st.aa.diskCard === 'shown' && !st.aa.pending,
+        JSON.stringify(st.aa));
+    st = await send('aa-revert', undefined, function (aa) { return aa.pending === 'revert'; });
+    ok('Remove patch over the running patch: waits, what runs named', st.aa.runDpi === 240 && st.aa.runCard === 'shown' && !armedAa(r), JSON.stringify(st.aa));
+    st = await send('aa-apply', undefined, function (aa) { return aa.state === 'patched' || aa.pending === 'apply'; });
+    ok('Remove patch, then Patch before the restart: aapd runs it already, nothing waits', st.aa.state === 'patched' && !st.aa.pending && armedAa(r),
+        JSON.stringify(st.aa));
+    st = await send('aa-density', 250, function (aa) { return aa.dpi === 250; });
+    st = await send('aa-density', 260, function (aa) { return aa.dpi === 260; });
+    ok('Zoom twice before the restart: 260 dpi waits, aapd runs 240', st.aa.pending === 'apply' && st.aa.runDpi === 240 && aaRecord(r).writes.dpi === 260,
+        JSON.stringify(st.aa));
+    st = await send('aa-revert', undefined, function (aa) { return aa.pending === 'revert'; });
+    st = await send('aa-apply', undefined, function (aa) { return aa.pending === 'apply'; });
+    ok('then Remove patch and Patch: 260 dpi waits', st.aa.dpi === 260 && st.aa.runDpi === 240 && armedAa(r), JSON.stringify(st.aa));
+    st = await after();
+    ok('the restart runs the last: patched at 260 dpi, nothing pending', st.aa.state === 'patched' && st.aa.dpi === 260 && !st.aa.pending, JSON.stringify(st.aa));
+    st = await send('aa-density', 270, function (aa) { return aa.dpi === 270; });
+    st = await send('aa-density', 260, function (aa) { return aa.dpi === 260; });
+    ok('Zoom and back before the restart: aapd runs it already, nothing waits', st.aa.state === 'patched' && !st.aa.pending, JSON.stringify(st.aa));
+    /* The turn card with a render running: it waits only while the render
+     * runs another crop than the one asked for. */
+    renderStarts(r);
+    st = await send('aa-card', 'hidden', function (aa) { return aa.diskCard === 'hidden'; });
+    ok('the card hidden over a render without the crop: waits', st.aa.pending === 'apply' && st.aa.runCard === 'shown' && cropEnv(r) !== null, JSON.stringify(st.aa));
+    st = await send('aa-card', 'shown', function (aa) { return aa.diskCard === 'shown'; });
+    ok('and shown again before the restart: the render and aapd run it already, nothing waits', st.aa.state === 'patched' && !st.aa.pending &&
+        cropEnv(r) === null, JSON.stringify(st.aa));
+    st = await send('aa-card', 'hidden', function (aa) { return aa.diskCard === 'hidden'; });
+    st = await send('aa-density', 270, function (aa) { return aa.dpi === 270; });
+    ok('a Zoom over a waiting card: both wait', st.aa.pending === 'apply' && st.aa.dpi === 270 && st.aa.diskCard === 'hidden' && st.aa.runDpi === 260 &&
+        st.aa.runCard === 'shown', JSON.stringify(st.aa));
+    st = await after();
+    ok('the restart runs both: patched at 270 dpi with the card hidden', st.aa.state === 'patched' && st.aa.dpi === 270 && st.aa.diskCard === 'hidden' &&
+        !st.aa.pending, JSON.stringify(st.aa));
+    st = await send('aa-revert', undefined, function (aa) { return aa.pending === 'revert'; });
+    ok('Remove patch with the card hidden: waits, the crop override gone', cropEnv(r) === null && st.aa.runCard === 'hidden', JSON.stringify(st.aa));
+    st = await send('aa-apply', undefined, function (aa) { return aa.state === 'patched' || aa.pending === 'apply'; });
+    ok('then Patch before the restart: aapd and the render run it already, nothing waits', st.aa.state === 'patched' && !st.aa.pending &&
+        cropEnv(r) !== null, JSON.stringify(st.aa));
+    ok('through all of them aapd was never killed, stopped or started', alive(victim) && noAapdCall(before), calls(r).slice(before).join(';'));
+    victim.kill('SIGKILL');
     pr.proc.kill('SIGKILL');
 
     /* A build no list names: an install arms it as any other, on trial,
@@ -1203,8 +1275,7 @@ var record = require('../patch_record.js');
 /* The aapd watcher on an earlier release's patch of aapd (its backup and
  * record) in a folder of its own, with systemd and the restore stubbed. */
 function fakeRec(opts) {
-    var d = opts.dir || fs.mkdtempSync(path.join(os.tmpdir(), 'woc-aarec-'));
-    dirs.push(d);
+    var d = opts.dir || tmp.dir();
     var t = recovery.targets({ state: path.join(d, 'boot-recovery.json'), sock: path.join(d, 'patch.sock'), carplay: path.join(d, 'carplay'),
         aapd: path.join(d, 'aapd'), aapdConf: path.join(d, 'aapd.conf') }).aapd;
     if (!opts.dir) {
@@ -1448,7 +1519,6 @@ async function recoveryTests() {
     var envU = Object.assign({}, u.env, { WOC_BOOT_ID: path.join(u.d, 'bootid') });
     fs.writeFileSync(path.join(u.d, 'bootid'), 'x\n');
     var ch = cp.spawn(process.execPath, [path.join(PATCH, 'recovery.js'), 'boot', 'aapd'], { env: envU });
-    children.push(ch);
     var chOut = '';
     ch.stdout.on('data', function (d) { chOut += d; });
     ch.stderr.on('data', function (d) { chOut += d; });
@@ -1502,8 +1572,7 @@ async function recoveryTests() {
 
     /* shutdown_mark.sh: aapd SIGKILLed is stopped (no crash), as for its
      * watcher; carplay's record is unchanged. */
-    var md = fs.mkdtempSync(path.join(os.tmpdir(), 'woc-mark-'));
-    dirs.push(md);
+    var md = tmp.dir();
     fs.writeFileSync(path.join(md, 'boot_id'), 'B\n');
     fs.writeFileSync(path.join(md, 'systemctl'), '#!/bin/sh\nprintf "ActiveState=failed\\nResult=signal\\nExecMainCode=2\\nExecMainStatus=9\\n"\n');
     fs.chmodSync(path.join(md, 'systemctl'), 0o755);

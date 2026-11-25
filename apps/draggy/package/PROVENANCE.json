@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/cauliflowermossgrape/idrive7-apps",
-  "commit": "71253d0424609c8fb1a47503fdaef4cd88ae403a",
+  "commit": "454e47f8b6aec5b2e0d7335257d7cc3644d9d858",
   "language": "zh-CN",
   "sdk": "Excluded; donor-linked by mgu-deploy",
   "adaptations": [
@@ -9,11 +9,11 @@
     "Numeric three-part CN versions"
   ],
   "component": "draggy",
-  "upstreamVersion": "2.7.0",
-  "releaseVersion": "2.7.1",
+  "upstreamVersion": "2.7.2",
+  "releaseVersion": "2.7.3",
   "cnRevision": 1,
   "adaptedSourceFilesSha256": {
-    "apps/draggy/app.json": "fe0ac16c0e08baef64b5a58ba63359e46412f76795d777318ec612a33d2005e5",
+    "apps/draggy/app.json": "73c57c29210e2210907450e2e9b87435d352f31e9d8dbd25168ef1e7be85bc5f",
     "apps/draggy/demo.js": "bdecde9b2d2d4af9cf1411d99520640bbfcefe0cd7b30a83c8468d8b6a6aa42a",
     "apps/draggy/icon.png": "4d57c4caa4dff86649f7395796c8fbd05eeac035efba6df067f95dd0cf6f160b",
     "apps/draggy/main.js": "27fffd265f8dff3914cb69920e131ed30cf3550fc097e103f4f88305a95dc27b",

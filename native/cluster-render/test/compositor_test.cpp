@@ -51,14 +51,17 @@
  * - others_fps: a shown layer holding the other clients' videos and
  *   composites, and releasing them. */
 #include <algorithm>
+#include <cmath>
 #include <cstdio>
 #include <cstring>
+#include <memory>
 #include <string>
 #include <vector>
 
 #include "../kit/block_pack.h"
 #include "../kit/yuv_atlas.h"
 #include "../src/compositor.h"
+#include "../src/curves.h"
 #include "fake_graph.h"
 
 using namespace crs;
@@ -1301,6 +1304,10 @@ static void many_layers_within_budget()
 }
 
 
+/* As kSample, the atlas a cube map. */
+static const char *const kSampleCube = "#version 100\nprecision mediump float;\n"
+                                       "uniform lowp samplerCube u_atlas;\nvarying vec2 v_uv;\n"
+                                       "void main(){gl_FragColor=textureCube(u_atlas,vec3(v_uv,1.0));}";
 static const char *const kSample = "#version 100\nprecision mediump float;\nuniform sampler2D u_atlas;\n"
                                    "uniform vec4 u_glyphs[3];\nvarying vec2 v_uv;\n"
                                    "void main() { gl_FragColor = texture2D(u_atlas, v_uv) * u_glyphs[0]; }";
@@ -1308,6 +1315,14 @@ static const char *const kLitVs = "#version 100\nattribute vec3 a_position;\natt
                                   "uniform mat4 u_mvp;\nuniform mat4 u_normal;\nvarying vec3 v_n;\n"
                                   "void main() { v_n = (u_normal * vec4(a_normal, 0.0)).xyz;\n"
                                   "  gl_Position = u_mvp * vec4(a_position, 1.0); }";
+/* A sampler and the uniforms the values tests link: u_level, u_fade, an
+ * array and a vec4. */
+static const char *const kLevelFs = "#version 100\nprecision mediump float;\nuniform sampler2D u_atlas;\n"
+                                    "uniform float u_level;\nuniform mediump float u_fade;\n"
+                                    "uniform float u_bars[4]; // uniform float u_gone;\n"
+                                    "uniform vec4 u_tint;\nuniform vec3 u_near, u_far;\nvarying vec2 v_uv;\n"
+                                    "void main() { gl_FragColor = texture2D(u_atlas, v_uv) * u_level * u_fade *"
+                                    " u_bars[0] * u_tint * vec4(u_near + u_far, 1.0); }";
 static const char *const kFlatVs = "#version 100\nattribute vec3 a_position;\nuniform mat4 u_mvp;\n"
                                    "void main() { gl_Position = u_mvp * vec4(a_position, 1.0); }";
 static const char *const kPartFs = "#version 100\nprecision mediump float;\nuniform vec4 u_color;\n"
@@ -1470,7 +1485,7 @@ static void republish_rebuilds()
     mp.projection.fov = 40;
     const uint32_t mesh = r.comp->add_mesh(1, r.panel, params(Klass::Content, R(100, 100, 400, 300)), mp, r.now, &err);
     MeshLayer *m = static_cast<MeshLayer *>(r.comp->layer(1, mesh));
-    r.comp->add_part(1, mesh, 1, kLitVs, kSample, PartLook(), &err);
+    r.comp->add_part(1, mesh, 1, kLitVs, kSample, PartLook(), 0, &err);
     r.comp->geometry(1, mesh, 1, fan(4, true), r.now, &err);
     Pose pose;
     pose.r[1] = 30;
@@ -1690,15 +1705,15 @@ static void meshes()
     MeshParams mp;
     const uint32_t id = r.comp->add_mesh(1, r.panel, params(Klass::Content, R(0, 0, 640, 480)), mp, r.now, &err);
     ok("a part's vertex shader must read a_position",
-       !r.comp->add_part(1, id, 1, "#version 100\nvoid main(){gl_Position=vec4(0.0);}", kPartFs, PartLook(), &err));
+       !r.comp->add_part(1, id, 1, "#version 100\nvoid main(){gl_Position=vec4(0.0);}", kPartFs, PartLook(), 0, &err));
     PartLook glow;
     glow.depth = false;
     glow.cull = Cull::None;
     glow.blend = Blend::Add;
     ok("parts with their own shaders and looks",
-       r.comp->add_part(1, id, 1, kLitVs, kPartFs, PartLook(), &err) &&
-           r.comp->add_part(1, id, 2, kFlatVs, kPartFs, glow, &err));
-    ok("a part number once", !r.comp->add_part(1, id, 2, kFlatVs, kPartFs, glow, &err));
+       r.comp->add_part(1, id, 1, kLitVs, kPartFs, PartLook(), 0, &err) &&
+           r.comp->add_part(1, id, 2, kFlatVs, kPartFs, glow, 0, &err));
+    ok("a part number once", !r.comp->add_part(1, id, 2, kFlatVs, kPartFs, glow, 0, &err));
     r.run(100);
     std::string why;
     ok("no geometry yet: stalled, nothing asked", r.comp->state(id, &why) == LayerState::Stalled &&
@@ -1740,7 +1755,7 @@ static void meshes()
     lim.pixel_bytes = 64 * 1024;
     Rig small(0, lim);
     const uint32_t sid = small.comp->add_mesh(1, small.panel, params(Klass::Content, R(0, 0, 64, 64)), mp, small.now, &err);
-    small.comp->add_part(1, sid, 1, kFlatVs, kPartFs, PartLook(), &err);
+    small.comp->add_part(1, sid, 1, kFlatVs, kPartFs, PartLook(), 0, &err);
     ok("geometry counts in the service's memory", !small.comp->geometry(1, sid, 1, fan(6000, false), small.now, &err) &&
                                                      err.find("memory") != std::string::npos);
 }
@@ -1754,7 +1769,7 @@ static void pass_order()
         LayerParams lp = params(k, R(0, 0, 400, 300));
         lp.z = z;
         const uint32_t id = r.comp->add_mesh(1, r.panel, lp, mp, r.now, &err);
-        r.comp->add_part(1, id, 1, kFlatVs, kPartFs, PartLook(), &err);
+        r.comp->add_part(1, id, 1, kFlatVs, kPartFs, PartLook(), 0, &err);
         r.comp->geometry(1, id, 1, fan(2, false), r.now, &err);
         return id;
     };
@@ -1787,7 +1802,7 @@ static void pass_order()
     LayerParams xp = params(Klass::Alert, R(0, 0, 400, 300));
     xp.exclusive = true;
     const uint32_t alert = r.comp->add_mesh(2, r.panel, xp, mp, r.now, &err);
-    r.comp->add_part(2, alert, 1, kFlatVs, kPartFs, PartLook(), &err);
+    r.comp->add_part(2, alert, 1, kFlatVs, kPartFs, PartLook(), 0, &err);
     r.comp->geometry(2, alert, 1, fan(2, false), r.now, &err);
     r.step(10);
     std::string why;
@@ -1842,7 +1857,7 @@ static void animations()
     MeshParams mp;
     const uint32_t mid = r.comp->add_mesh(1, r.panel, params(Klass::Content, R(0, 0, 64, 64)), mp, r.now, &err);
     Layer *m = r.comp->layer(1, mid);
-    r.comp->add_part(1, mid, 1, kFlatVs, kPartFs, PartLook(), &err);
+    r.comp->add_part(1, mid, 1, kFlatVs, kPartFs, PartLook(), 0, &err);
     ok("a mesh layer's camera moves", m->animate(1, 0, keys(Animated::Translate, 3, {0, 1000}, {0, 0, 0, 0, 0, 5}), &err));
     ok("but has no scale", !m->animate(2, 0, keys(Animated::Scale, 3, {0}, {1, 1, 1}), &err));
     ok("a part turns in 3D", m->animate(2, 1, keys(Animated::Rotate, 3, {0, 1000}, {0, 0, 0, 0, 360, 0}), &err));
@@ -2349,7 +2364,7 @@ static void render_state()
     decal.custom.op = BlendOp::Max;
     decal.color_mask = kMaskA;
     ok("render state: a part with its own depth test, blending and mask",
-       r.comp->add_part(1, mesh, 1, kLitVs, kPartFs, decal, &err) &&
+       r.comp->add_part(1, mesh, 1, kLitVs, kPartFs, decal, 0, &err) &&
            r.comp->geometry(1, mesh, 1, fan(4, true), r.now, &err));
     r.run(200);
     const FakePart *part = nullptr;
@@ -2366,7 +2381,7 @@ static void render_state()
        !r.comp->add_effect(1, r.panel, params(Klass::Overlay, R(0, 0, 8, 8)), "", huge + kSample, 0, r.now, &err) &&
            err.find("at most 65536 bytes") != std::string::npos && r.gpu.next_effect == effects);
     ok("render state: and a part's vertex shader",
-       !r.comp->add_part(1, mesh, 2, huge + kLitVs, kPartFs, PartLook(), &err) &&
+       !r.comp->add_part(1, mesh, 2, huge + kLitVs, kPartFs, PartLook(), 0, &err) &&
            err.find("at most 65536 bytes") != std::string::npos && r.gpu.next_effect == effects);
     (void)plain;
 }
@@ -2489,6 +2504,1410 @@ static void mipmapped_assets()
     ok("mipmaps: anisotropy past 16 refused", Asset::size_error(aniso) != nullptr);
 }
 
+/* Canvases (PROTOCOL.md "Canvases"): checked when made, within each client's
+ * and target's limits; drawn in by effect and mesh layers kept out of the
+ * stack, which never make the target wanted; sampled by a layer on screen,
+ * not by its own layers; a canvas drawn once drawn again only when its
+ * content changes; dropped only when nothing is in it or samples it; made
+ * again with its layers in a new scene; and a client gone takes it all. */
+static void canvases()
+{
+    Rig r;
+    std::string err;
+    CanvasSpec cs;
+    cs.w = 256;
+    cs.h = 128;
+    cs.clear[3] = 1;
+    CanvasSpec bad = cs;
+    bad.w = 4096;
+    ok("canvas: past 2048 refused", !r.comp->add_canvas(1, r.panel, bad, &err) && err.find("2048x2048") != std::string::npos);
+    bad = cs;
+    bad.sampler.sampling = Sampling::Trilinear;
+    ok("canvas: no mipmapped sampling", !r.comp->add_canvas(1, r.panel, bad, &err) && err.find("mip") != std::string::npos);
+    bad = cs;
+    bad.clear[0] = 2;
+    ok("canvas: a clear colour past 1 refused", !r.comp->add_canvas(1, r.panel, bad, &err));
+    const uint32_t cv = r.comp->add_canvas(1, r.panel, cs, &err);
+    ok("canvas: made, its memory RGBA8 twice", cv && r.comp->canvas(cv)->memory() == 256u * 128 * 4 * 2);
+    LayerParams in = params(Klass::Content, R(0, 0, 256, 128));
+    in.canvas = cv;
+    const uint32_t art = r.comp->add_effect(1, r.panel, in, "", kSample, 0, r.now, &err);
+    ok("canvas: a layer of another client cannot draw in it",
+       !r.comp->add_effect(2, r.panel, in, "", kSample, 0, r.now, &err) && err == "no such canvas");
+    ok("canvas: nor a layer of another target", !r.comp->add_effect(1, r.map, in, "", kSample, 0, r.now, &err) &&
+                                                    err == "the canvas is on another target");
+    ok("canvas: its layers do not sample it", !r.comp->bind(1, art, 0, "u_atlas", cv, &err) &&
+                                                  err.find("the canvas itself") != std::string::npos);
+    r.run(200);
+    ok("canvas: a canvas and its layers ask for nothing", r.port.requests == 0 && !r.g("panel"));
+    const uint32_t shown = r.comp->add_effect(1, r.panel, params(Klass::Overlay, R(100, 100, 256, 128)), "", kSample,
+                                              0, r.now, &err);
+    ok("canvas: a layer on screen samples it", r.comp->bind(1, shown, 0, "u_atlas", cv, &err));
+    r.run(200);
+    FakeGraph *g = r.g("panel");
+    int handle = 0, in_q = 0, out_q = 0;
+    if (g) {
+        for (const auto &kv : g->shown.canvases)
+            handle = kv.first;
+        for (const auto &kv : g->shown.quads)
+            (kv.second.canvas ? in_q : out_q) = kv.first;
+    }
+    ok("canvas: the target asked for and published, the canvas made in it", r.port.requests == 1 && g && handle &&
+                                                                               g->shown.canvases[handle].spec.w == 256);
+    ok("canvas: its layer drawn in it, the other on screen sampling it",
+       in_q && out_q && g->shown.quads[in_q].canvas == handle && g->shown.quads[in_q].visible &&
+           g->shown.quads[out_q].canvas == 0 && g->shown.quads[out_q].textures["u_atlas"] == handle);
+    std::string why;
+    r.slots.on_shown(0x01000400, r.now);
+    r.run(50);
+    ok("canvas: both layers shown", r.comp->state(art, &why) == LayerState::Shown &&
+                                        r.comp->state(shown, &why) == LayerState::Shown);
+    ok("canvas: dropping it refused while in use", !r.comp->remove_asset(1, cv, &err) &&
+                                                       err == "canvas in use: its layers go first");
+
+    /* Drawn once: again only when what is in it changes. */
+    CanvasSpec once = cs;
+    once.w = once.h = 64;
+    once.once = true;
+    const uint32_t oc = r.comp->add_canvas(1, r.panel, once, &err);
+    LayerParams oin = params(Klass::Content, R(0, 0, 64, 64));
+    oin.canvas = oc;
+    const uint32_t still = r.comp->add_effect(1, r.panel, oin, "", kSample, 0, r.now, &err);
+    r.run(100);
+    int oh = 0;
+    for (const auto &kv : g->shown.canvases)
+        if (kv.second.spec.once)
+            oh = kv.first;
+    const int first = oh ? g->shown.canvases[oh].redraws : -1;
+    r.run(500);
+    ok("canvas: drawn once: nothing changed, not drawn again", oh && first >= 1 && g->shown.canvases[oh].redraws == first);
+    const float v = 0.5f;
+    static_cast<EffectLayer *>(r.comp->layer(1, still))->set_uniform("u_level", &v, 1);
+    r.run(50);
+    ok("canvas: a uniform changed: drawn again, once", g->shown.canvases[oh].redraws == first + 1);
+    r.run(300);
+    ok("canvas: and then not", g->shown.canvases[oh].redraws == first + 1);
+
+    /* A mesh layer in a canvas: its view in the canvas. */
+    MeshParams mp;
+    LayerParams min = params(Klass::Content, R(0, 0, 256, 128));
+    min.canvas = cv;
+    const uint32_t mesh = r.comp->add_mesh(1, r.panel, min, mp, r.now, &err);
+    r.comp->add_part(1, mesh, 1, kLitVs, kPartFs, PartLook(), 0, &err);
+    r.comp->geometry(1, mesh, 1, fan(4, true), r.now, &err);
+    r.run(200);
+    bool view_in = false;
+    for (const auto &kv : g->shown.views)
+        view_in = view_in || (kv.second.canvas == handle && kv.second.visible);
+    ok("canvas: a mesh layer's view drawn in it", view_in && r.comp->state(mesh, &why) == LayerState::Shown);
+
+    /* Limits. */
+    CanvasSpec big;
+    big.w = big.h = 2048;
+    ok("canvas: a target's canvases together at most 2048x2048 pixels",
+       !r.comp->add_canvas(1, r.panel, big, &err) && err.find("together") != std::string::npos);
+    CanvasSpec small;
+    small.w = small.h = 8;
+    const uint32_t c3 = r.comp->add_canvas(1, r.panel, small, &err);
+    const uint32_t c4 = r.comp->add_canvas(1, r.panel, small, &err);
+    ok("canvas: four a client", c3 && c4 && !r.comp->add_canvas(1, r.panel, small, &err) && err == "too many canvases");
+    ok("canvas: one with nothing in it or sampling it is dropped", r.comp->remove_asset(1, c4, &err) &&
+                                                                     !r.comp->canvas(c4));
+
+    /* A new scene: the canvases and their layers made again. */
+    r.comp->unpublish(r.slots.targets()[r.panel]);
+    ok("canvas: the scene gone", !r.g("panel"));
+    std::string perr;
+    r.comp->publish(r.slots.targets()[r.panel], &perr);
+    r.run(100);
+    g = r.g("panel");
+    int quads_in = 0;
+    for (const auto &kv : g ? g->shown.quads : std::map<int, FakeQuad>())
+        quads_in += kv.second.canvas != 0;
+    ok("canvas: published again: the canvases and the layers in them made again",
+       g && g->shown.canvases.size() == 3 && quads_in == 2 && r.comp->state(art, &why) == LayerState::Shown);
+
+    r.comp->remove_owner(1);
+    ok("canvas: the client gone: its layers, canvases and all gone", r.comp->canvases().empty() &&
+                                                                     r.comp->layers().empty());
+}
+
+/* Layers in canvases under the rules of layers on screen: bound to an
+ * immutable asset's texture when it is made, in each scene, and drawn only
+ * once what they sample is in their buffers, nothing they sample refused; a
+ * canvas samples only canvases made before it; a canvas drawn once drawn
+ * again for what it samples (through other canvases too, not for any asset
+ * written) and when its target is shown again after a park; one drawn every
+ * frame drawn only while something visible samples it; a client's canvases
+ * at most half the pixel memory. */
+static void canvases_as_layers()
+{
+    Rig r;
+    std::string err, why;
+    CanvasSpec cs;
+    cs.w = cs.h = 64;
+    cs.once = true;
+    const uint32_t a = r.comp->add_canvas(1, r.panel, cs, &err);
+    const uint32_t b = r.comp->add_canvas(1, r.panel, cs, &err);
+    LayerParams pa = params(Klass::Content, R(0, 0, 64, 64));
+    pa.canvas = a;
+    LayerParams pb = pa;
+    pb.canvas = b;
+    const uint32_t in_a = r.comp->add_effect(1, r.panel, pa, "", kSample, 0, r.now, &err);
+    const uint32_t in_b = r.comp->add_effect(1, r.panel, pb, "", kSample, 0, r.now, &err);
+    ok("canvas order: a layer in a canvas does not sample a canvas made after its own",
+       !r.comp->bind(1, in_a, 0, "u_atlas", b, &err) &&
+           err == "a layer in a canvas samples only canvases made before its own");
+    ok("canvas order: it samples one made before", r.comp->bind(1, in_b, 0, "u_atlas", a, &err));
+    AssetParams ep;
+    ep.format = TexFormat::ETC2RGBA;
+    ep.w = ep.h = 8;
+    const uint32_t etc = r.comp->add_asset(1, r.panel, ep, &err);
+    ok("immutable: a layer in a canvas samples a compressed asset", r.comp->bind(1, in_a, 0, "u_atlas", etc, &err));
+    const uint32_t shown = r.comp->add_effect(1, r.panel, params(Klass::Overlay, R(0, 0, 64, 64)), "", kSample, 0,
+                                              r.now, &err);
+    r.comp->bind(1, shown, 0, "u_atlas", b, &err);
+    r.run(200);
+    r.slots.on_shown(0x01000400, r.now);
+    r.run(100);
+    /* The quad drawn in the canvas made n-th (from 0) in the scene. */
+    auto in_canvas = [&](size_t n) -> const FakeQuad * {
+        FakeGraph *g = r.g("panel");
+        if (!g || g->shown.canvases.size() <= n)
+            return nullptr;
+        const int handle = std::next(g->shown.canvases.begin(), (long)n)->first;
+        for (const auto &kv : g->shown.quads)
+            if (kv.second.canvas == handle)
+                return &kv.second;
+        return nullptr;
+    };
+    auto etc_buffer = [&]() {
+        FakeGraph *g = r.g("panel");
+        for (const auto &kv : g ? g->shown.buffers : std::map<int, FakeBuffer>())
+            if (kv.second.f == TexFormat::ETC2RGBA)
+                return kv.first;
+        return 0;
+    };
+    ok("immutable: before its pixels the layer in the canvas stalls, not drawn",
+       r.comp->state(in_a, &why) == LayerState::Stalled && in_canvas(0) && !in_canvas(0)->visible);
+    std::vector<uint8_t> blocks(tex_bytes(TexFormat::ETC2RGBA, 8, 8), 0x55);
+    r.comp->asset(1, etc)->update({}, blocks.data(), blocks.size(), &err);
+    r.run(200);
+    const FakeQuad *qa = in_canvas(0);
+    ok("immutable: its texture made, the layer in the canvas bound to it, drawn and shown",
+       etc_buffer() && qa && qa->textures.count("u_atlas") && qa->textures.at("u_atlas") == etc_buffer() &&
+           qa->visible && r.comp->state(in_a, &why) == LayerState::Shown);
+    r.comp->unpublish(r.slots.targets()[r.panel]);
+    std::string perr;
+    r.comp->publish(r.slots.targets()[r.panel], &perr);
+    r.run(200);
+    qa = in_canvas(0);
+    const FakeQuad *qb = in_canvas(1);
+    FakeGraph *g = r.g("panel");
+    const int ha = g ? g->shown.canvases.begin()->first : 0;
+    ok("a new scene: bound again to the texture made again, and to the canvas made before",
+       etc_buffer() && qa && qa->textures.count("u_atlas") && qa->textures.at("u_atlas") == etc_buffer() && qa->visible &&
+           qb && qb->textures.count("u_atlas") && qb->textures.at("u_atlas") == ha && qb->visible);
+
+    /* Drawn once: again for what it samples. */
+    auto redraws = [&](size_t n) {
+        FakeGraph *gg = r.g("panel");
+        return gg && gg->shown.canvases.size() > n ? std::next(gg->shown.canvases.begin(), (long)n)->second.redraws
+                                                   : -1;
+    };
+    r.run(300);
+    const int ra = redraws(0), rb = redraws(1);
+    AssetParams other;
+    other.w = other.h = 4;
+    const uint32_t x = r.comp->add_asset(1, r.panel, other, &err);
+    std::vector<uint8_t> px(4 * 4 * 4, 9);
+    r.comp->asset(1, x)->update({}, px.data(), px.size(), &err);
+    r.run(200);
+    ok("once: an asset none of its layers samples written: not drawn again",
+       ra >= 1 && redraws(0) == ra && redraws(1) == rb);
+    const float v = 0.25f;
+    static_cast<EffectLayer *>(r.comp->layer(1, in_a))->set_uniform("u_level", &v, 1);
+    r.run(100);
+    ok("once: a layer in canvas a changed: a drawn again, and b, which samples a",
+       redraws(0) == ra + 1 && redraws(1) == rb + 1);
+    r.slots.on_parked(0x01000400, r.now);
+    r.run(200);
+    r.slots.on_shown(0x01000400, r.now);
+    r.run(200);
+    ok("once: shown again after a park: drawn again", redraws(0) == ra + 2 && redraws(1) == rb + 2);
+
+    /* Drawn every frame: only while something visible samples it. */
+    CanvasSpec live;
+    live.w = live.h = 32;
+    const uint32_t lc = r.comp->add_canvas(1, r.panel, live, &err);
+    const uint32_t lc2 = r.comp->add_canvas(1, r.panel, live, &err);
+    LayerParams pl = params(Klass::Content, R(0, 0, 32, 32));
+    pl.canvas = lc2;
+    const uint32_t in_lc2 = r.comp->add_effect(1, r.panel, pl, "", kSample, 0, r.now, &err);
+    r.run(200);
+    auto enabled = [&](uint32_t id) {
+        FakeGraph *gg = r.g("panel");
+        const Canvas *c = r.comp->canvas(id);
+        return gg && c && gg->shown.canvases.count(c->buffer()) && gg->shown.canvases.at(c->buffer()).enabled;
+    };
+    ok("every frame: nothing samples it: not drawn", lc && lc2 && !enabled(lc) && !enabled(lc2));
+    const uint32_t viewer = r.comp->add_effect(1, r.panel, params(Klass::Overlay, R(100, 0, 32, 32)), "", kSample, 0,
+                                               r.now, &err);
+    r.comp->bind(1, in_lc2, 0, "u_atlas", lc, &err);
+    r.comp->bind(1, viewer, 0, "u_atlas", lc2, &err);
+    r.run(200);
+    ok("every frame: sampled by a layer shown: drawn, and the canvas it samples through its layer",
+       enabled(lc2) && enabled(lc));
+    Layer *vl = r.comp->layer(1, viewer);
+    vl->params.visible = false;
+    r.comp->changed(vl);
+    r.run(200);
+    ok("every frame: that layer hidden: neither drawn", !enabled(lc2) && !enabled(lc));
+    vl->params.visible = true;
+    r.comp->changed(vl);
+    r.run(200);
+    ok("every frame: shown again: both drawn", enabled(lc2) && enabled(lc));
+
+    /* A texture the renderer refused: the layer in the canvas not drawn. */
+    Rig no;
+    no.gpu.refuse_textures = true;
+    const uint32_t nc = no.comp->add_canvas(1, no.panel, cs, &err);
+    LayerParams pn = params(Klass::Content, R(0, 0, 64, 64));
+    pn.canvas = nc;
+    const uint32_t in_n = no.comp->add_effect(1, no.panel, pn, "", kSample, 0, no.now, &err);
+    const uint32_t nb = no.comp->add_asset(1, no.panel, ep, &err);
+    no.comp->bind(1, in_n, 0, "u_atlas", nb, &err);
+    no.comp->asset(1, nb)->update({}, blocks.data(), blocks.size(), &err);
+    const uint32_t nshown = no.comp->add_effect(1, no.panel, params(Klass::Overlay, R(0, 0, 64, 64)), "", kSample, 0,
+                                                no.now, &err);
+    no.comp->bind(1, nshown, 0, "u_atlas", nc, &err);
+    no.run(200);
+    no.slots.on_shown(0x01000400, no.now);
+    no.run(200);
+    FakeGraph *ng = no.g("panel");
+    bool drawn = false;
+    for (const auto &kv : ng ? ng->shown.quads : std::map<int, FakeQuad>())
+        drawn = drawn || (kv.second.canvas && kv.second.visible);
+    ok("refused: the layer in the canvas is an error, not drawn",
+       ng && no.comp->state(in_n, &why) == LayerState::Error && !drawn);
+
+    /* Pixel memory: a client's canvases at most half of it. */
+    Rig m;
+    CanvasSpec half;
+    half.w = half.h = 1024;
+    CanvasSpec tiny;
+    tiny.w = tiny.h = 8;
+    ok("memory: a client's canvases up to half the pixel memory",
+       m.comp->add_canvas(1, m.panel, half, &err) && !m.comp->add_canvas(1, m.panel, tiny, &err) &&
+           err.find("at most half the service's pixel memory") != std::string::npos);
+    ok("memory: another client's canvases have the rest", m.comp->add_canvas(2, m.panel, tiny, &err) != 0);
+}
+
+/* Eased curves (curves.h): sampled into linear keys that start and end at
+ * the client's, ease as asked, and stay within the sampled keys' limit;
+ * smooth passes through every key. */
+static void curves()
+{
+    Animation a;
+    a.width = 1;
+    a.t = {0, 1000};
+    a.v = {0, 100};
+    Animation in = a;
+    sample_curve(Curve::EaseInOut, &in);
+    auto at = [](const Animation &x, uint32_t t) {
+        for (size_t k = 0; k < x.t.size(); k++)
+            if (x.t[k] == t)
+                return x.v[k];
+        return -1.0f;
+    };
+    ok("curves: ease_in_out from the first key to the last, 16 steps",
+       in.t.size() == 17 && in.t.front() == 0 && in.t.back() == 1000 && in.v.front() == 0 && in.v.back() == 100);
+    ok("curves: slow at the ends, half way in the middle",
+       at(in, 500) == 50 && at(in, 62) < 1.0f && at(in, 937) > 99.0f && !in.step);
+    Animation ein = a;
+    sample_curve(Curve::EaseIn, &ein);
+    Animation eout = a;
+    sample_curve(Curve::EaseOut, &eout);
+    ok("curves: ease_in starts slow, ease_out ends slow", at(ein, 500) == 12.5f && at(eout, 500) == 87.5f);
+    Animation sm;
+    sm.width = 3;
+    sm.t = {0, 100, 300, 600};
+    sm.v = {0, 0, 0, 10, 20, 30, 0, 40, 0, 5, 5, 5};
+    Animation smooth = sm;
+    sample_curve(Curve::Smooth, &smooth);
+    bool through = true;
+    for (size_t k = 0; k < sm.t.size(); k++)
+        for (size_t i = 0; i < 3; i++) {
+            size_t at_k = 0;
+            for (size_t j = 0; j < smooth.t.size(); j++)
+                if (smooth.t[j] == sm.t[k])
+                    at_k = j;
+            through = through && smooth.v[at_k * 3 + i] == sm.v[k * 3 + i];
+        }
+    ok("curves: smooth passes through every key, each of its values", through && smooth.width == 3);
+    Animation many;
+    many.width = 4;
+    for (uint32_t k = 0; k < 256; k++) {
+        many.t.push_back(k * 10);
+        for (int i = 0; i < 4; i++)
+            many.v.push_back((float)k);
+    }
+    sample_curve(Curve::Smooth, &many);
+    ok("curves: 256 keys stay within the sampled keys' limit", many.t.size() <= kMaxSampledKeys &&
+                                                                  many.t.size() == 255 * 4 + 1);
+    Animation close;
+    close.width = 1;
+    close.t = {0, 3};
+    close.v = {0, 1};
+    sample_curve(Curve::EaseIn, &close);
+    bool ascending = true;
+    for (size_t k = 1; k < close.t.size(); k++)
+        ascending = ascending && close.t[k] > close.t[k - 1];
+    ok("curves: keys 3 ms apart: steps a millisecond apart at the least", ascending && close.t.size() == 4);
+    Animation st = a;
+    sample_curve(Curve::Step, &st);
+    ok("curves: linear and step as sent", st.t.size() == 2);
+}
+
+/* Part hierarchies: a pivot that draws nothing, parts following it and each
+ * other, a part or parent that is not there refused with nothing made
+ * (parents are made first, so they never loop), all made again in a new
+ * scene with every parent, whatever the parts' numbers; and in a canvas, a
+ * pivot and a part following it, made before the canvas is in a scene and
+ * after. Curves past the float range: refused, or worked out in double. */
+static void hierarchies()
+{
+    Rig r;
+    std::string err;
+    MeshParams mp;
+    const uint32_t id = r.comp->add_mesh(1, r.panel, params(Klass::Content, R(0, 0, 640, 480)), mp, r.now, &err);
+    MeshLayer *m = static_cast<MeshLayer *>(r.comp->layer(1, id));
+    ok("hierarchy: a pivot", r.comp->add_part(1, id, 9, "", "", PartLook(), 0, &err));
+    ok("hierarchy: a part following it", r.comp->add_part(1, id, 1, kLitVs, kPartFs, PartLook(), 9, &err));
+    ok("hierarchy: a part following that part", r.comp->add_part(1, id, 2, kLitVs, kPartFs, PartLook(), 1, &err));
+    ok("hierarchy: a parent that is not there refused, nothing made",
+       !r.comp->add_part(1, id, 3, kLitVs, kPartFs, PartLook(), 7, &err) && !m->has_part(3) &&
+           err == "a part's parent is another part of the layer, made before it");
+    ok("hierarchy: a part that is there refused", !r.comp->add_part(1, id, 1, "", "", PartLook(), 0, &err) &&
+                                                      err == "part 1 exists");
+    ok("hierarchy: a pivot is not drawn: geometry refused", !r.comp->geometry(1, id, 9, fan(4, true), r.now, &err));
+    r.comp->geometry(1, id, 1, fan(4, true), r.now, &err);
+    r.comp->geometry(1, id, 2, fan(4, true), r.now, &err);
+    Pose turn;
+    turn.r[1] = 45;
+    m->set_pose(9, turn);
+    r.run(300);
+    FakeGraph *g = r.g("panel");
+    auto check = [&](const char *when) {
+        int pivot = 0, p1 = 0, p2 = 0;
+        if (g)
+            for (const auto &kv : g->shown.parts) {
+                if (kv.second.pivot)
+                    pivot = kv.first;
+            }
+        if (g)
+            for (const auto &kv : g->shown.parts) {
+                if (!kv.second.pivot && kv.second.parent == pivot)
+                    p1 = kv.first;
+            }
+        if (g)
+            for (const auto &kv : g->shown.parts)
+                if (!kv.second.pivot && p1 && kv.second.parent == p1)
+                    p2 = kv.first;
+        ok((std::string("hierarchy: ") + when + ": the pivot turned, part 1 following it, part 2 part 1").c_str(),
+           pivot && p1 && p2 && g->shown.parts[pivot].pose.r[1] == 45 && !g->shown.parts[pivot].geometry &&
+               g->shown.parts[p1].geometry);
+    };
+    check("made");
+    r.comp->unpublish(r.slots.targets()[r.panel]);
+    std::string perr;
+    r.comp->publish(r.slots.targets()[r.panel], &perr);
+    r.run(300);
+    g = r.g("panel");
+    check("in a new scene");
+    std::string why;
+    ok("hierarchy: the layer drawn", r.comp->state(id, &why) != LayerState::Error);
+
+    /* In a canvas: made before the canvas is in a scene, and after. */
+    Rig cr;
+    CanvasSpec cs;
+    cs.w = cs.h = 64;
+    const uint32_t cv = cr.comp->add_canvas(1, cr.panel, cs, &err);
+    LayerParams in = params(Klass::Content, R(0, 0, 64, 64));
+    in.canvas = cv;
+    const uint32_t cm = cr.comp->add_mesh(1, cr.panel, in, mp, cr.now, &err);
+    ok("hierarchy in a canvas: a pivot and a part following it, the canvas in no scene yet",
+       cm && cr.comp->add_part(1, cm, 1, "", "", PartLook(), 0, &err) &&
+           cr.comp->add_part(1, cm, 2, kLitVs, kPartFs, PartLook(), 1, &err));
+    cr.comp->geometry(1, cm, 2, fan(4, true), cr.now, &err);
+    const uint32_t shown = cr.comp->add_effect(1, cr.panel, params(Klass::Overlay, R(0, 0, 64, 64)), "", kSample, 0,
+                                               cr.now, &err);
+    cr.comp->bind(1, shown, 0, "u_atlas", cv, &err);
+    cr.run(300);
+    auto followed = [&](int *pairs) {
+        FakeGraph *cg = cr.g("panel");
+        *pairs = 0;
+        if (!cg)
+            return false;
+        for (const auto &kv : cg->shown.parts)
+            if (!kv.second.pivot && kv.second.parent && cg->shown.parts.count(kv.second.parent) &&
+                cg->shown.parts.at(kv.second.parent).pivot)
+                ++*pairs;
+        return true;
+    };
+    int pairs = 0;
+    ok("hierarchy in a canvas: made in its scene, the part following the pivot, the layer drawn",
+       followed(&pairs) && pairs == 1 && cr.comp->state(cm, &why) == LayerState::Shown);
+    ok("hierarchy in a canvas: another pivot and part made in the scene",
+       cr.comp->add_part(1, cm, 3, "", "", PartLook(), 0, &err) &&
+           cr.comp->add_part(1, cm, 4, kLitVs, kPartFs, PartLook(), 3, &err) && (cr.run(300), followed(&pairs)) &&
+           pairs == 2 && cr.comp->state(cm, &why) == LayerState::Shown);
+
+    /* A playing animation replaced (a needle sent to a new value): in place,
+     * one replace(), no stop; its keys' bytes taken at the flush. */
+    Layer *ml = r.comp->layer(1, id);
+    Animation spin;
+    spin.property = Animated::Rotate;
+    spin.width = 3;
+    spin.t = {0, 1000};
+    spin.v = {0, 0, 0, 0, 90, 0};
+    ml->animate(1, 9, spin, &err);
+    r.comp->touch(ml);
+    r.run(100);
+    const int replaces = g ? g->replaces : -1;
+    const uint64_t taken = g ? g->animation_taken : 0;
+    spin.v = {0, 90, 0, 0, 120, 0};
+    const bool again = ml->animate(1, 9, spin, &err);
+    r.comp->touch(ml);
+    r.run(100);
+    ok("animation: one playing replaced in place, its new keys' bytes taken at the flush",
+       again && g && g->replaces == replaces + 1 && g->shown.animations.size() == 1 &&
+           g->shown.animations.begin()->second.a.v[4] == 120 && g->animation_taken == taken + 2 * 16);
+
+    /* Moved to another part: the old one's pose set back. */
+    int pivot_h = 0;
+    for (const auto &kv : g ? g->shown.parts : std::map<int, FakePart>())
+        if (kv.second.pivot)
+            pivot_h = kv.first;
+    const int poses = pivot_h ? g->shown.parts[pivot_h].poses : -1;
+    ml->animate(1, 1, spin, &err);
+    r.comp->touch(ml);
+    r.run(100);
+    ok("animation: moved to another part, the old part's pose set back",
+       pivot_h && g->shown.parts[pivot_h].poses > poses);
+    /* Moved to another uniform: the old one's own value sent again. */
+    const uint32_t fx = r.comp->add_effect(1, r.panel, params(Klass::Overlay, R(0, 0, 32, 32)), "", kSample, 0, r.now,
+                                           &err);
+    EffectLayer *el = static_cast<EffectLayer *>(r.comp->layer(1, fx));
+    const float level = 0.25f;
+    el->set_uniform("u_level", &level, 1);
+    el->animate(2, 0, keys(Animated::Uniform, 1, {0, 9}, {0, 1}, "u_level"), &err);
+    r.comp->touch(el);
+    r.run(100);
+    int sets = -1;
+    for (const auto &kv : g->shown.quads)
+        if (kv.second.uniforms.count("u_level"))
+            sets = kv.second.sets.at("u_level");
+    el->animate(2, 0, keys(Animated::Uniform, 1, {0, 9}, {0, 1}, "u_fade"), &err);
+    r.comp->touch(el);
+    r.run(100);
+    int after = -1;
+    for (const auto &kv : g->shown.quads)
+        if (kv.second.uniforms.count("u_level"))
+            after = kv.second.sets.at("u_level");
+    ok("animation: moved to another uniform, the old uniform's own value sent again", sets >= 1 && after > sets);
+
+    /* Curves at the ends of the float range. */
+    Animation wide;
+    wide.t = {0, 10};
+    wide.v = {-3e38f, 3e38f};
+    bool finite = sample_curve(Curve::EaseIn, &wide) && wide.t.size() > 2;
+    for (float x : wide.v)
+        finite = finite && std::isfinite(x);
+    ok("curves: keys -3e38 and 3e38 eased: worked out in double, every key finite", finite);
+    Animation over;
+    over.t = {0, 10, 20};
+    over.v = {3.4e38f, 3.4e38f, -3.4e38f};
+    const Animation kept = over;
+    ok("curves: a smooth curve past the float range refused, the keys as they were",
+       !sample_curve(Curve::Smooth, &over) && over.t == kept.t && over.v == kept.v);
+}
+
+/* Animation keys out of their own share of the upload cap, a bucket per
+ * target: never charged to the writes' pacer; animations on the map leave
+ * the panel's writes going, the map's and the panel's animations both
+ * progress, a bucket goes below 0 by less than one animation with large
+ * ones on every target, many clients take turns; a replacement waits with
+ * the old animation playing, its old target restored once it is made. */
+static void animation_keys_within_budget()
+{
+    std::string err;
+    Animation big;
+    big.property = Animated::Uniform;
+    big.uniform = "u_level";
+    for (uint32_t k = 0; k < 1009; k++) {
+        big.t.push_back(k * 4);
+        big.v.push_back((float)(k % 2));
+    }
+    const int64_t big_bytes = (int64_t)key_bytes(big);
+    auto effect_on = [&](Rig &r, uint64_t owner, int target, int x) {
+        return r.comp->layer(owner, r.comp->add_effect(owner, target, params(Klass::Overlay, R(x, 0, 32, 32)), "",
+                                                       kSample, 0, r.now, &err));
+    };
+    auto show_all = [](Rig &r) {
+        r.run(200);
+        r.slots.on_shown(0x010004f0, r.now);
+        r.slots.on_shown(0x01000400, r.now);
+        r.run(200);
+    };
+
+    /* Paid from the target's bucket; the writes' pacer untouched: with no
+     * writes it sits full at the cap less the keys' share, a burst of 250
+     * ms, to the byte, in the tick that makes the animation. */
+    Rig slow(64 * 1024);
+    Layer *l = effect_on(slow, 1, slow.panel, 0);
+    show_all(slow);
+    l->animate(1, 0, big, &err);
+    slow.comp->touch(l);
+    for (int k = 0; k < 20 && slow.comp->key_bucket(slow.panel) >= 0; k++)
+        slow.step(10);
+    ok("keys: paid from the target's bucket, below 0 by less than one animation, the writes' pacer charged nothing",
+       slow.comp->key_bucket(slow.panel) < 0 && slow.comp->key_bucket(slow.panel) > -big_bytes &&
+           slow.comp->pacer().allowance() == int64_t(Compositor::writes_rate(64 * 1024) * 250 / 1000));
+
+    /* Animations on the map, an image written on the panel. */
+    Rig r(100 * 1024);
+    const uint32_t img = r.comp->add_image(20, r.panel, params(Klass::Overlay, R(200, 0, 32, 32)), 32, 32, 30,
+                                           Sampling::Nearest, r.now, &err);
+    ImageLayer *il = static_cast<ImageLayer *>(r.comp->layer(20, img));
+    std::vector<Layer *> on_map, on_panel;
+    for (uint64_t c = 1; c <= 10; c++) {
+        on_map.push_back(effect_on(r, c, r.map, 40 * (int)c));
+        on_panel.push_back(effect_on(r, c + 10, r.panel, 40 * (int)c));
+    }
+    std::vector<uint8_t> px(32 * 32 * 4);
+    il->update({}, px.data(), px.size(), &err);
+    show_all(r);
+    FakeGraph *gm = r.g("map");
+    const uint64_t frames = il->write_stats().frames;
+    Animation wide;
+    wide.property = Animated::Uniform;
+    wide.uniform = "u_tint";
+    wide.width = 4;
+    for (uint32_t k = 0; k < 1024; k++) {
+        wide.t.push_back(k * 4);
+        for (int c = 0; c < 4; c++)
+            wide.v.push_back((float)(k % 2));
+    }
+    int64_t lowest_bucket = INT64_MAX, lowest_pacer = INT64_MAX;
+    const uint64_t map_before = gm ? gm->animation_taken : 0;
+    for (int tick = 0; tick < 300; tick++) {
+        std::fill(px.begin(), px.end(), (uint8_t)tick);
+        il->update({}, px.data(), px.size(), &err);
+        for (size_t c = 0; c < on_map.size(); c++) {
+            Animation a = c % 2 ? wide : big;
+            a.owner = c + 1;
+            a.v[0] = (float)tick;
+            on_map[c]->animate(1, 0, a, &err);
+            r.comp->touch(on_map[c]);
+        }
+        r.step(10);
+        for (int ti : {r.map, r.panel, r.hud})
+            lowest_bucket = std::min(lowest_bucket, r.comp->key_bucket(ti));
+        lowest_pacer = std::min(lowest_pacer, r.comp->pacer().allowance());
+    }
+    ok("keys: animations on the map leave the panel's writes going (over 40 of 3 s's 4 KB frames at 100 KB/s)",
+       il->write_stats().frames - frames > 40);
+    ok("keys: the map's animations made meanwhile", gm && gm->animation_taken > map_before);
+    ok("keys: a bucket below 0 by less than one animation of the most keys (20,480 bytes), the writes' pacer by "
+       "one write",
+       lowest_bucket > -Compositor::kMaxKeyBytes && lowest_pacer >= -(int64_t)(32 * 32 * 4));
+
+    /* Animations on the map and on the panel at once (1 MB/s: about 43
+     * KB/s of keys a target): both progress, the panel's clients taking
+     * turns, and once they stop every client's newest is made. */
+    Rig q(1000 * 1024);
+    std::vector<Layer *> q_map, q_panel;
+    for (uint64_t c = 1; c <= 10; c++) {
+        q_map.push_back(effect_on(q, c, q.map, 40 * (int)c));
+        q_panel.push_back(effect_on(q, c + 10, q.panel, 40 * (int)c));
+    }
+    show_all(q);
+    FakeGraph *qm = q.g("map"), *qp = q.g("panel");
+    const uint64_t m0 = qm ? qm->animation_taken : 0, p0 = qp ? qp->animation_taken : 0;
+    for (int tick = 0; tick < 300; tick++) {
+        for (size_t c = 0; c < q_map.size(); c++) {
+            Animation a = big;
+            a.owner = c + 1;
+            a.v[0] = (float)tick;
+            q_map[c]->animate(1, 0, a, &err);
+            q.comp->touch(q_map[c]);
+            a.owner = c + 11;
+            q_panel[c]->animate(1, 0, a, &err);
+            q.comp->touch(q_panel[c]);
+        }
+        q.step(10);
+    }
+    const uint64_t made_map = (qm ? qm->animation_taken : 0) - m0, made_panel = (qp ? qp->animation_taken : 0) - p0;
+    uint64_t least = UINT64_MAX, most = 0;
+    for (uint64_t c = 11; c <= 20; c++) {
+        least = std::min(least, qp ? qp->made_by[c] : 0);
+        most = std::max(most, qp ? qp->made_by[c] : 0);
+    }
+    ok("keys: the map's and the panel's animations both progress, each within half of the other",
+       made_map > 0 && made_panel > 0 && made_map <= 2 * made_panel && made_panel <= 2 * made_map);
+    ok("keys: the panel's ten clients made in turn (each at least half the most any made)", least > 0 && most <= 2 * least);
+    q.run(3000);
+    bool all = qp != nullptr;
+    for (const auto &kv : qp ? qp->shown.animations : std::map<int, FakeAnimation>())
+        all = all && kv.second.made && !kv.second.replacing && kv.second.a.v[0] == 299.0f;
+    ok("keys: the replacements stopped, every client's newest made", all);
+
+    /* A replacement waits with the old animation playing; moved to another
+     * uniform, the old one's own value is written when it is made. */
+    Rig w(4 * 1024);
+    EffectLayer *el = static_cast<EffectLayer *>(effect_on(w, 1, w.panel, 0));
+    const float level = 0.25f;
+    el->set_uniform("u_level", &level, 1);
+    show_all(w);
+    Animation first = big;
+    first.t.resize(16);
+    first.v.resize(16);
+    el->animate(1, 0, first, &err);
+    w.comp->touch(el);
+    w.run(1000);
+    FakeGraph *gw = w.g("panel");
+    int h = 0, sets = -1;
+    if (gw)
+        for (const auto &kv : gw->shown.animations)
+            h = kv.first;
+    for (const auto &kv : gw ? gw->shown.quads : std::map<int, FakeQuad>())
+        if (kv.second.sets.count("u_level"))
+            sets = kv.second.sets.at("u_level");
+    Animation moved = big;   /* 8 KB, past what the 512 B/s bucket holds */
+    moved.uniform = "u_fade";
+    el->animate(1, 0, moved, &err);
+    w.comp->touch(el);
+    w.run(50);
+    int waiting_sets = -1;
+    for (const auto &kv : gw ? gw->shown.quads : std::map<int, FakeQuad>())
+        if (kv.second.sets.count("u_level"))
+            waiting_sets = kv.second.sets.at("u_level");
+    const bool waiting = h && gw->shown.animations.count(h) && gw->shown.animations[h].replacing &&
+                         gw->shown.animations[h].a.uniform == "u_level";
+    ok("keys: a replacement waiting for the bucket, the old animation playing, its uniform not set back yet",
+       waiting && sets >= 1 && waiting_sets == sets);
+    for (int k = 0; k < 400 && gw->shown.animations[h].replacing; k++)
+        w.step(50);
+    int made_sets = -1;
+    for (const auto &kv : gw ? gw->shown.quads : std::map<int, FakeQuad>())
+        if (kv.second.sets.count("u_level"))
+            made_sets = kv.second.sets.at("u_level");
+    ok("keys: made in its turn, the old uniform's own value written then",
+       !gw->shown.animations[h].replacing && gw->shown.animations[h].a.uniform == "u_fade" && made_sets > sets);
+}
+
+/* Thousands of replacements alternating between targets while one waits:
+ * one restore kept (the target that plays), never chained; made, that
+ * target given its own value back once, and none of the never-made ones'. */
+static void replacements_waiting()
+{
+    std::string err;
+    Rig r(64 * 1024);
+    EffectLayer *el = static_cast<EffectLayer *>(r.comp->layer(
+        1, r.comp->add_effect(1, r.panel, params(Klass::Overlay, R(0, 0, 32, 32)), "", kSample, 0, r.now, &err)));
+    const float level = 0.25f, fade = 0.5f;
+    el->set_uniform("u_level", &level, 1);
+    el->set_uniform("u_fade", &fade, 1);
+    r.run(200);
+    r.slots.on_shown(0x01000400, r.now);
+    r.run(200);
+    FakeGraph *g = r.g("panel");
+    /* playing: 1,009 keys on u_level, which leave the bucket in debt for
+     * about 3 s */
+    Animation big;
+    big.property = Animated::Uniform;
+    big.uniform = "u_level";
+    for (uint32_t k = 0; k < 1009; k++) {
+        big.t.push_back(k * 4);
+        big.v.push_back((float)(k % 2));
+    }
+    el->animate(1, 0, big, &err);
+    r.comp->touch(el);
+    for (int k = 0; k < 50 && r.comp->key_bucket(r.panel) >= 0; k++)
+        r.step(10);
+    int h = 0;
+    for (const auto &kv : g ? g->shown.animations : std::map<int, FakeAnimation>())
+        if (kv.second.made)
+            h = kv.first;
+    auto sets_of = [&](const char *u) {
+        for (const auto &kv : g ? g->shown.quads : std::map<int, FakeQuad>())
+            if (kv.second.sets.count(u))
+                return kv.second.sets.at(u);
+        return 0;
+    };
+    const int level_sets = sets_of("u_level"), fade_sets = sets_of("u_fade");
+    Animation rot;
+    rot.t = {0, 1000};
+    rot.v = {0, 90};
+    Animation glow = rot;
+    glow.property = Animated::Uniform;
+    glow.uniform = "u_fade";
+    for (int i = 0; i < 5000; i++) {
+        el->animate(1, 0, i % 2 ? rot : glow, &err);
+        if (i % 100 == 99) {
+            r.comp->touch(el);
+            r.step(10);
+        }
+    }
+    const bool waiting = h && g->shown.animations.count(h) && g->shown.animations[h].replacing &&
+                         g->shown.animations[h].a.uniform == "u_level";
+    ok("replacements: 5,000 alternating ones waiting, u_level's animation playing, nothing restored yet",
+       waiting && sets_of("u_level") == level_sets && sets_of("u_fade") == fade_sets);
+    for (int k = 0; k < 600 && g->shown.animations[h].replacing; k++)
+        r.step(10);
+    ok("replacements: the newest (a rotate) made, u_level given its own value once, u_fade never",
+       !g->shown.animations[h].replacing && g->shown.animations[h].a.property == Animated::Rotate &&
+           sets_of("u_level") == level_sets + 1 && sets_of("u_fade") == fade_sets);
+
+    /* The graph keeps one restore, whatever the number of replacements. */
+    auto token = std::make_shared<int>(0);
+    const int node = g->shown.animations[h].node;
+    g->key_allowance(0);
+    for (int i = 0; i < 5000; i++) {
+        Animation a = i % 2 ? rot : glow;
+        a.property = i % 2 ? Animated::Translate : Animated::Scale;
+        a.width = 3;
+        a.v = {0, 0, 0, 1, 1, 1};
+        g->replace(h, node, a, [token]() { ++*token; });
+    }
+    ok("replacements: the graph holds one restore of 5,000 (no chain)", token.use_count() == 2 && *token == 0);
+    g->key_allowance(UINT64_MAX);
+    g->make_animations();
+    ok("replacements: made, the restore run once and let go", *token == 1 && token.use_count() == 1);
+    /* Back on the target that plays: nothing restored. */
+    g->key_allowance(0);
+    for (int i = 0; i < 1000; i++) {
+        Animation a = rot;
+        a.property = i % 2 ? Animated::Translate : Animated::Rotate;
+        a.width = i % 2 ? 3 : 1;
+        a.v = i % 2 ? std::vector<float>{0, 0, 0, 1, 1, 1} : std::vector<float>{0, 90};
+        g->replace(h, node, a, [token]() { ++*token; });
+    }
+    g->key_allowance(UINT64_MAX);
+    g->make_animations();
+    ok("replacements: the newest back on the target that plays, nothing restored", *token == 1 &&
+                                                                                       token.use_count() == 1);
+}
+
+/* Writes saturating the cap while animations come every 100 ms on every
+ * target: writes and keys together within the cap over 20 s, plus the
+ * pacer's burst and one write, plus each target's held keys and one
+ * animation past its bucket (compositor.h). */
+static void writes_and_keys_within_cap()
+{
+    std::string err;
+    const uint64_t cap = 1000 * 1024;
+    Rig r(cap);
+    const uint32_t img = r.comp->add_image(20, r.panel, params(Klass::Overlay, R(200, 0, 256, 256)), 256, 256, 30,
+                                           Sampling::Nearest, r.now, &err);
+    ImageLayer *il = static_cast<ImageLayer *>(r.comp->layer(20, img));
+    std::vector<Layer *> fx;
+    for (int ti : {r.map, r.panel, r.hud})
+        fx.push_back(r.comp->layer(
+            (uint64_t)ti + 1,
+            r.comp->add_effect((uint64_t)ti + 1, ti, params(Klass::Overlay, R(0, 0, 32, 32)), "", kSample, 0, r.now,
+                               &err)));
+    std::vector<uint8_t> px(256 * 256 * 4);
+    il->update({}, px.data(), px.size(), &err);
+    r.run(200);
+    r.slots.on_shown(0x010004f0, r.now);
+    r.slots.on_shown(0x01000400, r.now);
+    r.run(1000);
+    auto total = [&]() {
+        uint64_t b = 0;
+        for (const char *t : {"map", "panel", "hud"})
+            if (FakeGraph *g = r.g(t))
+                b += g->flushed_bytes + g->animation_taken;
+        return b;
+    };
+    Animation a;
+    a.property = Animated::Uniform;
+    a.uniform = "u_level";
+    for (uint32_t k = 0; k < 500; k++) {   /* 4,000 bytes, about what a bucket holds */
+        a.t.push_back(k * 4);
+        a.v.push_back((float)(k % 2));
+    }
+    const uint64_t before = total();
+    const uint64_t keys_before = r.g("map") ? r.g("map")->animation_taken : 0;
+    const int secs = 20;
+    for (int tick = 0; tick < secs * 100; tick++) {
+        std::fill(px.begin(), px.end(), (uint8_t)tick);
+        il->update({}, px.data(), px.size(), &err);
+        if (tick % 10 == 0)
+            for (size_t i = 0; i < fx.size(); i++) {
+                a.v[0] = (float)tick;
+                a.owner = i + 1;
+                fx[i]->animate(1, 0, a, &err);
+                r.comp->touch(fx[i]);
+            }
+        r.step(10);
+    }
+    const uint64_t sent = total() - before;
+    const uint64_t held = cap / Compositor::kKeyShare / 3 * Compositor::kKeyHeldMs / 1000;
+    const uint64_t bound = cap * secs + cap * 250 / 1000 + px.size() + 3 * (held + Compositor::kMaxKeyBytes);
+    char name[200];
+    std::snprintf(name, sizeof name,
+                  "keys and writes: %llu KB in 20 s at a 1000 KB/s cap, within it and the burst, one write and each "
+                  "target's held keys and one animation (%llu KB), and over 90%% of it",
+                  (unsigned long long)(sent / 1024), (unsigned long long)(bound / 1024));
+    ok(name, sent <= bound && sent >= cap * secs * 9 / 10);
+    ok("keys and writes: the map's animations made meanwhile",
+       r.g("map") && r.g("map")->animation_taken > keys_before);
+}
+
+/* The writes' pacer brought up to the time at the rate it had before it
+ * takes another: a frame written while keys wait, nothing written until
+ * they are made, and the next frame not before the writes' rate (the cap
+ * less the keys' share) has repaid it over the wait and the whole cap
+ * since. */
+static void pacer_settled_at_its_old_rate()
+{
+    std::string err;
+    const uint64_t cap = 64 * 1024;
+    Rig r(cap);
+    const uint32_t img = r.comp->add_image(20, r.panel, params(Klass::Overlay, R(200, 0, 256, 256)), 256, 256, 30,
+                                           Sampling::Nearest, r.now, &err);
+    ImageLayer *il = static_cast<ImageLayer *>(r.comp->layer(20, img));
+    Layer *el = r.comp->layer(1, r.comp->add_effect(1, r.panel, params(Klass::Overlay, R(0, 0, 32, 32)), "", kSample,
+                                                    0, r.now, &err));
+    std::vector<uint8_t> px(256 * 256 * 4);
+    il->update({}, px.data(), px.size(), &err);
+    r.run(200);
+    r.slots.on_shown(0x01000400, r.now);
+    r.run(6000);   /* the first frame written, the pacer full again */
+    Animation big;
+    big.property = Animated::Uniform;
+    big.uniform = "u_level";
+    for (uint32_t k = 0; k < 1009; k++) {
+        big.t.push_back(k * 4);
+        big.v.push_back((float)(k % 2));
+    }
+    el->animate(1, 0, big, &err);
+    r.comp->touch(el);
+    for (int k = 0; k < 50 && r.comp->key_bucket(r.panel) >= 0; k++)
+        r.step(10);
+    /* a replacement waits for the bucket: the writes at the cap less the
+     * keys' share */
+    big.v[0] = 5;
+    el->animate(1, 0, big, &err);
+    r.comp->touch(el);
+    r.step(10);
+    const uint64_t f0 = il->write_stats().frames;
+    std::fill(px.begin(), px.end(), (uint8_t)1);
+    il->update({}, px.data(), px.size(), &err);
+    for (int k = 0; k < 50 && il->write_stats().frames == f0; k++)
+        r.step(10);
+    const int64_t t_write = r.now;
+    FakeGraph *g = r.g("panel");
+    int h = 0;
+    for (const auto &kv : g ? g->shown.animations : std::map<int, FakeAnimation>())
+        h = kv.first;
+    const bool waited = h && g->shown.animations[h].replacing;
+    for (int k = 0; k < 1000 && g && g->shown.animations[h].replacing; k++)
+        r.step(10);
+    r.step(10);   /* the writes back at the whole cap: this tick's refill */
+    const int64_t t_switch = r.now;
+    const uint64_t f1 = il->write_stats().frames;
+    for (int k = 0; k < 1000 && il->write_stats().frames == f1; k++) {
+        px[0]++;
+        il->update({}, px.data(), px.size(), &err);
+        r.step(10);
+    }
+    const int64_t t_next = r.now;
+    /* written at the writes' burst (250 ms of their rate), the frame left a
+     * debt the next frame waits for */
+    const int64_t debt = int64_t(px.size()) - int64_t(Compositor::writes_rate(cap) * 250 / 1000);
+    const int64_t granted = int64_t(Compositor::writes_rate(cap)) * (t_switch - t_write) / 1000 +
+                            int64_t(cap) * (t_next - t_switch) / 1000;
+    char name[200];
+    std::snprintf(name, sizeof name,
+                  "pacer: a frame written while keys waited (%lld B of debt), the next %lld ms after they were made: "
+                  "repaid at the writes' rate over the wait (%lld B granted), no sooner",
+                  (long long)debt, (long long)(t_next - t_switch), (long long)granted);
+    ok(name, waited && il->write_stats().frames > f1 && granted >= debt && granted <= debt + int64_t(cap) / 10);
+}
+
+/* An animation waiting on a parked target, which no flush makes, holds no
+ * other target's writes: the pacer stays at the whole cap. */
+static void keys_waiting_where_parked()
+{
+    std::string err;
+    Rig r(64 * 1024);
+    Layer *m = r.comp->layer(1, r.comp->add_effect(1, r.map, params(Klass::Overlay, R(0, 0, 32, 32)), "", kSample, 0,
+                                                   r.now, &err));
+    r.comp->add_effect(2, r.panel, params(Klass::Overlay, R(0, 0, 32, 32)), "", kSample, 0, r.now, &err);
+    r.run(200);
+    r.slots.on_shown(0x010004f0, r.now);
+    r.slots.on_shown(0x01000400, r.now);
+    r.run(200);
+    r.slots.on_parked(0x010004f0, r.now);
+    r.run(100);
+    Animation a;
+    a.t = {0, 1000};
+    a.v = {0, 90};
+    m->animate(1, 0, a, &err);
+    r.comp->touch(m);
+    r.run(500);
+    ok("keys: an animation waiting on a parked target, the writes' pacer at the whole cap",
+       r.g("map") && r.g("map")->animations_due() && r.comp->pacer().allowance() == int64_t(64 * 1024 * 250 / 1000));
+}
+
+/* Draw modes and instances: a part's index count checked by its mode,
+ * instances refused while they are off, the indices drawn
+ * bounded by part, layer and target, mode and instances given to the
+ * renderer. */
+static void draw_modes()
+{
+    Rig r;
+    std::string err;
+    MeshParams mp;
+    const uint32_t id = r.comp->add_mesh(1, r.panel, params(Klass::Content, R(0, 0, 640, 480)), mp, r.now, &err);
+    PartLook lines;
+    lines.draw = Draw::Lines;
+    PartLook many;
+    many.instances = 200;
+    ok("draw: instances on by default", r.comp->instancing());
+    r.comp->set_instancing(false);
+    ok("draw: instances off refuses a part of instances above 1",
+       !r.comp->add_part(1, id, 2, kLitVs, kPartFs, many, 0, &err) &&
+           err == "instances are off on this cluster (cluster-render.conf)");
+    r.comp->set_instancing(true);
+    ok("draw: a part of lines, one of 200 instances",
+       r.comp->add_part(1, id, 1, kLitVs, kPartFs, lines, 0, &err) && r.comp->add_part(1, id, 2, kLitVs, kPartFs, many, 0, &err));
+    MeshData odd = fan(4, true);
+    odd.index.pop_back();
+    ok("draw: lines take whole lines", !r.comp->geometry(1, id, 1, std::move(odd), r.now, &err) &&
+                                           err == "the part's indices are whole lines");
+    MeshData pairs = fan(4, true);
+    pairs.index.resize(4);
+    ok("draw: and are taken", r.comp->geometry(1, id, 1, std::move(pairs), r.now, &err));
+    ok("draw: of 4 taken", r.comp->geometry(1, id, 2, fan(4, true), r.now, &err));
+    r.run(300);
+    FakeGraph *g = r.g("panel");
+    bool drawn_lines = false, drawn_many = false;
+    for (const auto &kv : g ? g->shown.parts : std::map<int, FakePart>()) {
+        drawn_lines = drawn_lines || (kv.second.look.draw == Draw::Lines && kv.second.geometry);
+        drawn_many = drawn_many || (kv.second.look.instances == 200 && kv.second.geometry);
+    }
+    ok("draw: both drawn as asked", drawn_lines && drawn_many);
+
+    /* What a frame draws, in indices times instances: a part, a layer's
+     * parts, every mesh layer on the target. */
+    auto tris = [](uint32_t n) {
+        MeshData d;
+        d.vertices = 3;
+        d.position = {0, 0, -5, 1, 0, -5, 0, 1, -5};
+        d.normal = {0, 0, 1, 0, 0, 1, 0, 0, 1};
+        for (uint32_t i = 0; i < n; i++)
+            d.index.insert(d.index.end(), {0, 1, 2});
+        return d;
+    };
+    r.comp->set_instancing(true);
+    PartLook lots;
+    lots.instances = 256;
+    r.comp->add_part(1, id, 3, kLitVs, kPartFs, lots, 0, &err);
+    ok("bound: a part of 65535 triangles drawn 256 times refused",
+       !r.comp->geometry(1, id, 3, tris(65535), r.now, &err) &&
+           err == "a part draws at most 196605 indices: its indices times its instances");
+    ok("bound: of 255 triangles 256 times (195840 indices) taken", r.comp->geometry(1, id, 3, tris(255), r.now, &err));
+    r.comp->add_part(1, id, 4, kLitVs, kPartFs, PartLook(), 0, &err);
+    ok("bound: a layer's parts past 393216 indices together refused",
+       !r.comp->geometry(1, id, 4, tris(65535), r.now, &err) &&
+           err == "a mesh layer's parts draw at most 393216 indices together");
+    ok("bound: within them taken", r.comp->geometry(1, id, 4, tris(60000), r.now, &err));
+    const uint32_t id2 = r.comp->add_mesh(2, r.panel, params(Klass::Content, R(0, 0, 64, 64)), mp, r.now, &err);
+    r.comp->add_part(2, id2, 1, kLitVs, kPartFs, PartLook(), 0, &err);
+    r.comp->add_part(2, id2, 2, kLitVs, kPartFs, PartLook(), 0, &err);
+    ok("bound: another client's layer of 393210 indices taken",
+       r.comp->geometry(2, id2, 1, tris(65535), r.now, &err) && r.comp->geometry(2, id2, 2, tris(65535), r.now, &err));
+    const uint32_t id3 = r.comp->add_mesh(2, r.panel, params(Klass::Content, R(0, 0, 64, 64)), mp, r.now, &err);
+    r.comp->add_part(2, id3, 1, kLitVs, kPartFs, PartLook(), 0, &err);
+    ok("bound: the target's mesh layers past 786432 indices together refused",
+       !r.comp->geometry(2, id3, 1, tris(10000), r.now, &err) &&
+           err == "a target's mesh layers draw at most 786432 indices together");
+    const uint32_t id4 = r.comp->add_mesh(2, r.map, params(Klass::Content, R(0, 0, 64, 64)), mp, r.now, &err);
+    r.comp->add_part(2, id4, 1, kLitVs, kPartFs, PartLook(), 0, &err);
+    ok("bound: another target's are its own", r.comp->geometry(2, id4, 1, tris(10000), r.now, &err));
+}
+
+/* Cube maps: six square faces in one frame, sent whole and once, made as a
+ * cube texture an effect samples; refused when not square, mipmapped or too
+ * large for one message. */
+static void cube_maps()
+{
+    Rig r;
+    std::string err;
+    AssetParams cp;
+    cp.w = cp.h = 16;
+    cp.cube = true;
+    cp.sampler.sampling = Sampling::Bilinear;
+    ok("cube: six faces counted once", Asset::memory(cp) == 6u * 16 * 16 * 4 && cp.levels() == 1);
+    AssetParams bad = cp;
+    bad.h = 8;
+    ok("cube: faces are square", Asset::size_error(bad) != nullptr);
+    bad = cp;
+    bad.sampler.sampling = Sampling::Trilinear;
+    ok("cube: no mip levels", Asset::size_error(bad) != nullptr);
+    bad = cp;
+    bad.w = bad.h = 1024;
+    ok("cube: six faces fit one message", Asset::size_error(bad) != nullptr);
+    const uint32_t c = r.comp->add_asset(1, r.panel, cp, &err);
+    std::vector<uint8_t> faces(6 * 16 * 16 * 4);
+    for (size_t i = 0; i < faces.size(); i++)
+        faces[i] = (uint8_t)(i / (16 * 16 * 4) * 40);
+    ok("cube: a rect refused", !r.comp->asset(1, c)->update({crk::PixelRect{0, 0, 4, 4}}, faces.data(), 64, &err) &&
+                                   err == "a cube map is sent whole, with no rects");
+    ok("cube: the six faces taken", r.comp->asset(1, c)->update({}, faces.data(), faces.size(), &err));
+    ok("cube: sent once", !r.comp->asset(1, c)->update({}, faces.data(), faces.size(), &err) &&
+                              err == "a cube map is sent once");
+    const uint32_t fx = r.comp->add_effect(1, r.panel, params(Klass::Overlay, R(0, 0, 64, 64)), "", kSampleCube, 0,
+                                           r.now, &err);
+    ok("cube: an effect samples it by its samplerCube", r.comp->bind(1, fx, 0, "u_atlas", c, &err));
+    const uint32_t flat = r.comp->add_effect(1, r.panel, params(Klass::Overlay, R(64, 0, 64, 64)), "", kSample, 0,
+                                             r.now, &err);
+    ok("cube: bound to a sampler2D refused", !r.comp->bind(1, flat, 0, "u_atlas", c, &err) &&
+                                                 err == "the shader's u_atlas is a sampler2D: a cube map is bound to a "
+                                                        "samplerCube");
+    AssetParams plain;
+    plain.w = plain.h = 4;
+    const uint32_t two = r.comp->add_asset(1, r.panel, plain, &err);
+    ok("cube: a 2D asset bound to a samplerCube refused",
+       two && !r.comp->bind(1, fx, 0, "u_atlas", two, &err) &&
+           err == "the shader's u_atlas is a samplerCube: only a cube map is bound to it");
+    /* The samplers as the effect was compiled: each of a list. */
+    const uint32_t listed = r.comp->add_effect(
+        1, r.panel, params(Klass::Overlay, R(128, 0, 64, 64)), "",
+        "#version 100\nprecision mediump float;\nuniform sampler2D u_a, u_b;\nuniform vec4 u_tint;\nvarying vec2 v_uv;\n"
+        "void main(){gl_FragColor=texture2D(u_a,v_uv)+texture2D(u_b,v_uv)*u_tint;}",
+        0, r.now, &err);
+    ok("cube: the second of a list of sampler2Ds: a cube map refused, a 2D asset bound",
+       listed && !r.comp->bind(1, listed, 0, "u_b", c, &err) &&
+           err == "the shader's u_b is a sampler2D: a cube map is bound to a samplerCube" &&
+           r.comp->bind(1, listed, 0, "u_b", two, &err));
+    ok("cube: a uniform that is no sampler, and one the effect lacks, refused",
+       !r.comp->bind(1, listed, 0, "u_tint", two, &err) && err == "the shader has no sampler u_tint" &&
+           !r.comp->bind(1, listed, 0, "u_none", two, &err) && err == "the shader has no sampler u_none");
+    r.run(300);
+    FakeGraph *g = r.g("panel");
+    int cube = 0;
+    for (const auto &kv : g ? g->shown.buffers : std::map<int, FakeBuffer>())
+        if (kv.second.cube)
+            cube = kv.first;
+    bool bound = false;
+    if (g)
+        for (const auto &kv : g->shown.quads)
+            bound = bound || (kv.second.textures.count("u_atlas") && kv.second.textures.at("u_atlas") == cube);
+    ok("cube: made as a cube texture with its six faces, bound", cube && g->shown.buffers[cube].px == faces && bound);
+
+    /* Sampled by a layer in a canvas: bound once its texture is made. */
+    Rig cr;
+    const uint32_t cc = cr.comp->add_asset(1, cr.panel, cp, &err);
+    CanvasSpec cs;
+    cs.w = cs.h = 32;
+    const uint32_t cv = cr.comp->add_canvas(1, cr.panel, cs, &err);
+    LayerParams in = params(Klass::Content, R(0, 0, 32, 32));
+    in.canvas = cv;
+    const uint32_t sky = cr.comp->add_effect(1, cr.panel, in, "", kSampleCube, 0, cr.now, &err);
+    cr.comp->bind(1, sky, 0, "u_atlas", cc, &err);
+    const uint32_t shown = cr.comp->add_effect(1, cr.panel, params(Klass::Overlay, R(0, 0, 32, 32)), "", kSample, 0,
+                                               cr.now, &err);
+    cr.comp->bind(1, shown, 0, "u_atlas", cv, &err);
+    cr.run(200);
+    cr.comp->asset(1, cc)->update({}, faces.data(), faces.size(), &err);
+    cr.run(300);
+    FakeGraph *cg = cr.g("panel");
+    int cube_in = 0;
+    bool bound_in = false;
+    for (const auto &kv : cg ? cg->shown.buffers : std::map<int, FakeBuffer>())
+        if (kv.second.cube)
+            cube_in = kv.first;
+    for (const auto &kv : cg ? cg->shown.quads : std::map<int, FakeQuad>())
+        bound_in = bound_in || (kv.second.canvas && kv.second.textures.count("u_atlas") &&
+                                kv.second.textures.at("u_atlas") == cube_in && kv.second.visible);
+    ok("cube: a layer in a canvas bound to it once made, and drawn", cube_in && bound_in);
+}
+
+/* An effect's uniforms noted as compiled, and dropped with a layer refused;
+ * where the backend cannot say what it compiled, a sampler the renderer does
+ * not bind leaves the layer in error, never shown. */
+static void compiled_samplers()
+{
+    std::string err;
+    CompositorLimits lim;
+    lim.per_client = 1;
+    Rig one(0, lim);
+    one.comp->add_effect(1, one.panel, params(Klass::Overlay, R(0, 0, 8, 8)), "", kSample, 0, one.now, &err);
+    const size_t noted = one.comp->compiled_effects();
+    ok("samplers: an effect whose layer is refused leaves nothing noted",
+       noted == 1 && !one.comp->add_effect(1, one.panel, params(Klass::Overlay, R(8, 0, 8, 8)), "", kSample, 0, one.now,
+                                           &err) &&
+           one.comp->compiled_effects() == noted);
+
+    Rig r;
+    r.gpu.no_inputs = true;
+    r.gpu.unknown_sampler = "u_atlas";
+    AssetParams ap;
+    ap.w = ap.h = 4;
+    const uint32_t a = r.comp->add_asset(1, r.panel, ap, &err);
+    std::vector<uint8_t> px(4 * 4 * 4, 200);
+    r.comp->asset(1, a)->update({}, px.data(), px.size(), &err);
+    const uint32_t fx = r.comp->add_effect(1, r.panel, params(Klass::Overlay, R(0, 0, 32, 32)), "", kSample, 0, r.now,
+                                           &err);
+    ok("samplers: unknown to the backend, a bind taken before the scene", r.comp->bind(1, fx, 0, "u_atlas", a, &err));
+    r.run(200);
+    r.slots.on_shown(0x01000400, r.now);
+    r.run(300);
+    std::string why;
+    ok("samplers: the renderer not binding it, the layer in error, never shown",
+       r.comp->state(fx, &why) == LayerState::Error && why == "the renderer did not bind asset " + std::to_string(a) +
+                                                                     " to u_atlas");
+}
+
+/* Shared values (PROTOCOL.md "Shared values"): one value a quad's uniform,
+ * a quad's in a canvas and a mesh part's follow; set once for all of them;
+ * one animation of it; a layer's own value of a linked uniform kept, not
+ * sent, and sent again when unlinked; made again, linked and animated, in
+ * a new scene; refusals (another client's value, another target's, a vec2
+ * animated, a uniform an animation plays, the limits); dropped: every link
+ * undone; the client gone: its values gone. */
+static void shared_values()
+{
+    Rig r;
+    std::string err, why;
+    const float half = 0.5f;
+    const uint32_t level = r.comp->add_value(1, r.panel, 1, &half, &err);
+    ok("values: made", level && r.comp->value(1, level) && !r.comp->value(2, level));
+    const uint32_t a = r.comp->add_effect(1, r.panel, params(Klass::Overlay, R(0, 0, 64, 64)), "", kLevelFs, 0, r.now,
+                                          &err);
+    CanvasSpec cs;
+    cs.w = cs.h = 64;
+    const uint32_t cv = r.comp->add_canvas(1, r.panel, cs, &err);
+    LayerParams in = params(Klass::Content, R(0, 0, 64, 64));
+    in.canvas = cv;
+    const uint32_t b = r.comp->add_effect(1, r.panel, in, "", kLevelFs, 0, r.now, &err);
+    r.comp->bind(1, a, 0, "u_atlas", cv, &err);
+    MeshParams mp;
+    const uint32_t m = r.comp->add_mesh(1, r.panel, params(Klass::Content, R(100, 0, 64, 64)), mp, r.now, &err);
+    r.comp->add_part(1, m, 1, kLitVs, kLevelFs, PartLook(), 0, &err);
+    r.comp->geometry(1, m, 1, fan(4, true), r.now, &err);
+    const float own = 0.25f;
+    static_cast<EffectLayer *>(r.comp->layer(1, a))->set_uniform("u_level", &own, 1);
+    ok("values: a quad's uniform, a quad's in a canvas and a part's linked",
+       r.comp->link(1, a, 0, "u_level", level, &err) && r.comp->link(1, b, 0, "u_level", level, &err) &&
+           r.comp->link(1, m, 1, "u_level", level, &err) && r.comp->linked(1, a, 0, "u_level"));
+    r.run(200);
+    r.slots.on_shown(0x01000400, r.now);
+    r.run(200);
+    auto check = [&](const char *when, float want) {
+        FakeGraph *g = r.g("panel");
+        int handle = 0, links = 0;
+        if (g)
+            for (const auto &kv : g->shown.values)
+                handle = kv.first;
+        for (const auto &kv : g ? g->shown.quads : std::map<int, FakeQuad>())
+            links += kv.second.links.count("u_level") && kv.second.links.at("u_level") == handle;
+        for (const auto &kv : g ? g->shown.parts : std::map<int, FakePart>())
+            links += kv.second.links.count("u_level") && kv.second.links.at("u_level") == handle;
+        bool own_sent = false;
+        for (const auto &kv : g ? g->shown.quads : std::map<int, FakeQuad>())
+            own_sent = own_sent || kv.second.uniforms.count("u_level");
+        ok((std::string("values: ") + when + ": one value, three uniforms following it, none set on its own").c_str(),
+           handle && g->shown.values.size() == 1 && g->shown.values.at(handle).v[0] == want && links == 3 &&
+               !own_sent);
+        return handle;
+    };
+    check("made", 0.5f);
+    const float more = 0.8f;
+    FakeGraph *g = r.g("panel");
+    const int sets = g ? g->shown.values.begin()->second.sets : -1;
+    r.comp->set_value(1, level, &more, &err);
+    r.run(50);
+    ok("values: set once for all of them", g && g->shown.values.begin()->second.sets == sets + 1 &&
+                                               g->shown.values.begin()->second.v[0] == 0.8f);
+    Animation pulse = keys(Animated::Value, 1, {0, 500, 1000}, {0, 1, 0});
+    ok("values: one animation of it", r.comp->animate_value(1, level, 1, pulse, &err) && (r.run(50), true) &&
+                                          g->shown.animations.size() == 1 &&
+                                          g->shown.animations.begin()->second.node == g->shown.values.begin()->first);
+    pulse.v = {0, 0.5f, 0};
+    ok("values: sent again, replaced", r.comp->animate_value(1, level, 1, pulse, &err) && (r.run(50), true) &&
+                                           g->shown.animations.size() == 1 &&
+                                           g->shown.animations.begin()->second.a.v[1] == 0.5f);
+    r.comp->unpublish(r.slots.targets()[r.panel]);
+    std::string perr;
+    r.comp->publish(r.slots.targets()[r.panel], &perr);
+    r.run(200);
+    g = r.g("panel");
+    check("in a new scene", 0.8f);
+    ok("values: its animation started again", g && g->shown.animations.size() == 1);
+
+    /* Refusals. */
+    const float two[2] = {1, 2};
+    const uint32_t pair = r.comp->add_value(1, r.panel, 2, two, &err);
+    ok("values: a vec2 is set, not animated",
+       pair && !r.comp->animate_value(1, pair, 1, keys(Animated::Value, 2, {0, 9}, {0, 0, 1, 1}), &err));
+    ok("values: keys of another width refused", !r.comp->animate_value(1, level, 2, keys(Animated::Value, 3, {0, 9},
+                                                                                         {0, 0, 0, 1, 1, 1}),
+                                                                       &err));
+    const uint32_t other = r.comp->add_effect(2, r.panel, params(Klass::Overlay, R(0, 0, 8, 8)), "", kLevelFs, 0, r.now,
+                                              &err);
+    ok("values: another client's value is not one's own",
+       !r.comp->link(2, other, 0, "u_level", level, &err) && err == "no such value");
+    const uint32_t far = r.comp->add_value(1, r.map, 1, &half, &err);
+    ok("values: nor one on another target",
+       !r.comp->link(1, a, 0, "u_tint", far, &err) && err == "the value is on another target");
+    Layer *al = r.comp->layer(1, a);
+    al->animate(5, 0, keys(Animated::Uniform, 1, {0, 9}, {0, 1}, "u_fade"), &err);
+    /* Checked from the shader, before any scene. */
+    {
+        Rig q;
+        const uint32_t lv = q.comp->add_value(1, q.panel, 1, &half, &err);
+        const float four[4] = {1, 1, 1, 1};
+        const uint32_t tint = q.comp->add_value(1, q.panel, 4, four, &err);
+        const uint32_t e = q.comp->add_effect(1, q.panel, params(Klass::Overlay, R(0, 0, 8, 8)), "", kLevelFs, 0,
+                                              q.now, &err);
+        MeshParams qp;
+        const uint32_t qm = q.comp->add_mesh(1, q.panel, params(Klass::Content, R(0, 0, 8, 8)), qp, q.now, &err);
+        q.comp->add_part(1, qm, 9, "", "", PartLook(), 0, &err);
+        ok("values: before a scene, a uniform the shader lacks refused",
+           !q.comp->link(1, e, 0, "u_gone", lv, &err) && err == "the shader has no uniform u_gone" &&
+               !q.comp->linked(1, e, 0, "u_gone"));
+        ok("values: before a scene, a uniform of another type refused",
+           !q.comp->link(1, e, 0, "u_level", tint, &err) &&
+               err == "the shader's u_level is a float, the value a vec4");
+        ok("values: before a scene, an array refused",
+           !q.comp->link(1, e, 0, "u_bars", lv, &err) &&
+               err == "the shader's u_bars is an array: a value is linked to a plain uniform");
+        ok("values: a pivot refused", !q.comp->link(1, qm, 9, "u_level", lv, &err) && !q.comp->linked(1, qm, 9, "u_level"));
+        ok("values: before a scene, a uniform declared with its precision and of the type linked",
+           q.comp->link(1, e, 0, "u_fade", lv, &err) && q.comp->link(1, e, 0, "u_tint", tint, &err));
+        const float three[3] = {1, 2, 3};
+        const uint32_t trio = q.comp->add_value(1, q.panel, 3, three, &err);
+        ok("values: before a scene, the second of a list of vec3s linked",
+           trio && q.comp->link(1, e, 0, "u_far", trio, &err) && q.comp->linked(1, e, 0, "u_far"));
+        /* an effect the display cannot describe: no link, its uniform's
+         * own value kept */
+        q.gpu.no_inputs = true;
+        const uint32_t blind = q.comp->add_effect(1, q.panel, params(Klass::Overlay, R(8, 0, 8, 8)), "", kLevelFs, 0,
+                                                  q.now, &err);
+        ok("values: a shader the display cannot describe: a link refused, nothing held back",
+           blind && !q.comp->link(1, blind, 0, "u_level", lv, &err) &&
+               err == "the display cannot describe this shader's uniforms: no link to it" &&
+               !q.comp->linked(1, blind, 0, "u_level"));
+        q.gpu.no_inputs = false;
+    }
+    ok("values: a uniform an animation plays refused", !r.comp->link(1, a, 0, "u_fade", level, &err) &&
+                                                           err == "an animation plays the uniform: stop it first");
+    uint32_t made = 0;
+    for (int i = 0; i < 40; i++)
+        made += r.comp->add_value(3, r.panel, 1, &half, &err) != 0;
+    ok("values: 32 a client", made == 32 && err == "too many values");
+
+    /* Unlinked: the uniform's own value again; dropped: every link undone. */
+    ok("values: unlinked, its own value goes again", r.comp->link(1, a, 0, "u_level", 0, &err) && (r.run(50), true) &&
+                                                         !r.comp->linked(1, a, 0, "u_level"));
+    bool own_back = false;
+    for (const auto &kv : g ? g->shown.quads : std::map<int, FakeQuad>())
+        own_back = own_back || (kv.second.uniforms.count("u_level") && kv.second.uniforms.at("u_level")[0] == 0.25f &&
+                                !kv.second.links.count("u_level"));
+    ok("values: the quad's u_level its own 0.25", own_back);
+
+    /* A canvas drawn once draws again when a value its layers follow
+     * changes: set, animated or stopped. */
+    {
+        CanvasSpec ocs;
+        ocs.w = ocs.h = 64;
+        ocs.once = true;
+        const uint32_t oc = r.comp->add_canvas(1, r.panel, ocs, &err);
+        LayerParams oin = params(Klass::Content, R(0, 0, 64, 64));
+        oin.canvas = oc;
+        const uint32_t still = r.comp->add_effect(1, r.panel, oin, "", kLevelFs, 0, r.now, &err);
+        r.comp->link(1, still, 0, "u_level", level, &err);
+        r.run(300);
+        FakeGraph *og = r.g("panel");
+        int oh = 0;
+        for (const auto &kv : og ? og->shown.canvases : std::map<int, FakeCanvas>())
+            if (kv.second.spec.once)
+                oh = kv.first;
+        const int first = oh ? og->shown.canvases[oh].redraws : -1;
+        r.run(300);
+        const float again = 0.3f;
+        r.comp->set_value(1, level, &again, &err);
+        r.run(50);
+        ok("values: a canvas drawn once that follows it drawn again when it is set",
+           oh && first >= 1 && og->shown.canvases[oh].redraws == first + 1);
+        r.comp->animate_value(1, level, 5, keys(Animated::Value, 1, {0, 9}, {0, 1}), &err);
+        r.run(50);
+        r.comp->stop_value(1, level, 5);
+        r.run(50);
+        ok("values: and when it is animated and stopped", oh && og->shown.canvases[oh].redraws == first + 3);
+    }
+    const int vh = g && !g->shown.values.empty() ? g->shown.values.begin()->first : -1;
+    ok("values: dropped, its links undone, its animation gone",
+       r.comp->remove_asset(1, level, &err) && (r.run(50), true) && !r.comp->value(1, level) &&
+           !r.comp->linked(1, b, 0, "u_level") && !r.comp->linked(1, m, 1, "u_level") && !g->shown.values.count(vh) &&
+           std::none_of(g->shown.animations.begin(), g->shown.animations.end(),
+                        [vh](const std::pair<const int, FakeAnimation> &kv) { return kv.second.node == vh; }));
+    r.comp->remove_owner(1);
+    ok("values: the client gone, its values gone", !r.comp->value(1, pair) && !r.comp->value(1, far));
+}
+
+/* A value's animation through its target's key bucket (#258): paid from it,
+ * below 0 by less than one animation, the writes' pacer charged nothing, and
+ * taking its turn with another client's layer animation. */
+static void value_keys()
+{
+    std::string err;
+    Rig r(64 * 1024);
+    const float zero = 0;
+    const uint32_t v = r.comp->add_value(1, r.panel, 1, &zero, &err);
+    const uint32_t fx = r.comp->add_effect(2, r.panel, params(Klass::Overlay, R(0, 0, 32, 32)), "", kSample, 0, r.now,
+                                           &err);
+    Layer *l = r.comp->layer(2, fx);
+    r.run(200);
+    r.slots.on_shown(0x01000400, r.now);
+    r.run(200);
+    Animation big;
+    big.property = Animated::Value;
+    for (uint32_t k = 0; k < 1009; k++) {
+        big.t.push_back(k * 4);
+        big.v.push_back((float)(k % 2));
+    }
+    r.comp->animate_value(1, v, 1, big, &err);
+    for (int k = 0; k < 20 && r.comp->key_bucket(r.panel) >= 0; k++)
+        r.step(10);
+    FakeGraph *g = r.g("panel");
+    /* with no writes, the pacer sits full at the cap less the keys' share
+     * (a 250 ms burst), to the byte, in the tick that makes the animation */
+    ok("value keys: paid from the target's bucket, below 0 by less than one animation, the writes' pacer charged "
+       "nothing",
+       g && g->made_by[1] == key_bytes(big) && r.comp->key_bucket(r.panel) < 0 &&
+           r.comp->key_bucket(r.panel) > -(int64_t)key_bytes(big) &&
+           r.comp->pacer().allowance() == int64_t(Compositor::writes_rate(64 * 1024) * 250 / 1000));
+    Animation layer_keys = big;
+    layer_keys.property = Animated::Uniform;
+    layer_keys.uniform = "u_level";
+    layer_keys.owner = 2;
+    l->animate(1, 0, layer_keys, &err);
+    r.comp->touch(l);
+    big.v[0] = 5;
+    r.comp->animate_value(1, v, 1, big, &err);
+    for (int k = 0; k < 600 && (g->made_by[2] == 0 || g->made_by[1] < 2 * key_bytes(big)); k++)
+        r.step(10);
+    ok("value keys: the value's replacement and another client's layer animation both made in their turns",
+       g->made_by[1] == 2 * key_bytes(big) && g->made_by[2] == key_bytes(layer_keys));
+}
+
 int main()
 {
     image_first_upload();
@@ -2529,6 +3948,20 @@ int main()
     others_fps();
     render_state();
     mipmapped_assets();
+    canvases();
+    canvases_as_layers();
+    curves();
+    hierarchies();
+    animation_keys_within_budget();
+    replacements_waiting();
+    writes_and_keys_within_cap();
+    keys_waiting_where_parked();
+    pacer_settled_at_its_old_rate();
+    draw_modes();
+    cube_maps();
+    compiled_samplers();
+    shared_values();
+    value_keys();
     std::printf(failures ? "%d FAILED\n" : "all ok\n", failures);
     return failures ? 1 : 0;
 }

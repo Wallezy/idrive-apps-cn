@@ -1,19 +1,27 @@
 [
   {
+    "version": "0.9.13",
+    "changes": [
+      "优化旋钮焦点和选项切换的显示，保留简体中文。"
+    ],
+    "upstreamVersion": "0.9.12",
+    "cnRevision": 1
+  },
+  {
     "version": "0.9.11",
-    "upstreamVersion": "0.9.10",
-    "cnRevision": 1,
     "changes": [
       "改进控制模块重新识别与连接恢复。"
-    ]
+    ],
+    "upstreamVersion": "0.9.10",
+    "cnRevision": 1
   },
   {
     "version": "0.9.7",
-    "upstreamVersion": "0.9.6",
-    "cnRevision": 1,
     "changes": [
       "新增发动机设置应用，保留操作确认与车辆限制。",
       "完善简体中文显示，保留无水印界面。"
-    ]
+    ],
+    "upstreamVersion": "0.9.6",
+    "cnRevision": 1
   }
 ]

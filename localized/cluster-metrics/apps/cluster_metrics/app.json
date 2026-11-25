@@ -1,13 +1,13 @@
 {
   "id": "cluster_metrics",
-  "title": "Cluster Metrics",
-  "description": "Real-time efficiency, HV battery %, powertrain temperatures, gear in D, full-wing Right-Wing Media/Charging/Trip/TPMS & Alerts widget, HUD turn-by-turn nav, and live DSC hydraulic brake indicator for BMW iDrive 7",
-  "version": "0.9.0",
+  "title": "Cluster+",
+  "description": "Stock+ instrument cluster & HUD overlay for BMW iDrive 7: live efficiency & power, active gear, cabin & powertrain temps, HV battery %, hydraulic brake & charging bars, Media/Trip/TPMS/Charging widgets, and HUD navigation",
+  "version": "0.9.3",
   "autostart": true,
   "license": "GPL-3.0-only",
   "vendor": "chyiz",
   "bundleNotices": [
-    "Cluster Metrics - GNU General Public License v3.0 (GPL-3.0, see LICENSE).",
+    "Cluster+ - GNU General Public License v3.0 (GPL-3.0, see LICENSE).",
     "Copyright (c) 2026 chyiz (https://github.com/chyiz)",
     "",
     "Bundled runtime dependencies retain their upstream licenses:",
@@ -71,11 +71,16 @@
       "statusSwitchDriveDynamicSport2": "rs",
       "statusActualValueTorque2": "rs"
     },
+    "de.bmw.infotainment.drivingexcitement.Efficiencytainment": {
+      "_optional": "PHEV combustion engine start / switch-off prevention reason (low HV SoC, warmup, comfort)",
+      "statusReasonPowerUpCombustionEngine": "rs"
+    },
     "de.bmw.infotainment.drivingexcitement.Efficiencytainment2": {
-      "_optional": "PHEV high-voltage battery temperature, charge state, and real-time eDRIVE / regen needle %",
+      "_optional": "PHEV high-voltage battery temperature, charge state, operating mode, and real-time eDRIVE / regen needle %",
       "statusBatteryTemperature": "rs",
       "statusPowerRelativHybrid": "rs",
-      "statusChargeOfBatteryHybrid": "rs"
+      "statusChargeOfBatteryHybrid": "rs",
+      "statusOperatingModeHybrid": "rs"
     },
     "de.bmw.infotainment.lsc.LSCDataSink": {
       "_optional": "PHEV high-voltage battery pack voltage",
@@ -230,14 +235,14 @@
     {
       "name": "MAIN",
       "kind": "menu",
-      "title": "Cluster Metrics",
+      "title": "Cluster+",
       "settings": false,
       "repoLink": false,
       "items": [
         [
           "tworow",
           "STATUS_SUMMARY",
-          "Cluster Metrics Status"
+          "Cluster+ Status"
         ],
         [
           "tworow",
@@ -353,10 +358,13 @@
           "WIDGET_CHARGING",
           "Right widget: Charging finish time (auto)"
         ],
+        "belowSpeedLine1",
+        "belowSpeedLine2",
         "gearDisplay",
         "cabinTempDisplay",
         "hvSocGauge",
         "brakeIndicator",
+        "iceChargeBar",
         "cornerRightDisplay",
         "cornerLeftDisplay",
         "clusterNudgeX",
@@ -455,7 +463,7 @@
   "settings": [
     {
       "key": "enabled",
-      "label": "Enable cluster & HUD metrics",
+      "label": "Enable Cluster+",
       "type": "bool",
       "default": false
     },
@@ -488,11 +496,11 @@
       "options": [
         [
           "panel_only",
-          "Full Cluster Panel (all zones + right widget)"
+          "Full Cluster (all overlays + right widgets)"
         ],
         [
           "map_only",
-          "Map Slot Only (over CarPlay/AA map; stock BC)"
+          "Center Map Area Only (keeps stock BC widgets)"
         ]
       ]
     },
@@ -568,7 +576,7 @@
       "options": [
         [
           "efficiency_gear",
-          "Efficiency + Gear (fixed slots)"
+          "Efficiency + Gear"
         ],
         [
           "efficiency",
@@ -613,7 +621,7 @@
       "options": [
         [
           "power",
-          "Power / Boost only"
+          "Power / RPM & Boost"
         ],
         [
           "power_gear",
@@ -750,11 +758,43 @@
       "options": [
         [
           "oil_cool",
-          "Oil + Coolant (always)"
+          "Oil + Coolant"
         ],
         [
           "oil_gbx",
           "Oil + Gearbox oil"
+        ],
+        [
+          "off",
+          "Off"
+        ]
+      ]
+    },
+    {
+      "key": "belowSpeedLine1",
+      "label": "Below speed Line 1 (top)",
+      "type": "choice",
+      "default": "efficiency",
+      "options": [
+        [
+          "efficiency",
+          "Efficiency / Charging kW"
+        ],
+        [
+          "off",
+          "Off"
+        ]
+      ]
+    },
+    {
+      "key": "belowSpeedLine2",
+      "label": "Below speed Line 2 (bottom)",
+      "type": "choice",
+      "default": "power",
+      "options": [
+        [
+          "power",
+          "Power / RPM & Boost"
         ],
         [
           "off",
@@ -801,6 +841,12 @@
           "Off"
         ]
       ]
+    },
+    {
+      "key": "iceChargeBar",
+      "label": "Engine battery-charge bar (PHEV)",
+      "type": "bool",
+      "default": true
     },
     {
       "key": "smartAlerts",
@@ -1193,7 +1239,7 @@
             "did": "5656",
             "bytes": 2,
             "at": 0,
-            "factor": 0.01,
+            "factor": 0.00429153,
             "min": 0,
             "max": 150,
             "timeoutMs": 900
@@ -1203,6 +1249,15 @@
             "bytes": 2,
             "at": 0,
             "factor": 0.05,
+            "min": 0,
+            "max": 150,
+            "timeoutMs": 900
+          },
+          {
+            "did": "4521",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.134228,
             "min": 0,
             "max": 150,
             "timeoutMs": 900

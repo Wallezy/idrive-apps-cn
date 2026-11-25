@@ -160,7 +160,7 @@ function formatEvEff(kmPerKwh, units) {
     };
     const unitLabel = labelMap[mode] || 'mi/kWh';
     if (typeof kmPerKwh !== 'number' || !isFinite(kmPerKwh) || kmPerKwh <= 0) {
-        return { value: '--', unit: unitLabel };
+        return { value: '---', unit: unitLabel };
     }
     if (mode === 'kwh_100km') {
         const kwh100 = Math.min(99.9, Math.max(4.0, 100 / kmPerKwh));
@@ -187,7 +187,7 @@ function formatFuelEff(lPer100km, isDfco, units) {
         return { value: mode === 'l_100km' ? '0.0' : '99+', unit: unitLabel };
     }
     if (typeof lPer100km !== 'number' || !isFinite(lPer100km) || lPer100km <= 0) {
-        return { value: '--', unit: unitLabel };
+        return { value: '---', unit: unitLabel };
     }
     if (mode === 'l_100km') {
         return { value: Math.min(99.9, lPer100km).toFixed(1), unit: unitLabel };
@@ -222,11 +222,12 @@ function formatSpeed(kmh, units) {
 }
 
 function formatPowerKw(kw) {
-    if (typeof kw !== 'number' || !isFinite(kw)) return { value: '--', unit: 'kW', text: '-- kW' };
+    if (typeof kw !== 'number' || !isFinite(kw)) return { value: '--', unit: 'kW', text: '-- kW', charging: false };
+    const charging = kw < -0.05;
     const abs = Math.abs(kw);
-    const sign = kw > 0.05 ? '+' : kw < -0.05 ? '-' : '';
     const num = abs >= 100 ? abs.toFixed(0) : abs.toFixed(1);
-    return { value: sign + num, unit: 'kW', text: sign + num + ' kW' };
+    const val = charging ? ('+' + num) : num;
+    return { value: val, unit: 'kW', text: val + ' kW', charging };
 }
 
 module.exports = {

@@ -1,27 +1,35 @@
 [
   {
+    "version": "1.6.6",
+    "changes": [
+      "优化旋钮焦点和选项切换的显示，保留简体中文。"
+    ],
+    "upstreamVersion": "1.6.5",
+    "cnRevision": 1
+  },
+  {
     "version": "1.6.4",
-    "upstreamVersion": "1.6.3",
-    "cnRevision": 1,
     "changes": [
       "完善保养数据识别与展示。"
-    ]
+    ],
+    "upstreamVersion": "1.6.3",
+    "cnRevision": 1
   },
   {
     "version": "1.6.2",
-    "upstreamVersion": "1.6.1",
-    "cnRevision": 1,
     "changes": [
       "更新保养项目与详情展示。",
       "完善简体中文显示，保留无水印界面。"
-    ]
+    ],
+    "upstreamVersion": "1.6.1",
+    "cnRevision": 1
   },
   {
     "version": "1.1.3",
-    "upstreamVersion": "1.1.1",
-    "cnRevision": 2,
     "changes": [
       "移除界面角落水印，让仪表和数据显示更清爽。"
-    ]
+    ],
+    "upstreamVersion": "1.1.1",
+    "cnRevision": 2
   }
 ]

@@ -14,7 +14,6 @@
 const { withAlpha } = require('./kit/canvas');
 const {
     drawArrow,
-    drawLaneArrows,
     laneWindow,
     shapeOf,
     roundaboutGeom,
@@ -28,9 +27,153 @@ const ROAD_H = 38;
 const LANE_W = 40;
 const LANE_H = 50;
 const LANES_MAX = 6;
-const LANE_K_SCALE = 0.56 / 0.4; // scale Redline's 0.4 lane glyphs to 0.56 full-height strip
 const isNum = (x) => typeof x === 'number' && isFinite(x);
 const laneW = (n, maxW) => Math.min(LANE_W, maxW / Math.max(1, n));
+
+const LANE_TURN_DIRECTIONS = [
+    'STRAIGHT_ON', 'SLIGHT_LEFT', 'SLIGHT_RIGHT', 'LEFT', 'RIGHT',
+    'HARD_LEFT', 'HARD_RIGHT', 'SHARP_LEFT', 'SHARP_RIGHT',
+    'UTURN_LEFT', 'UTURN_RIGHT', 'U_TURN_LEFT', 'U_TURN_RIGHT',
+];
+
+function laneDirSide(d) {
+    return /LEFT/.test(d) ? -1 : 1;
+}
+
+function laneTurnDeg(d) {
+    if (/SLIGHT/.test(d)) return 45;
+    if (/HARD|SHARP/.test(d)) return 135;
+    if (/LEFT|RIGHT/.test(d)) return 90;
+    return 0;
+}
+
+function roundLanePath(path, r, headRun) {
+    if (!r || path.length < 3) return path;
+    const len = (a, b) => Math.sqrt((b[0] - a[0]) * (b[0] - a[0]) + (b[1] - a[1]) * (b[1] - a[1]));
+    const out = [path[0]];
+    for (let i = 1; i < path.length - 1; i++) {
+        const A = path[i - 1], B = path[i], C = path[i + 1];
+        const la = len(A, B), lc = len(B, C);
+        const maxEnd = i === path.length - 2 ? Math.max(0, lc - (headRun || 16)) : lc / 2;
+        const rr = Math.max(0, Math.min(r, la / 2, maxEnd));
+        if (rr < 1) { out.push(B); continue; }
+        const P = [B[0] + (A[0] - B[0]) * rr / la, B[1] + (A[1] - B[1]) * rr / la];
+        const Q = [B[0] + (C[0] - B[0]) * rr / lc, B[1] + (C[1] - B[1]) * rr / lc];
+        for (let k = 0; k <= 6; k++) {
+            const t = k / 6, u = 1 - t;
+            out.push([
+                u * u * P[0] + 2 * u * t * B[0] + t * t * Q[0],
+                u * u * P[1] + 2 * u * t * B[1] + t * t * Q[1],
+            ]);
+        }
+    }
+    out.push(path[path.length - 1]);
+    return out;
+}
+
+function laneGlyphSpec(dir, hasStraight, stemX) {
+    const d = String(dir || '');
+    const mir = laneDirSide(d);
+    const sx = typeof stemX === 'number' ? stemX : 0;
+    if (/UTURN|U_TURN/.test(d)) {
+        if (!hasStraight) {
+            // Full-height standalone U-turn with wide open hairpin channel
+            const p = [[12, 35], [12, -14]];
+            for (let i = 1; i <= 8; i++) {
+                const a = i * Math.PI / 8;
+                p.push([12 * Math.cos(a), -14 - 12 * Math.sin(a)]);
+            }
+            p.push([-12, 16]);
+            return { path: p, mir: -mir, head: 0.80, round: 0, widthScale: 0.84 };
+        }
+        const localSx = sx * mir;
+        const p = [[localSx, 35], [localSx, -10]];
+        for (let i = 1; i <= 8; i++) {
+            const a = Math.PI - i * Math.PI / 8;
+            p.push([localSx + 10 + 10 * Math.cos(a), -10 - 10 * Math.sin(a)]);
+        }
+        p.push([localSx + 20, 15]);
+        return { path: p, mir, head: 0.74, round: 0, widthScale: 0.84 };
+    }
+    const deg = laneTurnDeg(d);
+    if (deg === 0) return { path: [[sx, 35], [sx, -37]], mir: 1, head: 1.0, round: 0 };
+    if (!hasStraight) {
+        // Standalone turning lane: full-height stem + rounded bend so turning lanes match straight height
+        if (deg === 90) return { path: [[-8, 35], [-8, -15], [25, -15]], mir, head: 0.96, round: 9 };
+        if (deg === 45) return { path: [[-4, 35], [-4, -1], [24, -31]], mir, head: 0.96, round: 9 };
+        return { path: [[-10, 35], [-10, -16], [23, 17]], mir, head: 0.92, round: 9 };
+    }
+    // Combo lane (straight + turn): stem shifted slightly opposite the turn so the arm has clear horizontal neck
+    const localSx = sx * mir;
+    if (deg === 90) return { path: [[localSx, 35], [localSx, 3], [27, 3]], mir, head: 0.80, round: 7 };
+    if (deg === 45) return { path: [[localSx, 35], [localSx, 7], [26, -18]], mir, head: 0.82, round: 7 };
+    return { path: [[localSx, 35], [localSx, -2], [24, 21]], mir, head: 0.80, round: 7 };
+}
+
+function drawLaneArrowPath(cv, path, X, Y, s, W, col, headScale) {
+    const p = path.slice();
+    const a = p[p.length - 2];
+    const b = p[p.length - 1];
+    const ax = X(a), ay = Y(a), bx = X(b), by = Y(b);
+    const l = Math.sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay)) || 1;
+    const ux = (bx - ax) / l;
+    const uy = (by - ay) / l;
+    const hs = headScale || 1;
+    const L = 21 * s * hs;
+    const HW = 15.2 * s * hs;
+    const back = Math.min(L * 0.72, l * 0.88) / l;
+    p[p.length - 1] = [b[0] + (a[0] - b[0]) * back, b[1] + (a[1] - b[1]) * back];
+    if (cv.stroke) {
+        cv.stroke(p.map((pt) => [X(pt), Y(pt)]), W, col);
+    } else {
+        for (let i = 1; i < p.length; i++) cv.line(X(p[i - 1]), Y(p[i - 1]), X(p[i]), Y(p[i]), W, col);
+    }
+    const qx = bx - ux * L;
+    const qy = by - uy * L;
+    cv.triangle([[bx, by], [qx - uy * HW, qy + ux * HW], [qx + uy * HW, qy - ux * HW]], col);
+}
+
+/**
+ * Bold, full-height BMW-style HUD lane arrow renderer:
+ *   - Thicker strokes (`W = 12.8 * s`) so straight & turning lanes stay crisp on windshield glass
+ *   - Full-height turning stems (`y = +35 -> -15`) on standalone turn lanes and elevated branches on combo lanes
+ */
+function drawBoldLaneArrows(cv, lane, cx, cy, cellW, cellH, col, dim) {
+    const s = Math.min(cellH / 78, cellW / 60);
+    const W = Math.max(2.6, 12.8 * s);
+    if (lane.info === 'ELLIPSIS') {
+        const dr = Math.max(1.8, 3.2 * s);
+        [-12, 0, 12].forEach((dx) => cv.circle(cx + dx * s, cy, dr, dim));
+        return;
+    }
+    const follows = lane.follows || (lane.follow && lane.follow !== 'NONE' ? [lane.follow] : []);
+    const others = Array.isArray(lane.others) ? lane.others : [];
+    const blocked = lane.info === 'BLOCKED';
+    const allDirs = others.concat(follows);
+    const hasStraight = allDirs.some((d) => d === 'STRAIGHT_ON');
+    const hasLeft = allDirs.some((d) => /LEFT/.test(String(d || '')));
+    const hasRight = allDirs.some((d) => /RIGHT/.test(String(d || '')));
+    // Shift shared stem slightly away from a one-sided combo turn so the turn arm is bold & unmistakable
+    const stemX = hasStraight ? (hasRight && !hasLeft ? -7 : (hasLeft && !hasRight ? 7 : 0)) : 0;
+
+    const one = (d, c) => {
+        if (!d || d === 'NONE' || LANE_TURN_DIRECTIONS.indexOf(d) < 0) return;
+        const g = laneGlyphSpec(d, hasStraight, stemX);
+        const X = (p) => cx + p[0] * g.mir * s;
+        const Y = (p) => cy + p[1] * s;
+        const pts = g.round ? roundLanePath(g.path, g.round, 15 * (g.head || 1)) : g.path;
+        drawLaneArrowPath(cv, pts, X, Y, s, W * (g.widthScale || 1), c, g.head || 1);
+    };
+
+    others.forEach((d) => one(d, dim));
+    follows.forEach((d) => one(d, lane.hi && !blocked ? col : dim));
+    if (blocked) {
+        const r = 13 * s;
+        const xw = Math.max(2.4, 4.4 * s);
+        cv.line(cx - r, cy - r, cx + r, cy + r, xw, dim);
+        cv.line(cx - r, cy + r, cx + r, cy - r, xw, dim);
+    }
+}
 
 function foldAscii(s) {
     let t = String(s || '')
@@ -81,10 +224,10 @@ function scaleAlpha(rgba, a) {
 }
 
 function drawHovDiamond(cv, cx, cy, s, col) {
-    const rx = Math.max(3, 5.2 * s);
-    const ry = Math.max(4, 7.6 * s);
+    const rx = Math.max(3.5, 11 * s);
+    const ry = Math.max(5, 16 * s);
     const pts = [[cx, cy - ry], [cx + rx, cy], [cx, cy + ry], [cx - rx, cy], [cx, cy - ry]];
-    cv.polyline(pts, Math.max(1.4, 2.0 * s), col);
+    cv.polyline(pts, Math.max(2.0, 4.2 * s), col);
 }
 
 /**
@@ -100,15 +243,13 @@ function drawLaneRow(cv, L, cx, cy, col, dim, accent, opts) {
     const cellMaxW = typeof o.cellMaxW === 'number' ? o.cellMaxW : LANE_W;
     const w = Math.min(cellMaxW, maxW / Math.max(1, n));
     const h = typeof o.h === 'number' ? o.h : LANE_H;
-    const kScale = typeof o.kScale === 'number' ? o.kScale : LANE_K_SCALE;
     const alpha = typeof o.alpha === 'number' ? o.alpha : 1;
     if (alpha <= 0.02) return 0;
 
     const totalW = n * w;
     const x = Math.round(cx - totalW / 2);
     const y0 = cy - h / 2;
-    const k = Math.min(kScale, (w / LANE_W) * kScale);
-    const lineW = o.isBack ? 1.4 : Math.max(1.5, 2 * (h / LANE_H));
+    const lineW = o.isBack ? 1.5 : Math.max(1.6, 2 * (h / LANE_H));
 
     const cCol = scaleAlpha(col, alpha);
     const cDim = scaleAlpha(dim, alpha * (o.isBack ? 0.82 : 1));
@@ -135,14 +276,15 @@ function drawLaneRow(cv, L, cx, cy, col, dim, accent, opts) {
         }
     }
 
+    const hovS = Math.min(h / 78, w / 60);
     for (let i = 0; i < n; i++) {
         const ln = win.lanes[i];
         const lcx = x + (i + 0.5) * w;
         const hasArrows = Boolean((ln.follows && ln.follows.length) || (ln.others && ln.others.length));
         if (ln.info === 'HOV' && !hasArrows) {
-            drawHovDiamond(cv, lcx, cy, Math.max(0.75, k * 0.9), ln.hi ? cCol : cDim);
+            drawHovDiamond(cv, lcx, cy, hovS, ln.hi ? cCol : cDim);
         } else {
-            drawLaneArrows(cv, ln, lcx, cy, k, cCol, cDim);
+            drawBoldLaneArrows(cv, ln, lcx, cy, w, h, cCol, cDim);
         }
         if (ulAlpha > 0.05 && ln.hi && ln.info !== 'BLOCKED') {
             cv.fillRect(Math.round(x + i * w + 4), Math.round(y0 + h + 3), Math.max(4, Math.round(w - 8)), 3, cAcc);
@@ -162,7 +304,6 @@ function drawLanes(cv, L, x, cy, w, col, dim, accent) {
         maxW: n * w,
         cellMaxW: w,
         h: LANE_H,
-        kScale: LANE_K_SCALE,
         alpha: 1,
         underlineAlpha: 1,
     });
@@ -542,12 +683,10 @@ function drawHudNav(cv, m, opts) {
             const tgtCy = nextRow ? botLaneCy : (cv.h - 38);
             const tgtH = nextRow ? 44 : LANE_H;
             const tgtCellW = nextRow ? 38 : LANE_W;
-            const tgtK = nextRow ? 1.28 : LANE_K_SCALE;
             drawLaneRow(cv, m.lanes, midX, topLaneCy + (tgtCy - topLaneCy) * ease, col, dim, ACCENT_BLUE, {
                 maxW: 204 + ((cv.w - 16) - 204) * ease,
                 cellMaxW: 30 + (tgtCellW - 30) * ease,
                 h: 28 + (tgtH - 28) * ease,
-                kScale: 0.86 + (tgtK - 0.86) * ease,
                 alpha: 0.74 + 0.26 * ease,
                 isBack: ease < 0.20,
                 underlineAlpha: Math.max(0, (ease - 0.20) / 0.80),

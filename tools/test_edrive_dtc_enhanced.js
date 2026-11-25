@@ -54,7 +54,7 @@ async function main() {
         assert.strictEqual(pkg.main, 'javascript/localized-entry.js');
         assert.strictEqual(pkg.license, 'MIT');
         const provenance = JSON.parse(fs.readFileSync(path.join(packageDir, 'PROVENANCE.json')));
-        assert.strictEqual(provenance.commit, '35bca28bc82b30482d73782877ebaf92c69dcb8c');
+        assert.strictEqual(provenance.commit, JSON.parse(fs.readFileSync(path.join(root, 'localized/cauliflower/release-plan.json'), 'utf8'))[id].upstreamCommit);
         assert.strictEqual(pkg.license, 'MIT', 'License follows verified public source, not generated export metadata');
         assert(!fs.existsSync(path.join(packageDir, 'node_modules')));
         assert(!fs.existsSync(path.join(packageDir, 'javascript/app.js')));
@@ -110,7 +110,7 @@ async function main() {
     assert(spec.startWidget && spec.startWidget.image === 'BackgroundImage1');
     passed('eDrive home widget includes its layout and matching runtime specification');
 
-    const { FastKw, FRESH_MS, MIN_FIT } = require(appPath('edrive', 'fastkw.js'));
+    const { FastKw, HOLD_MS, MIN_FIT } = require(appPath('edrive', 'fastkw.js'));
     const fast = new FastKw();
     assert.strictEqual(fast.now(10000), null);
     for (let i = 0; i < 40; i++) {
@@ -123,7 +123,7 @@ async function main() {
     const at = 10000 + 39 * 500;
     assert(Number.isFinite(fast.now(at + 250)));
     assert(Math.abs(fast.now(at + 250) - (1.5 * (5 + (39 % 7) * 3) + 1.3)) < 0.5);
-    assert.strictEqual(fast.now(at + FRESH_MS + 1), null, 'Stale needle must not look live');
+    assert.strictEqual(fast.now(at + HOLD_MS + 1), null, 'Stale needle must not look live');
     const n = fast.fit.n;
     fast.reading(NaN, at + 250);
     assert.strictEqual(fast.fit.n, n);

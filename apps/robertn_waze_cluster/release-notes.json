@@ -1,29 +1,30 @@
 [
   {
+    "version": "0.6.21",
+    "changes": [
+      "完善安卓设置待重启状态和中文提示。",
+      "保留仪表全屏、显示位置与 HUD 设置。"
+    ],
+    "upstreamVersion": "0.6.16",
+    "cnRevision": 1
+  },
+  {
     "version": "0.6.20",
-    "upstreamVersion": "0.6.14",
-    "cnRevision": 1,
     "changes": [
       "完善投屏补丁状态与兼容提示。",
       "保留仪表全屏、位置和 HUD 设置。"
-    ]
-  },
-  {
-    "version": "0.6.19",
-    "upstreamVersion": "0.6.12",
-    "cnRevision": 2,
-    "changes": [
-      "准确区分 Android Auto 异常退出与主机重启后的补丁恢复提示。"
-    ]
+    ],
+    "upstreamVersion": "0.6.14",
+    "cnRevision": 1
   },
   {
     "version": "0.6.18",
-    "upstreamVersion": "0.6.12",
-    "cnRevision": 1,
     "changes": [
       "修复部分苹果地图黑屏或只显示转向卡片的问题。",
       "保留仪表盘全屏及中文设置；旧补丁会提示更新。"
-    ]
+    ],
+    "upstreamVersion": "0.6.12",
+    "cnRevision": 1
   },
   {
     "version": "0.6.17",

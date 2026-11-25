@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "id": "gforce",
-  "version": "1.6.23",
+  "version": "1.6.25",
   "tree": "package",
   "modules": [
     "src/sdk.js"

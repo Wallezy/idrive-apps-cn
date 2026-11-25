@@ -123,7 +123,7 @@ try {
     for (const category of sensors.CATS) { page.cat = category; render('readouts-' + category); }
     tap('sensor:time'); assert.strictEqual(picked[2], 'time');
     page.tab = 'map'; values.mapInTheme = true; render('map-unavailable');
-    assert(labels.includes('当前主题不支持地图，请选 GT3、Sport 或 M'));
+    assert(labels.includes('当前主题不支持地图，请选 GT3、Sport、M、M view 或 Vector'));
     page.tab = 'look'; playing = true; render('demo-playing'); assert(labels.includes('仪表演示中 · 25 秒'));
     playing = false; blocked = 'moving'; speed = 20; render('demo-moving');
     assert(!frame.targets.some((t) => t.key === 'demo:play'), 'moving car cannot start demo');

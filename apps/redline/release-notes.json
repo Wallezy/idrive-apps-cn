@@ -1,36 +1,45 @@
 [
   {
+    "version": "2.0.50",
+    "changes": [
+      "修复手动挡退出倒挡后挡位仍显示 R 的问题。",
+      "优化选项布局与旋钮焦点显示。"
+    ],
+    "upstreamVersion": "2.0.49",
+    "cnRevision": 1
+  },
+  {
     "version": "2.0.46",
-    "upstreamVersion": "2.0.45",
-    "cnRevision": 1,
     "changes": [
       "改进燃油、爆震与电气数据兼容。"
-    ]
+    ],
+    "upstreamVersion": "2.0.45",
+    "cnRevision": 1
   },
   {
     "version": "2.0.43",
-    "upstreamVersion": "2.0.42",
-    "cnRevision": 1,
     "changes": [
       "同步来电时 HUD 避让等新版改进。",
       "完善简体中文显示，保留无水印界面。"
-    ]
+    ],
+    "upstreamVersion": "2.0.42",
+    "cnRevision": 1
   },
   {
     "version": "2.0.42",
-    "upstreamVersion": "2.0.41",
-    "cnRevision": 1,
     "changes": [
       "十种 HUD 布局、驾驶模式独立设置、导航和胎压小窗。",
       "固定中文，修复上传重试和停止后的资源清理；自动演示默认关闭。"
-    ]
+    ],
+    "upstreamVersion": "2.0.41",
+    "cnRevision": 1
   },
   {
     "version": "1.8.3",
-    "upstreamVersion": "1.8.1",
-    "cnRevision": 2,
     "changes": [
       "移除界面角落水印，让仪表和数据显示更清爽。"
-    ]
+    ],
+    "upstreamVersion": "1.8.1",
+    "cnRevision": 2
   }
 ]

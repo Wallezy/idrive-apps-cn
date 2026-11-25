@@ -1,6 +1,6 @@
 {
   "name": "oap-driverecorder-next",
-  "version": "2.5.2",
+  "version": "2.5.3",
   "description": "录制车载摄像头，保存、锁定和导出片段，支持旋钮与触控。仅停车时播放，超过 4 GB 循环覆盖未锁定片段；需要支持行车记录的摄像头。",
   "private": false,
   "main": "javascript/runner.js",

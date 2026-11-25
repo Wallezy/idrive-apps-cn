@@ -81,13 +81,15 @@ trial"). A build counts as pristine when all its sites read stock.
 `SHIPPED` in `carplay_patch.js` keeps, by build-id, the shipped SHA-256
 and bytes of the two builds earlier releases patched in the file
 (carplay 22.28.3 and 21.27.4). It never decides whether a build is
-patched; it serves to put back such a patch without its backup ("Undo"),
-and a site of such a build that reads as neither its shipped bytes nor our
-edit reads as modified by something else (`known: yes, modified build
-(neither the shipped bytes nor our edit at <offset>)`), such as another
-physical size in the geometry, which the classifier alone reads as stock.
-Bytes away from the sites do not count: a file of such a build that
-differs elsewhere is pristine and patched like any other.
+patched. What it writes or trusts needs the file to be the shipped one,
+apart from our edits: putting back such a patch without its backup
+("Undo") and boot recovery's checks ("Boot recovery"); `probe` compares
+any file of such a build with it to name what differs. The locator's
+checks decide whether a file is pristine: a file with such a build-id
+that is not the shipped file, its sites found and reading as stock, is
+patched like any other build, whatever else differs (another firmware
+image, or bytes another tool left in a geometry immediate the classifier
+reads as stock).
 
 **The cluster coding.** The patch is made for cars coded
 `KI_KOMBI_VARIANT` 7, the value Edit 1 remaps. `carplay_patch.js` reads the
@@ -675,7 +677,6 @@ shows.
 | the original with our backup (CarPlay's Remove patch button was used, or boot recovery removed the patch), or a patch in memory turned off (Remove patch: whatever carplay is, a firmware update's included; boot recovery: the carplay it turned off, another one is planned again on trial) | nothing: the map stays off; the first install on HIGH F applies it again ("Supported head units"), except where boot recovery removed the patch | drops our backup |
 | a build with an edit site not found or not recognised | nothing: a conflict | with our verified backup of the same build differing from it (`restorable`), writes the backup whole (pending) and drops it; else nothing |
 | another build with one of our edits and no backup of ours to trust | nothing: a conflict | nothing: the removal is refused (exit 1) |
-| a build `SHIPPED` knows with a site holding neither its shipped bytes nor ours | nothing: a conflict | nothing |
 | `carplay.service` starting another program (an `ExecStart` in a unit or drop-in under `/etc` or `/run/systemd/system`) | puts a patch of ours back as it ships; plans nothing: a conflict | turns the patch in memory off; puts a patch of ours back |
 
 A conflict is not a failure: the hook exits 0 with `conflict` in its result,
@@ -918,10 +919,9 @@ next head-unit start, for an aapd that still reads it.
 `Environment=LD_PRELOAD=/usr/lib/libschedconfig.so.1`, kept first. aapd
 runs as `cia_13006`, is not setuid and has no file capabilities (its
 process has none: `CapEff`, `CapPrm` 0), so the loader honours the
-preload. `patchd` restarts aapd itself only where recmgr loaded its
-entry and systemd loaded this drop-in.
+preload. `patchd` never restarts aapd ("Android Auto: Activation").
 
-**Activation.** As for carplay; an install never restarts aapd. A change
+**Activation.** Every change waits for the next head-unit start. A change
 of the turn card also changes the render's crop, which it reads at its
 start, so the change waits for the next head-unit start
 ("Android Auto: the geometry").
@@ -1098,11 +1098,10 @@ and counts as pristine when all its sites read stock: no list of builds
 decides whether it is patched. An install arms it as any other, on trial
 until it ran healthy on this car ("Boot recovery"). `SHIPPED` in
 `aapd_patch.js` keeps the shipped SHA-256 and bytes of aapd 22.39.3, the
-build earlier releases patched in the file, only to put such a patch back
-without its backup; a site of that build that reads as neither its
-shipped bytes nor our edit reads as modified by something else, and bytes
-away from the sites do not count. `probe` prints `differs:` as CarPlay's
-does. `--unproven`, which earlier
+build earlier releases patched in the file, for the same uses as
+CarPlay's, each needing the whole file to be the shipped one; the
+locator's checks decide whether a file is pristine. `probe`
+prints `differs:` as CarPlay's does. `--unproven`, which earlier
 releases' Patch button passed, changes nothing. `status` prints the
 build-id, the version its debug source paths name, `planable:` and
 `foreign:` (our edits beside another change in either file).
@@ -1325,8 +1324,11 @@ about 0.62 x dpi rows down, so the cut is 156 rows up to 200 dpi, then
 1088:480 (240 dpi `4,160,1270,560`, 300 `46,196,1188,524`, 400
 `116,258,1048,462`). The render reads its crop at start: `patchd` writes this
 one to `/var/opt/waze-on-cluster/aa-crop.env`, which `waze-on-cluster.service`
-passes as `-s src_crop=…`, and a change of it waits, with the copy of
-aapd.conf it goes with, for the next head-unit start. Showing the card again removes the file. A render
+passes as `-s src_crop=…`. A crop other than the one the running render
+read at its start (its `WOC_SRC_CROP`, from `/proc/<pid>/environ`) waits,
+with the copy of aapd.conf it goes with, for the next head-unit start; with
+no render running, any change of the file does. Showing the card again
+removes the file. A render
 that restarts before that start (an update of the tool, a crash) reads the
 new crop early, while the phone still draws the old geometry: the map is
 cropped wrongly until the head-unit start.
@@ -1377,15 +1379,11 @@ points it at. `aapd.service` (`Type=simple`, `WatchdogSec=30`,
 `User=cia_13006`) has no `Restart=` and no `OnFailure=`, and the firmware's
 recmgr and crash-handler lists do not name it. So its end matters only to
 recmgr, which restarts the head unit for a service it does not list, and,
-for a core dump, to the crash handler. `patchd` restarts aapd itself only
-where recmgr loaded `aapd` in both lists this boot and systemd loaded the
-tool's drop-in: SIGKILL of the main PID (no core dump, so no crash
-handler), the run's `InvocationID` recorded in
-`/dev/shm/waze-on-cluster/aapd-killed`, then `systemctl start aapd.service`,
-`is-active`, and its memory read until it runs the plan (or, for Remove
-patch, runs as it ships). The drop-in adds no `SuccessExitStatus`: a
-SIGKILL fails the unit (`Result=signal`), which runs nothing. Otherwise the
-change waits for the next head-unit start, `/dev/shm/waze-on-cluster/aa-pending`
+for a core dump, to the crash handler. `patchd` never restarts aapd: an
+aapd started while the head unit runs gets no touch or iDrive controller
+input until the next head-unit start. So Patch, Remove patch, Zoom and the
+turn card each wait for the next head-unit start (the app's **Restart head
+unit**), `/dev/shm/waze-on-cluster/aa-pending`
 marking it with what aapd runs until then (`run`: its density and turn
 card, null for stock). Remove patch of a patch still waiting leaves nothing
 waiting: aapd runs as it ships already. A put-back of an earlier release's

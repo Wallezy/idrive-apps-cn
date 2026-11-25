@@ -9,8 +9,12 @@ FROM ubuntu:18.04@sha256:dca176c9663a7ba4c1f0e710986f5a25e672842963d95b960191e2d
 ARG UBUNTU_ARCHIVE
 RUN if [ -n "$UBUNTU_ARCHIVE" ]; then \
       sed -i "s|http://archive.ubuntu.com/ubuntu|$UBUNTU_ARCHIVE|g; s|http://security.ubuntu.com/ubuntu|$UBUNTU_ARCHIVE|g" /etc/apt/sources.list; \
-    fi \
- && apt-get update -qq \
- && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends \
-      g++ make binutils python3 python3-pyelftools >/dev/null \
+    fi; \
+    for i in 1 2 3 4 5 6; do \
+      apt-get update -q \
+      && DEBIAN_FRONTEND=noninteractive apt-get install -y -q --no-install-recommends \
+           g++ make binutils python3 python3-pyelftools \
+      && break; \
+      [ "$i" = 6 ] && exit 1; sleep 30; \
+    done \
  && rm -rf /var/lib/apt/lists/*

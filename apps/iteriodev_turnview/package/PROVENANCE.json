@@ -1,6 +1,6 @@
 {
   "repository": "IterioDev/car-apps",
-  "commit": "f67a602df54f3e31cc10387aca453e4cfdee3c9e",
+  "commit": "eedd1059f9a3465bde0894f1be48197298df80c8",
   "authorization": {
     "date": "2026-11-23",
     "basis": "Owner confirms author permission for the Chinese port and redistribution.",
@@ -12,7 +12,7 @@
   },
   "runtimeValidation": "pending; no car connected or changed",
   "nativeBinaryRebuild": false,
-  "upstreamVersion": "1.7.0",
-  "releaseVersion": "1.7.1",
-  "sourcePackageSha256": "53a12bcd06341c7d4f1ce4c8c1f038cdf6640a9c337a61f970f14fff73134770"
+  "upstreamVersion": "1.7.1",
+  "releaseVersion": "1.7.2",
+  "sourcePackageSha256": "9ea3ca186b54fbb7236f80b914f531595be61089497ceca1d329c8dc27f293aa"
 }

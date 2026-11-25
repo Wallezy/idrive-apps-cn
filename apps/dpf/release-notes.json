@@ -1,11 +1,11 @@
 [
   {
     "version": "0.1.76",
-    "upstreamVersion": "0.1.75",
-    "cnRevision": 1,
     "changes": [
       "新增 DPF 状态，查看积碳、灰分与再生信息。",
       "采用上游直接诊断路径，不启用实验数据服务。"
-    ]
+    ],
+    "upstreamVersion": "0.1.75",
+    "cnRevision": 1
   }
 ]

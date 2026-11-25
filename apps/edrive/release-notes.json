@@ -1,36 +1,45 @@
 [
   {
+    "version": "2.11.5",
+    "changes": [
+      "改善电功率估算与范围判断。",
+      "优化旋钮焦点和中文界面显示。"
+    ],
+    "upstreamVersion": "2.11.4",
+    "cnRevision": 1
+  },
+  {
     "version": "2.11.1",
-    "upstreamVersion": "2.11.0",
-    "cnRevision": 1,
     "changes": [
       "完善纯电与混动车型电量、续航及电池数据显示。"
-    ]
+    ],
+    "upstreamVersion": "2.11.0",
+    "cnRevision": 1
   },
   {
     "version": "2.9.4",
-    "upstreamVersion": "2.9.2",
-    "cnRevision": 2,
     "changes": [
       "保留驻车休眠与缺失读数处理。",
       "完善简体中文显示，保留无水印界面。"
-    ]
+    ],
+    "upstreamVersion": "2.9.2",
+    "cnRevision": 2
   },
   {
     "version": "2.9.3",
-    "upstreamVersion": "2.9.2",
-    "cnRevision": 1,
     "changes": [
       "补齐插混、48V、12V 电池页面和主页卡片；估算功率明确标识。",
       "停车闲置停止诊断轮询，无信号时不会自动显示模拟读数。"
-    ]
+    ],
+    "upstreamVersion": "2.9.2",
+    "cnRevision": 1
   },
   {
     "version": "2.0.3",
-    "upstreamVersion": "2.0.1",
-    "cnRevision": 2,
     "changes": [
       "移除界面角落水印，让仪表和数据显示更清爽。"
-    ]
+    ],
+    "upstreamVersion": "2.0.1",
+    "cnRevision": 2
   }
 ]

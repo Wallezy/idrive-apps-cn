@@ -12,6 +12,7 @@ function text(value) {
     if ((m = /^Turn HUD Widgets off so (.*) shows\?$/.exec(s))) return '关闭 HUD Widgets 并显示 ' + m[1] + '？';
     if ((m = /^Can't reach Waze on Cluster \((.*)\)$/.exec(s))) return '无法连接 Waze 仪表盘（' + m[1] + '）';
     if ((m = /^Off · (.*) has the screen · pick one to take it back$/.exec(s))) return m[1] + ' 正在显示，请选主题切换';
+    if ((m = /^Waiting to show the map \((.*)\)$/.exec(s))) return '正在等待地图显示（' + m[1] + '）';
     return t(s.replace(' · trail ', ' · 轨迹 ').replace(/  ·  now/i, ' · 当前'));
 }
 function localizeCanvas(cv) {

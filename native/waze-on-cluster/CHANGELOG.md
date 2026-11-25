@@ -2,12 +2,69 @@
 
 ## Unreleased
 
+## 0.14.15
+
+- 改善安卓投屏和地图恢复，保留仪表全屏。
+- 安卓补丁、缩放及手机卡片设置在车机下次启动时生效。
+
 ## 0.14.6
 
 - 改善安卓投屏重连与固件兼容识别。
 - 支持纯图层主题显示地图，保留全屏和恢复保护。
 
 ## 0.13.1
+## 0.14.14
+
+Android Auto: Patch, Remove patch, Zoom and the turn card take effect at
+the next head-unit start (**Restart head unit**), so Android Auto's
+touchscreen and iDrive controller keep working after them. Several can be
+changed before that restart; changing one back to what already runs leaves
+nothing waiting.
+
+## 0.14.13
+
+The patch and recovery services run in the head unit's slice for standard
+services, and the journal keeper in its slice for background work, so none
+of them takes CPU time ahead of the HMI.
+
+## 0.14.12
+
+The tests build with the cluster renderer's iDrive 7 log-level handling
+left out, as the map feed test does not use it. Nothing changes on the car.
+
+## 0.14.11
+
+The map's frames go to the cluster renderer through shared memory where
+the renderer takes them, which takes less CPU for each frame. The receive
+and decode threads wait without waking while no stream comes.
+
+## 0.14.10
+
+The tests run at once: `make test` takes about a minute and a half instead
+of about 18, with the same checks. Nothing changes on the car.
+
+## 0.14.9
+
+Building from source retries a failed package download and shows its
+error.
+
+## 0.14.8
+
+The tests remove their temporary files and stop the processes they start
+however a run ends, also when it fails or is interrupted.
+
+## 0.14.7
+
+CarPlay's cluster map works on cars where removing or updating
+another CarPlay safe-area tool left `Changed by another tool`; restart the
+head unit after updating.
+
+## 0.14.6
+
+Uses about 10 MB less of the head unit's memory: the diagnostic DLT
+capture now runs inside the patch service instead of a service of its own.
+Boot recovery and the journal keeper stay separate.
+
 ## 0.14.5
 
 A cluster theme app that draws with layers only can show the map inside its

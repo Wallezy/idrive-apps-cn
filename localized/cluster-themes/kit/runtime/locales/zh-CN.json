@@ -1464,5 +1464,17 @@
   "B5": "B5",
   "B8": "B8",
   "XB7": "XB7",
-  "XD3": "XD3"
+  "XD3": "XD3",
+  "Another app is showing the Waze map": "其他应用正在显示 Waze 地图",
+  "Needs robertnisipeanu's Waze on Cluster 0.14.5 or newer with cluster-render 0.8.2 or newer.": "需要地图服务 0.14.5 及仪表渲染器 0.8.2 或更新版本。",
+  "On: GT3, Sport, M, M view and Vector open a window in the middle and Waze's map shows in it,": "开启后，支持的主题将在中央窗口显示 Waze 地图，",
+  "This theme has no map version (GT3, Sport, M, M view and Vector do)": "当前主题不支持地图，请选 GT3、Sport、M、M view 或 Vector",
+  "Turning this off gives Waze its usual place back.": "关闭后，Waze 恢复原来的显示位置。",
+  "Update Waze on Cluster and cluster-render to show the map in the theme": "请更新地图服务与仪表渲染器以在主题中显示地图",
+  "Update Waze on Cluster to show its map in the theme": "请更新地图服务以在主题中显示地图",
+  "Waiting for the cluster": "正在等待仪表服务",
+  "Waiting for the theme to draw": "正在等待主题绘制",
+  "Waiting for the theme to show on the cluster": "正在等待主题显示到仪表",
+  "Waiting to show the map": "正在等待地图显示",
+  "above BMW's own map view, so nothing shows twice. When the map goes away the theme fills back in.": "覆盖原厂地图以避免重复显示；地图退出后主题自动恢复。"
 }

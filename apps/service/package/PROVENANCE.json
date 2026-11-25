@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/cauliflowermossgrape/idrive7-apps",
-  "commit": "35bca28bc82b30482d73782877ebaf92c69dcb8c",
+  "commit": "454e47f8b6aec5b2e0d7335257d7cc3644d9d858",
   "language": "zh-CN",
   "sdk": "Excluded; donor-linked by mgu-deploy",
   "adaptations": [
@@ -9,11 +9,11 @@
     "Numeric three-part CN versions"
   ],
   "component": "service",
-  "upstreamVersion": "1.6.3",
-  "releaseVersion": "1.6.4",
+  "upstreamVersion": "1.6.5",
+  "releaseVersion": "1.6.6",
   "cnRevision": 1,
   "adaptedSourceFilesSha256": {
-    "apps/service/app.json": "6d061a2e065b825ee9fd84ad4806b42a0aabcb55c347041bff325724850ae29b",
+    "apps/service/app.json": "b83467c6668c6acc05c54c11a6577e89fdae3d529721e3c2c64938636875d380",
     "apps/service/icon.png": "606928ba45bd2f212eb81d87a5ae8ff4fc9d0129c6973e0d70a51ef861179ee9",
     "apps/service/main.js": "45599133b4ccba145c1c42f2ef438141fba8fe5c7d14c0f4cde4b3bf4ddfdd95"
   }

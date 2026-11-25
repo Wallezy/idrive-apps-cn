@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/cauliflowermossgrape/idrive7-apps",
-  "commit": "35bca28bc82b30482d73782877ebaf92c69dcb8c",
+  "commit": "454e47f8b6aec5b2e0d7335257d7cc3644d9d858",
   "language": "zh-CN",
   "sdk": "Excluded; donor-linked by mgu-deploy",
   "adaptations": [
@@ -9,16 +9,16 @@
     "Numeric three-part CN versions"
   ],
   "component": "edrive",
-  "upstreamVersion": "2.11.0",
-  "releaseVersion": "2.11.1",
+  "upstreamVersion": "2.11.4",
+  "releaseVersion": "2.11.5",
   "cnRevision": 1,
   "adaptedSourceFilesSha256": {
-    "apps/edrive/app.json": "f8a9777709c04bc806578f886fb0a38516de60dcb3895508b46cc5dfa817e78b",
+    "apps/edrive/app.json": "63b5a231298fa43f27589fbcd9592dd7754358a500251881f657d7af68402e49",
     "apps/edrive/battery12.js": "8d14fc3d5d7b79f0f3ad1ddc5f172365590266ccceaa70e005fa80693ddbb924",
-    "apps/edrive/fastkw.js": "b9a74d9ac3b735b151fb7608c6be4cb959643ff0668d72b67c9ad6d3474e5fd7",
+    "apps/edrive/fastkw.js": "cdd5cf356f11f80584ba0de81ac87c3ba12fb95307248320649e590e856ac7e7",
     "apps/edrive/icon.png": "5869ea41c3c995e8f085e2761277db3e5f5040b6042ad50ad185d9b3b52a824a",
     "apps/edrive/linkqueue.js": "ccf468a51dbeddaf79cf50ca792c3a44df5db71b33867b6d3410a98d33948a28",
-    "apps/edrive/live.js": "b2cc00eb2dd7bedee4f773c78d81df0dcc74b4b2177d6709ffd91918e803c9a1",
+    "apps/edrive/live.js": "b69d908bf1138f7d8890e8de164bd82fd2e164ff27eeffc916602c71894532a3",
     "apps/edrive/main.js": "8df7fc2e866c0422db43ead73c2d1df5d151cd1a287a8c6cd2e37761099aac12",
     "apps/edrive/range.js": "64b3f77fa49d4cf7cc54758d3faf871c45322001bda43ead53eed7db94217b34"
   }

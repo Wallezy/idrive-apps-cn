@@ -1,6 +1,6 @@
 'use strict';
 /**
- * main.js - Cluster Metrics entry point for BMW iDrive 7 (MGU OAP).
+ * main.js - Cluster+ entry point for BMW iDrive 7 (MGU OAP).
  *
  * Uses BMW's native full-screen-width RHMI list (`LT_State_Wide`):
  *   - MAIN: native switches, dropdowns, live status summary, and a button to open Diagnostics.
@@ -537,22 +537,30 @@ mgu.run({
                 ui.text('BTN_PROBE_BRAKE', 'Saved ' + asciiOnly(t.probeSavedPath || '/tmp/cluster-metrics-probe.log'));
             }
 
+            const tripDiag = (typeof t.tripDistKm === 'number' && isFinite(t.tripDistKm))
+                ? (' | Trip: ' + (units.distUnit === 'mi' ? (t.tripDistKm * 0.621371).toFixed(1) + ' mi' : t.tripDistKm.toFixed(1) + ' km') +
+                    (typeof t.rawWayPassed === 'number' ? ' (raw=' + t.rawWayPassed + ')' : ''))
+                : '';
             setTwoRow(
                 'DIAG_POWERTRAIN',
                 'Powertrain (' + profile.vehicleType.toUpperCase() + (t.demo ? ' DEMO' : ' LIVE') + ' - ' + profile.mode.toUpperCase() + ')',
                 'Efficiency: ' + hero.value + ' ' + hero.unit + ' | Secondary: ' + (sum.subText || '--') +
-                    ' | Speed: ' + spd.value + ' ' + spd.unit + ' @ ' + Math.round(t.rpm || 0) + ' rpm'
+                    ' | Speed: ' + spd.value + ' ' + spd.unit + ' @ ' + Math.round(t.rpm || 0) + ' rpm' + tripDiag
             );
 
             const socStr = (typeof t.soc === 'number' && isFinite(t.soc)) ? (t.soc.toFixed(1) + '%') : '--';
-            const kwStr = (typeof t.hvKw === 'number' && isFinite(t.hvKw)) ? ((t.hvKw >= 0 ? '+' : '') + t.hvKw.toFixed(1) + ' kW') : '--';
+            const kwStr = (typeof t.hvKw === 'number' && isFinite(t.hvKw))
+                ? (t.hvKw < -0.05 ? ('+' + Math.abs(t.hvKw).toFixed(1) + ' kW CHG') : (Math.abs(t.hvKw).toFixed(1) + ' kW'))
+                : '--';
             const erangeStr = (typeof t.erangeKm === 'number' && isFinite(t.erangeKm))
                 ? (units.distUnit === 'mi' ? Math.round(t.erangeKm * 0.621371) + ' mi' : Math.round(t.erangeKm) + ' km')
                 : '--';
+            const hybExtra = (t.opModeHybrid !== null && t.opModeHybrid !== undefined ? ' | Op:' + t.opModeHybrid : '') +
+                (t.iceStartReason && t.iceStartReason !== 'NONE' ? ' | ICE:' + t.iceStartReason : '');
             setTwoRow(
                 'DIAG_BATTERY',
                 'HV Battery (Charge / Power / Temp)',
-                'SoC: ' + socStr + ' | Power: ' + kwStr + ' | Temp: ' + fmtTempAscii(t.battTempC, units) + ' | EV Range: ' + erangeStr
+                'SoC: ' + socStr + ' | Power: ' + kwStr + ' | Temp: ' + fmtTempAscii(t.battTempC, units) + ' | EV Range: ' + erangeStr + hybExtra
             );
 
             const hvacTag = t.cabinHvacMode === 'cooling' ? ' [AC]'
@@ -581,7 +589,9 @@ mgu.run({
                     : (sum.brakeHold ? ('Pedal hold 1/20 (' + barTag + 'sw=' + swTag + ')')
                         : (t.frictionG > 0.02
                             ? (barTag + t.frictionG.toFixed(2) + 'g (' + sum.brakeLit + '/20, sw=' + swTag + ')' + (t.absActive ? ' ABS' : ''))
-                            : ('0.00g idle (' + barTag + 'sw=' + swTag + ')'))));
+                            : (sum.iceChargeActive
+                                ? ('ICE Chg +' + sum.iceChargeKw.toFixed(1) + ' kW (' + sum.iceChargeLit + '/20)')
+                                : ('0.00g idle (' + barTag + 'sw=' + swTag + ')')))));
             setTwoRow(
                 'DIAG_CHASSIS',
                 'Gearbox & Friction Brake',

@@ -178,12 +178,19 @@
         "statusActualValueTorque2": "rs"
       }
     },
+    "de.bmw.infotainment.drivingexcitement.Efficiencytainment": {
+      "instances": "1",
+      "attributes": {
+        "statusReasonPowerUpCombustionEngine": "rs"
+      }
+    },
     "de.bmw.infotainment.drivingexcitement.Efficiencytainment2": {
       "instances": "1",
       "attributes": {
         "statusBatteryTemperature": "rs",
         "statusPowerRelativHybrid": "rs",
-        "statusChargeOfBatteryHybrid": "rs"
+        "statusChargeOfBatteryHybrid": "rs",
+        "statusOperatingModeHybrid": "rs"
       }
     },
     "de.bmw.infotainment.lsc.LSCDataSink": {

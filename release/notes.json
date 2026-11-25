@@ -1,6 +1,15 @@
 {
   "cluster-render": [
     {
+      "version": "0.8.13",
+      "changes": [
+        "修复关闭 DLT 时地图短暂显示后消失的问题。",
+        "优化图层资源释放，增加画布、文字和视频传输支持。"
+      ],
+      "upstreamVersion": "0.8.12",
+      "cnRevision": 1
+    },
+    {
       "version": "0.8.3",
       "changes": [
         "支持纯图层主题嵌入地图，保留全屏与原厂告警避让。",
@@ -20,11 +29,11 @@
     },
     {
       "version": "0.6.10",
-      "upstreamVersion": "0.6.9",
-      "cnRevision": 1,
       "changes": [
         "启动时优先等待原厂仪表就绪，地图请求卡住后自动重试。"
-      ]
+      ],
+      "upstreamVersion": "0.6.9",
+      "cnRevision": 1
     },
     {
       "version": "0.6.7",
@@ -63,42 +72,42 @@
     },
     {
       "version": "0.6.1",
-      "upstreamVersion": "0.6.0",
-      "cnRevision": 1,
       "changes": [
         "Beta：支持仪表主题内嵌实时地图。",
         "保留仪表全屏遮罩和映射失败保护。"
-      ]
+      ],
+      "upstreamVersion": "0.6.0",
+      "cnRevision": 1
     },
     {
       "version": "0.5.14",
-      "upstreamVersion": "0.5.9",
-      "cnRevision": 3,
       "changes": [
         "移除地图下层校准协议、测试网格及临时画布覆盖。",
         "保留仪表全屏地图的原厂表盘透明遮罩与兼容性检查。"
-      ]
-    },
-    {
-      "version": "0.5.13",
+      ],
       "upstreamVersion": "0.5.9",
-      "cnRevision": 2,
-      "changes": [
-        "新增 ID7 全幅视频透明遮罩，保留原厂表盘区域。",
-        "后台握手未确认支持时禁止发送扩展图层；绘图失败不回退为不透明视频。"
-      ]
+      "cnRevision": 3
     },
     {
       "version": "0.5.12",
-      "upstreamVersion": "0.5.9",
-      "cnRevision": 1,
       "changes": [
         "支持压缩图像资源，减少仪表和 HUD 图像占用。",
         "保留停车校准功能。"
-      ]
+      ],
+      "upstreamVersion": "0.5.9",
+      "cnRevision": 1
     }
   ],
   "waze-on-cluster": [
+    {
+      "version": "0.14.15",
+      "changes": [
+        "改善安卓投屏和地图恢复，保留仪表全屏。",
+        "安卓补丁、缩放及手机卡片设置在车机下次启动时生效。"
+      ],
+      "upstreamVersion": "0.14.14",
+      "cnRevision": 1
+    },
     {
       "version": "0.14.6",
       "changes": [
@@ -118,47 +127,21 @@
       "cnRevision": 1
     },
     {
-      "version": "0.11.1",
-      "upstreamVersion": "0.11.0",
-      "cnRevision": 1,
-      "changes": [
-        "CarPlay 地图补丁改为内存加载，兼容旧版补丁迁移与故障恢复。",
-        "保留仪表盘全屏、显示位置和 HUD 设置。"
-      ]
-    },
-    {
       "version": "0.10.13",
-      "upstreamVersion": "0.10.12",
-      "cnRevision": 1,
       "changes": [
         "诊断日志优先保存在内存，故障和正常关机时保存，减少存储写入。"
-      ]
-    },
-    {
-      "version": "0.10.12",
-      "upstreamVersion": "0.10.11",
-      "cnRevision": 1,
-      "changes": [
-        "修复 Android Auto 显示未就绪时异常退出，并完善自动恢复。",
-        "保留全屏、显示位置和 HUD 设置，补充故障诊断信息。"
-      ]
-    },
-    {
-      "version": "0.10.10",
-      "upstreamVersion": "0.10.9",
-      "cnRevision": 1,
-      "changes": [
-        "主题内地图新增可选传输优化，默认关闭；保留现有全屏和 HUD 显示。"
-      ]
+      ],
+      "upstreamVersion": "0.10.12",
+      "cnRevision": 1
     },
     {
       "version": "0.10.7",
-      "upstreamVersion": "0.10.7",
-      "cnRevision": 1,
       "changes": [
         "恢复兼容的 CarPlay 导航显示区域。",
         "完善旧补丁升级、中断恢复及回滚兼容。"
-      ]
+      ],
+      "upstreamVersion": "0.10.7",
+      "cnRevision": 1
     },
     {
       "version": "0.10.6",
@@ -189,31 +172,40 @@
     },
     {
       "version": "0.10.1",
-      "upstreamVersion": "0.10.0",
-      "cnRevision": 1,
       "changes": [
         "Beta：适配主题内嵌地图的裁切与重连。",
         "保留仪表盘全屏切换。"
-      ]
+      ],
+      "upstreamVersion": "0.10.0",
+      "cnRevision": 1
     },
     {
       "version": "0.9.16",
-      "upstreamVersion": "0.9.14",
-      "cnRevision": 2,
       "changes": [
         "支持保留原厂表盘的扩展地图目标，并向应用报告配套能力。"
-      ]
+      ],
+      "upstreamVersion": "0.9.14",
+      "cnRevision": 2
     },
     {
       "version": "0.9.15",
-      "upstreamVersion": "0.9.14",
-      "cnRevision": 1,
       "changes": [
         "简化应用说明，方便了解安装与使用方式。"
-      ]
+      ],
+      "upstreamVersion": "0.9.14",
+      "cnRevision": 1
     }
   ],
   "robertn_waze_cluster": [
+    {
+      "version": "0.6.21",
+      "changes": [
+        "完善安卓设置待重启状态和中文提示。",
+        "保留仪表全屏、显示位置与 HUD 设置。"
+      ],
+      "upstreamVersion": "0.6.16",
+      "cnRevision": 1
+    },
     {
       "version": "0.6.20",
       "changes": [
@@ -224,21 +216,13 @@
       "cnRevision": 1
     },
     {
-      "version": "0.6.19",
-      "upstreamVersion": "0.6.12",
-      "cnRevision": 2,
-      "changes": [
-        "准确区分 Android Auto 异常退出与主机重启后的补丁恢复提示。"
-      ]
-    },
-    {
       "version": "0.6.18",
-      "upstreamVersion": "0.6.12",
-      "cnRevision": 1,
       "changes": [
         "修复部分苹果地图黑屏或只显示转向卡片的问题。",
         "保留仪表盘全屏及中文设置；旧补丁会提示更新。"
-      ]
+      ],
+      "upstreamVersion": "0.6.12",
+      "cnRevision": 1
     },
     {
       "version": "0.6.17",
@@ -261,12 +245,12 @@
   ],
   "cluster_metrics": [
     {
-      "version": "0.9.1",
+      "version": "0.9.4",
       "changes": [
-        "改进中日韩文字清晰度，新增胎压与车辆提醒。",
-        "优化 HUD 导航避让、BC 按键和充电完成时间显示。"
+        "新增 HUD 布局、油门与转速显示，完善混动充电信息。",
+        "优化媒体封面、单位和发动机数据，保留中文与导航避让。"
       ],
-      "upstreamVersion": "0.9.0",
+      "upstreamVersion": "0.9.3",
       "cnRevision": 1
     }
   ],
@@ -280,22 +264,13 @@
       "cnRevision": 1
     },
     {
-      "version": "0.1.5",
-      "upstreamVersion": "0.1.1",
-      "cnRevision": 2,
-      "changes": [
-        "开始前显示准备事项，二次确认后倒计时 20 秒，留出下车关门时间。",
-        "倒计时内再次点击可取消；车辆移动、车速信号中断或离开页面后须重新确认。"
-      ]
-    },
-    {
       "version": "0.1.2",
-      "upstreamVersion": "0.1.1",
-      "cnRevision": 1,
       "changes": [
         "新增 RAM 麦克风状态读取和停车确认校准。",
         "清理界面推广文字，保留作者和许可记录。"
-      ]
+      ],
+      "upstreamVersion": "0.1.1",
+      "cnRevision": 1
     }
   ],
   "dpf_monitor": [
@@ -412,6 +387,15 @@
   ],
   "ambient_config": [
     {
+      "version": "2.7.24",
+      "changes": [
+        "新增可拖动的车内灯光预览，优化灯带分区提示。",
+        "对开灯前报告异常的灯带自动复查，保留模块查找和离车停止。"
+      ],
+      "upstreamVersion": "2.7.23",
+      "cnRevision": 1
+    },
+    {
       "version": "2.7.18",
       "changes": [
         "修正部分 G30 车型下层灯带的分区。",
@@ -431,50 +415,58 @@
     },
     {
       "version": "2.7.14",
-      "upstreamVersion": "2.7.13",
-      "cnRevision": 1,
       "changes": [
         "改进自定义灯色、门灯控制与颜色恢复，增强车身模块忙时兼容。"
-      ]
+      ],
+      "upstreamVersion": "2.7.13",
+      "cnRevision": 1
     },
     {
       "version": "2.5.2",
-      "upstreamVersion": "2.5.0",
-      "cnRevision": 2,
       "changes": [
         "车身模块暂忙时自动重试读取，减少无法自定义颜色的情况。"
-      ]
+      ],
+      "upstreamVersion": "2.5.0",
+      "cnRevision": 2
     },
     {
       "version": "2.5.1",
-      "upstreamVersion": "2.5.0",
-      "cnRevision": 1,
       "changes": [
         "同步新版灯光控制与模式设置。",
         "完善简体中文显示，保留无水印界面。"
-      ]
+      ],
+      "upstreamVersion": "2.5.0",
+      "cnRevision": 1
     },
     {
       "version": "2.4.6",
-      "upstreamVersion": "2.4.4",
-      "cnRevision": 2,
       "changes": [
         "修复部分车机按钮无响应及连续点击预览后页面消失的问题。",
         "自动选择兼容的渲染服务，连接恢复后自动恢复操作。",
         "移除界面角落水印。"
-      ]
+      ],
+      "upstreamVersion": "2.4.4",
+      "cnRevision": 2
     },
     {
       "version": "2.4.5",
-      "upstreamVersion": "2.4.4",
-      "cnRevision": 1,
       "changes": [
         "新增完整简体中文界面与状态提示。",
         "支持从国内商店安装和在线更新。"
-      ]
+      ],
+      "upstreamVersion": "2.4.4",
+      "cnRevision": 1
     }
   ],
   "brake_test": [
+    {
+      "version": "1.5.24",
+      "changes": [
+        "优化旋钮焦点和选项切换的显示，保留简体中文。"
+      ],
+      "upstreamVersion": "1.5.23",
+      "cnRevision": 1
+    },
     {
       "version": "1.5.22",
       "changes": [
@@ -485,23 +477,32 @@
     },
     {
       "version": "1.5.21",
-      "upstreamVersion": "1.5.20",
-      "cnRevision": 1,
       "changes": [
         "更新制动测试与历史记录页面。",
         "完善简体中文显示，保留无水印界面。"
-      ]
+      ],
+      "upstreamVersion": "1.5.20",
+      "cnRevision": 1
     },
     {
       "version": "1.3.3",
-      "upstreamVersion": "1.3.1",
-      "cnRevision": 2,
       "changes": [
         "移除界面角落水印，让仪表和数据显示更清爽。"
-      ]
+      ],
+      "upstreamVersion": "1.3.1",
+      "cnRevision": 2
     }
   ],
   "car_vitals": [
+    {
+      "version": "2.27.13",
+      "changes": [
+        "修复手动挡退出倒挡后挡位仍显示 R 的问题。",
+        "优化选项布局与旋钮焦点显示。"
+      ],
+      "upstreamVersion": "2.27.12",
+      "cnRevision": 1
+    },
     {
       "version": "2.27.10",
       "changes": [
@@ -512,31 +513,39 @@
     },
     {
       "version": "2.27.5",
-      "upstreamVersion": "2.27.3",
-      "cnRevision": 2,
       "changes": [
         "保留目标与实际读数修复，更新共享运行库。",
         "完善简体中文显示，保留无水印界面。"
-      ]
+      ],
+      "upstreamVersion": "2.27.3",
+      "cnRevision": 2
     },
     {
       "version": "2.27.4",
-      "upstreamVersion": "2.27.3",
-      "cnRevision": 1,
       "changes": [
         "四页车辆监测，增加目标/实际增压、充气量与历史；明确缺失数据。"
-      ]
+      ],
+      "upstreamVersion": "2.27.3",
+      "cnRevision": 1
     },
     {
       "version": "2.13.2",
-      "upstreamVersion": "2.13.0",
-      "cnRevision": 2,
       "changes": [
         "移除界面角落水印，让仪表和数据显示更清爽。"
-      ]
+      ],
+      "upstreamVersion": "2.13.0",
+      "cnRevision": 2
     }
   ],
   "doom": [
+    {
+      "version": "1.7.25",
+      "changes": [
+        "优化旋钮焦点和选项切换的显示，保留简体中文。"
+      ],
+      "upstreamVersion": "1.7.24",
+      "cnRevision": 1
+    },
     {
       "version": "1.7.23",
       "changes": [
@@ -547,23 +556,31 @@
     },
     {
       "version": "1.7.22",
-      "upstreamVersion": "1.7.21",
-      "cnRevision": 1,
       "changes": [
         "更新全屏游戏画面、主菜单与旋钮操作。",
         "完善简体中文显示，保留无水印界面。"
-      ]
+      ],
+      "upstreamVersion": "1.7.21",
+      "cnRevision": 1
     },
     {
       "version": "1.4.3",
-      "upstreamVersion": "1.4.1",
-      "cnRevision": 2,
       "changes": [
         "移除界面角落水印，让仪表和数据显示更清爽。"
-      ]
+      ],
+      "upstreamVersion": "1.4.1",
+      "cnRevision": 2
     }
   ],
   "draggy": [
+    {
+      "version": "2.7.3",
+      "changes": [
+        "优化旋钮焦点和选项切换的显示，保留简体中文。"
+      ],
+      "upstreamVersion": "2.7.2",
+      "cnRevision": 1
+    },
     {
       "version": "2.7.1",
       "changes": [
@@ -575,31 +592,39 @@
     },
     {
       "version": "2.6.1",
-      "upstreamVersion": "2.6.0",
-      "cnRevision": 1,
       "changes": [
         "增加起步打滑记录，改进加速计时。"
-      ]
+      ],
+      "upstreamVersion": "2.6.0",
+      "cnRevision": 1
     },
     {
       "version": "2.5.21",
-      "upstreamVersion": "2.5.20",
-      "cnRevision": 1,
       "changes": [
         "更新加速计时与成绩页面。",
         "完善简体中文显示，保留无水印界面。"
-      ]
+      ],
+      "upstreamVersion": "2.5.20",
+      "cnRevision": 1
     },
     {
       "version": "2.3.3",
-      "upstreamVersion": "2.3.1",
-      "cnRevision": 2,
       "changes": [
         "移除界面角落水印，让仪表和数据显示更清爽。"
-      ]
+      ],
+      "upstreamVersion": "2.3.1",
+      "cnRevision": 2
     }
   ],
   "dtc_scanner": [
+    {
+      "version": "2.9.11",
+      "changes": [
+        "优化旋钮焦点和选项切换的显示，保留简体中文。"
+      ],
+      "upstreamVersion": "2.9.10",
+      "cnRevision": 1
+    },
     {
       "version": "2.9.10",
       "changes": [
@@ -610,32 +635,40 @@
     },
     {
       "version": "2.9.9",
-      "upstreamVersion": "2.9.7",
-      "cnRevision": 2,
       "changes": [
         "保留清除确认处理，更新中文诊断资源。",
         "完善简体中文显示，保留无水印界面。"
-      ]
+      ],
+      "upstreamVersion": "2.9.7",
+      "cnRevision": 2
     },
     {
       "version": "2.9.8",
-      "upstreamVersion": "2.9.7",
-      "cnRevision": 1,
       "changes": [
         "故障列表滚动与独立中文诊断说明库；缺失翻译保留原文。",
         "清码需要二次确认，超时或离开页面取消待确认状态。"
-      ]
+      ],
+      "upstreamVersion": "2.9.7",
+      "cnRevision": 1
     },
     {
       "version": "2.6.5",
-      "upstreamVersion": "2.6.3",
-      "cnRevision": 2,
       "changes": [
         "移除界面角落水印，让仪表和数据显示更清爽。"
-      ]
+      ],
+      "upstreamVersion": "2.6.3",
+      "cnRevision": 2
     }
   ],
   "dyno": [
+    {
+      "version": "1.6.6",
+      "changes": [
+        "优化旋钮焦点和选项切换的显示，保留简体中文。"
+      ],
+      "upstreamVersion": "1.6.5",
+      "cnRevision": 1
+    },
     {
       "version": "1.6.4",
       "changes": [
@@ -646,23 +679,32 @@
     },
     {
       "version": "1.6.3",
-      "upstreamVersion": "1.6.2",
-      "cnRevision": 1,
       "changes": [
         "更新功率估算与结果展示。",
         "完善简体中文显示，保留无水印界面。"
-      ]
+      ],
+      "upstreamVersion": "1.6.2",
+      "cnRevision": 1
     },
     {
       "version": "1.2.6",
-      "upstreamVersion": "1.2.4",
-      "cnRevision": 2,
       "changes": [
         "移除界面角落水印，让仪表和数据显示更清爽。"
-      ]
+      ],
+      "upstreamVersion": "1.2.4",
+      "cnRevision": 2
     }
   ],
   "edrive": [
+    {
+      "version": "2.11.5",
+      "changes": [
+        "改善电功率估算与范围判断。",
+        "优化旋钮焦点和中文界面显示。"
+      ],
+      "upstreamVersion": "2.11.4",
+      "cnRevision": 1
+    },
     {
       "version": "2.11.1",
       "changes": [
@@ -673,32 +715,40 @@
     },
     {
       "version": "2.9.4",
-      "upstreamVersion": "2.9.2",
-      "cnRevision": 2,
       "changes": [
         "保留驻车休眠与缺失读数处理。",
         "完善简体中文显示，保留无水印界面。"
-      ]
+      ],
+      "upstreamVersion": "2.9.2",
+      "cnRevision": 2
     },
     {
       "version": "2.9.3",
-      "upstreamVersion": "2.9.2",
-      "cnRevision": 1,
       "changes": [
         "补齐插混、48V、12V 电池页面和主页卡片；估算功率明确标识。",
         "停车闲置停止诊断轮询，无信号时不会自动显示模拟读数。"
-      ]
+      ],
+      "upstreamVersion": "2.9.2",
+      "cnRevision": 1
     },
     {
       "version": "2.0.3",
-      "upstreamVersion": "2.0.1",
-      "cnRevision": 2,
       "changes": [
         "移除界面角落水印，让仪表和数据显示更清爽。"
-      ]
+      ],
+      "upstreamVersion": "2.0.1",
+      "cnRevision": 2
     }
   ],
   "gforce": [
+    {
+      "version": "1.6.25",
+      "changes": [
+        "优化旋钮焦点和选项切换的显示，保留简体中文。"
+      ],
+      "upstreamVersion": "1.6.24",
+      "cnRevision": 1
+    },
     {
       "version": "1.6.23",
       "changes": [
@@ -709,23 +759,31 @@
     },
     {
       "version": "1.6.22",
-      "upstreamVersion": "1.6.21",
-      "cnRevision": 1,
       "changes": [
         "更新加速度显示和记录页面。",
         "完善简体中文显示，保留无水印界面。"
-      ]
+      ],
+      "upstreamVersion": "1.6.21",
+      "cnRevision": 1
     },
     {
       "version": "1.4.3",
-      "upstreamVersion": "1.4.1",
-      "cnRevision": 2,
       "changes": [
         "移除界面角落水印，让仪表和数据显示更清爽。"
-      ]
+      ],
+      "upstreamVersion": "1.4.1",
+      "cnRevision": 2
     }
   ],
   "live_adjustments": [
+    {
+      "version": "0.9.13",
+      "changes": [
+        "优化旋钮焦点和选项切换的显示，保留简体中文。"
+      ],
+      "upstreamVersion": "0.9.12",
+      "cnRevision": 1
+    },
     {
       "version": "0.9.11",
       "changes": [
@@ -736,15 +794,23 @@
     },
     {
       "version": "0.9.7",
-      "upstreamVersion": "0.9.6",
-      "cnRevision": 1,
       "changes": [
         "新增发动机设置应用，保留操作确认与车辆限制。",
         "完善简体中文显示，保留无水印界面。"
-      ]
+      ],
+      "upstreamVersion": "0.9.6",
+      "cnRevision": 1
     }
   ],
   "live_data": [
+    {
+      "version": "1.0.21",
+      "changes": [
+        "优化旋钮焦点和选项切换的显示，保留简体中文。"
+      ],
+      "upstreamVersion": "1.0.20",
+      "cnRevision": 1
+    },
     {
       "version": "1.0.19",
       "changes": [
@@ -755,15 +821,24 @@
     },
     {
       "version": "1.0.14",
-      "upstreamVersion": "1.0.13",
-      "cnRevision": 1,
       "changes": [
         "新增可自定义的实时车辆数据页面。",
         "完善简体中文显示，保留无水印界面。"
-      ]
+      ],
+      "upstreamVersion": "1.0.13",
+      "cnRevision": 1
     }
   ],
   "redline": [
+    {
+      "version": "2.0.50",
+      "changes": [
+        "修复手动挡退出倒挡后挡位仍显示 R 的问题。",
+        "优化选项布局与旋钮焦点显示。"
+      ],
+      "upstreamVersion": "2.0.49",
+      "cnRevision": 1
+    },
     {
       "version": "2.0.46",
       "changes": [
@@ -774,32 +849,40 @@
     },
     {
       "version": "2.0.43",
-      "upstreamVersion": "2.0.42",
-      "cnRevision": 1,
       "changes": [
         "同步来电时 HUD 避让等新版改进。",
         "完善简体中文显示，保留无水印界面。"
-      ]
+      ],
+      "upstreamVersion": "2.0.42",
+      "cnRevision": 1
     },
     {
       "version": "2.0.42",
-      "upstreamVersion": "2.0.41",
-      "cnRevision": 1,
       "changes": [
         "十种 HUD 布局、驾驶模式独立设置、导航和胎压小窗。",
         "固定中文，修复上传重试和停止后的资源清理；自动演示默认关闭。"
-      ]
+      ],
+      "upstreamVersion": "2.0.41",
+      "cnRevision": 1
     },
     {
       "version": "1.8.3",
-      "upstreamVersion": "1.8.1",
-      "cnRevision": 2,
       "changes": [
         "移除界面角落水印，让仪表和数据显示更清爽。"
-      ]
+      ],
+      "upstreamVersion": "1.8.1",
+      "cnRevision": 2
     }
   ],
   "service": [
+    {
+      "version": "1.6.6",
+      "changes": [
+        "优化旋钮焦点和选项切换的显示，保留简体中文。"
+      ],
+      "upstreamVersion": "1.6.5",
+      "cnRevision": 1
+    },
     {
       "version": "1.6.4",
       "changes": [
@@ -810,23 +893,31 @@
     },
     {
       "version": "1.6.2",
-      "upstreamVersion": "1.6.1",
-      "cnRevision": 1,
       "changes": [
         "更新保养项目与详情展示。",
         "完善简体中文显示，保留无水印界面。"
-      ]
+      ],
+      "upstreamVersion": "1.6.1",
+      "cnRevision": 1
     },
     {
       "version": "1.1.3",
-      "upstreamVersion": "1.1.1",
-      "cnRevision": 2,
       "changes": [
         "移除界面角落水印，让仪表和数据显示更清爽。"
-      ]
+      ],
+      "upstreamVersion": "1.1.1",
+      "cnRevision": 2
     }
   ],
   "warmup": [
+    {
+      "version": "1.9.3",
+      "changes": [
+        "优化旋钮焦点和选项切换的显示，保留简体中文。"
+      ],
+      "upstreamVersion": "1.9.2",
+      "cnRevision": 1
+    },
     {
       "version": "1.9.1",
       "changes": [
@@ -837,23 +928,31 @@
     },
     {
       "version": "1.8.2",
-      "upstreamVersion": "1.8.1",
-      "cnRevision": 1,
       "changes": [
         "更新温度与暖机状态展示。",
         "完善简体中文显示，保留无水印界面。"
-      ]
+      ],
+      "upstreamVersion": "1.8.1",
+      "cnRevision": 1
     },
     {
       "version": "1.4.6",
-      "upstreamVersion": "1.4.4",
-      "cnRevision": 2,
       "changes": [
         "移除界面角落水印，让仪表和数据显示更清爽。"
-      ]
+      ],
+      "upstreamVersion": "1.4.4",
+      "cnRevision": 2
     }
   ],
   "zf8hp": [
+    {
+      "version": "1.5.11",
+      "changes": [
+        "优化旋钮焦点和选项切换的显示，保留简体中文。"
+      ],
+      "upstreamVersion": "1.5.10",
+      "cnRevision": 1
+    },
     {
       "version": "1.5.9",
       "changes": [
@@ -864,23 +963,24 @@
     },
     {
       "version": "1.5.8",
-      "upstreamVersion": "1.5.6",
-      "cnRevision": 2,
       "changes": [
         "保留只读监测与车型识别，更新共享运行库。",
         "完善简体中文显示，保留无水印界面。"
-      ]
-    },
-    {
-      "version": "1.5.7",
+      ],
       "upstreamVersion": "1.5.6",
-      "cnRevision": 1,
-      "changes": [
-        "新增七页只读 ZF 8HP 监测，按控制器型号校验数据，区分缓存与实时读数。"
-      ]
+      "cnRevision": 2
     }
   ],
   "cluster_themes": [
+    {
+      "version": "0.19.11",
+      "changes": [
+        "改善地图在纯图层主题中的显示兼容。",
+        "隐藏或退出主题时恢复地图，优化 M 视图布局。"
+      ],
+      "upstreamVersion": "0.19.10",
+      "cnRevision": 1
+    },
     {
       "version": "0.19.10",
       "changes": [
@@ -901,15 +1001,23 @@
     },
     {
       "version": "0.19.1",
-      "upstreamVersion": "0.19.0",
-      "cnRevision": 1,
       "changes": [
         "新增 Vector、M View 布局，改进全屏排列与音乐显示。",
         "保留原版主题名称、仪表风格和单位，支持国内源在线更新。"
-      ]
+      ],
+      "upstreamVersion": "0.19.0",
+      "cnRevision": 1
     }
   ],
   "iteriodev_turnview": [
+    {
+      "version": "1.7.2",
+      "changes": [
+        "更新应用菜单图标，保留中文界面与原有功能。"
+      ],
+      "upstreamVersion": "1.7.1",
+      "cnRevision": 1
+    },
     {
       "version": "1.7.1",
       "changes": [
@@ -921,6 +1029,14 @@
     }
   ],
   "oap-driverecorder-next": [
+    {
+      "version": "2.5.3",
+      "changes": [
+        "更新应用菜单图标，保留中文界面与原有功能。"
+      ],
+      "upstreamVersion": "2.5.2",
+      "cnRevision": 1
+    },
     {
       "version": "2.5.2",
       "changes": [
@@ -956,55 +1072,55 @@
   "osa": [
     {
       "version": "0.2.65",
-      "upstreamVersion": "0.2.63",
-      "cnRevision": 2,
       "changes": [
         "新增油温助手，支持暖机估算与本地历史。",
         "简体中文界面，适配商店渲染器和仪表通知。",
         "兼容旧版车机运行时的油温通知。"
-      ]
+      ],
+      "upstreamVersion": "0.2.63",
+      "cnRevision": 2
     }
   ],
   "dpf": [
     {
       "version": "0.1.76",
-      "upstreamVersion": "0.1.75",
-      "cnRevision": 1,
       "changes": [
         "新增 DPF 状态，查看积碳、灰分与再生信息。",
         "采用上游直接诊断路径，不启用实验数据服务。"
-      ]
+      ],
+      "upstreamVersion": "0.1.75",
+      "cnRevision": 1
     }
   ],
   "spritmonitor": [
     {
       "version": "0.1.46",
-      "upstreamVersion": "0.1.45",
-      "cnRevision": 1,
       "changes": [
         "新增加油记录，支持燃油与 AdBlue 补充。",
         "提供中文界面，账户关联和联网同步由用户发起。"
-      ]
+      ],
+      "upstreamVersion": "0.1.45",
+      "cnRevision": 1
     }
   ],
   "bmrmodz-car-equipment": [
     {
       "version": "0.1.6",
-      "upstreamVersion": "0.1.5",
-      "cnRevision": 1,
       "changes": [
         "为油温助手与 DPF 状态提供只读车辆选装配置缓存。"
-      ]
+      ],
+      "upstreamVersion": "0.1.5",
+      "cnRevision": 1
     }
   ],
   "bmrmodz-notification": [
     {
       "version": "0.1.2",
-      "upstreamVersion": "0.1.1",
-      "cnRevision": 1,
       "changes": [
         "为油温助手与 DPF 状态显示短时仪表通知，保留原厂告警避让。"
-      ]
+      ],
+      "upstreamVersion": "0.1.1",
+      "cnRevision": 1
     }
   ]
 }

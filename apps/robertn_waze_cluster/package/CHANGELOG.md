@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 0.6.21
+
+- 完善安卓设置待重启状态和中文提示。
+- 保留仪表全屏、显示位置与 HUD 设置。
+
 ## 0.6.20
 
 - 完善投屏补丁状态与兼容提示。
@@ -56,6 +61,18 @@
 - Check page control IDs before packaging to prevent conflicting controls from breaking app startup.
 
 - The CN app defaults to Simplified Chinese while the HMI language is unavailable and follows explicit display-language selections. Chinese status rows translate known renderer and patch messages, frame counts and transfer limits; unknown diagnostics retain their original detail. Native protocol fields and logs are unchanged.
+## 0.6.16
+
+Android Auto: Patch, Remove patch, Zoom and Hide phone's turn card can be
+changed again while a change waits for the head-unit restart; one restart
+applies the last choice. The cluster map row stays on while Android Auto
+still runs its patch until that restart.
+
+## 0.6.15
+
+When boot recovery removes the Android Auto patch because Android Auto
+crashed with it, Android Auto's Status reads `Removed — Android Auto crashed`.
+
 ## 0.6.14
 
 A Patch or Remove patch that fails shows the reason.

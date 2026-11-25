@@ -1,36 +1,44 @@
 [
   {
-    "version": "2.9.10",
-    "upstreamVersion": "2.9.8",
+    "version": "2.9.11",
+    "upstreamVersion": "2.9.10",
     "cnRevision": 1,
     "changes": [
-      "同步上游兼容性更新，保留简体中文界面。"
+      "优化旋钮焦点和选项切换的显示，保留简体中文。"
     ]
+  },
+  {
+    "version": "2.9.10",
+    "changes": [
+      "同步上游兼容性更新，保留简体中文界面。"
+    ],
+    "upstreamVersion": "2.9.8",
+    "cnRevision": 1
   },
   {
     "version": "2.9.9",
-    "upstreamVersion": "2.9.7",
-    "cnRevision": 2,
     "changes": [
       "保留清除确认处理，更新中文诊断资源。",
       "完善简体中文显示，保留无水印界面。"
-    ]
+    ],
+    "upstreamVersion": "2.9.7",
+    "cnRevision": 2
   },
   {
     "version": "2.9.8",
-    "upstreamVersion": "2.9.7",
-    "cnRevision": 1,
     "changes": [
       "故障列表滚动与独立中文诊断说明库；缺失翻译保留原文。",
       "清码需要二次确认，超时或离开页面取消待确认状态。"
-    ]
+    ],
+    "upstreamVersion": "2.9.7",
+    "cnRevision": 1
   },
   {
     "version": "2.6.5",
-    "upstreamVersion": "2.6.3",
-    "cnRevision": 2,
     "changes": [
       "移除界面角落水印，让仪表和数据显示更清爽。"
-    ]
+    ],
+    "upstreamVersion": "2.6.3",
+    "cnRevision": 2
   }
 ]

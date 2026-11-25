@@ -1,6 +1,6 @@
 'use strict';
 /**
- * test/run_tests.js - Automated verification suite for idrive7-cluster-metrics.
+ * test/run_tests.js - Automated verification suite for idrive7-cluster-plus (Cluster+).
  */
 
 const assert = require('assert');
@@ -47,7 +47,8 @@ const {
     SignalHub, FastKw, LeadVehicleTracker, decodeStatusBattery2, decodeCabinTemp,
     createHvacState, feedHvacClimate2, feedHvacClimateMaster, resolveHvacMode,
     calcCarClockOffsetMin,
-    computeFrictionBrake, computeChargingState, decodeDscPressure, decodeDscPedal, decodeDscRegen, flagActive,
+    computeFrictionBrake, computeChargingState, computeIceBatteryCharge, decodeIceStartReason,
+    decodeDscPressure, decodeDscPedal, decodeDscRegen, flagActive,
 } = require(path.join(APP_DIR, 'signals'));
 const { NavTracker, parseHudStatusText, parseWazeHudShowing } = require(path.join(APP_DIR, 'nav_tracker'));
 const {
@@ -151,23 +152,15 @@ function inBox(x, y, box) {
         assert.strictEqual(unitsMod.formatTemp(23.5, unitsMod.US_PRESET).text, '74\u00B0F');
     });
 
-    /* 4. Efficiency Integration (No IDLE Hijack at 0 mph) */
-    await test('Efficiency holds rolling mi/kWh at 0 mph (never IDLE hijack) & handles DFCO', () => {
+    /* 4. Efficiency Raw Instantaneous (Shows '---' at 0 mph) & DFCO */
+    await test('Efficiency reports raw instant mi/kWh when moving, returns null (---) at 0 mph & handles DFCO', () => {
         const eff = new EfficiencyTracker();
         let t = 100000;
-        for (let i = 0; i <= 30; i++) {
-            t += 1000;
-            eff.update({ speedKmh: 72, rpm: 0, engineOn: false, hvKw: 12.0 }, t);
-        }
         const cruising = eff.update({ speedKmh: 72, rpm: 0, engineOn: false, hvKw: 12.0 }, t + 1000);
-        assert(Math.abs(cruising.evKmPerKwh - 6.0) < 0.2, 'expected ~6.0 km/kWh, got ' + cruising.evKmPerKwh);
+        assert(Math.abs(cruising.evKmPerKwh - 6.0) < 0.05, 'expected 6.0 km/kWh, got ' + cruising.evKmPerKwh);
 
-        let stopped;
-        for (let i = 0; i < 20; i++) {
-            t += 1000;
-            stopped = eff.update({ speedKmh: 0, rpm: 0, engineOn: false, hvKw: 1.6 }, t);
-        }
-        assert(Math.abs(stopped.evKmPerKwh - cruising.evKmPerKwh) < 0.01, 'must hold EV efficiency at 0 mph');
+        const stopped = eff.update({ speedKmh: 0, rpm: 0, engineOn: false, hvKw: 1.6 }, t + 2000);
+        assert.strictEqual(stopped.evKmPerKwh, null, 'stopped at 0 mph must return null so UI shows --- mi/kWh');
 
         const renderer = new OverlayRenderer({ allowPanel: true });
         const profile = { vehicleType: 'phev', engineOn: false, mode: 'ev_drive', isEv: true, isCold: false, coldCeilingRpm: null, alert: null };
@@ -176,12 +169,13 @@ function inBox(x, y, box) {
             units: unitsMod.US_PRESET,
             profile,
             efficiency: stopped,
-        }, { enabled: true, gearDisplay: 'next_to_d' }, t);
-        assert.strictEqual(renderer.lastSummary.hero.value, '3.7');
+        }, { enabled: true, gearDisplay: 'next_to_d' }, t + 2000);
+        assert.strictEqual(renderer.lastSummary.hero.value, '---');
         assert.strictEqual(renderer.lastSummary.hero.unit, 'mi/kWh');
-        assert.strictEqual(renderer.lastSummary.subText, '+1.6 kW');
+        assert.strictEqual(renderer.lastSummary.subText, '1.6 kW');
+        assert.strictEqual(renderer.lastSummary.subBolt, false);
 
-        const gasRes = eff.update({ speedKmh: 95, rpm: 1800, engineOn: true, dmeFuelLh: 0.0 }, t + 1000);
+        const gasRes = eff.update({ speedKmh: 95, rpm: 1800, engineOn: true, dmeFuelLh: 0.0 }, t + 3000);
         assert.strictEqual(gasRes.isDfco, true);
     });
 
@@ -1524,7 +1518,7 @@ function inBox(x, y, box) {
         assert.strictEqual(mSnap.active, true);
         assert.strictEqual(mSnap.title, '691. Is This What a Healthy Economy Looks Like?');
         assert.strictEqual(mSnap.artist, 'Freakonomics Radio');
-        assert(mSnap.cover && mSnap.cover.w === 144);
+        assert(mSnap.cover && mSnap.cover.w === 176);
         assert.strictEqual(mSnap.page, 'media');
 
         // Verify long title shrinks to 22px min and paginates smoothly over time (never truncating permanently)
@@ -1546,27 +1540,27 @@ function inBox(x, y, box) {
         assert.strictEqual(r.lastSummary.rightWidgetPage, 'media');
         assert.strictEqual(r.layers.right_widget.visible, true);
 
-        // Verify non-shifting HUD Line 1 Efficiency + Gear alignment:
-        //   - Changing efficiency value ("3.8" -> "34.6" -> "--") keeps Gear "D5" pixel slice (x=162..220) identical!
-        //   - Changing Stage P (no gear) <-> D5 keeps Efficiency pixel slice (x=0..145) identical!
+        // Verify non-shifting HUD Line 1 Efficiency + Gear alignment (uniform Row-2 band y=38..62):
+        //   - Changing efficiency value ("3.8" -> "12.0" -> "--") keeps Gear "D5" pixel slice (x=110..146) identical!
+        //   - Changing Stage P (no gear) <-> D5 keeps Efficiency pixel slice (x=0..108) identical!
         const grabHudSlice = (cv, x0, x1) => {
             const chunks = [];
-            for (let y = 0; y < 44; y++) chunks.push(Buffer.from(cv.d.slice((y * cv.w + x0) * 4, (y * cv.w + x1) * 4)));
+            for (let y = 38; y < 62; y++) chunks.push(Buffer.from(cv.d.slice((y * cv.w + x0) * 4, (y * cv.w + x1) * 4)));
             return Buffer.concat(chunks);
         };
-        const gearSliceA = grabHudSlice(r.layers.hud_main.cv, 162, 220);
-        const effSliceA = grabHudSlice(r.layers.hud_main.cv, 0, 145);
+        const gearSliceA = grabHudSlice(r.layers.hud_main.cv, 110, 146);
+        const effSliceA = grabHudSlice(r.layers.hud_main.cv, 0, 108);
 
-        model.efficiency.evKmPerKwh = 21.5; // "13.4 mi/kWh" (wider digits)
+        model.efficiency.evKmPerKwh = 21.5; // "12.0 mi/kWh" (wider digits)
         r.render(model, { enabled: true, hudLine1: 'efficiency_gear', hudLine2: 'power', hudLine3: 'brake' }, 12050);
-        assert.strictEqual(Buffer.compare(gearSliceA, grabHudSlice(r.layers.hud_main.cv, 162, 220)), 0,
+        assert.strictEqual(Buffer.compare(gearSliceA, grabHudSlice(r.layers.hud_main.cv, 110, 146)), 0,
             'Gear D5 on HUD Row 1 must NOT shift when efficiency changes width');
 
         model.efficiency.evKmPerKwh = 6.1;
         model.telemetry.stage = 'P';
         model.telemetry.gear = null;
         r.render(model, { enabled: true, hudLine1: 'efficiency_gear', hudLine2: 'power', hudLine3: 'brake' }, 12100);
-        assert.strictEqual(Buffer.compare(effSliceA, grabHudSlice(r.layers.hud_main.cv, 0, 145)), 0,
+        assert.strictEqual(Buffer.compare(effSliceA, grabHudSlice(r.layers.hud_main.cv, 0, 108)), 0,
             'Efficiency on HUD Row 1 must NOT shift when Gear disappears in Park');
         model.telemetry.stage = 'D';
         model.telemetry.gear = 5;
@@ -1672,18 +1666,18 @@ function inBox(x, y, box) {
             },
         };
         r.render(model, { enabled: true, widgetMedia: true, widgetTrip: true }, 4100);
-        assert.strictEqual(r.layers.right_widget.rect.x, 1252, 'right_widget shifted right to x=1252 (foreground cx=1438)');
+        assert.strictEqual(r.layers.right_widget.rect.x, 1244, 'right_widget shifted to x=1244 (cover top-left at world 1376,164)');
         let titleGlyphPixels = 0;
         let artistGlyphPixels = 0;
         const rwCv = r.layers.right_widget.cv;
-        for (let y = 260; y <= 292; y++) {
-            for (let x = 90; x <= 282; x++) {
+        for (let y = 308; y <= 346; y++) {
+            for (let x = 90; x <= 340; x++) {
                 const o = (y * rwCv.w + x) * 4;
                 if (rwCv.d[o] > 210 && rwCv.d[o + 1] > 210 && rwCv.d[o + 2] > 210 && rwCv.d[o + 3] > 200) titleGlyphPixels++;
             }
         }
-        for (let y = 298; y <= 328; y++) {
-            for (let x = 90; x <= 282; x++) {
+        for (let y = 354; y <= 390; y++) {
+            for (let x = 90; x <= 340; x++) {
                 const o = (y * rwCv.w + x) * 4;
                 if (rwCv.d[o] > 165 && rwCv.d[o + 1] > 170 && rwCv.d[o + 3] > 200) artistGlyphPixels++;
             }
@@ -1713,7 +1707,8 @@ function inBox(x, y, box) {
         assert.strictEqual(r.lastSummary.isCharging, true);
         assert.strictEqual(r.lastSummary.rightWidgetPage, 'charging', 'charging widget must auto-activate and cannot be turned off while charging');
         assert.strictEqual(r.layers.right_widget.visible, true);
-        assert.strictEqual(r.lastSummary.hero.value, '3.5', 'below_speed must replace -- mi/kWh with charging speed kW');
+        assert.strictEqual(r.lastSummary.hero.value, '+3.5', 'below_speed must replace -- mi/kWh with charging speed +kW');
+        assert.strictEqual(r.lastSummary.hero.bolt, true, 'charging speed hero must display lightning bolt');
         assert.strictEqual(r.lastSummary.hero.unit, 'kW');
         assert.strictEqual(r.lastSummary.subText, 'CHARGING 16A');
 
@@ -1735,8 +1730,10 @@ function inBox(x, y, box) {
         assert.strictEqual(decodeStatusBattery2({ conditionBatteryChargingCondition: 0 }), 0);
         assert.strictEqual(decodeStatusBattery2({ conditionBatteryChargingCondition: 255 }), null, '255 invalid must return null');
 
-        assert.strictEqual(decodeCabinTemp({ temperatureInside: 124 }), 22.0); // 124 * 0.5 - 40 = 22.0C (72F)
-        assert.strictEqual(decodeCabinTemp({ temperatureInside: 80 }), 0.0);
+        assert.strictEqual(decodeCabinTemp({ temperatureInside: 160 }), 22.0); // 160 * 0.1 + 6.0 = 22.0C (72F)
+        assert.strictEqual(decodeCabinTemp({ temperatureInside: 146 }), 20.6); // Real G30 road-test raw=146 -> 20.6C (69F)
+        assert.strictEqual(decodeCabinTemp({ temperatureInside: 154 }), 21.4); // Real G30 road-test raw=154 -> 21.4C (71F)
+        assert.strictEqual(decodeCabinTemp({ temperatureInside: 0 }), 6.0);
         assert.strictEqual(decodeCabinTemp({ temperatureInside: 255 }), null, '255 invalid must return null');
 
         const lt = new LeadVehicleTracker();
@@ -2237,15 +2234,19 @@ function inBox(x, y, box) {
         assert(greenPx > 120, 'Exit badge must paint green body');
         assert(whitePx > 200, 'US shield + road text must paint bright white pixels');
 
-        // F. Calibrated G30 right-wing backdrop covers top-left eyebrow handle (1265, 104),
-        //    stays strictly inside outer bezel at (1765, 355), and clears bottom-left map at (1400, 600).
-        const cov = { w: 144, h: 144, d: Buffer.alloc(144 * 144 * 4, 220) };
-        const bg = buildStockBackdrop(cov, 536, 536, { ox: 1252, oy: 88, vx: 196, vy: 218 });
-        const alphaAt = (wx, wy) => bg[((wy - 88) * 536 + (wx - 1252)) * 4 + 3];
-        assert(alphaAt(1275, 105) > 20, 'backdrop must reach top-left extended eyebrow handle at (1275, 105)');
-        assert.strictEqual(alphaAt(1765, 355), 0, 'backdrop must NOT spill past outer-right bezel at (1765, 355)');
+        // F. Homography-calibrated G30 right-wing backdrop covers pointed top-left eyebrow tip (1248, 96),
+        //    trims top-right bezel purple zone (1560, 122), fills mid-right cyan bezel (1755, 355),
+        //    and trims bottom '100 %' / 'Power %' strip (1560, 610 === 0 while 1560, 592 > 20).
+        const cov = { w: 176, h: 176, d: Buffer.alloc(176 * 176 * 4, 220) };
+        const bg = buildStockBackdrop(cov, 536, 520, { ox: 1244, oy: 88, vx: 220, vy: 252 });
+        const alphaAt = (wx, wy) => bg[((wy - 88) * 536 + (wx - 1244)) * 4 + 3];
+        assert(alphaAt(1248, 96) > 20, 'backdrop must fill pointed top-left eyebrow tip at (1248, 96)');
+        assert.strictEqual(alphaAt(1560, 122), 0, 'backdrop must NOT exceed top-right bezel at (1560, 122)');
+        assert(alphaAt(1768, 355) > 20, 'backdrop must fill mid-right bezel curve out to (1768, 355)');
+        assert.strictEqual(alphaAt(1776, 355), 0, 'backdrop must NOT spill past outer-right bezel at (1776, 355)');
         assert.strictEqual(alphaAt(1400, 600), 0, 'backdrop must NOT spill onto bottom-left map at (1400, 600)');
-        assert(alphaAt(1560, 610) > 20, 'backdrop must reach bottom-right gauge curve at (1560, 610)');
+        assert(alphaAt(1560, 592) > 20, 'backdrop must reach bottom-right gauge curve at (1560, 592)');
+        assert.strictEqual(alphaAt(1560, 606), 0, 'backdrop must stop cleanly above Power % / 100% strip at y>=604');
     });
 
     /* 22. v0.8.6: Two-Level Stacked HUD Lane Guidance & Promotion Slide-Down Animation */
@@ -2500,6 +2501,503 @@ function inBox(x, y, box) {
             const atlas = bakeSizeAtlas(parsedRg, 36, '19:39 Tire Pressure Low', 0.016);
             assert(atlas.atlasW > 64 && atlas.glyphs[57] && atlas.glyphs[57][2] > 10, 'BMWTARG.ttf must rasterize crisp glyphs');
         }
+    });
+
+    /* 24. DME 0x5656 SGBD fuel factor, 16-bit injection counter wraparound, '/' slant bar & white HUD gas mode */
+    await test('DME 0x5656 SGBD fuel factor (0.00429153), 16-bit injection wrap, "/" slant bar & white HUD gas mode', () => {
+        const appSpec = JSON.parse(fs.readFileSync(path.join(APP_DIR, 'app.json'), 'utf8'));
+        const did5656 = appSpec.config.dids.dme.fuelRate.find((c) => c.did === '5656');
+        assert(did5656 && Math.abs(did5656.factor - 0.00429153) < 1e-6,
+            'DME DID 5656 must use SGBD factor 0.00119209 * 3.6 = 0.00429153 L/h (never 2.33x inflated 0.01)');
+
+        const { bcToL100 } = require(path.join(APP_DIR, 'signals'));
+        assert(Math.abs(bcToL100(35.0, 3) - (235.214583 / 35.0)) < 0.01, 'bcToL100 must decode numeric enum 3 as MPG_US');
+        assert(Math.abs(bcToL100(42.0, 2) - (282.480936 / 42.0)) < 0.01, 'bcToL100 must decode numeric enum 2 as MPG_UK');
+        assert.strictEqual(bcToL100(35.0, 7), null, 'bcToL100 must reject SIGNAL_UNGUELTIG = 7');
+
+        // 16-bit statusInjectionVolume wraparound (65400 -> 136 = +272 counts over 0.5s = 544 counts/s)
+        // must calibrate cleanly against DME L/h and NOT decay toward 0 on unchanged 100ms render ticks!
+        const et = new EfficiencyTracker();
+        et.update({ speedKmh: 64.37, rpm: 1800, engineOn: true, dmeFuelLh: 4.30, injVolumeRaw: 65400 }, 1000);
+        et.update({ speedKmh: 64.37, rpm: 1800, engineOn: true, dmeFuelLh: 4.30, injVolumeRaw: 65400 }, 1100);
+        et.update({ speedKmh: 64.37, rpm: 1800, engineOn: true, dmeFuelLh: 4.30, injVolumeRaw: 136 }, 1500);
+        const rWrap = et.update({ speedKmh: 64.37, rpm: 1800, engineOn: true, dmeFuelLh: 4.30, injVolumeRaw: 136 }, 1600);
+        assert(et.injCalibrated && Math.abs(rWrap.lPerHour - 4.30) < 0.15,
+            'calibrated 16-bit wrapped injection counter must match 4.30 L/h (~35 MPG at 40 mph), got ' + rWrap.lPerHour);
+
+        // Verify '/' forward-slash media progress bar (top row extends further right than bottom row) & white HUD gas mode
+        const r = new OverlayRenderer({ allowPanel: true });
+        const cov176 = { w: 176, h: 176, d: Buffer.alloc(176 * 176 * 4, 180) };
+        r.render({
+            units: unitsMod.US_PRESET,
+            profile: { vehicleType: 'phev', engineOn: true, mode: 'gas_cold', isEv: false, isCold: true, coldCeilingRpm: 3800, alert: null },
+            efficiency: { evKmPerKwh: 5.5, fuelLPer100km: 6.72, isDfco: false },
+            telemetry: {
+                speedKmh: 72, rpm: 1850, boostBar: 0.35, soc: 14, soc12: 88, oilTempC: 58, coolantTempC: 65,
+                stage: 'D', program: 'D', gear: 6, frictionG: 0,
+                media: {
+                    active: true, playing: true, title: '季節は次々死んでいく', artist: 'amazarashi',
+                    cover: cov176, coverRev: 1, totalSec: 240, elapsedSec: 120, remainSec: 120, frac: 0.5, bcStep: 0,
+                },
+            },
+        }, { enabled: true, widgetMedia: true }, 5000);
+
+        assert.strictEqual(r.lastSummary.heroCol, '#f2f5fa', 'Gas mode MPG hero value must be white (never blue)');
+        assert.strictEqual(r.lastSummary.heroUnitCol, '#f2f5fa', 'Gas mode MPG unit must be white (never blue)');
+        assert.strictEqual(r.lastSummary.subCol, '#f2f5fa', 'Gas mode Line 2 must be white (never blue)');
+        assert.strictEqual(r.lastSummary.subText, '1850 / 3800 RPM', 'Cold gas mode must show Live RPM / Cold Rev Ceiling');
+
+        // Warm gas mode switches Line 2 to Live RPM + Turbo Boost Pressure in white
+        r.render({
+            units: unitsMod.US_PRESET,
+            profile: { vehicleType: 'phev', engineOn: true, mode: 'gas_warm', isEv: false, isCold: false, coldCeilingRpm: null, alert: null },
+            efficiency: { evKmPerKwh: 5.5, fuelLPer100km: 6.72, isDfco: false },
+            telemetry: {
+                speedKmh: 88, rpm: 2143, boostBar: 0.35, soc: 14, soc12: 88, oilTempC: 92, coolantTempC: 89,
+                stage: 'D', program: 'D', gear: 7, frictionG: 0,
+                media: {
+                    active: true, playing: true, title: '季節は次々死んでいく', artist: 'amazarashi',
+                    cover: cov176, coverRev: 1, totalSec: 240, elapsedSec: 120, remainSec: 120, frac: 0.5, bcStep: 0,
+                },
+            },
+        }, { enabled: true, widgetMedia: true }, 5200);
+        assert.strictEqual(r.lastSummary.subText, '2143 RPM  +5.1 PSI', 'Warm gas mode must show raw Live RPM + Turbo Boost PSI');
+        assert.strictEqual(r.lastSummary.subCol, '#f2f5fa', 'Warm gas mode Line 2 must stay white');
+
+        // Check '/' forward-slash right end of cyan progress fill bar at barY=440 (top row y=440 vs bottom row y=451)
+        const rw = r.layers.right_widget.cv;
+        const maxCyanX = (py) => {
+            let mx = -1;
+            for (let x = 52; x < 395; x++) {
+                const o = (py * rw.w + x) * 4;
+                if (rw.d[o + 1] > 190 && rw.d[o + 2] > 235 && rw.d[o + 3] === 255) mx = x;
+            }
+            return mx;
+        };
+        const topBarRight = maxCyanX(440);
+        const botBarRight = maxCyanX(451);
+        assert(topBarRight > botBarRight + 8,
+            'Media progress bar must slant "/" (top-right > bottom-right), got top=' + topBarRight + ' vs bot=' + botBarRight);
+    });
+
+    /* 25. Option D: Idle Brake-Rail Engine Battery-Charge Bar (PHEV), FastKw ICE Gate & Instant Brake Yield */
+    await test('Option D: Idle brake_rail shows ICE -> HV battery charging, rejects DFCO/regen, keeps RPM+Boost & Media intact, and yields 0ms on brake', async () => {
+        // 1. decodeIceStartReason handles numeric codes and BMW enum strings
+        assert.strictEqual(decodeIceStartReason({ displaySwitchOffPreventionCombustionEngineReason: 3 }), 'LOW_SOC');
+        assert.strictEqual(decodeIceStartReason({ displaySwitchOffPreventionCombustionEngineReason: 'VM_LAEUFT_WEGEN_BATTERIELADEZUSTAND' }), 'LOW_SOC');
+        assert.strictEqual(decodeIceStartReason({ displaySwitchOffPreventionCombustionEngineReason: 'KEIN_ENGOFFPROHIBITOR' }), 'NONE');
+        assert.strictEqual(decodeIceStartReason({ displaySwitchOffPreventionCombustionEngineReason: 255 }), null);
+
+        // 2. computeIceBatteryCharge unit matrix
+        const st = {};
+        // Pure EV regen (rpm=0) -> rejected
+        let c = computeIceBatteryCharge({ speedKmh: 65, rpm: 0, engineOn: false, hvKw: -18.0, pedalPct: 0, torqueNm: 0 }, st, 1000);
+        assert.strictEqual(c.active, false);
+
+        // Manual-throttle low-SoC cruise charging -> active!
+        c = computeIceBatteryCharge({ speedKmh: 102, rpm: 1780, engineOn: true, hvKw: -6.0, pedalPct: 24, torqueNm: 138, isDfco: false }, st, 2000);
+        assert.strictEqual(c.active, true);
+        assert(Math.abs(c.chargeKw - 6.0) < 0.05);
+
+        // Brief 400ms 8HP upshift dip while still running & unbraked -> held smoothly without blinking
+        c = computeIceBatteryCharge({ speedKmh: 103, rpm: 1420, engineOn: true, hvKw: -0.1, pedalPct: 22, torqueNm: 60, isDfco: false }, st, 2400);
+        assert.strictEqual(c.active, true);
+        assert(Math.abs(c.chargeKw - 6.0) < 0.05);
+
+        // Highway lift-off DFCO wheel regen with spinning ICE (rpm=1750, hvKw=-16.5, torqueNm=-24, isDfco=true) -> immediately rejected!
+        c = computeIceBatteryCharge({ speedKmh: 98, rpm: 1750, engineOn: true, hvKw: -16.5, pedalPct: 0, torqueNm: -24, isDfco: true }, st, 2500);
+        assert.strictEqual(c.active, false);
+
+        // Off-throttle coasting without torque proof (pedalPct=0, torqueNm=null) -> rejected!
+        c = computeIceBatteryCharge({ speedKmh: 90, rpm: 1600, engineOn: true, hvKw: -11.0, pedalPct: 0, torqueNm: null, isDfco: false }, st, 3000);
+        assert.strictEqual(c.active, false);
+
+        // Hands-free ACC highway cruise (pedalPct=0, positive DME torqueNm=132, recupPct=0, gLong=0.0) -> active!
+        c = computeIceBatteryCharge({ speedKmh: 108, rpm: 1680, engineOn: true, hvKw: -5.8, pedalPct: 0, torqueNm: 132, recupPct: 0, gLong: 0.0, isDfco: false }, st, 4000);
+        assert.strictEqual(c.active, true);
+        assert(Math.abs(c.chargeKw - 5.8) < 0.05);
+
+        // Stationary red-light idle generation (speedKmh=0, rpm=1050, hvKw=-3.2, unplugged) -> active!
+        const stIdle = {};
+        c = computeIceBatteryCharge({ speedKmh: 0, rpm: 1050, engineOn: true, hvKw: -3.2, pedalPct: 0, torqueNm: 38, plugConnected: false }, stIdle, 5000);
+        assert.strictEqual(c.active, true);
+        assert(Math.abs(c.chargeKw - 3.2) < 0.05);
+
+        // Plug-in shore charging -> rejected!
+        c = computeIceBatteryCharge({ speedKmh: 0, rpm: 1050, engineOn: true, hvKw: -3.5, plugConnected: true }, stIdle, 5200);
+        assert.strictEqual(c.active, false);
+
+        // 3. FastKw ICE gate in SignalHub: steady-throttle ICE charging (needle 0/0, udsKw=-6.4) must NOT be masked by FastKw!
+        const appSpec = JSON.parse(fs.readFileSync(path.join(APP_DIR, 'app.json'), 'utf8'));
+        const hub = new SignalHub({
+            spec: appSpec,
+            settings: { values: { enabled: true, demo: 'off', vehicle: 'phev', iceChargeBar: true }, get(k) { return this.values[k]; } },
+            signals: null,
+            log: { info() {}, warn() {}, error() {} },
+        }, { noDiag: true, ipcDir: path.join(os.tmpdir(), 'cm-no-ipc-' + process.pid), edriveSharedPath: '' });
+        const now0 = Date.now();
+        hub.lastRealSignalT = now0;
+        // Pre-train FastKw in pure EV mode so fastKw.now() would return ~+0.6 kW at needle [0, 0]
+        for (let k = 0; k < 6; k++) {
+            hub.fastKw.needle(20, 0, now0 - 1500 + k * 100);
+            hub.fastKw.reading(17.6, now0 - 1480 + k * 100);
+        }
+        hub.fastKw.needle(0, 0, now0);
+        const thetaRestBefore = hub.fastKw.theta[2];
+        assert(hub.fastKw.now(now0) !== null, 'FastKw must be primed in EV mode');
+
+        // Switch to ICE running (rpm=1780) with SME udsKw = -6.4 kW
+        hub.live.stage = 'D';
+        hub.live.speedKmh = 102;
+        hub.live.rpm = 1780;
+        hub.live.udsKw = -6.4;
+        hub.live.udsKwT = now0;
+        const snapIce = hub.snapshot(now0);
+        assert.strictEqual(snapIce.hvKw, -6.4, 'snapshot() must report raw SME udsKw (-6.4 kW) instead of FastKw when ICE is running');
+        assert.strictEqual(hub.fastKw.theta[2], thetaRestBefore, 'EV resting offset theta[2] must stay uncorrupted');
+
+        // Demand gating of Efficiencytainment (effReason) when iceChargeBar is toggled off
+        hub._started = true;
+        hub.ctx.signals = {
+            watch() {
+                let closed = false;
+                return Promise.resolve({ shutdown() { closed = true; }, get closed() { return closed; } });
+            },
+        };
+        hub.syncDemand({ enabled: true, vehicle: 'phev', iceChargeBar: true }, {});
+        assert.strictEqual(hub.activeWatchers().effReason, true, 'effReason must watch when iceChargeBar is enabled on PHEV');
+        hub.syncDemand({ enabled: true, vehicle: 'phev', iceChargeBar: false }, {});
+        assert.strictEqual(hub.activeWatchers().effReason, false, 'effReason must tear down when iceChargeBar is disabled');
+        hub.stop();
+
+        // 4. OverlayRenderer Option D visual rendering, layout isolation & 0ms brake priority
+        const r = new OverlayRenderer({ allowPanel: true });
+        const baseModel = {
+            units: unitsMod.US_PRESET,
+            profile: { vehicleType: 'phev', engineOn: true, mode: 'gas_warm', isEv: false, isCold: false, coldCeilingRpm: null, alert: null },
+            efficiency: { evKmPerKwh: 5.8, fuelLPer100km: 10.8, isDfco: false },
+            telemetry: {
+                speedKmh: 102, rpm: 1780, boostBar: 0.14, hvKw: -6.0, soc: 11, soc12: 88,
+                oilTempC: 92, coolantTempC: 90, pedalPct: 24, torqueNm: 140, gLong: 0.02,
+                stage: 'D', program: 'D', gear: 7, frictionG: 0, driverBraking: false,
+                media: { active: true, playing: true, title: 'Night Drive', artist: 'amazarashi', totalSec: 200, elapsedSec: 80, remainSec: 120, frac: 0.4, bcStep: 0 },
+            },
+        };
+        r.render(baseModel, { enabled: true, widgetMedia: true, brakeIndicator: 'bar_num', iceChargeBar: true, hudLine3: 'brake' }, 10000);
+
+        assert.strictEqual(r.lastSummary.iceChargeActive, true);
+        assert.strictEqual(r.lastSummary.iceChargeLit, 8, '6.0 / 15.0 kW must light 8/20 left-to-right segments');
+        assert.strictEqual(r.lastSummary.subText, '1780 RPM  +2.0 PSI', 'Line 2 RPM + Boost must stay 100% untouched');
+        assert.strictEqual(r.lastSummary.rightWidgetPage, 'media', 'Now Playing media card must remain active on right wing');
+
+        const brCv = r.layers.brake_rail.cv;
+        // Leftmost segment (x=6, y=24) must be bright cyan (#38c7ff -> R=56, G=199, B=255), while rightmost (x=288, y=24) stays dim
+        const leftOff = (24 * brCv.w + 6) * 4;
+        const rightOff = (24 * brCv.w + 288) * 4;
+        assert(brCv.d[leftOff + 1] > 180 && brCv.d[leftOff + 2] > 240 && brCv.d[leftOff + 3] === 255, 'Leftmost brake_rail segment must be lit cyan');
+        assert(brCv.d[rightOff + 3] < 160, 'Rightmost brake_rail segment must stay dim at 8/20');
+
+        // Top half (y=0..18): 'CHG +6.0 kW' text + bolt sits strictly on left (x < 160), leaving KOMBI4 'Power %' (x >= 195) 100% clear!
+        let leftLabelPx = 0;
+        let powerPctZonePx = 0;
+        for (let py = 0; py < 19; py++) {
+            for (let px = 0; px < brCv.w; px++) {
+                if (brCv.d[(py * brCv.w + px) * 4 + 3] > 0) {
+                    if (px < 165) leftLabelPx++;
+                    if (px >= 195) powerPctZonePx++;
+                }
+            }
+        }
+        assert(leftLabelPx > 80, 'expected bolt + CHG +6.0 kW label in left half of brake_rail');
+        assert.strictEqual(powerPctZonePx, 0, 'CHG label must stay 100% clear of stock Power % label on right');
+
+        // HUD Line 3 ('brake') must also render cyan charge bar + '+6.0 kW'
+        const hudCv = r.layers.hud_main.cv;
+        let hudRow3Cyan = 0;
+        for (let py = 74; py < 98; py++) {
+            for (let px = 4; px < hudCv.w; px++) {
+                const o = (py * hudCv.w + px) * 4;
+                if (hudCv.d[o + 1] > 180 && hudCv.d[o + 2] > 240 && hudCv.d[o + 3] > 200) hudRow3Cyan++;
+            }
+        }
+        assert(hudRow3Cyan > 60, 'HUD Line 3 brake slot must render cyan ICE charge bar & kW');
+
+        // bar_only mode hides text above segments while keeping cyan segments lit
+        r.render(baseModel, { enabled: true, brakeIndicator: 'bar_only', iceChargeBar: true }, 10200);
+        let barOnlyTopPx = 0;
+        for (let py = 0; py < 19; py++) {
+            for (let px = 0; px < brCv.w; px++) {
+                if (brCv.d[(py * brCv.w + px) * 4 + 3] > 0) barOnlyTopPx++;
+            }
+        }
+        assert.strictEqual(barOnlyTopPx, 0, 'bar_only must omit CHG +kW text above segments');
+
+        // Touching the brake yields in 0 ms to right-to-left Amber/Orange/Red friction brake!
+        const brakedModel = Object.assign({}, baseModel, {
+            telemetry: Object.assign({}, baseModel.telemetry, { pedalPct: 0, driverBraking: true, frictionG: 0.24, brakeBar: 18 }),
+        });
+        r.render(brakedModel, { enabled: true, brakeIndicator: 'bar_num', iceChargeBar: true }, 10250);
+        assert.strictEqual(r.lastSummary.iceChargeActive, false, 'ICE charge bar must yield in 0ms when braking');
+        assert(r.lastSummary.brakeLit >= 8, 'Friction brake segments must light immediately');
+        assert(brCv.d[rightOff + 0] > 220 && brCv.d[rightOff + 3] === 255, 'Rightmost segment must immediately switch to amber/orange brake color');
+
+        // Disabling iceChargeBar turns Option D off completely
+        r.render(baseModel, { enabled: true, brakeIndicator: 'bar_num', iceChargeBar: false }, 11000);
+        assert.strictEqual(r.lastSummary.iceChargeActive, false);
+        assert.strictEqual(r.lastSummary.iceChargeLit, 0);
+    });
+
+    /* 26. Road-Test Feedback Fixes: Raw Telemetry (No Smoothing), Uniform HUD & Zero Headway Overlap, Right-to-Left HUD Brake, Bolt/+ Consistency, Cabin Temp & Bold/Tall Lane Arrows */
+    await test('Road-test fixes: zero telemetry smoothing, uniform non-overlapping HUD, R->L HUD brake, bolt/+ power, IHKA cabin temp & bold tall lane arrows', () => {
+        // 1. Zero smoothing: immediate step response for EV eff, fuel eff, injection flow, and ICE charging kW
+        const et = new EfficiencyTracker();
+        let res = et.update({ speedKmh: 72, rpm: 0, engineOn: false, hvKw: 12.0 }, 1000);
+        assert(Math.abs(res.evKmPerKwh - 6.0) < 0.01, 'instant EV eff must read 6.0 km/kWh on first moving sample');
+        res = et.update({ speedKmh: 72, rpm: 0, engineOn: false, hvKw: 24.0 }, 1200);
+        assert(Math.abs(res.evKmPerKwh - 3.0) < 0.01, 'step change 12->24 kW must jump immediately to 3.0 km/kWh with zero smoothing');
+        res = et.update({ speedKmh: 0, rpm: 0, engineOn: false, hvKw: 1.2 }, 1500);
+        assert.strictEqual(res.evKmPerKwh, null, 'stopping at 0 mph must return null so UI displays --- mi/kWh');
+        res = et.update({ speedKmh: 0, rpm: 750, engineOn: true, dmeFuelLh: 0.9 }, 1600);
+        assert.strictEqual(res.fuelLPer100km, null, 'stopping at 0 mph in gas mode must return null so UI displays --- MPG');
+
+        res = et.update({ speedKmh: 64.37, rpm: 1800, engineOn: true, dmeFuelLh: 4.30 }, 2000);
+        const l100A = (4.30 / 64.37) * 100;
+        assert(Math.abs(res.fuelLPer100km - l100A) < 0.05, 'instant fuel eff must match raw DME L/h immediately');
+        res = et.update({ speedKmh: 64.37, rpm: 2400, engineOn: true, dmeFuelLh: 8.60 }, 2200);
+        assert(Math.abs(res.fuelLPer100km - l100A * 2) < 0.05, 'step change in fuel rate must respond 100% immediately with zero lag');
+
+        const iceSt = {};
+        let c1 = computeIceBatteryCharge({ speedKmh: 90, rpm: 1800, engineOn: true, hvKw: -4.2, pedalPct: 20, torqueNm: 120 }, iceSt, 1000);
+        assert(Math.abs(c1.chargeKw - 4.2) < 0.01);
+        let c2 = computeIceBatteryCharge({ speedKmh: 90, rpm: 2100, engineOn: true, hvKw: -11.4, pedalPct: 35, torqueNm: 180 }, iceSt, 1200);
+        assert(Math.abs(c2.chargeKw - 11.4) < 0.01, 'ICE charging kW must jump immediately from 4.2 to raw 11.4 kW (zero EMA lag), got ' + c2.chargeKw);
+
+        // 2. Uniform HUD font/layout across nav & headway states + ZERO overlap with hud_headway
+        const r = new OverlayRenderer({ allowPanel: true });
+        const navRoad = {
+            routeActive: true, guide: 'BMW', hasLanes: false, miniMapActive: false, wocHudShowing: false,
+            show: { kind: 'turn', dir: 'RIGHT', dist: '0.4', unit: 'mi', exitBadge: '14B', road: 'I-280 North' },
+        };
+        const leadOn = { active: true, gapM: 32.0, headwaySec: 1.3, relSpeedKmh: -9.0, status: 'ok' };
+        const makeHudModel = (withRoad, withLead, isEv, hvKw, frictionG, brakeBar) => ({
+            units: unitsMod.US_PRESET,
+            profile: isEv
+                ? { vehicleType: 'phev', engineOn: false, mode: hvKw < -0.5 ? 'ev_regen' : 'ev_drive', isEv: true, isCold: false, coldCeilingRpm: null, alert: null }
+                : { vehicleType: 'phev', engineOn: true, mode: 'gas_warm', isEv: false, isCold: false, coldCeilingRpm: null, alert: null },
+            efficiency: { evKmPerKwh: 6.1, fuelLPer100km: 7.4, isDfco: false },
+            telemetry: {
+                speedKmh: 96, rpm: isEv ? 0 : 2143, boostBar: 0.35, hvKw, soc: 45, soc12: 88,
+                oilTempC: 92, coolantTempC: 90, pedalPct: 22, torqueNm: 140,
+                stage: 'D', program: 'D', gear: 7, frictionG: frictionG || 0, brakeBar: brakeBar || 0,
+                leadVehicle: withLead ? leadOn : { active: false },
+                hudNav: withRoad ? navRoad : { routeActive: false, show: null },
+            },
+        });
+        const hudOpts = { enabled: true, hudNavMode: 'own_nav_minimap', hudHeadway: 'full', hudLine1: 'efficiency_gear', hudLine2: 'power', hudLine3: 'brake' };
+
+        r.render(makeHudModel(false, false, false, 0, 0, 0), hudOpts, 1000);
+        const hudBufNoNavNoLead = Buffer.from(r.layers.hud_main.cv.d);
+        r.render(makeHudModel(false, true, false, 0, 0, 0), hudOpts, 1100);
+        const hudBufNoNavWithLead = Buffer.from(r.layers.hud_main.cv.d);
+        const hwRect = r.layers.hud_headway.rect;
+        r.render(makeHudModel(true, false, false, 0, 0, 0), hudOpts, 1200);
+        const hudBufNavNoLead = Buffer.from(r.layers.hud_main.cv.d);
+        r.render(makeHudModel(true, true, false, 0, 0, 0), hudOpts, 1300);
+        const hudBufNavWithLead = Buffer.from(r.layers.hud_main.cv.d);
+
+        assert.strictEqual(Buffer.compare(hudBufNoNavNoLead, hudBufNoNavWithLead), 0, 'hud_main must stay pixel-identical when lead vehicle appears (zero font jump)');
+        assert.strictEqual(Buffer.compare(hudBufNoNavNoLead, hudBufNavNoLead), 0, 'hud_main must stay pixel-identical when hud_road appears (zero font jump)');
+        assert.strictEqual(Buffer.compare(hudBufNoNavNoLead, hudBufNavWithLead), 0, 'hud_main must stay pixel-identical with both hud_road and hud_headway');
+
+        // Verify ZERO painted hud_main pixels fall inside hud_headway bounding box in world space!
+        const hudRect = r.layers.hud_main.rect;
+        let hwOverlapPx = 0;
+        for (let py = 0; py < hudRect.h; py++) {
+            const wy = hudRect.y + py;
+            if (wy < hwRect.y || wy >= hwRect.y + hwRect.h) continue;
+            for (let px = 0; px < hudRect.w; px++) {
+                const wx = hudRect.x + px;
+                if (wx < hwRect.x || wx >= hwRect.x + hwRect.w) continue;
+                if (hudBufNavWithLead[(py * hudRect.w + px) * 4 + 3] > 0) hwOverlapPx++;
+            }
+        }
+        assert.strictEqual(hwOverlapPx, 0, 'hud_main must have 0 pixels overlapping hud_headway, got ' + hwOverlapPx);
+
+        // 3. HUD brake meter grows RIGHT-to-LEFT while HUD ICE charging grows LEFT-to-RIGHT
+        r.render(makeHudModel(false, false, false, 0, 0.14, 12), hudOpts, 2000); // ~3/12 brake segments
+        const hCv = r.layers.hud_main.cv;
+        const leftSegX = 10;                  // i=0 (leftmost segment center)
+        const rightSegX = 6 + 11 * 14 + 4;    // i=11 (rightmost segment center)
+        const segMidY = 89;
+        const leftOff = (segMidY * hCv.w + leftSegX) * 4;
+        const rightOff = (segMidY * hCv.w + rightSegX) * 4;
+        assert(hCv.d[rightOff] > 220 && hCv.d[rightOff + 3] === 255, 'HUD brake light pressure must light RIGHTMOST segment amber');
+        assert(hCv.d[leftOff] < 80 && hCv.d[leftOff + 1] < 90, 'HUD brake light pressure must leave LEFTMOST segment dim (right-to-left growth)');
+
+        r.render(makeHudModel(false, false, false, -5.0, 0, 0), hudOpts, 2200); // ~4/12 ICE charge segments
+        assert(hCv.d[leftOff + 1] > 180 && hCv.d[leftOff + 2] > 240 && hCv.d[leftOff + 3] === 255, 'HUD ICE charge must light LEFTMOST segment cyan');
+        assert(hCv.d[rightOff + 1] < 90 && hCv.d[rightOff + 2] < 130, 'HUD ICE charge must leave RIGHTMOST segment dim (left-to-right growth)');
+
+        // 4. Consumption has NO '+' sign; Charging/Regen consistently shows bolt + '+' everywhere
+        assert.strictEqual(unitsMod.formatPowerKw(12.4).text, '12.4 kW');
+        assert.strictEqual(unitsMod.formatPowerKw(12.4).charging, false);
+        assert.strictEqual(unitsMod.formatPowerKw(0.0).text, '0.0 kW');
+        assert.strictEqual(unitsMod.formatPowerKw(-18.5).text, '+18.5 kW');
+        assert.strictEqual(unitsMod.formatPowerKw(-18.5).charging, true);
+
+        r.render(makeHudModel(false, false, true, 12.4, 0, 0), hudOpts, 2400);
+        assert.strictEqual(r.lastSummary.subText, '12.4 kW');
+        assert.strictEqual(r.lastSummary.subBolt, false);
+
+        r.render(makeHudModel(false, false, true, -18.5, 0, 0), hudOpts, 2600);
+        assert.strictEqual(r.lastSummary.subText, '+18.5 kW');
+        assert.strictEqual(r.lastSummary.subBolt, true);
+        // Verify cyan bolt pixels exist left of '+18.5 kW' on HUD Line 2 (x=6..14, y=60..72)
+        let hudRegenBoltPx = 0;
+        for (let py = 60; py <= 72; py++) {
+            for (let px = 6; px <= 14; px++) {
+                const o = (py * hCv.w + px) * 4;
+                if (hCv.d[o + 1] > 180 && hCv.d[o + 2] > 240 && hCv.d[o + 3] === 255) hudRegenBoltPx++;
+            }
+        }
+        assert(hudRegenBoltPx >= 20, 'EV regen on HUD Line 2 must draw cyan lightning bolt before +18.5 kW, got ' + hudRegenBoltPx);
+
+        // 5. Bold, full-height HUD lane guidance arrows (turning height matches straight; straight stem >= 7px wide)
+        const { drawHudNav, NW, NH } = require(path.join(APP_DIR, 'hud_nav_renderer'));
+        const { Canvas } = require('./kit/canvas');
+        const laneCv = new Canvas(NW, NH);
+        drawHudNav(laneCv, {
+            kind: 'turn', dir: 'RIGHT', dist: '500', unit: 'ft', road: '',
+            lanes: {
+                lanes: [
+                    { follows: ['LEFT'], others: [], hi: true, info: 'NONE' },
+                    { follows: ['STRAIGHT_ON'], others: [], hi: true, info: 'NONE' },
+                    { follows: ['STRAIGHT_ON', 'RIGHT'], others: [], hi: true, info: 'NONE' },
+                    { follows: ['RIGHT'], others: [], hi: true, info: 'NONE' },
+                ],
+                markers: ['SOLID', 'DASHED', 'DASHED', 'DASHED', 'SOLID'],
+                rec: 3,
+            },
+        }, { hideRoad: true });
+        // 4 lanes * 40px = 160px centered in 264px -> x = 52..212 (Lane 0: 52..92, Lane 1: 92..132, Lane 3: 172..212), cy = 194 (y = 169..219)
+        const spanY = (x0, x1) => {
+            let lo = 999, hi = -1;
+            for (let y = 166; y <= 220; y++) {
+                for (let x = x0; x <= x1; x++) {
+                    const o = (y * NW + x) * 4;
+                    if (laneCv.d[o] > 200 && laneCv.d[o + 1] > 200 && laneCv.d[o + 2] > 200 && laneCv.d[o + 3] > 200) {
+                        if (y < lo) lo = y;
+                        if (y > hi) hi = y;
+                    }
+                }
+            }
+            return hi - lo + 1;
+        };
+        const leftTurnH = spanY(56, 88);
+        const straightH = spanY(96, 128);
+        const rightTurnH = spanY(176, 208);
+        assert(leftTurnH >= 36 && rightTurnH >= 36,
+            'Turning lane arrows must be tall (>=36px, not stubby 14px), got left=' + leftTurnH + ', right=' + rightTurnH + ', straight=' + straightH);
+
+        // Straight arrow stem thickness at y = 204 (mid-stem well below arrowhead) in Lane 1 (x = 96..128)
+        let stemWidthPx = 0;
+        for (let x = 96; x <= 128; x++) {
+            const o = (204 * NW + x) * 4;
+            if (laneCv.d[o] > 200 && laneCv.d[o + 3] > 200) stemWidthPx++;
+        }
+        assert(stemWidthPx >= 7, 'Straight lane arrow stem must be bold (>=7px wide), got ' + stemWidthPx + 'px');
+    });
+
+    /* 27. Stopped '---' Efficiency, KombiIF Trip km->mi Fix, Media Wing Calibration (+22px & Middle-Right Curve), and Cluster Below-Speed Per-Line Off */
+    await test('Stopped --- MPG/mi/kWh, KombiIF trip km decoding, calibrated media backdrop & per-line belowSpeed Off toggles', async () => {
+        // 1. Stopped at red light: '--- MPG' (Gas) and '--- mi/kWh' (EV)
+        assert.strictEqual(unitsMod.formatEvEff(null, unitsMod.US_PRESET).value, '---');
+        assert.strictEqual(unitsMod.formatFuelEff(null, false, unitsMod.US_PRESET).value, '---');
+
+        const et = new EfficiencyTracker();
+        assert(Math.abs(et.update({ speedKmh: 60, rpm: 1800, engineOn: true, dmeFuelLh: 5.0, bcFuelLPer100km: 8.5 }, 1000).fuelLPer100km - 8.333) < 0.05);
+        const gasStopped = et.update({ speedKmh: 0, rpm: 750, engineOn: true, dmeFuelLh: 0.8, bcFuelLPer100km: 8.5 }, 1500);
+        assert.strictEqual(gasStopped.fuelLPer100km, null, 'stopped gas engine must NOT fall back to bcFuelLPer100km');
+        assert.strictEqual(gasStopped.isDfco, false);
+
+        // 2. KombiIF.statusBordcomputerTravelData.wayPassed is ALWAYS in km (never double-scaled on US cars!)
+        const appSpec = JSON.parse(fs.readFileSync(path.join(APP_DIR, 'app.json'), 'utf8'));
+        const watchHandlers = {};
+        const fakeSigs = {
+            watch(iface, inst, handlers) {
+                watchHandlers[iface] = handlers;
+                return Promise.resolve({ shutdown() {} });
+            },
+        };
+        const hub = new SignalHub({
+            spec: appSpec,
+            settings: { values: { enabled: true, demo: 'off', unitSystem: 'us' }, get(k) { return this.values[k]; } },
+            signals: fakeSigs,
+            log: { info() {}, warn() {}, error() {} },
+        }, { noDiag: true, ipcDir: path.join(os.tmpdir(), 'cm-trip-test-' + process.pid), edriveSharedPath: '' });
+        hub.start();
+        await new Promise((res) => setTimeout(res, 20));
+        watchHandlers['de.bmw.infotainment.KombiIF'].statusBordcomputerTravelData({
+            wayPassed: 100, rideDurationHours: 1, rideDurationMinutes: 25,
+        });
+        const snapTrip = hub.snapshot(Date.now());
+        assert.strictEqual(snapTrip.tripDistKm, 100, 'wayPassed=100 must stay 100 km (62.1 mi), never 160.9 km on US cars');
+        assert.strictEqual(snapTrip.rawWayPassed, 100);
+        assert.strictEqual(snapTrip.tripMinutes, 85);
+        hub.stop();
+
+        // 3. Media wing backdrop calibration (top inset y>=91, bottom inset y<=599, middle-right reaches x=1768 at y=358)
+        const { buildStockBackdrop } = require(path.join(APP_DIR, 'image_decode'));
+        const cov = { w: 176, h: 176, d: Buffer.alloc(176 * 176 * 4, 210) };
+        const bg = buildStockBackdrop(cov, 536, 520, { ox: 1244, oy: 88, vx: 220, vy: 274 });
+        const alphaAt = (wx, wy) => bg[((wy - 88) * 536 + (wx - 1244)) * 4 + 3];
+        assert.strictEqual(alphaAt(1300, 90), 0, 'top edge must stay inset cleanly below y=90');
+        assert.strictEqual(alphaAt(1520, 600), 0, 'bottom edge must stay inset cleanly above y=600');
+        assert(alphaAt(1768, 358) > 35, 'middle-right backdrop must reach cyan arc around x=1768 at y=358, got alpha=' + alphaAt(1768, 358));
+
+        // 4. Cluster below_speed & map_speed per-line Off settings
+        const r = new OverlayRenderer({ allowPanel: true });
+        const m = {
+            units: unitsMod.US_PRESET,
+            profile: { vehicleType: 'phev', engineOn: false, mode: 'ev_drive', isEv: true, isCold: false, coldCeilingRpm: null, alert: null },
+            efficiency: { evKmPerKwh: 6.0, fuelLPer100km: null, isDfco: false },
+            telemetry: { speedKmh: 72, rpm: 0, hvKw: 12.4, soc: 68, soc12: 88, stage: 'D', program: 'D', gear: 5, frictionG: 0 },
+        };
+        const countBandPx = (cv, y0, y1) => {
+            let n = 0;
+            for (let y = y0; y < y1; y++) {
+                for (let x = 0; x < cv.w; x++) if (cv.d[(y * cv.w + x) * 4 + 3] > 180) n++;
+            }
+            return n;
+        };
+
+        // Line 1 ON, Line 2 OFF -> top band painted, bottom band empty
+        r.render(m, { enabled: true, belowSpeedLine1: 'efficiency', belowSpeedLine2: 'off', gearDisplay: 'next_to_d' }, 5000);
+        assert.strictEqual(r.layers.below_speed.visible, true);
+        assert(countBandPx(r.layers.below_speed.cv, 4, 52) > 200, 'Line 1 ON must paint top band');
+        assert.strictEqual(countBandPx(r.layers.below_speed.cv, 55, 84), 0, 'Line 2 OFF must leave bottom band completely empty');
+
+        // Line 1 OFF, Line 2 ON -> Line 2 shifts cleanly up to y=44
+        r.render(m, { enabled: true, belowSpeedLine1: 'off', belowSpeedLine2: 'power', gearDisplay: 'next_to_d' }, 5100);
+        assert.strictEqual(r.layers.below_speed.visible, true);
+        assert(countBandPx(r.layers.below_speed.cv, 20, 52) > 100, 'Line 1 OFF + Line 2 ON must draw power line cleanly up at y=44');
+        assert.strictEqual(countBandPx(r.layers.below_speed.cv, 56, 84), 0, 'bottom band must stay clean when Line 2 shifts up');
+
+        // BOTH OFF -> below_speed hidden completely (and HUD stays visible!)
+        r.render(m, { enabled: true, belowSpeedLine1: 'off', belowSpeedLine2: 'off', gearDisplay: 'next_to_d' }, 5200);
+        assert.strictEqual(r.layers.below_speed.visible, false, 'both lines OFF must hide below_speed layer completely');
+        assert.strictEqual(r.lastSummary.showBelowSpeed, false);
+        assert.strictEqual(r.layers.hud_main.visible, true, 'disabling cluster below_speed must not hide HUD');
+
+        // Also hides map_speed in map_only mode (both from scratch and after previously enabled over Waze map)
+        const tmpWaze = path.join(os.tmpdir(), 'cm-waze-test27-' + process.pid + '.json');
+        fs.writeFileSync(tmpWaze, JSON.stringify({ state: 'showing', target: 'map' }));
+        const rMap = new OverlayRenderer({ allowPanel: true, wazeStatusPath: tmpWaze });
+        rMap.render(m, { enabled: true, clusterSlotMode: 'map_only', belowSpeedLine1: 'efficiency', belowSpeedLine2: 'power', gearDisplay: 'next_to_d' }, 5300);
+        assert.strictEqual(rMap.layers.map_speed.visible, true);
+        rMap.render(m, { enabled: true, clusterSlotMode: 'map_only', belowSpeedLine1: 'off', belowSpeedLine2: 'off', gearDisplay: 'next_to_d' }, 5350);
+        assert.strictEqual(rMap.layers.map_speed.visible, false, 'both lines OFF must also hide map_speed in map_only mode');
+        fs.unlinkSync(tmpWaze);
     });
 
     console.log('\nAll ' + passed + ' tests passed.');

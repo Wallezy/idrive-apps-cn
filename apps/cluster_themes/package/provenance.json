@@ -1,14 +1,14 @@
 {
   "repository": "https://github.com/bimmer-lab/apps",
-  "commit": "30867179098d8f93a54557882611f83faa87adbd",
+  "commit": "68a29e5a8bcc9ec71c0764b2598920b85a2f664a",
   "component": "cluster_themes",
-  "upstreamVersion": "0.19.9",
+  "upstreamVersion": "0.19.10",
   "cnRevision": 1,
-  "releaseVersion": "0.19.10",
+  "releaseVersion": "0.19.11",
   "scope": "Chinese centre-screen controls, settings, help and catalog; original instrument themes, units, signals and defaults preserved",
   "sdk": "Not included; linked on the head unit",
   "releaseChanges": [
-    "改善 M 视图圆弧刻度与节日灯带。",
-    "保留中文设置、地图和原厂底栏选项。"
+    "改善地图在纯图层主题中的显示兼容。",
+    "隐藏或退出主题时恢复地图，优化 M 视图布局。"
   ]
 }

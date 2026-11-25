@@ -1,5 +1,13 @@
 [
   {
+    "version": "1.7.2",
+    "changes": [
+      "更新应用菜单图标，保留中文界面与原有功能。"
+    ],
+    "upstreamVersion": "1.7.1",
+    "cnRevision": 1
+  },
+  {
     "version": "1.7.1",
     "changes": [
       "新增转向影像，提供中文界面与状态提示。",

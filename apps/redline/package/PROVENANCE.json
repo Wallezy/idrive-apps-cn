@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/cauliflowermossgrape/idrive7-apps",
-  "commit": "35bca28bc82b30482d73782877ebaf92c69dcb8c",
+  "commit": "454e47f8b6aec5b2e0d7335257d7cc3644d9d858",
   "language": "zh-CN",
   "sdk": "Excluded; donor-linked by mgu-deploy",
   "adaptations": [
@@ -9,13 +9,13 @@
     "Numeric three-part CN versions"
   ],
   "component": "redline",
-  "upstreamVersion": "2.0.45",
-  "releaseVersion": "2.0.46",
+  "upstreamVersion": "2.0.49",
+  "releaseVersion": "2.0.50",
   "cnRevision": 1,
   "adaptedSourceFilesSha256": {
     "apps/redline/MPL-2.0.txt": "3f3d9e0024b1921b067d6f7f88deb4a60cbe7a78e76c64e3f1d7fc3b779b9d04",
     "apps/redline/README.md": "efc9525dcb2bd0de4f4fa1dd78d3167b559c566e7b23c1739a8e281c52f47c62",
-    "apps/redline/app.json": "e9a54c60ad67aaaf8731e7cb09302e82d8f796c3223902f69264509c47c32196",
+    "apps/redline/app.json": "8428c92ffda709a61ee819c23f392a28f5f45632c6d5149202f3488d8481d82e",
     "apps/redline/call.js": "87a213fdb41765e92c11daa50d53f91db15707e5eeda4439bef97f6db63950af",
     "apps/redline/cluster_render_client.js": "3ccedc32f28e9d94a29b8b5873011a10405acd55ecebc05e08981ccf13c095a4",
     "apps/redline/electrical.js": "c89cc42a4740232d9a193f36f7c9bf2db77ec304d4a45e1636f1a802aa61678e",
@@ -33,7 +33,7 @@
     "apps/redline/launch.js": "fc91cb3aed3bc586054d68a0f346bf0c871fba1c7c78922418fc9c2f22a25a1a",
     "apps/redline/limiter.js": "0ee58c81c54f52f748b6dfa560af39ec25b83f257b0fed821593e316e76a82c7",
     "apps/redline/logview.js": "6130e38d82f4b969dab5836c7ed9ef9e8a3be58d9e8207bd857a2a38b183a77f",
-    "apps/redline/main.js": "df40fef5f873fc6209e888d9b082bc3a5a0c626dbbcbab4e360bc8bc983ba4b3",
+    "apps/redline/main.js": "389efd7124021d5457d5d5bcfa262610ed6979662b81a10ca8d622dfbf29dcf2",
     "apps/redline/nav.js": "2d26bb40d6656342a3866c984216513b0e98bc585cf7f4ff5107da36cf7325ed",
     "apps/redline/navlog.js": "337fc544ed2da1bcc5f3c38b2a84cf25016a75cc8e0b7b2b7b08117935d9665f",
     "apps/redline/powerlog.js": "466ba80a222918409389fa02fe0a15241e029c19507af9d704dc49fc47f032b6",

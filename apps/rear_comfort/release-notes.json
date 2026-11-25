@@ -1,28 +1,28 @@
 [
   {
     "version": "0.5.7",
-    "upstreamVersion": "0.5.6",
-    "cnRevision": 1,
     "changes": [
       "新增后排休憩、视野姿态与按住调节，完善记忆和空调同步。",
       "修复联动失败后未停止、退出页面及取消后继续调节的问题。"
-    ]
+    ],
+    "upstreamVersion": "0.5.6",
+    "cnRevision": 1
   },
   {
     "version": "0.4.6",
-    "upstreamVersion": "0.4.4",
-    "cnRevision": 2,
     "changes": [
       "修复后排空调风量调节与温度、开关状态显示。"
-    ]
+    ],
+    "upstreamVersion": "0.4.4",
+    "cnRevision": 2
   },
   {
     "version": "0.4.5",
-    "upstreamVersion": "0.4.4",
-    "cnRevision": 1,
     "changes": [
       "新增简体中文应用，接入国内商店更新。",
       "兼容商店渲染与输入组件，清理界面推广水印。"
-    ]
+    ],
+    "upstreamVersion": "0.4.4",
+    "cnRevision": 1
   }
 ]

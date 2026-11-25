@@ -140,7 +140,7 @@
               "did": "5656",
               "bytes": 2,
               "at": 0,
-              "factor": 0.01,
+              "factor": 0.00429153,
               "min": 0,
               "max": 150,
               "timeoutMs": 900
@@ -150,6 +150,15 @@
               "bytes": 2,
               "at": 0,
               "factor": 0.05,
+              "min": 0,
+              "max": 150,
+              "timeoutMs": 900
+            },
+            {
+              "did": "4521",
+              "bytes": 2,
+              "at": 0,
+              "factor": 0.134228,
               "min": 0,
               "max": 150,
               "timeoutMs": 900

@@ -1,5 +1,13 @@
 [
   {
+    "version": "2.5.3",
+    "changes": [
+      "更新应用菜单图标，保留中文界面与原有功能。"
+    ],
+    "upstreamVersion": "2.5.2",
+    "cnRevision": 1
+  },
+  {
     "version": "2.5.2",
     "changes": [
       "新增行车记录，支持录像、锁定片段与 USB 导出。",

@@ -5,7 +5,7 @@
     "type": "OnlineApp",
     "name": "cluster_metrics",
     "vendor": "chyiz",
-    "version": "0.9.1",
+    "version": "0.9.4",
     "defaultLanguage": "en_GB",
     "stringBundleUuid": "1d426b7d-e21a-54c6-b738-c2bf09694bfb",
     "resourceBundleUuid": "7414718d-ffa9-50be-beeb-80dd24f2354e",

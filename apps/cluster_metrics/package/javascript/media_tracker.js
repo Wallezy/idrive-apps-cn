@@ -10,7 +10,7 @@ const fs = require('fs');
 const { decodeCoverThumb, MAX_BYTES } = require('./image_decode');
 const { foldAscii } = require('./hud_nav_renderer');
 
-const COVER_SIDE = 144;
+const COVER_SIDE = 176;
 const META_KEYS = { 3: 'TITLE', 5: 'ARTIST', 7: 'ALBUM', 9: 'ALBUM_ARTIST', 17: 'COVER_FILE', 32: 'PERFORMER', 40: 'EPISODE', 47: 'SERIES' };
 const ITEM_TYPES = { 0: 'UNDEFINED', 1: 'ARTIST', 2: 'ALBUM', 3: 'TITLE', ARTIST: 'ARTIST', ALBUM: 'ALBUM', TITLE: 'TITLE', UNDEFINED: 'UNDEFINED' };
 const PAGES = ['media', 'trip', 'tpms', 'off'];

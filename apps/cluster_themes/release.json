@@ -3,7 +3,7 @@
   "requires": {
     "mgu-deploy": "0.8.18",
     "mgu-render": "0.6.19",
-    "cluster-render": "0.5.9"
+    "cluster-render": "0.8.13"
   },
   "uninstallable": true,
   "mguHmi": [

@@ -1,7 +1,7 @@
 {
  "id": "cluster_metrics",
  "title": "\u7ec4\u5408\u4eea\u8868\u6570\u636e",
- "version": "0.9.1",
+ "version": "0.9.4",
  "screens": [
   {
    "name": "MAIN",
@@ -129,10 +129,13 @@
      "WIDGET_CHARGING",
      "Right widget: Charging finish time (auto)"
     ],
+    "belowSpeedLine1",
+    "belowSpeedLine2",
     "gearDisplay",
     "cabinTempDisplay",
     "hvSocGauge",
     "brakeIndicator",
+    "iceChargeBar",
     "cornerRightDisplay",
     "cornerLeftDisplay",
     "clusterNudgeX",
@@ -231,7 +234,7 @@
  "settings": [
   {
    "key": "enabled",
-   "label": "\u5f00\u542f\u6570\u636e\u663e\u793a\uff08\u9996\u6b21\u4f7f\u7528\u8bf7\u624b\u52a8\u5f00\u542f\uff09",
+   "label": "\u542f\u7528\u7ec4\u5408\u4eea\u8868\u6570\u636e",
    "type": "bool",
    "default": false
   },
@@ -264,11 +267,11 @@
    "options": [
     [
      "panel_only",
-     "\u5b8c\u6574\u4eea\u8868\u533a\u57df\uff08\u542b\u53f3\u4fa7\u4fe1\u606f\uff09"
+     "\u5168\u4eea\u8868\uff08\u5168\u90e8\u53e0\u52a0\u4fe1\u606f\u4e0e\u53f3\u4fa7\u7ec4\u4ef6\uff09"
     ],
     [
      "map_only",
-     "\u4ec5\u5730\u56fe\u53e0\u52a0\uff08\u4fdd\u7559\u539f\u5382\u884c\u8f66\u4fe1\u606f\uff09"
+     "\u4ec5\u4e2d\u592e\u5730\u56fe\u533a\uff08\u4fdd\u7559\u539f\u5382\u884c\u8f66\u4fe1\u606f\uff09"
     ]
    ]
   },
@@ -344,7 +347,7 @@
    "options": [
     [
      "efficiency_gear",
-     "\u80fd\u8017\u4e0e\u6321\u4f4d\uff08\u56fa\u5b9a\u4f4d\u7f6e\uff09"
+     "\u80fd\u8017\u4e0e\u6321\u4f4d"
     ],
     [
      "efficiency",
@@ -389,7 +392,7 @@
    "options": [
     [
      "power",
-     "\u4ec5\u529f\u7387\uff0f\u589e\u538b"
+     "\u529f\u7387\uff0f\u8f6c\u901f\u4e0e\u589e\u538b"
     ],
     [
      "power_gear",
@@ -526,11 +529,43 @@
    "options": [
     [
      "oil_cool",
-     "\u673a\u6cb9\u4e0e\u51b7\u5374\u6db2\u6e29\u5ea6"
+     "\u673a\u6cb9\u4e0e\u51b7\u5374\u6db2"
     ],
     [
      "oil_gbx",
      "\u673a\u6cb9\u4e0e\u53d8\u901f\u7bb1\u6cb9\u6e29"
+    ],
+    [
+     "off",
+     "\u5173\u95ed"
+    ]
+   ]
+  },
+  {
+   "key": "belowSpeedLine1",
+   "label": "\u8f66\u901f\u4e0b\u65b9\u7b2c\u4e00\u884c",
+   "type": "choice",
+   "default": "efficiency",
+   "options": [
+    [
+     "efficiency",
+     "\u80fd\u8017\uff0f\u5145\u7535\u529f\u7387"
+    ],
+    [
+     "off",
+     "\u5173\u95ed"
+    ]
+   ]
+  },
+  {
+   "key": "belowSpeedLine2",
+   "label": "\u8f66\u901f\u4e0b\u65b9\u7b2c\u4e8c\u884c",
+   "type": "choice",
+   "default": "power",
+   "options": [
+    [
+     "power",
+     "\u529f\u7387\uff0f\u8f6c\u901f\u4e0e\u589e\u538b"
     ],
     [
      "off",
@@ -577,6 +612,12 @@
      "\u5173\u95ed"
     ]
    ]
+  },
+  {
+   "key": "iceChargeBar",
+   "label": "\u53d1\u52a8\u673a\u5145\u7535\u529f\u7387\u6761\uff08\u63d2\u6df7\uff09",
+   "type": "bool",
+   "default": true
   },
   {
    "key": "smartAlerts",
@@ -969,7 +1010,7 @@
       "did": "5656",
       "bytes": 2,
       "at": 0,
-      "factor": 0.01,
+      "factor": 0.00429153,
       "min": 0,
       "max": 150,
       "timeoutMs": 900
@@ -979,6 +1020,15 @@
       "bytes": 2,
       "at": 0,
       "factor": 0.05,
+      "min": 0,
+      "max": 150,
+      "timeoutMs": 900
+     },
+     {
+      "did": "4521",
+      "bytes": 2,
+      "at": 0,
+      "factor": 0.134228,
       "min": 0,
       "max": 150,
       "timeoutMs": 900
@@ -1072,7 +1122,7 @@
   "GENERAL": 10,
   "ALERTS": 27,
   "CLUSTER": 40,
-  "HUD": 57,
-  "DIAG": 68
+  "HUD": 60,
+  "DIAG": 71
  }
 }

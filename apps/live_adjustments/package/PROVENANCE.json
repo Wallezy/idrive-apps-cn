@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/cauliflowermossgrape/idrive7-apps",
-  "commit": "35bca28bc82b30482d73782877ebaf92c69dcb8c",
+  "commit": "454e47f8b6aec5b2e0d7335257d7cc3644d9d858",
   "language": "zh-CN",
   "sdk": "Excluded; donor-linked by mgu-deploy",
   "adaptations": [
@@ -9,13 +9,13 @@
     "Numeric three-part CN versions"
   ],
   "component": "live_adjustments",
-  "upstreamVersion": "0.9.10",
-  "releaseVersion": "0.9.11",
+  "upstreamVersion": "0.9.12",
+  "releaseVersion": "0.9.13",
   "cnRevision": 1,
   "adaptedSourceFilesSha256": {
     "apps/live_adjustments/README.md": "c4b796ee26d864a5667d3aaf7854e7c3f10f100225cc9c688a4217b91a157d25",
     "apps/live_adjustments/adapters.js": "75966db987b31f1d7da8b9d5d3eecd7e6900f043914d018c16692f9eb1fdd438",
-    "apps/live_adjustments/app.json": "932018a8c2ee64c25a75a54a6cbcd86ee8d81e89f6f11566ad43f173a3df2363",
+    "apps/live_adjustments/app.json": "cca643f65d248cbe5b665ac22830e0e62ddee057c092ffffea937dbb7d70325e",
     "apps/live_adjustments/auto.js": "86e88bc3821967617729e6c88d2f8f461048ecb959d22b4819c6dd20b604c4bb",
     "apps/live_adjustments/bm3_profiles.js": "53438f1dcad22486f162f38ef6a41d332c54a5d11827c7c157c7f38fd78b3cbb",
     "apps/live_adjustments/bm3_protocol.js": "04baf1e30e84a6d42634dc96ac091b589947eadc3cd519a5eb336b509c8434d5",

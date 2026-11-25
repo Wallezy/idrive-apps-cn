@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/cauliflowermossgrape/idrive7-apps",
-  "commit": "35bca28bc82b30482d73782877ebaf92c69dcb8c",
+  "commit": "454e47f8b6aec5b2e0d7335257d7cc3644d9d858",
   "language": "zh-CN",
   "sdk": "Excluded; donor-linked by mgu-deploy",
   "adaptations": [
@@ -9,14 +9,14 @@
     "Numeric three-part CN versions"
   ],
   "component": "car_vitals",
-  "upstreamVersion": "2.27.9",
-  "releaseVersion": "2.27.10",
+  "upstreamVersion": "2.27.12",
+  "releaseVersion": "2.27.13",
   "cnRevision": 1,
   "adaptedSourceFilesSha256": {
-    "apps/car_vitals/app.json": "5c3cebd0810465d896581e8125b34771dcb7c0194383a02796306abd688077fb",
+    "apps/car_vitals/app.json": "a6915636f97c2b0f16c1b57af98b8b03abd7f3bb18eb652deb21a46ff680e92f",
     "apps/car_vitals/demo.js": "ee1963ef3dae5510d624d329952795f854dd5154fa43e349578a1d765df4f055",
     "apps/car_vitals/icon.png": "f4ed2c2cf8f3c7dce5929aadeade8989449e8e5389568e05c0c4f42f1daef37d",
-    "apps/car_vitals/main.js": "dc70607fa0ea1b58f0ecd4c2ad35d050b76508643c2d28fa0199d52988e56fa2",
+    "apps/car_vitals/main.js": "86a5cd2424560f0cc11329bd53510e5c0758399995176abd3a269d59ab976d53",
     "apps/car_vitals/paired_reading.js": "adde28e16851dc7dcfbeb061cde092a7392c982428f9ca0885dc404c0453dd3a",
     "apps/car_vitals/program.js": "7a39b78a8d1f574341a5f76d9bd3762c536d0ac77a8d87047cec09a4e3528e18"
   }
