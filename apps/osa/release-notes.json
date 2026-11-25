@@ -1,5 +1,13 @@
 [
   {
+    "version": "0.2.66",
+    "changes": [
+      "完善原作者和来源信息，贡献记录随安装包提供。"
+    ],
+    "upstreamVersion": "0.2.63",
+    "cnRevision": 3
+  },
+  {
     "version": "0.2.65",
     "changes": [
       "新增油温助手，支持暖机估算与本地历史。",

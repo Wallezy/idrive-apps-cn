@@ -246,6 +246,8 @@ def stage(plan, item, cache):
         "version": version, "upstreamVersion": item["version"], "cnRevision": 1,
         "changes": changes,
     }])
+    from apply_attribution import apply
+    apply(identity)
     baseline = read(ROOT / "release/cn-localization-versions.json")
     baseline["components"][identity] = version
     write(ROOT / "release/cn-localization-versions.json", baseline)

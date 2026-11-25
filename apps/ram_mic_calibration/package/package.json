@@ -1,10 +1,10 @@
 {
   "name": "ram_mic_calibration",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "在 ID7 车机读取 RAM01 麦克风校准状态，并在停车后二次确认启动校准。",
   "main": "javascript/localized-entry.js",
   "private": false,
-  "author": "custom",
+  "author": "小白151（JackieZ123430）",
   "license": "MIT",
   "engines": {
     "node": ">=8.7.0"
@@ -33,6 +33,8 @@
     "package.json",
     "permissions.json",
     "rhmiData",
-    "LICENSE"
+    "LICENSE",
+    "ATTRIBUTION.json",
+    "CONTRIBUTORS.zh-CN.md"
   ]
 }

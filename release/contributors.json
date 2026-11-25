@@ -1,0 +1,841 @@
+{
+  "schema": 1,
+  "components": {
+    "ambient_config": [
+      {
+        "role": "author",
+        "name": "cauliflowermossgrape",
+        "contribution": "氛围灯区域、颜色与灯光控制应用。",
+        "source": "https://github.com/cauliflowermossgrape/idrive7-apps"
+      },
+      {
+        "role": "translation",
+        "name": "小白151（JackieZ123430）",
+        "contribution": "当前包保留的简体中文基础译文；后续 CN 补充和兼容修改见源码记录。",
+        "source": "https://github.com/JackieZ123430/idrive7-apps-cn"
+      },
+      {
+        "role": "adaptation",
+        "name": "Wallezy",
+        "contribution": "CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      }
+    ],
+    "bmrmodz-car-equipment": [
+      {
+        "role": "author",
+        "name": "dzooky / BMRMODZ",
+        "contribution": "车辆装备识别与配置读取服务。",
+        "source": "https://github.com/dzooky/bmrmodz"
+      },
+      {
+        "role": "adaptation",
+        "name": "Wallezy",
+        "contribution": "CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      }
+    ],
+    "bmrmodz-notification": [
+      {
+        "role": "author",
+        "name": "dzooky / BMRMODZ",
+        "contribution": "车机原生通知服务。",
+        "source": "https://github.com/dzooky/bmrmodz"
+      },
+      {
+        "role": "adaptation",
+        "name": "Wallezy",
+        "contribution": "CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      }
+    ],
+    "brake_test": [
+      {
+        "role": "author",
+        "name": "cauliflowermossgrape",
+        "contribution": "制动距离与减速度测试应用。",
+        "source": "https://github.com/cauliflowermossgrape/idrive7-apps"
+      },
+      {
+        "role": "translation",
+        "name": "小白151（JackieZ123430）",
+        "contribution": "当前包保留的简体中文基础译文；后续 CN 补充和兼容修改见源码记录。",
+        "source": "https://github.com/JackieZ123430/idrive7-apps-cn"
+      },
+      {
+        "role": "adaptation",
+        "name": "Wallezy",
+        "contribution": "CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      }
+    ],
+    "car_vitals": [
+      {
+        "role": "author",
+        "name": "cauliflowermossgrape",
+        "contribution": "车辆实时状态与仪表数据应用。",
+        "source": "https://github.com/cauliflowermossgrape/idrive7-apps"
+      },
+      {
+        "role": "translation",
+        "name": "小白151（JackieZ123430）",
+        "contribution": "当前包保留的简体中文基础译文；后续 CN 补充和兼容修改见源码记录。",
+        "source": "https://github.com/JackieZ123430/idrive7-apps-cn"
+      },
+      {
+        "role": "adaptation",
+        "name": "Wallezy",
+        "contribution": "CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      }
+    ],
+    "cluster-render": [
+      {
+        "role": "author",
+        "name": "Robert Nisipeanu",
+        "contribution": "仪表与 HUD 渲染服务、图层合成、显示生命周期与原厂告警避让。",
+        "source": "https://github.com/robertnisipeanu/idrive-apps"
+      },
+      {
+        "role": "adaptation",
+        "name": "Wallezy",
+        "contribution": "CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      }
+    ],
+    "cluster_metrics": [
+      {
+        "role": "author",
+        "name": "chyiz",
+        "contribution": "组合仪表数据应用：仪表与 HUD 遥测、布局及导航叠加。",
+        "source": "https://github.com/chyiz/idrive7-cluster-metrics"
+      },
+      {
+        "role": "translation",
+        "name": "Wallezy",
+        "contribution": "本发行维护的中文菜单、动态状态与中文媒体字形适配。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      },
+      {
+        "role": "runtime",
+        "name": "cauliflowermossgrape",
+        "contribution": "MGU App Kit：应用生命周期、绘图、车辆信号与设置框架。",
+        "source": "https://github.com/cauliflowermossgrape/idrive7-apps"
+      },
+      {
+        "role": "runtime",
+        "name": "Robert Nisipeanu",
+        "contribution": "cluster-render 渲染客户端；保留 MPL-2.0 声明。",
+        "source": "https://github.com/robertnisipeanu/idrive-apps"
+      },
+      {
+        "role": "adaptation",
+        "name": "Wallezy",
+        "contribution": "CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      }
+    ],
+    "cluster_themes": [
+      {
+        "role": "author",
+        "name": "bimmer-lab / apps contributors",
+        "contribution": "仪表主题、布局与主题管理；各布局及借用代码的具体贡献见 NOTICE。",
+        "source": "https://github.com/bimmer-lab/apps"
+      },
+      {
+        "role": "translation",
+        "name": "Wallezy",
+        "contribution": "本发行维护的中文控制界面、设置和商店文案；原始仪表主题视觉与名称保留。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      },
+      {
+        "role": "runtime",
+        "name": "cauliflowermossgrape",
+        "contribution": "MGU App Kit：应用生命周期、绘图、车辆信号与设置框架。",
+        "source": "https://github.com/cauliflowermossgrape/idrive7-apps"
+      },
+      {
+        "role": "runtime",
+        "name": "小白151（JackieZ123430）",
+        "contribution": "共享代码保留的中文支持与工具贡献；完整范围见源码及许可声明。",
+        "source": "https://github.com/JackieZ123430/idrive7-apps-cn"
+      },
+      {
+        "role": "runtime",
+        "name": "Robert Nisipeanu",
+        "contribution": "仪表渲染客户端与 cluster-render 接口；保留 MPL-2.0 代码声明。",
+        "source": "https://github.com/robertnisipeanu/idrive-apps"
+      },
+      {
+        "role": "adaptation",
+        "name": "Wallezy",
+        "contribution": "CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      }
+    ],
+    "doom": [
+      {
+        "role": "author",
+        "name": "cauliflowermossgrape",
+        "contribution": "Doom 移植、车机交互与显示集成；游戏引擎和数据另有作者及许可证。",
+        "source": "https://github.com/cauliflowermossgrape/idrive7-apps"
+      },
+      {
+        "role": "translation",
+        "name": "小白151（JackieZ123430）",
+        "contribution": "当前包保留的简体中文基础译文；后续 CN 补充和兼容修改见源码记录。",
+        "source": "https://github.com/JackieZ123430/idrive7-apps-cn"
+      },
+      {
+        "role": "adaptation",
+        "name": "Wallezy",
+        "contribution": "CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      },
+      {
+        "role": "assets",
+        "name": "id Software / Doom 社区 / Freedoom contributors",
+        "contribution": "Doom 引擎移植和游戏数据；分别保留 GPL、BSD 及相关第三方声明。",
+        "source": "https://github.com/cauliflowermossgrape/idrive7-apps/tree/main/apps/doom"
+      }
+    ],
+    "dpf": [
+      {
+        "role": "author",
+        "name": "dzooky / BMRMODZ",
+        "contribution": "DPF 状态、再生、里程与故障监测应用。 保留上游自带的多语言资源与原有开发者标识。",
+        "source": "https://github.com/dzooky/bmrmodz"
+      },
+      {
+        "role": "runtime",
+        "name": "cauliflowermossgrape",
+        "contribution": "MGU App Kit：应用生命周期、绘图、车辆信号与设置框架。",
+        "source": "https://github.com/cauliflowermossgrape/idrive7-apps"
+      },
+      {
+        "role": "runtime",
+        "name": "小白151（JackieZ123430）",
+        "contribution": "共享代码保留的中文支持与工具贡献；完整范围见源码及许可声明。",
+        "source": "https://github.com/JackieZ123430/idrive7-apps-cn"
+      },
+      {
+        "role": "adaptation",
+        "name": "Wallezy",
+        "contribution": "CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      }
+    ],
+    "dpf_monitor": [
+      {
+        "role": "author",
+        "name": "alexp50 / bmw-apps contributors",
+        "contribution": "颗粒捕集器监测与再生状态应用。 逐文件作者和第三方来源以原项目声明为准。",
+        "source": "https://github.com/alexp50/bmw-apps"
+      },
+      {
+        "role": "translation",
+        "name": "小白151（JackieZ123430）",
+        "contribution": "当前包保留的中文译文；对应上游中文贡献 PR #3。",
+        "source": "https://github.com/alexp50/bmw-apps/pull/3"
+      },
+      {
+        "role": "runtime",
+        "name": "cauliflowermossgrape",
+        "contribution": "MGU App Kit：应用生命周期、绘图、车辆信号与设置框架。",
+        "source": "https://github.com/cauliflowermossgrape/idrive7-apps"
+      },
+      {
+        "role": "adaptation",
+        "name": "Wallezy",
+        "contribution": "CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      }
+    ],
+    "draggy": [
+      {
+        "role": "author",
+        "name": "cauliflowermossgrape",
+        "contribution": "加速测试、滚动起步与测试记录应用。",
+        "source": "https://github.com/cauliflowermossgrape/idrive7-apps"
+      },
+      {
+        "role": "translation",
+        "name": "小白151（JackieZ123430）",
+        "contribution": "当前包保留的简体中文基础译文；后续 CN 补充和兼容修改见源码记录。",
+        "source": "https://github.com/JackieZ123430/idrive7-apps-cn"
+      },
+      {
+        "role": "adaptation",
+        "name": "Wallezy",
+        "contribution": "CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      }
+    ],
+    "dtc_scanner": [
+      {
+        "role": "author",
+        "name": "cauliflowermossgrape",
+        "contribution": "车辆故障码读取与故障详情应用。",
+        "source": "https://github.com/cauliflowermossgrape/idrive7-apps"
+      },
+      {
+        "role": "translation",
+        "name": "小白151（JackieZ123430）",
+        "contribution": "当前包保留的简体中文基础译文；后续 CN 补充和兼容修改见源码记录。",
+        "source": "https://github.com/JackieZ123430/idrive7-apps-cn"
+      },
+      {
+        "role": "adaptation",
+        "name": "Wallezy",
+        "contribution": "CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      }
+    ],
+    "dyno": [
+      {
+        "role": "author",
+        "name": "cauliflowermossgrape",
+        "contribution": "道路测功与功率估算应用。",
+        "source": "https://github.com/cauliflowermossgrape/idrive7-apps"
+      },
+      {
+        "role": "translation",
+        "name": "小白151（JackieZ123430）",
+        "contribution": "当前包保留的简体中文基础译文；后续 CN 补充和兼容修改见源码记录。",
+        "source": "https://github.com/JackieZ123430/idrive7-apps-cn"
+      },
+      {
+        "role": "adaptation",
+        "name": "Wallezy",
+        "contribution": "CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      }
+    ],
+    "edrive": [
+      {
+        "role": "author",
+        "name": "cauliflowermossgrape",
+        "contribution": "混动系统、电池与能量状态应用。",
+        "source": "https://github.com/cauliflowermossgrape/idrive7-apps"
+      },
+      {
+        "role": "translation",
+        "name": "小白151（JackieZ123430）",
+        "contribution": "当前包保留的简体中文基础译文；后续 CN 补充和兼容修改见源码记录。",
+        "source": "https://github.com/JackieZ123430/idrive7-apps-cn"
+      },
+      {
+        "role": "adaptation",
+        "name": "Wallezy",
+        "contribution": "CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      }
+    ],
+    "gforce": [
+      {
+        "role": "author",
+        "name": "cauliflowermossgrape",
+        "contribution": "车辆加速度与 G 值显示应用。",
+        "source": "https://github.com/cauliflowermossgrape/idrive7-apps"
+      },
+      {
+        "role": "translation",
+        "name": "小白151（JackieZ123430）",
+        "contribution": "当前包保留的简体中文基础译文；后续 CN 补充和兼容修改见源码记录。",
+        "source": "https://github.com/JackieZ123430/idrive7-apps-cn"
+      },
+      {
+        "role": "adaptation",
+        "name": "Wallezy",
+        "contribution": "CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      }
+    ],
+    "green_light_alert": [
+      {
+        "role": "author",
+        "name": "alexp50 / bmw-apps contributors",
+        "contribution": "交通信号灯变化与起步提醒应用。 逐文件作者和第三方来源以原项目声明为准。",
+        "source": "https://github.com/alexp50/bmw-apps"
+      },
+      {
+        "role": "translation",
+        "name": "小白151（JackieZ123430）",
+        "contribution": "当前包保留的中文译文；对应上游中文贡献 PR #3。",
+        "source": "https://github.com/alexp50/bmw-apps/pull/3"
+      },
+      {
+        "role": "runtime",
+        "name": "cauliflowermossgrape",
+        "contribution": "MGU App Kit：应用生命周期、绘图、车辆信号与设置框架。",
+        "source": "https://github.com/cauliflowermossgrape/idrive7-apps"
+      },
+      {
+        "role": "adaptation",
+        "name": "Wallezy",
+        "contribution": "CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      }
+    ],
+    "iteriodev-drplay": [
+      {
+        "role": "author",
+        "name": "IterioDev / RobertNisipeanu / Cauliflowermossgrape",
+        "contribution": "行车记录应用与媒体播放服务；联合作者的具体贡献见原项目声明。",
+        "source": "https://github.com/IterioDev/car-apps"
+      }
+    ],
+    "iteriodev-turnview": [
+      {
+        "role": "author",
+        "name": "IterioDev / RobertNisipeanu / Cauliflowermossgrape",
+        "contribution": "转向影像应用与摄像头显示服务；联合作者的具体贡献见原项目声明。",
+        "source": "https://github.com/IterioDev/car-apps"
+      }
+    ],
+    "iteriodev_turnview": [
+      {
+        "role": "author",
+        "name": "IterioDev / RobertNisipeanu / Cauliflowermossgrape",
+        "contribution": "转向影像应用与摄像头显示服务；联合作者的具体贡献见原项目声明。",
+        "source": "https://github.com/IterioDev/car-apps"
+      }
+    ],
+    "live_adjustments": [
+      {
+        "role": "author",
+        "name": "cauliflowermossgrape",
+        "contribution": "发动机设置应用及对应控制逻辑。",
+        "source": "https://github.com/cauliflowermossgrape/idrive7-apps"
+      },
+      {
+        "role": "translation",
+        "name": "小白151（JackieZ123430）",
+        "contribution": "当前包保留的简体中文基础译文；后续 CN 补充和兼容修改见源码记录。",
+        "source": "https://github.com/JackieZ123430/idrive7-apps-cn"
+      },
+      {
+        "role": "adaptation",
+        "name": "Wallezy",
+        "contribution": "CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      }
+    ],
+    "live_data": [
+      {
+        "role": "author",
+        "name": "cauliflowermossgrape",
+        "contribution": "发动机与车辆实时数据应用。",
+        "source": "https://github.com/cauliflowermossgrape/idrive7-apps"
+      },
+      {
+        "role": "translation",
+        "name": "小白151（JackieZ123430）",
+        "contribution": "当前包保留的简体中文基础译文；后续 CN 补充和兼容修改见源码记录。",
+        "source": "https://github.com/JackieZ123430/idrive7-apps-cn"
+      },
+      {
+        "role": "adaptation",
+        "name": "Wallezy",
+        "contribution": "CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      }
+    ],
+    "mgu-inputgate": [
+      {
+        "role": "author",
+        "name": "cauliflowermossgrape",
+        "contribution": "车机输入组件、旋钮与触控输入接口。",
+        "source": "https://github.com/cauliflowermossgrape/idrive7-apps"
+      },
+      {
+        "role": "adaptation",
+        "name": "Wallezy",
+        "contribution": "CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      }
+    ],
+    "oap-driverecorder-next": [
+      {
+        "role": "author",
+        "name": "IterioDev / RobertNisipeanu / Cauliflowermossgrape",
+        "contribution": "行车记录应用与媒体播放服务；联合作者的具体贡献见原项目声明。",
+        "source": "https://github.com/IterioDev/car-apps"
+      }
+    ],
+    "osa": [
+      {
+        "role": "author",
+        "name": "dzooky / BMRMODZ",
+        "contribution": "油温、变速箱温度与预热提醒应用。 保留上游自带的多语言资源与原有开发者标识。",
+        "source": "https://github.com/dzooky/bmrmodz"
+      },
+      {
+        "role": "runtime",
+        "name": "cauliflowermossgrape",
+        "contribution": "MGU App Kit：应用生命周期、绘图、车辆信号与设置框架。",
+        "source": "https://github.com/cauliflowermossgrape/idrive7-apps"
+      },
+      {
+        "role": "runtime",
+        "name": "小白151（JackieZ123430）",
+        "contribution": "共享代码保留的中文支持与工具贡献；完整范围见源码及许可声明。",
+        "source": "https://github.com/JackieZ123430/idrive7-apps-cn"
+      },
+      {
+        "role": "adaptation",
+        "name": "Wallezy",
+        "contribution": "CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      }
+    ],
+    "parking_clearance": [
+      {
+        "role": "author",
+        "name": "alexp50 / bmw-apps contributors",
+        "contribution": "泊车距离与车身周边距离显示应用。 逐文件作者和第三方来源以原项目声明为准。",
+        "source": "https://github.com/alexp50/bmw-apps"
+      },
+      {
+        "role": "translation",
+        "name": "小白151（JackieZ123430）",
+        "contribution": "当前包保留的中文译文；对应上游中文贡献 PR #3。",
+        "source": "https://github.com/alexp50/bmw-apps/pull/3"
+      },
+      {
+        "role": "runtime",
+        "name": "cauliflowermossgrape",
+        "contribution": "MGU App Kit：应用生命周期、绘图、车辆信号与设置框架。",
+        "source": "https://github.com/cauliflowermossgrape/idrive7-apps"
+      },
+      {
+        "role": "adaptation",
+        "name": "Wallezy",
+        "contribution": "CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      }
+    ],
+    "ram_mic_calibration": [
+      {
+        "role": "author",
+        "name": "小白151（JackieZ123430）",
+        "contribution": "RAM 麦克风校准应用及其交互界面。",
+        "source": "https://gitee.com/xiaobai-151/mgu-cn-xiaobai"
+      },
+      {
+        "role": "runtime",
+        "name": "cauliflowermossgrape",
+        "contribution": "MGU App Kit：应用生命周期、绘图、车辆信号与设置框架。",
+        "source": "https://github.com/cauliflowermossgrape/idrive7-apps"
+      },
+      {
+        "role": "adaptation",
+        "name": "Wallezy",
+        "contribution": "CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      }
+    ],
+    "rear_comfort": [
+      {
+        "role": "author",
+        "name": "alexp50 / bmw-apps contributors",
+        "contribution": "后排空调、座椅与舒适功能应用。 逐文件作者和第三方来源以原项目声明为准。",
+        "source": "https://github.com/alexp50/bmw-apps"
+      },
+      {
+        "role": "translation",
+        "name": "小白151（JackieZ123430）",
+        "contribution": "当前包保留的中文译文；对应上游中文贡献 PR #3。",
+        "source": "https://github.com/alexp50/bmw-apps/pull/3"
+      },
+      {
+        "role": "runtime",
+        "name": "cauliflowermossgrape",
+        "contribution": "MGU App Kit：应用生命周期、绘图、车辆信号与设置框架。",
+        "source": "https://github.com/cauliflowermossgrape/idrive7-apps"
+      },
+      {
+        "role": "adaptation",
+        "name": "Wallezy",
+        "contribution": "CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      }
+    ],
+    "redline": [
+      {
+        "role": "author",
+        "name": "cauliflowermossgrape",
+        "contribution": "换挡提示、转速布局和 HUD 显示应用；布局中的第三方贡献见 NOTICE 与 MPL-2.0.txt。",
+        "source": "https://github.com/cauliflowermossgrape/idrive7-apps"
+      },
+      {
+        "role": "translation",
+        "name": "小白151（JackieZ123430）",
+        "contribution": "当前包保留的简体中文基础译文；后续 CN 补充和兼容修改见源码记录。",
+        "source": "https://github.com/JackieZ123430/idrive7-apps-cn"
+      },
+      {
+        "role": "adaptation",
+        "name": "Wallezy",
+        "contribution": "CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      }
+    ],
+    "ride_height": [
+      {
+        "role": "author",
+        "name": "alexp50 / bmw-apps contributors",
+        "contribution": "车身高度与底盘状态应用。 逐文件作者和第三方来源以原项目声明为准。",
+        "source": "https://github.com/alexp50/bmw-apps"
+      },
+      {
+        "role": "translation",
+        "name": "小白151（JackieZ123430）",
+        "contribution": "当前包保留的中文译文；对应上游中文贡献 PR #3。",
+        "source": "https://github.com/alexp50/bmw-apps/pull/3"
+      },
+      {
+        "role": "runtime",
+        "name": "cauliflowermossgrape",
+        "contribution": "MGU App Kit：应用生命周期、绘图、车辆信号与设置框架。",
+        "source": "https://github.com/cauliflowermossgrape/idrive7-apps"
+      },
+      {
+        "role": "adaptation",
+        "name": "Wallezy",
+        "contribution": "CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      }
+    ],
+    "road_trip_computer": [
+      {
+        "role": "author",
+        "name": "alexp50 / bmw-apps contributors",
+        "contribution": "旅途数据、油耗与行程统计应用。 逐文件作者和第三方来源以原项目声明为准。",
+        "source": "https://github.com/alexp50/bmw-apps"
+      },
+      {
+        "role": "translation",
+        "name": "小白151（JackieZ123430）",
+        "contribution": "当前包保留的中文译文；对应上游中文贡献 PR #3。",
+        "source": "https://github.com/alexp50/bmw-apps/pull/3"
+      },
+      {
+        "role": "runtime",
+        "name": "cauliflowermossgrape",
+        "contribution": "MGU App Kit：应用生命周期、绘图、车辆信号与设置框架。",
+        "source": "https://github.com/cauliflowermossgrape/idrive7-apps"
+      },
+      {
+        "role": "adaptation",
+        "name": "Wallezy",
+        "contribution": "CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      }
+    ],
+    "robertn_waze_cluster": [
+      {
+        "role": "author",
+        "name": "Robert Nisipeanu",
+        "contribution": "仪表盘地图应用的设置、状态与显示控制。",
+        "source": "https://github.com/robertnisipeanu/idrive-apps"
+      },
+      {
+        "role": "translation",
+        "name": "Wallezy",
+        "contribution": "本发行维护的原生中文状态、设置和显示选项。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      },
+      {
+        "role": "adaptation",
+        "name": "Wallezy",
+        "contribution": "CN 显示位置、仪表全屏、投屏状态和恢复路径的适配与维护。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      }
+    ],
+    "service": [
+      {
+        "role": "author",
+        "name": "cauliflowermossgrape",
+        "contribution": "车辆保养项目、间隔与状态应用。",
+        "source": "https://github.com/cauliflowermossgrape/idrive7-apps"
+      },
+      {
+        "role": "translation",
+        "name": "小白151（JackieZ123430）",
+        "contribution": "当前包保留的简体中文基础译文；后续 CN 补充和兼容修改见源码记录。",
+        "source": "https://github.com/JackieZ123430/idrive7-apps-cn"
+      },
+      {
+        "role": "adaptation",
+        "name": "Wallezy",
+        "contribution": "CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      }
+    ],
+    "spritmonitor": [
+      {
+        "role": "author",
+        "name": "dzooky / BMRMODZ",
+        "contribution": "油耗平台集成、加油记录与离线补传应用。 保留上游自带的多语言资源与原有开发者标识。",
+        "source": "https://github.com/dzooky/bmrmodz"
+      },
+      {
+        "role": "runtime",
+        "name": "cauliflowermossgrape",
+        "contribution": "MGU App Kit：应用生命周期、绘图、车辆信号与设置框架。",
+        "source": "https://github.com/cauliflowermossgrape/idrive7-apps"
+      },
+      {
+        "role": "runtime",
+        "name": "小白151（JackieZ123430）",
+        "contribution": "共享代码保留的中文支持与工具贡献；完整范围见源码及许可声明。",
+        "source": "https://github.com/JackieZ123430/idrive7-apps-cn"
+      },
+      {
+        "role": "adaptation",
+        "name": "Wallezy",
+        "contribution": "CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      }
+    ],
+    "start_stop_insight": [
+      {
+        "role": "author",
+        "name": "alexp50 / bmw-apps contributors",
+        "contribution": "自动启停状态及限制原因显示应用。 逐文件作者和第三方来源以原项目声明为准。",
+        "source": "https://github.com/alexp50/bmw-apps"
+      },
+      {
+        "role": "translation",
+        "name": "小白151（JackieZ123430）",
+        "contribution": "当前包保留的中文译文；对应上游中文贡献 PR #3。",
+        "source": "https://github.com/alexp50/bmw-apps/pull/3"
+      },
+      {
+        "role": "runtime",
+        "name": "cauliflowermossgrape",
+        "contribution": "MGU App Kit：应用生命周期、绘图、车辆信号与设置框架。",
+        "source": "https://github.com/cauliflowermossgrape/idrive7-apps"
+      },
+      {
+        "role": "adaptation",
+        "name": "Wallezy",
+        "contribution": "CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      }
+    ],
+    "sys_monitor": [
+      {
+        "role": "author",
+        "name": "hexlay",
+        "contribution": "系统监控应用：进程、处理器、内存和趋势视图。",
+        "source": "https://github.com/hexlay/idrive7-system-monitor"
+      },
+      {
+        "role": "translation",
+        "name": "Wallezy",
+        "contribution": "本应用独立维护的中文词典、菜单与状态文案；对应 localized/system-monitor/translations.zh-CN.json。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      },
+      {
+        "role": "runtime",
+        "name": "cauliflowermossgrape",
+        "contribution": "MGU App Kit：应用生命周期、绘图、车辆信号与设置框架。",
+        "source": "https://github.com/cauliflowermossgrape/idrive7-apps"
+      },
+      {
+        "role": "runtime",
+        "name": "小白151（JackieZ123430）",
+        "contribution": "共享代码保留的中文支持与工具贡献；完整范围见源码及许可声明。",
+        "source": "https://github.com/JackieZ123430/idrive7-apps-cn"
+      },
+      {
+        "role": "adaptation",
+        "name": "Wallezy",
+        "contribution": "CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      }
+    ],
+    "warmup": [
+      {
+        "role": "author",
+        "name": "cauliflowermossgrape",
+        "contribution": "发动机暖机状态与温度显示。",
+        "source": "https://github.com/cauliflowermossgrape/idrive7-apps"
+      },
+      {
+        "role": "translation",
+        "name": "小白151（JackieZ123430）",
+        "contribution": "当前包保留的简体中文基础译文；后续 CN 补充和兼容修改见源码记录。",
+        "source": "https://github.com/JackieZ123430/idrive7-apps-cn"
+      },
+      {
+        "role": "adaptation",
+        "name": "Wallezy",
+        "contribution": "CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      }
+    ],
+    "waze-on-cluster": [
+      {
+        "role": "author",
+        "name": "Robert Nisipeanu",
+        "contribution": "手机地图投屏服务、地图来源与显示路由。",
+        "source": "https://github.com/robertnisipeanu/idrive-apps"
+      },
+      {
+        "role": "adaptation",
+        "name": "Wallezy",
+        "contribution": "CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      }
+    ],
+    "xdrive_studio": [
+      {
+        "role": "author",
+        "name": "alexp50 / bmw-apps contributors",
+        "contribution": "xDrive 四驱与动力分配状态应用。 逐文件作者和第三方来源以原项目声明为准。",
+        "source": "https://github.com/alexp50/bmw-apps"
+      },
+      {
+        "role": "translation",
+        "name": "小白151（JackieZ123430）",
+        "contribution": "当前包保留的中文译文；对应上游中文贡献 PR #3。",
+        "source": "https://github.com/alexp50/bmw-apps/pull/3"
+      },
+      {
+        "role": "runtime",
+        "name": "cauliflowermossgrape",
+        "contribution": "MGU App Kit：应用生命周期、绘图、车辆信号与设置框架。",
+        "source": "https://github.com/cauliflowermossgrape/idrive7-apps"
+      },
+      {
+        "role": "adaptation",
+        "name": "Wallezy",
+        "contribution": "CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      }
+    ],
+    "zf8hp": [
+      {
+        "role": "author",
+        "name": "cauliflowermossgrape",
+        "contribution": "ZF 8HP 变速箱状态、适配与维护信息应用。",
+        "source": "https://github.com/cauliflowermossgrape/idrive7-apps"
+      },
+      {
+        "role": "translation",
+        "name": "小白151（JackieZ123430）",
+        "contribution": "当前包保留的简体中文基础译文；后续 CN 补充和兼容修改见源码记录。",
+        "source": "https://github.com/JackieZ123430/idrive7-apps-cn"
+      },
+      {
+        "role": "adaptation",
+        "name": "Wallezy",
+        "contribution": "CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。",
+        "source": "https://github.com/Wallezy/idrive-apps-cn"
+      }
+    ]
+  }
+}

@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "id": "start_stop_insight",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "tree": "package",
   "modules": [
     "src/sdk.js"

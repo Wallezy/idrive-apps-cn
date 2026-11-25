@@ -1,10 +1,10 @@
 {
   "name": "warmup",
-  "version": "1.9.3",
+  "version": "1.9.4",
   "description": "Oil and coolant warm-up calculator (time to ready), safe rev limit, turbo cool-down and a cold start counter",
   "main": "javascript/localized-entry.js",
   "private": false,
-  "author": "custom",
+  "author": "cauliflowermossgrape",
   "license": "MIT",
   "engines": {
     "node": ">=8.7.0"
@@ -34,6 +34,8 @@
     "LICENSE",
     "NOTICE.zh-CN.md",
     "PROVENANCE.json",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "ATTRIBUTION.json",
+    "CONTRIBUTORS.zh-CN.md"
   ]
 }

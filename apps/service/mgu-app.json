@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "id": "service",
-  "version": "1.6.6",
+  "version": "1.6.7",
   "tree": "package",
   "modules": [
     "src/sdk.js"

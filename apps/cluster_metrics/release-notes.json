@@ -1,5 +1,13 @@
 [
   {
+    "version": "0.9.5",
+    "changes": [
+      "完善原作者和来源信息，贡献记录随安装包提供。"
+    ],
+    "upstreamVersion": "0.9.3",
+    "cnRevision": 2
+  },
+  {
     "version": "0.9.4",
     "changes": [
       "新增 HUD 布局、油门与转速显示，完善混动充电信息。",

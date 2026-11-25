@@ -1,10 +1,10 @@
 {
   "name": "road_trip_computer",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "全屏显示行程历史、油耗、油价、费用、续航、车外温度和 GPS 海拔",
   "main": "javascript/localized-entry.js",
   "private": false,
-  "author": "alexp50",
+  "author": "alexp50 / bmw-apps contributors",
   "license": "MIT",
   "engines": {
     "node": ">=8.7.0"
@@ -34,6 +34,8 @@
     "permissions.json",
     "rhmiData",
     "rhmiDataStartWidget",
-    "LICENSE"
+    "LICENSE",
+    "ATTRIBUTION.json",
+    "CONTRIBUTORS.zh-CN.md"
   ]
 }

@@ -1,5 +1,13 @@
 [
   {
+    "version": "0.19.12",
+    "changes": [
+      "完善原作者和来源信息，贡献记录随安装包提供。"
+    ],
+    "upstreamVersion": "0.19.10",
+    "cnRevision": 2
+  },
+  {
     "version": "0.19.11",
     "upstreamVersion": "0.19.10",
     "cnRevision": 1,

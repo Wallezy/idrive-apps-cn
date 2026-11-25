@@ -5,7 +5,7 @@
     "type": "OnlineApp",
     "name": "start_stop_insight",
     "vendor": "alexp50",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "defaultLanguage": "en_GB",
     "stringBundleUuid": "f384248a-170e-5e0a-ab05-1d84362b30ec",
     "resourceBundleUuid": "d072ba50-acc1-5c03-8175-77dae9c6c3d0",

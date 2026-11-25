@@ -1,5 +1,13 @@
 [
   {
+    "version": "2.11.6",
+    "changes": [
+      "完善原作者和来源信息，贡献记录随安装包提供。"
+    ],
+    "upstreamVersion": "2.11.4",
+    "cnRevision": 2
+  },
+  {
     "version": "2.11.5",
     "changes": [
       "改善电功率估算与范围判断。",

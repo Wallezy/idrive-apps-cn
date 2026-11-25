@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "id": "xdrive_studio",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "tree": "package",
   "modules": [
     "src/sdk.js"

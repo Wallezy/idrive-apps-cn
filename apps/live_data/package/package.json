@@ -1,10 +1,10 @@
 {
   "name": "live_data",
-  "version": "1.0.21",
+  "version": "1.0.22",
   "description": "Read-only live values from the car and its control units, a trip computer with fuel cost, and gauge screens of your own, one of them as the home-screen widget",
   "main": "javascript/localized-entry.js",
   "private": false,
-  "author": "custom",
+  "author": "cauliflowermossgrape",
   "license": "MIT",
   "engines": {
     "node": ">=8.7.0"
@@ -34,6 +34,8 @@
     "NOTICE.zh-CN.md",
     "PROVENANCE.json",
     "CHANGELOG.md",
-    "rhmiDataStartWidget"
+    "rhmiDataStartWidget",
+    "ATTRIBUTION.json",
+    "CONTRIBUTORS.zh-CN.md"
   ]
 }

@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "id": "dpf",
-  "version": "0.1.76",
+  "version": "0.1.77",
   "tree": "package",
   "modules": [
     "src/sdk.js"

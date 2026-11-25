@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "component": "robertn_waze_cluster",
+  "contributors": [
+    {
+      "role": "author",
+      "name": "Robert Nisipeanu",
+      "contribution": "仪表盘地图应用的设置、状态与显示控制。",
+      "source": "https://github.com/robertnisipeanu/idrive-apps"
+    },
+    {
+      "role": "translation",
+      "name": "Wallezy",
+      "contribution": "本发行维护的原生中文状态、设置和显示选项。",
+      "source": "https://github.com/Wallezy/idrive-apps-cn"
+    },
+    {
+      "role": "adaptation",
+      "name": "Wallezy",
+      "contribution": "CN 显示位置、仪表全屏、投屏状态和恢复路径的适配与维护。",
+      "source": "https://github.com/Wallezy/idrive-apps-cn"
+    }
+  ]
+}

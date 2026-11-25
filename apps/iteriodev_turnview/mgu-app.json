@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "id": "iteriodev_turnview",
-  "version": "1.7.2",
+  "version": "1.7.3",
   "tree": "package",
   "modules": [
     "src/main.js",

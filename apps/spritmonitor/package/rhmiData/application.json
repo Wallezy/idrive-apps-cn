@@ -5,7 +5,7 @@
     "type": "OnlineApp",
     "name": "spritmonitor",
     "vendor": "custom",
-    "version": "0.1.46",
+    "version": "0.1.47",
     "defaultLanguage": "en_GB",
     "stringBundleUuid": "3e76a4cc-464d-5304-9071-da6e235f0ce5",
     "resourceBundleUuid": "5b3761df-b43d-5db6-839a-69f448a76769",

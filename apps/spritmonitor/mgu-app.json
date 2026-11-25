@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "id": "spritmonitor",
-  "version": "0.1.46",
+  "version": "0.1.47",
   "tree": "package",
   "modules": [
     "src/sdk.js"

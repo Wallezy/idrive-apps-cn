@@ -5,7 +5,7 @@
     "type": "OnlineApp",
     "name": "dpf",
     "vendor": "custom",
-    "version": "0.1.76",
+    "version": "0.1.77",
     "defaultLanguage": "en_GB",
     "stringBundleUuid": "37d24b37-cdc5-562f-a6ca-d152175f30c9",
     "resourceBundleUuid": "5c38e166-2fce-5fe6-b0fd-038177a7eeed",

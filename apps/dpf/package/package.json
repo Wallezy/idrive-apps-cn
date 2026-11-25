@@ -1,10 +1,10 @@
 {
   "name": "dpf",
-  "version": "0.1.76",
+  "version": "0.1.77",
   "description": "只读查看支持的 B47、B57 柴油机颗粒过滤器数据、再生状态与距离；保留原有 DPF 监测应用。",
   "main": "javascript/localized-entry.js",
   "private": false,
-  "author": "BMRMODZ / dzooky",
+  "author": "dzooky / BMRMODZ",
   "license": "MIT",
   "engines": {
     "node": ">=8.7.0"
@@ -33,6 +33,8 @@
     "LICENSE",
     "NOTICE.zh-CN.md",
     "PROVENANCE.json",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "ATTRIBUTION.json",
+    "CONTRIBUTORS.zh-CN.md"
   ]
 }

@@ -1,5 +1,15 @@
 # Releases
 
+CN contributor records are maintained in `release/contributors.json`. Each
+component has bounded plain-text `author`, `translation`, `adaptation`, `runtime`
+or `assets` records with a name, contribution and HTTPS source. The catalog
+carries these as optional `contributors` metadata, independently of dependency
+and artifact identity. `tools/apply_attribution.py` writes the same records into
+each application's source package; import tools apply it when staging an app.
+Original licenses, copyright headers and immutable import provenance remain
+alongside these records. A translation record describes the text actually
+included in that package.
+
 CN release preparation uses the successful exact-main-commit `Test` workflow's
 `cn-release-<sha>-a` artifact. The workflow builds on two independent runners and
 compares package hashes. Its retained archive includes `catalog.json`, packages,

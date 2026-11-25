@@ -1,6 +1,6 @@
 {
   "name": "iteriodev_turnview",
-  "version": "1.7.2",
+  "version": "1.7.3",
   "description": "在仪表或中控显示前摄像头与导航转向。需前摄像头；每次随车启动后关闭。仪表中央画面不能与 Waze 仪表地图同时使用，请将 Waze 设为仅 HUD。",
   "private": false,
   "main": "javascript/runner.js",
@@ -37,7 +37,9 @@
     "LICENSE.md",
     "NOTICE.zh-CN.md",
     "PROVENANCE.json",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "ATTRIBUTION.json",
+    "CONTRIBUTORS.zh-CN.md"
   ],
   "dependencies": {
     "oap-sdk": "24.10.2"

@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "id": "ambient_config",
-  "version": "2.7.24",
+  "version": "2.7.25",
   "tree": "package",
   "modules": [
     "src/sdk.js"

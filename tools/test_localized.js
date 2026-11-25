@@ -8,6 +8,7 @@ const cp = require('child_process');
 const zlib = require('zlib');
 const crypto = require('crypto');
 const link = require('./oap_link');
+require('./test_attribution');
 const root = path.resolve(__dirname, '..');
 const ids = require('../release/repo.json').unprefixedAppIds;
 const imports = require('../release/community-import-plan.json').apps;

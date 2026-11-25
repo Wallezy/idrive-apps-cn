@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "component": "doom",
+  "contributors": [
+    {
+      "role": "author",
+      "name": "cauliflowermossgrape",
+      "contribution": "Doom 移植、车机交互与显示集成；游戏引擎和数据另有作者及许可证。",
+      "source": "https://github.com/cauliflowermossgrape/idrive7-apps"
+    },
+    {
+      "role": "translation",
+      "name": "小白151（JackieZ123430）",
+      "contribution": "当前包保留的简体中文基础译文；后续 CN 补充和兼容修改见源码记录。",
+      "source": "https://github.com/JackieZ123430/idrive7-apps-cn"
+    },
+    {
+      "role": "adaptation",
+      "name": "Wallezy",
+      "contribution": "CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。",
+      "source": "https://github.com/Wallezy/idrive-apps-cn"
+    },
+    {
+      "role": "assets",
+      "name": "id Software / Doom 社区 / Freedoom contributors",
+      "contribution": "Doom 引擎移植和游戏数据；分别保留 GPL、BSD 及相关第三方声明。",
+      "source": "https://github.com/cauliflowermossgrape/idrive7-apps/tree/main/apps/doom"
+    }
+  ]
+}

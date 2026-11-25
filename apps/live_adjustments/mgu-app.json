@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "id": "live_adjustments",
-  "version": "0.9.13",
+  "version": "0.9.14",
   "tree": "package",
   "modules": [
     "src/sdk.js"

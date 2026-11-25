@@ -1,10 +1,10 @@
 {
   "name": "rear_comfort",
-  "version": "0.5.7",
+  "version": "0.5.8",
   "description": "G12 行政座舱后排空调、舒适座椅、按摩、遮阳帘及娱乐控制",
   "main": "javascript/localized-entry.js",
   "private": false,
-  "author": "alexp50",
+  "author": "alexp50 / bmw-apps contributors",
   "license": "MIT",
   "engines": {
     "node": ">=8.7.0"
@@ -33,6 +33,8 @@
     "package.json",
     "permissions.json",
     "rhmiData",
-    "LICENSE"
+    "LICENSE",
+    "ATTRIBUTION.json",
+    "CONTRIBUTORS.zh-CN.md"
   ]
 }

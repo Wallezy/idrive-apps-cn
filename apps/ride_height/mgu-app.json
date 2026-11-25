@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "id": "ride_height",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "tree": "package",
   "modules": [
     "src/sdk.js"

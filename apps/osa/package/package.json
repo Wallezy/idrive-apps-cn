@@ -1,10 +1,10 @@
 {
   "name": "osa",
-  "version": "0.2.65",
+  "version": "0.2.66",
   "description": "查看机油、冷却液和变速箱油温，估算暖机时间并保存本地历史。",
   "main": "javascript/localized-entry.js",
   "private": false,
-  "author": "BMRMODZ / dzooky",
+  "author": "dzooky / BMRMODZ",
   "license": "MIT",
   "engines": {
     "node": ">=8.7.0"
@@ -33,6 +33,8 @@
     "LICENSE",
     "NOTICE.zh-CN.md",
     "PROVENANCE.json",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "ATTRIBUTION.json",
+    "CONTRIBUTORS.zh-CN.md"
   ]
 }

@@ -97,3 +97,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+    from apply_attribution import apply
+    apply('cluster_themes')

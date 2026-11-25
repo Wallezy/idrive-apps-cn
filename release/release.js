@@ -40,6 +40,7 @@ const OUT = path.join(__dirname, 'out');
 const PACKER = path.join('release', 'tool_artifact.js');
 const publishTarget = require('./publish');
 const { compareVersions, textsOf, SEMVER } = require('./catalog.js');
+const { contributorsOf } = require('./contributors.js');
 
 function readJson(file) {
     return JSON.parse(fs.readFileSync(file, 'utf8'));
@@ -235,6 +236,21 @@ function components(root = REPO) {
         tool(dir, id, [dir, `:(exclude,glob)${dir}/*.md`, `:(exclude)${dir}/test`]);
     });
     const texts = catalogTexts(out.map((c) => c.id), root);
+    const creditsFile = path.join(root, 'release/contributors.json');
+    const credits = fs.existsSync(creditsFile) ? readJson(creditsFile) : { schema: 1, components: {} };
+    if (credits.schema !== 1 || !credits.components || typeof credits.components !== 'object' || Array.isArray(credits.components)) {
+        throw new Error('release/contributors.json needs schema 1 and components');
+    }
+    Object.keys(credits.components).forEach((id) => {
+        const c = out.find((x) => x.id === id);
+        const records = contributorsOf(credits.components[id]);
+        if (!c || !records.length || !records.some((x) => x.role === 'author') ||
+            JSON.stringify(records) !== JSON.stringify(credits.components[id])) {
+            throw new Error(`release/contributors.json: ${id} needs reviewed author and contribution records`);
+        }
+        c.contributors = records;
+        c.author = records.filter((x) => x.role === 'author').map((x) => x.name).join(' / ');
+    });
     out.forEach((c) => {
         if (texts[c.id]) {
             c.texts = texts[c.id];
@@ -389,21 +405,20 @@ function buildIn(c, exportDir, env) {
     return artifact;
 }
 
-/* Sets each published entry's "texts" to its component's (none: removed);
+/* Sets each published entry's display metadata to its component's (none: removed);
  * returns the entries that changed. */
 function retext(entries, all) {
     return entries.filter((e) => {
         const c = all.find((x) => x.id === e.id);
-        const want = (c && c.texts) || null;
-        if (JSON.stringify(want) === JSON.stringify(e.texts || null)) {
-            return false;
-        }
-        if (want) {
-            e.texts = want;
-        } else {
-            delete e.texts;
-        }
-        return true;
+        let changed = false;
+        ['texts', 'author', 'contributors'].forEach((key) => {
+            const want = (c && c[key]) || null;
+            if (JSON.stringify(want) === JSON.stringify(e[key] || null)) return;
+            if (want) e[key] = want;
+            else delete e[key];
+            changed = true;
+        });
+        return changed;
     });
 }
 
@@ -432,6 +447,10 @@ function catalogEntry(c, file) {
     }
     if (c.texts) {
         entry.texts = c.texts;
+    }
+    if (c.contributors) {
+        entry.contributors = c.contributors;
+        entry.author = c.author;
     }
     // an app's icon, published beside the catalog as <id>.png
     if (c.icon) {

@@ -1,1 +1,5 @@
-{"name": "cluster_metrics", "version": "0.9.4", "lockfileVersion": 1}
+{
+  "name": "cluster_metrics",
+  "version": "0.9.5",
+  "lockfileVersion": 1
+}

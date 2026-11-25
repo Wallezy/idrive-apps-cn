@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "id": "osa",
-  "version": "0.2.65",
+  "version": "0.2.66",
   "tree": "package",
   "modules": [
     "src/sdk.js"

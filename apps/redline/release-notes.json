@@ -1,5 +1,13 @@
 [
   {
+    "version": "2.0.51",
+    "changes": [
+      "完善原作者和来源信息，贡献记录随安装包提供。"
+    ],
+    "upstreamVersion": "2.0.49",
+    "cnRevision": 2
+  },
+  {
     "version": "2.0.50",
     "changes": [
       "修复手动挡退出倒挡后挡位仍显示 R 的问题。",

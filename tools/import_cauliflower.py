@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Build pinned upstream apps into SDK-free, fixed-Chinese CN source packages."""
 import hashlib,json,pathlib,shutil,sys,tempfile,re
+from apply_attribution import apply as apply_attribution
 ROOT=pathlib.Path(__file__).resolve().parents[1];LOCAL=ROOT/'localized/cauliflower'
 sys.path.insert(0,str(LOCAL/'kit/tools'))
 import build
@@ -53,6 +54,7 @@ def main():
    write(app/'release.json',{'build':'node ../../tools/build_localized.js','requires':requires,'uninstallable':True,'mguHmi':['ID7']})
    write(app/'release-notes.json',[{'version':version,'upstreamVersion':spec['version'],'cnRevision':item['cnRevision'],'changes':changes}]+[n for n in old_notes if n['version']!=version][:15])
    baseline['components'][identity]=version
+   apply_attribution(identity)
    for catalog in (ROOT/'release/texts').glob('*.json'):
     texts=read(catalog);texts[identity]={'title':title,'description':item['description']} if catalog.stem=='zh-CN' else {'title':spec['title']+' (简体中文)','description':'Simplified Chinese edition. '+item['englishDescription']};write(catalog,texts)
  repo['unprefixedAppIds']=sorted(set(repo['unprefixedAppIds'])|set(selected));write(ROOT/'release/repo.json',repo)

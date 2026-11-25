@@ -5,7 +5,7 @@
     "type": "OnlineApp",
     "name": "ram_mic_calibration",
     "vendor": "custom",
-    "version": "0.4.1",
+    "version": "0.4.2",
     "defaultLanguage": "en_GB",
     "stringBundleUuid": "bcd460df-755b-5027-8a57-741a3f8abd13",
     "resourceBundleUuid": "8450e705-0f60-53cc-9740-4c3117f3558e",

@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "id": "rear_comfort",
-  "version": "0.5.7",
+  "version": "0.5.8",
   "tree": "package",
   "modules": [
     "src/sdk.js"

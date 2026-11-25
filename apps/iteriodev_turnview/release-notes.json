@@ -1,5 +1,13 @@
 [
   {
+    "version": "1.7.3",
+    "changes": [
+      "完善原作者和来源信息，贡献记录随安装包提供。"
+    ],
+    "upstreamVersion": "1.7.1",
+    "cnRevision": 2
+  },
+  {
     "version": "1.7.2",
     "changes": [
       "更新应用菜单图标，保留中文界面与原有功能。"

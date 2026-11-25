@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "component": "oap-driverecorder-next",
+  "contributors": [
+    {
+      "role": "author",
+      "name": "IterioDev / RobertNisipeanu / Cauliflowermossgrape",
+      "contribution": "行车记录应用与媒体播放服务；联合作者的具体贡献见原项目声明。",
+      "source": "https://github.com/IterioDev/car-apps"
+    }
+  ]
+}

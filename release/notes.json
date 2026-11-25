@@ -198,6 +198,14 @@
   ],
   "robertn_waze_cluster": [
     {
+      "version": "0.6.22",
+      "changes": [
+        "完善原作者和来源信息，贡献记录随安装包提供。"
+      ],
+      "upstreamVersion": "0.6.16",
+      "cnRevision": 2
+    },
+    {
       "version": "0.6.21",
       "changes": [
         "完善安卓设置待重启状态和中文提示。",
@@ -245,6 +253,14 @@
   ],
   "cluster_metrics": [
     {
+      "version": "0.9.5",
+      "changes": [
+        "完善原作者和来源信息，贡献记录随安装包提供。"
+      ],
+      "upstreamVersion": "0.9.3",
+      "cnRevision": 2
+    },
+    {
       "version": "0.9.4",
       "changes": [
         "新增 HUD 布局、油门与转速显示，完善混动充电信息。",
@@ -255,6 +271,14 @@
     }
   ],
   "ram_mic_calibration": [
+    {
+      "version": "0.4.2",
+      "changes": [
+        "完善原作者和来源信息，贡献记录随安装包提供。"
+      ],
+      "upstreamVersion": "0.4.0",
+      "cnRevision": 2
+    },
     {
       "version": "0.4.1",
       "changes": [
@@ -275,6 +299,22 @@
   ],
   "dpf_monitor": [
     {
+      "version": "0.4.2",
+      "changes": [
+        "完善原作者和来源信息，贡献记录随安装包提供。"
+      ],
+      "upstreamVersion": "0.4.0",
+      "cnRevision": 2
+    },
+    {
+      "version": "0.4.1",
+      "changes": [
+        "新增下次颗粒捕集器再生的预计距离和行驶时间。"
+      ],
+      "upstreamVersion": "0.4.0",
+      "cnRevision": 1
+    },
+    {
       "version": "0.3.3",
       "changes": [
         "新增简体中文应用，接入国内商店更新。",
@@ -285,6 +325,14 @@
     }
   ],
   "green_light_alert": [
+    {
+      "version": "0.2.7",
+      "changes": [
+        "完善原作者和来源信息，贡献记录随安装包提供。"
+      ],
+      "upstreamVersion": "0.2.5",
+      "cnRevision": 2
+    },
     {
       "version": "0.2.6",
       "changes": [
@@ -297,6 +345,14 @@
   ],
   "parking_clearance": [
     {
+      "version": "0.1.10",
+      "changes": [
+        "完善原作者和来源信息，贡献记录随安装包提供。"
+      ],
+      "upstreamVersion": "0.1.8",
+      "cnRevision": 2
+    },
+    {
       "version": "0.1.9",
       "changes": [
         "新增简体中文应用，接入国内商店更新。",
@@ -308,6 +364,31 @@
   ],
   "rear_comfort": [
     {
+      "version": "0.5.8",
+      "changes": [
+        "完善原作者和来源信息，贡献记录随安装包提供。"
+      ],
+      "upstreamVersion": "0.5.6",
+      "cnRevision": 2
+    },
+    {
+      "version": "0.5.7",
+      "changes": [
+        "新增后排休憩、视野姿态与按住调节，完善记忆和空调同步。",
+        "修复联动失败后未停止、退出页面及取消后继续调节的问题。"
+      ],
+      "upstreamVersion": "0.5.6",
+      "cnRevision": 1
+    },
+    {
+      "version": "0.4.6",
+      "changes": [
+        "修复后排空调风量调节与温度、开关状态显示。"
+      ],
+      "upstreamVersion": "0.4.4",
+      "cnRevision": 2
+    },
+    {
       "version": "0.4.5",
       "changes": [
         "新增简体中文应用，接入国内商店更新。",
@@ -318,6 +399,14 @@
     }
   ],
   "ride_height": [
+    {
+      "version": "0.6.2",
+      "changes": [
+        "完善原作者和来源信息，贡献记录随安装包提供。"
+      ],
+      "upstreamVersion": "0.6.0",
+      "cnRevision": 2
+    },
     {
       "version": "0.6.1",
       "changes": [
@@ -331,6 +420,14 @@
   ],
   "road_trip_computer": [
     {
+      "version": "1.0.2",
+      "changes": [
+        "完善原作者和来源信息，贡献记录随安装包提供。"
+      ],
+      "upstreamVersion": "1.0.0",
+      "cnRevision": 2
+    },
+    {
       "version": "1.0.1",
       "changes": [
         "新增简体中文应用，接入国内商店更新。",
@@ -341,6 +438,14 @@
     }
   ],
   "start_stop_insight": [
+    {
+      "version": "0.1.5",
+      "changes": [
+        "完善原作者和来源信息，贡献记录随安装包提供。"
+      ],
+      "upstreamVersion": "0.1.3",
+      "cnRevision": 2
+    },
     {
       "version": "0.1.4",
       "changes": [
@@ -353,6 +458,14 @@
   ],
   "xdrive_studio": [
     {
+      "version": "0.1.7",
+      "changes": [
+        "完善原作者和来源信息，贡献记录随安装包提供。"
+      ],
+      "upstreamVersion": "0.1.5",
+      "cnRevision": 2
+    },
+    {
       "version": "0.1.6",
       "changes": [
         "新增简体中文应用，接入国内商店更新。",
@@ -363,6 +476,14 @@
     }
   ],
   "sys_monitor": [
+    {
+      "version": "1.0.10",
+      "changes": [
+        "完善原作者和来源信息，贡献记录随安装包提供。"
+      ],
+      "upstreamVersion": "1.0.8",
+      "cnRevision": 2
+    },
     {
       "version": "1.0.9",
       "changes": [
@@ -386,6 +507,14 @@
     }
   ],
   "ambient_config": [
+    {
+      "version": "2.7.25",
+      "changes": [
+        "完善原作者和来源信息，贡献记录随安装包提供。"
+      ],
+      "upstreamVersion": "2.7.23",
+      "cnRevision": 2
+    },
     {
       "version": "2.7.24",
       "changes": [
@@ -411,6 +540,15 @@
         "增加整组灯光单色模式，保留分区设置和离车停止控制。"
       ],
       "upstreamVersion": "2.7.16",
+      "cnRevision": 1
+    },
+    {
+      "version": "2.7.16",
+      "changes": [
+        "改进部分车型车身模块识别，减少自定义颜色无法使用的情况。",
+        "新增装饰灯分区选择，可跟随上层或下层灯光。"
+      ],
+      "upstreamVersion": "2.7.15",
       "cnRevision": 1
     },
     {
@@ -460,6 +598,14 @@
   ],
   "brake_test": [
     {
+      "version": "1.5.25",
+      "changes": [
+        "完善原作者和来源信息，贡献记录随安装包提供。"
+      ],
+      "upstreamVersion": "1.5.23",
+      "cnRevision": 2
+    },
+    {
       "version": "1.5.24",
       "changes": [
         "优化旋钮焦点和选项切换的显示，保留简体中文。"
@@ -494,6 +640,14 @@
     }
   ],
   "car_vitals": [
+    {
+      "version": "2.27.14",
+      "changes": [
+        "完善原作者和来源信息，贡献记录随安装包提供。"
+      ],
+      "upstreamVersion": "2.27.12",
+      "cnRevision": 2
+    },
     {
       "version": "2.27.13",
       "changes": [
@@ -539,6 +693,14 @@
   ],
   "doom": [
     {
+      "version": "1.7.26",
+      "changes": [
+        "完善原作者和来源信息，贡献记录随安装包提供。"
+      ],
+      "upstreamVersion": "1.7.24",
+      "cnRevision": 2
+    },
+    {
       "version": "1.7.25",
       "changes": [
         "优化旋钮焦点和选项切换的显示，保留简体中文。"
@@ -573,6 +735,14 @@
     }
   ],
   "draggy": [
+    {
+      "version": "2.7.4",
+      "changes": [
+        "完善原作者和来源信息，贡献记录随安装包提供。"
+      ],
+      "upstreamVersion": "2.7.2",
+      "cnRevision": 2
+    },
     {
       "version": "2.7.3",
       "changes": [
@@ -618,12 +788,20 @@
   ],
   "dtc_scanner": [
     {
-      "version": "2.9.11",
+      "version": "2.9.12",
       "changes": [
-        "优化旋钮焦点和选项切换的显示，保留简体中文。"
+        "完善原作者和来源信息，贡献记录随安装包提供。"
       ],
       "upstreamVersion": "2.9.10",
-      "cnRevision": 1
+      "cnRevision": 2
+    },
+    {
+      "version": "2.9.11",
+      "upstreamVersion": "2.9.10",
+      "cnRevision": 1,
+      "changes": [
+        "优化旋钮焦点和选项切换的显示，保留简体中文。"
+      ]
     },
     {
       "version": "2.9.10",
@@ -662,6 +840,14 @@
   ],
   "dyno": [
     {
+      "version": "1.6.7",
+      "changes": [
+        "完善原作者和来源信息，贡献记录随安装包提供。"
+      ],
+      "upstreamVersion": "1.6.5",
+      "cnRevision": 2
+    },
+    {
       "version": "1.6.6",
       "changes": [
         "优化旋钮焦点和选项切换的显示，保留简体中文。"
@@ -696,6 +882,14 @@
     }
   ],
   "edrive": [
+    {
+      "version": "2.11.6",
+      "changes": [
+        "完善原作者和来源信息，贡献记录随安装包提供。"
+      ],
+      "upstreamVersion": "2.11.4",
+      "cnRevision": 2
+    },
     {
       "version": "2.11.5",
       "changes": [
@@ -742,6 +936,14 @@
   ],
   "gforce": [
     {
+      "version": "1.6.26",
+      "changes": [
+        "完善原作者和来源信息，贡献记录随安装包提供。"
+      ],
+      "upstreamVersion": "1.6.24",
+      "cnRevision": 2
+    },
+    {
       "version": "1.6.25",
       "changes": [
         "优化旋钮焦点和选项切换的显示，保留简体中文。"
@@ -777,6 +979,14 @@
   ],
   "live_adjustments": [
     {
+      "version": "0.9.14",
+      "changes": [
+        "完善原作者和来源信息，贡献记录随安装包提供。"
+      ],
+      "upstreamVersion": "0.9.12",
+      "cnRevision": 2
+    },
+    {
       "version": "0.9.13",
       "changes": [
         "优化旋钮焦点和选项切换的显示，保留简体中文。"
@@ -804,6 +1014,14 @@
   ],
   "live_data": [
     {
+      "version": "1.0.22",
+      "changes": [
+        "完善原作者和来源信息，贡献记录随安装包提供。"
+      ],
+      "upstreamVersion": "1.0.20",
+      "cnRevision": 2
+    },
+    {
       "version": "1.0.21",
       "changes": [
         "优化旋钮焦点和选项切换的显示，保留简体中文。"
@@ -830,6 +1048,14 @@
     }
   ],
   "redline": [
+    {
+      "version": "2.0.51",
+      "changes": [
+        "完善原作者和来源信息，贡献记录随安装包提供。"
+      ],
+      "upstreamVersion": "2.0.49",
+      "cnRevision": 2
+    },
     {
       "version": "2.0.50",
       "changes": [
@@ -876,6 +1102,14 @@
   ],
   "service": [
     {
+      "version": "1.6.7",
+      "changes": [
+        "完善原作者和来源信息，贡献记录随安装包提供。"
+      ],
+      "upstreamVersion": "1.6.5",
+      "cnRevision": 2
+    },
+    {
       "version": "1.6.6",
       "changes": [
         "优化旋钮焦点和选项切换的显示，保留简体中文。"
@@ -910,6 +1144,14 @@
     }
   ],
   "warmup": [
+    {
+      "version": "1.9.4",
+      "changes": [
+        "完善原作者和来源信息，贡献记录随安装包提供。"
+      ],
+      "upstreamVersion": "1.9.2",
+      "cnRevision": 2
+    },
     {
       "version": "1.9.3",
       "changes": [
@@ -946,6 +1188,14 @@
   ],
   "zf8hp": [
     {
+      "version": "1.5.12",
+      "changes": [
+        "完善原作者和来源信息，贡献记录随安装包提供。"
+      ],
+      "upstreamVersion": "1.5.10",
+      "cnRevision": 2
+    },
+    {
       "version": "1.5.11",
       "changes": [
         "优化旋钮焦点和选项切换的显示，保留简体中文。"
@@ -973,43 +1223,32 @@
   ],
   "cluster_themes": [
     {
+      "version": "0.19.12",
+      "changes": [
+        "完善原作者和来源信息，贡献记录随安装包提供。"
+      ],
+      "upstreamVersion": "0.19.10",
+      "cnRevision": 2
+    },
+    {
       "version": "0.19.11",
+      "upstreamVersion": "0.19.10",
+      "cnRevision": 1,
       "changes": [
         "改善地图在纯图层主题中的显示兼容。",
         "隐藏或退出主题时恢复地图，优化 M 视图布局。"
-      ],
-      "upstreamVersion": "0.19.10",
-      "cnRevision": 1
-    },
-    {
-      "version": "0.19.10",
-      "changes": [
-        "改善 M 视图圆弧刻度与节日灯带。",
-        "保留中文设置、地图和原厂底栏选项。"
-      ],
-      "upstreamVersion": "0.19.9",
-      "cnRevision": 1
-    },
-    {
-      "version": "0.19.9",
-      "changes": [
-        "新增混动／纯电模式主题、独立温度与胎压单位。",
-        "增加随车启动和原厂底栏保留选项，改进大字显示。"
-      ],
-      "upstreamVersion": "0.19.8",
-      "cnRevision": 1
-    },
-    {
-      "version": "0.19.1",
-      "changes": [
-        "新增 Vector、M View 布局，改进全屏排列与音乐显示。",
-        "保留原版主题名称、仪表风格和单位，支持国内源在线更新。"
-      ],
-      "upstreamVersion": "0.19.0",
-      "cnRevision": 1
+      ]
     }
   ],
   "iteriodev_turnview": [
+    {
+      "version": "1.7.3",
+      "changes": [
+        "完善原作者和来源信息，贡献记录随安装包提供。"
+      ],
+      "upstreamVersion": "1.7.1",
+      "cnRevision": 2
+    },
     {
       "version": "1.7.2",
       "changes": [
@@ -1029,6 +1268,14 @@
     }
   ],
   "oap-driverecorder-next": [
+    {
+      "version": "2.5.4",
+      "changes": [
+        "完善原作者和来源信息，贡献记录随安装包提供。"
+      ],
+      "upstreamVersion": "2.5.2",
+      "cnRevision": 2
+    },
     {
       "version": "2.5.3",
       "changes": [
@@ -1071,6 +1318,14 @@
   ],
   "osa": [
     {
+      "version": "0.2.66",
+      "changes": [
+        "完善原作者和来源信息，贡献记录随安装包提供。"
+      ],
+      "upstreamVersion": "0.2.63",
+      "cnRevision": 3
+    },
+    {
       "version": "0.2.65",
       "changes": [
         "新增油温助手，支持暖机估算与本地历史。",
@@ -1083,6 +1338,14 @@
   ],
   "dpf": [
     {
+      "version": "0.1.77",
+      "changes": [
+        "完善原作者和来源信息，贡献记录随安装包提供。"
+      ],
+      "upstreamVersion": "0.1.75",
+      "cnRevision": 2
+    },
+    {
       "version": "0.1.76",
       "changes": [
         "新增 DPF 状态，查看积碳、灰分与再生信息。",
@@ -1093,6 +1356,14 @@
     }
   ],
   "spritmonitor": [
+    {
+      "version": "0.1.47",
+      "changes": [
+        "完善原作者和来源信息，贡献记录随安装包提供。"
+      ],
+      "upstreamVersion": "0.1.45",
+      "cnRevision": 2
+    },
     {
       "version": "0.1.46",
       "changes": [

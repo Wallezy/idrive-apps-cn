@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "component": "iteriodev_turnview",
+  "contributors": [
+    {
+      "role": "author",
+      "name": "IterioDev / RobertNisipeanu / Cauliflowermossgrape",
+      "contribution": "转向影像应用与摄像头显示服务；联合作者的具体贡献见原项目声明。",
+      "source": "https://github.com/IterioDev/car-apps"
+    }
+  ]
+}
