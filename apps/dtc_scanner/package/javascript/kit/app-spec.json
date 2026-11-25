@@ -1,7 +1,7 @@
 {
  "id": "dtc_scanner",
  "title": "\u6545\u969c\u68c0\u6d4b",
- "version": "2.9.11",
+ "version": "2.9.12",
  "screens": [
   {
    "name": "MAIN",

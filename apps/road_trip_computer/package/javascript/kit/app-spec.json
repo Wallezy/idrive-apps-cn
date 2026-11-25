@@ -1,7 +1,7 @@
 {
   "id": "road_trip_computer",
   "title": "行程电脑",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "screens": [
     {
       "name": "MAIN",

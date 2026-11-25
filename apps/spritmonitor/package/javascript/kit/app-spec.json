@@ -1,7 +1,7 @@
 {
  "id": "spritmonitor",
  "title": "\u52a0\u6cb9\u8bb0\u5f55",
- "version": "0.1.46",
+ "version": "0.1.47",
  "screens": [
   {
    "name": "MAIN",

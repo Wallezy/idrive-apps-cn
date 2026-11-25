@@ -1,7 +1,7 @@
 {
   "id": "ride_height",
   "title": "车身高度工作室",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "screens": [
     {
       "name": "MAIN",

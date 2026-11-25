@@ -1,7 +1,7 @@
 {
   "id": "xdrive_studio",
   "title": "xDrive 动力分配",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "screens": [
     {
       "name": "MAIN",

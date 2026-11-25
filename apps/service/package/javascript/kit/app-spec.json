@@ -1,7 +1,7 @@
 {
  "id": "service",
  "title": "\u4fdd\u517b\u4fe1\u606f",
- "version": "1.6.6",
+ "version": "1.6.7",
  "screens": [
   {
    "name": "MAIN",

@@ -1,7 +1,7 @@
 {
   "id": "parking_clearance",
   "title": "泊车距离",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "screens": [
     {
       "name": "MAIN",

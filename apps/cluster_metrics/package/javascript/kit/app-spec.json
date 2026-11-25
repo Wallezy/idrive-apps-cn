@@ -1,7 +1,7 @@
 {
  "id": "cluster_metrics",
  "title": "\u7ec4\u5408\u4eea\u8868\u6570\u636e",
- "version": "0.9.4",
+ "version": "0.9.5",
  "screens": [
   {
    "name": "MAIN",

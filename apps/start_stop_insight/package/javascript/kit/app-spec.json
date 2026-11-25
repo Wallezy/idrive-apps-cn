@@ -1,7 +1,7 @@
 {
   "id": "start_stop_insight",
   "title": "自动启停状态",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "screens": [
     {
       "name": "MAIN",

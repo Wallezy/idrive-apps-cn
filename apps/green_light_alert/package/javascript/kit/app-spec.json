@@ -1,7 +1,7 @@
 {
   "id": "green_light_alert",
   "title": "绿灯起步提醒",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "screens": [
     {
       "name": "MAIN",

@@ -1,7 +1,7 @@
 {
   "id": "ram_mic_calibration",
   "title": "RAM 麦克风校准",
-  "version": "0.1.5",
+  "version": "0.4.2",
   "screens": [
     {
       "name": "MAIN",

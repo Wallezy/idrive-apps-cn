@@ -1,7 +1,7 @@
 {
  "id": "osa",
  "title": "\u6cb9\u6e29\u52a9\u624b",
- "version": "0.2.65",
+ "version": "0.2.66",
  "screens": [
   {
    "name": "MAIN",
