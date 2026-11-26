@@ -1,7 +1,7 @@
 {
  "id": "ambient_config",
  "title": "\u6c1b\u56f4\u706f\u8bbe\u7f6e",
- "version": "2.7.25",
+ "version": "2.7.28",
  "screens": [
   {
    "name": "MAIN",
@@ -77,6 +77,12 @@
    "default": true
   },
   {
+   "key": "dayOff",
+   "label": "Off by day (on when the car switches to night)",
+   "type": "bool",
+   "default": false
+  },
+  {
    "key": "keep",
    "label": "\u542f\u52a8\u65f6\u6062\u590d\u81ea\u5b9a\u4e49\u989c\u8272",
    "type": "bool",
@@ -106,6 +112,12 @@
   {
    "key": "doorCar",
    "label": "\u5f00\u95e8\u65f6\u4fdd\u7559\u539f\u8f66\u8b66\u793a\u706f\uff08G20\uff0fG26\uff09",
+   "type": "bool",
+   "default": false
+  },
+  {
+   "key": "blinkBoth",
+   "label": "Turn glow and door red on both strips of a door line (G26: slower blink)",
    "type": "bool",
    "default": false
   },

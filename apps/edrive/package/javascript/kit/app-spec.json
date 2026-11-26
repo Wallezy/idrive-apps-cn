@@ -1,7 +1,7 @@
 {
  "id": "edrive",
  "title": "EDrive\u52a9\u624b",
- "version": "2.11.6",
+ "version": "2.11.7",
  "screens": [
   {
    "name": "MAIN",
@@ -1398,7 +1398,7 @@
  },
  "startWidget": {
   "comment": "Home-screen widget. Layout and cell names are those of BMW's Drive Recorder widget on this firmware: the drawn image goes into BackgroundImage1, the layout shows Title above it. If the image doesn't show or sits wrong, try another 'image' cell or adjust 'size' (pixels: the HMI scales the picture to the big widget and crops it centred; 384 x 256 fits the G05). safe: the share it crops off each side ([x, y] or [left, top, right, bottom]); it also fades the picture towards the edges, the top most, so the setting widgetFit keeps the content further in (live.js WIDGET_FIT).",
-  "name": "eDrive",
+  "name": "EDrive\u52a9\u624b",
   "layout": "LT_Table_OnlineApps_DriveRecorderWidget",
   "image": "BackgroundImage1",
   "scale": 2,

@@ -1,7 +1,7 @@
 {
   "id": "iteriodev-turnview",
   "kind": "tool",
-  "version": "0.10.2",
+  "version": "0.11.1",
   "title": "转向影像服务",
   "description": "为 Turn View 提供前摄像头、夜视及仪表导航画面。",
   "optional": true,
@@ -10,7 +10,7 @@
     "ID7"
   ],
   "requires": {
-    "cluster-render": "0.8.3",
+    "cluster-render": "0.8.15",
     "mgu-deploy": "0.8.28",
     "mgu-render": "0.6.28"
   },

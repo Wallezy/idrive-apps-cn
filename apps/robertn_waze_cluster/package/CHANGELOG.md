@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 0.6.23
+
+- 改善驾驶员设置读取与切换，增加读取失败提示。
+- 保留仪表全屏、位置与 HUD 设置。
+
 ## 0.6.22
 
 - 补充上游作者及各项贡献的来源说明。
@@ -65,6 +70,16 @@
 - Check page control IDs before packaging to prevent conflicting controls from breaking app startup.
 
 - The CN app defaults to Simplified Chinese while the HMI language is unavailable and follows explicit display-language selections. Chinese status rows translate known renderer and patch messages, frame counts and transfer limits; unknown diagnostics retain their original detail. Native protocol fields and logs are unchanged.
+## 0.6.17
+
+With Own settings for this driver in use, the page loads the current
+driver's settings each time it opens and follows a driver change at once,
+and a Show on or HUD change is saved only for the driver in use, so it no
+longer ends up in another driver's settings and comes back a few seconds
+later. If the driver profile can't be read, these settings stay greyed and
+the page says `Driver profile can't be read`. Requires the next
+waze-on-cluster.
+
 ## 0.6.16
 
 Android Auto: Patch, Remove patch, Zoom and Hide phone's turn card can be

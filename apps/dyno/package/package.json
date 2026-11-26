@@ -1,6 +1,6 @@
 {
   "name": "dyno",
-  "version": "1.6.7",
+  "version": "1.6.8",
   "description": "Power and torque curves from a full-throttle pull, saved and compared",
   "main": "javascript/localized-entry.js",
   "private": false,

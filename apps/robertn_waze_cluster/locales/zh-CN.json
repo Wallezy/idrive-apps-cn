@@ -25,7 +25,7 @@
     "Connecting…": "连接中…",
     "Removed after restart": "重启后移除",
     "Removed — head unit kept restarting": "已移除 — 主机反复重启",
-    "Removed — Android Auto crashed": "已移除 — Android Auto 崩溃",
+    "Removed — Android Auto crashed": "已移除 — Android Auto 异常退出",
     "Patched after restart": "重启后生效",
     "Removing patch…": "正在移除补丁…",
     "Patching…": "正在应用补丁…",
@@ -98,6 +98,6 @@
     "Own settings for this driver": "此驾驶员的专属设置",
     "Keep HUD map over BMW's pop-ups": "HUD 地图保持在 BMW 弹窗之上",
     "Cluster fullscreen": "仪表盘全屏",
-    "Removed — Android Auto crashed": "已移除 — Android Auto 异常退出"
+    "Driver profile can't be read": "无法读取驾驶员档案"
   }
 }

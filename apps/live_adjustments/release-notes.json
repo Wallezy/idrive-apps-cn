@@ -1,5 +1,13 @@
 [
   {
+    "version": "0.9.15",
+    "upstreamVersion": "0.9.14",
+    "cnRevision": 1,
+    "changes": [
+      "改善 BM3 状态读取和排气阀控制失败提示。"
+    ]
+  },
+  {
     "version": "0.9.14",
     "changes": [
       "完善原作者和来源信息，贡献记录随安装包提供。"

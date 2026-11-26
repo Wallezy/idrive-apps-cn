@@ -447,6 +447,20 @@ class Display {
      */
     _touch(phase, x, y) {
         const inside = (r) => x >= r.x && x < r.x + r.w && y >= r.y && y < r.y + r.h;
+        // the app takes a whole gesture (ctx.onTouch: a dial or a slider under the finger): every move goes to it, and no
+        // tap, scroll or target follows from it
+        if (this.own() && this.onTouch && !this.sheet && (phase === 1 || this.touchTaken)) {
+            if (phase === 1) {
+                let took = false;
+                try { took = !!this.onTouch(1, x, y); } catch (e) { this.log.error('touch', e); }
+                this.touchTaken = took;
+                if (took) { this.ownDown = null; this.downAt = null; return; }
+            } else {
+                try { this.onTouch(phase, x, y); } catch (e) { this.log.error('touch', e); }
+                if (phase === 3) this.touchTaken = false;
+                return;
+            }
+        }
         if (this.own()) {
             const pl = this.place, sx = x * pl.scale + pl.ox, sy = y * pl.scale + pl.oy;
             const bar = sy >= pl.h - this.barH() ? this.buttons().find((b) => sx >= b.x - this.barOff - pl.x && sx < b.x - this.barOff - pl.x + b.w) : null;
@@ -856,7 +870,10 @@ class Display {
         if (sx > end) { c.fillRect(end, 0, sx - end, FULL.headH - 2, HMI.headBg); c.fillRect(end, FULL.headH - 2, sx - end, 2, G.withAlpha('#ffffff', 0.22)); }
         // the tab the controller is on (the kit holds it: Display._ccu)
         const ft = this.focusTab != null && (!this.sheet || this.sheetHead) && (c.tabRects || []).find((q) => q.i === this.focusTab);
-        if (ft) c.strokeRoundRect(ft.x + 4, ft.y + 10, ft.w - 8, ft.h - 20, 10, 2, t.sel || t.accent);
+        if (ft) {
+            c.strokeRoundRect(ft.x + 1, ft.y + 7, ft.w - 2, ft.h - 14, 12, 5, G.withAlpha(t.sel || t.accent, 0.28));
+            c.strokeRoundRect(ft.x + 4, ft.y + 10, ft.w - 8, ft.h - 20, 10, 2.5, t.sel || t.accent);
+        }
         // the page button (or row) the controller is on, and one just pressed
         const k = pl.scale, onPage = (key) => !this.sheet && key && (this.pageTargets || []).find((q) => 'tgt:' + q.key === key);
         const pt = onPage(this.focusKey), pp = Date.now() - this.pressedT < 300 && onPage(this.pressed);
@@ -872,7 +889,13 @@ class Display {
         const sb = this.focusKey === 'scroll' && !this.sheet && this.pageScroll;
         if (sb === true) c.strokeRoundRect(hx + 6, FULL.headH + 6, W - hx - 12, H - this.barH() - FULL.headH - 12, 14, 3, G.withAlpha(t.sel || t.accent, 0.8));
         else if (sb && sb.bar) c.roundRect((sb.bar.x - 2) * k + pl.ox, sb.bar.y * k + pl.oy, (sb.bar.w + 4) * k, sb.bar.h * k, (sb.bar.w / 2 + 2) * k, t.sel || t.accent);
-        if (pt) c.strokeRoundRect(pt.x * k + pl.ox - 5, pt.y * k + pl.oy - 5, pt.w * k + 10, pt.h * k + 10, (pt.r != null ? pt.r : pt.h / 2) * k + 5, 3, t.sel || t.accent);
+        // the controller's mark: a white ring in a halo of the theme's colour (clear on a filled button too), the button lifted a little
+        if (pt) {
+            const S = t.sel || t.accent, fx = pt.x * k + pl.ox, fy = pt.y * k + pl.oy, fw = pt.w * k, fh = pt.h * k, fr = (pt.r != null ? pt.r : pt.h / 2) * k;
+            c.roundRect(fx, fy, fw, fh, fr, G.withAlpha('#ffffff', 0.08));
+            c.strokeRoundRect(fx - 8, fy - 8, fw + 16, fh + 16, fr + 8, 6, G.withAlpha(S, 0.55));
+            c.strokeRoundRect(fx - 4, fy - 4, fw + 8, fh + 8, fr + 4, 2.5, '#ffffff');
+        }
         // the strip's bottom edge continues under the see-through part
         c.fillRect(sx, 0, W - sx, FULL.headH, HMI.headBg);
         c.fillRect(sx, FULL.headH - 2, W - sx, 2, G.withAlpha('#ffffff', 0.22));

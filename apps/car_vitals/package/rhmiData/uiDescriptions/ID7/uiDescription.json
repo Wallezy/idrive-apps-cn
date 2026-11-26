@@ -242,6 +242,28 @@
      }
     },
     "15": {
+     "type": "checkBox",
+     "name": "SET_COLDZONE",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 2,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text": {
+        "value": "SID_CAR_VITALS_SET_COLDZONE",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
+    "16": {
      "type": "dropDownMenu",
      "name": "SET_SPEEDUNIT",
      "rows": [
@@ -269,7 +291,7 @@
       }
      }
     },
-    "16": {
+    "17": {
      "type": "dropDownMenu",
      "name": "SET_ENGINE",
      "rows": [
@@ -303,7 +325,7 @@
       }
      }
     },
-    "17": {
+    "18": {
      "type": "dropDownMenu",
      "name": "SET_REDLINE",
      "rows": [
@@ -421,7 +443,7 @@
       }
      }
     },
-    "18": {
+    "19": {
      "type": "dropDownMenu",
      "name": "SET_RPMSCALE",
      "rows": [
@@ -479,7 +501,7 @@
       }
      }
     },
-    "19": {
+    "20": {
      "type": "dropDownMenu",
      "name": "SET_MAXPOWER",
      "rows": [
@@ -687,7 +709,7 @@
       }
      }
     },
-    "20": {
+    "21": {
      "type": "dropDownMenu",
      "name": "SET_MAXTORQUEKGM",
      "rows": [
@@ -751,7 +773,7 @@
       }
      }
     },
-    "21": {
+    "22": {
      "type": "dropDownMenu",
      "name": "SET_POWERUNIT",
      "rows": [
@@ -785,7 +807,7 @@
       }
      }
     },
-    "22": {
+    "23": {
      "type": "dropDownMenu",
      "name": "SET_TORQUEUNIT",
      "rows": [
@@ -819,7 +841,7 @@
       }
      }
     },
-    "23": {
+    "24": {
      "type": "dropDownMenu",
      "name": "SET_POWERSOURCE",
      "rows": [
@@ -847,7 +869,7 @@
       }
      }
     },
-    "24": {
+    "25": {
      "type": "dropDownMenu",
      "name": "SET_OILWARN",
      "rows": [
@@ -899,7 +921,7 @@
       }
      }
     },
-    "25": {
+    "26": {
      "type": "checkBox",
      "name": "SET_FLIPLONG",
      "properties": {
@@ -921,7 +943,7 @@
       }
      ]
     },
-    "26": {
+    "27": {
      "type": "checkBox",
      "name": "SET_PROGRAMSTEADY",
      "properties": {
@@ -943,7 +965,7 @@
       }
      ]
     },
-    "27": {
+    "28": {
      "type": "checkBox",
      "name": "SET_PEAKS",
      "properties": {
@@ -965,7 +987,7 @@
       }
      ]
     },
-    "28": {
+    "29": {
      "type": "dropDownMenu",
      "name": "SET_PEAKHOLD",
      "rows": [
@@ -1011,7 +1033,7 @@
       }
      }
     },
-    "29": {
+    "30": {
      "type": "dropDownMenu",
      "name": "SET_XDRIVE",
      "rows": [
@@ -1045,7 +1067,7 @@
       }
      }
     },
-    "30": {
+    "31": {
      "type": "dropDownMenu",
      "name": "SET_SHOWBOOST",
      "rows": [
@@ -1079,7 +1101,7 @@
       }
      }
     },
-    "31": {
+    "32": {
      "type": "dropDownMenu",
      "name": "SET_BOOSTSOURCE",
      "rows": [
@@ -1113,7 +1135,7 @@
       }
      }
     },
-    "32": {
+    "33": {
      "type": "dropDownMenu",
      "name": "SET_SHOWGEARBOX",
      "rows": [
@@ -1147,7 +1169,7 @@
       }
      }
     },
-    "33": {
+    "34": {
      "type": "dropDownMenu",
      "name": "SET_SHOWEGS",
      "rows": [
@@ -1181,7 +1203,7 @@
       }
      }
     },
-    "34": {
+    "35": {
      "type": "dropDownMenu",
      "name": "SET_SHOWIAT",
      "rows": [
@@ -1215,7 +1237,7 @@
       }
      }
     },
-    "35": {
+    "36": {
      "type": "dropDownMenu",
      "name": "SET_SHOWHPFP",
      "rows": [
@@ -1249,7 +1271,7 @@
       }
      }
     },
-    "36": {
+    "37": {
      "type": "dropDownMenu",
      "name": "SET_SHOWLPFP",
      "rows": [
@@ -1283,7 +1305,7 @@
       }
      }
     },
-    "37": {
+    "38": {
      "type": "dropDownMenu",
      "name": "SET_SHOWTIMING",
      "rows": [
@@ -1317,7 +1339,7 @@
       }
      }
     },
-    "38": {
+    "39": {
      "type": "dropDownMenu",
      "name": "SET_SHOWBOOSTCTL",
      "rows": [
@@ -1351,7 +1373,7 @@
       }
      }
     },
-    "39": {
+    "40": {
      "type": "dropDownMenu",
      "name": "SET_SHOWLOAD",
      "rows": [
@@ -1385,7 +1407,7 @@
       }
      }
     },
-    "40": {
+    "41": {
      "type": "dropDownMenu",
      "name": "SET_SHOWMISFIRE",
      "rows": [
@@ -1419,7 +1441,7 @@
       }
      }
     },
-    "41": {
+    "42": {
      "type": "dropDownMenu",
      "name": "SET_SHOWTYRES",
      "rows": [
@@ -1453,7 +1475,7 @@
       }
      }
     },
-    "42": {
+    "43": {
      "type": "dropDownMenu",
      "name": "SET_SHOWTYRETEMP",
      "rows": [
@@ -1487,7 +1509,7 @@
       }
      }
     },
-    "43": {
+    "44": {
      "type": "checkBox",
      "name": "SET_ADVANCED",
      "properties": {
@@ -1509,7 +1531,7 @@
       }
      ]
     },
-    "44": {
+    "45": {
      "type": "dropDownMenu",
      "name": "SET_THEME",
      "rows": [
@@ -1549,7 +1571,7 @@
       }
      }
     },
-    "45": {
+    "46": {
      "type": "dropDownMenu",
      "name": "SET_SPEEDRATE",
      "rows": [
@@ -1601,7 +1623,7 @@
       }
      }
     },
-    "46": {
+    "47": {
      "type": "dropDownMenu",
      "name": "SET_LAYOUT",
      "rows": [
@@ -1629,7 +1651,7 @@
       }
      }
     },
-    "47": {
+    "48": {
      "type": "dropDownMenu",
      "name": "SET_RENDERER",
      "rows": [
@@ -1657,7 +1679,7 @@
       }
      }
     },
-    "48": {
+    "49": {
      "type": "dropDownMenu",
      "name": "SET_DEMO",
      "rows": [
@@ -1691,7 +1713,7 @@
       }
      }
     },
-    "49": {
+    "50": {
      "type": "button",
      "name": "CN_CREDITS",
      "properties": {
@@ -1717,7 +1739,7 @@
       }
      ]
     },
-    "50": {
+    "51": {
      "type": "button",
      "name": "REPO_CREDITS",
      "properties": {
@@ -1743,7 +1765,7 @@
       }
      ]
     },
-    "51": {
+    "52": {
      "type": "title",
      "name": "SETTINGS_TITLE",
      "rows": [

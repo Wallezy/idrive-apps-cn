@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "id": "edrive",
-  "version": "2.11.6",
+  "version": "2.11.7",
   "tree": "package",
   "modules": [
     "src/sdk.js"

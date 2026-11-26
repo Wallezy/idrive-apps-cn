@@ -1,6 +1,6 @@
 {
   "name": "zf8hp",
-  "version": "1.5.12",
+  "version": "1.5.13",
   "description": "Transmission Config, experimental ZF 8HP monitor: live data, clutch fill adaptations, shift maps and temperature history",
   "main": "javascript/localized-entry.js",
   "private": false,

@@ -24,8 +24,10 @@ const { OnlineApp, logging } = global.__mguLocalizedSdk;
 const themes = require('./themes');
 const { Display } = require('./display');
 const { HmiText } = require('./hmi-text');
+const { getLanguage } = require('./i18n');
 const { listSheet } = require('./sheet');
 const { qrLogSheet } = require('./qrlog');
+const { openMappedEntry, errorText } = require('./open-entry');
 
 const sdkLog = logging.getSDKLogger();
 const SPEC = JSON.parse(fs.readFileSync(path.join(__dirname, 'app-spec.json'), 'utf8'));
@@ -418,6 +420,7 @@ function patchStartWidgetEvents(app) {
 class Widget {
     constructor(spec) {
         this.spec = spec || {};
+        this.widgetHmiText = getLanguage() === 'zh-CN' ? new HmiText() : null;
         this.comp = null;
         this.vis = Object.create(null);      // spawnId -> visible (unknown = true)
         this._img = Object.create(null);
@@ -473,7 +476,13 @@ class Widget {
     }
     set(spawnId, cell, value, type) {
         if (!this.comp) return Promise.resolve();
-        if ((type || 'Text') === 'Text') value = widgetText(value);
+        if ((type || 'Text') === 'Text') {
+            if (this.widgetHmiText) {
+                return Promise.resolve(this.widgetHmiText.set(this.comp, 'widget', Number(spawnId), cell, value))
+                    .catch((e) => log.warn('widget ' + cell + ': ' + e));
+            }
+            value = widgetText(value);
+        }
         return Promise.resolve(this.comp.setValue(Number(spawnId), cell, value, type || 'Text'))
             .catch((e) => log.warn('widget ' + cell + ': ' + e));
     }
@@ -796,10 +805,10 @@ async function runInner(impl) {
         const map = mapped[uuid] ? Promise.resolve() : ui.rhmi.mapEntryState(uuid, mainState).then(() => { mapped[uuid] = true; });
         opening = map
             .then(() => (mainState && mainState.updateResources ? mainState.updateResources().catch(() => {}) : null))
-            .then(() => ui.rhmi.openEntryState(uuid))
+            .then(() => openMappedEntry(ui.rhmi, uuid, mainName, () => { delete mapped[uuid]; }))
             .then(() => ui._setVisible(mainName, true))
             .catch((e) => {
-                if ((tries || 1) > 1 && /INVALID/.test(String(e && e.message ? e.message : e) + ' ' + JSON.stringify(e || {}))) again = true;
+                if ((tries || 1) > 1 && /INVALID/.test(errorText(e))) again = true;
                 else log.error('open entry state', e);
             })
             .then(() => {

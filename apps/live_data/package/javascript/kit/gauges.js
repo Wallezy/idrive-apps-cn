@@ -116,15 +116,15 @@ const col = (t, c, dflt) => (c ? t[c] || c : dflt);
 
 /* ---------------- panel ---------------- */
 /** Widget chrome in the OEM (G20 / MGU7) style; cached as a layer. Returns the rect drawn: { x, y, w, h }. */
-function panel(cv, t, x, y, w, h, title) { return box(cv, t, x, y, w, stretch(cv, y, h), title); }
+function panel(cv, t, x, y, w, h, title, literal) { return box(cv, t, x, y, w, stretch(cv, y, h), title, literal); }
 /**
  * Height of a panel at y: one down to the page's bottom goes on down to the screen's where there is room
  * (cv.extra: display.js). (read only then: a page whose panels all end higher up is centred in the room instead)
  */
 function stretch(cv, y, h) { return y + h >= 500 && cv.extra ? h + cv.extra : h; }
-function box(cv, t, x, y, w, h, title) {
+function box(cv, t, x, y, w, h, title, literal) {
     x = Math.round(x); y = Math.round(y); w = Math.round(w); h = Math.round(h);
-    const L = layer(['panel', w, h, title || '', t.name].join('|'), w, h, (c) => drawPanel(c, t, 0, 0, w, h, title), cv.textScale);
+    const L = layer(['panel', w, h, title || '', t.name, !!literal].join('|'), w, h, (c) => drawPanel(c, t, 0, 0, w, h, title, literal), cv.textScale);
     cv.blit(L, x, y);
     return { x, y, w, h };
 }
@@ -140,7 +140,7 @@ const MARGIN = 22;
  * so it ends MARGIN over the panel's real bottom, room px lower (G.panel's stretch: cv.extra, else 0).
  */
 function toMargin(room, m) { return room + m - MARGIN; }
-function drawPanel(cv, t, x, y, w, h, title) {
+function drawPanel(cv, t, x, y, w, h, title, literal) {
     // flat light grey overlay; top: a short bold bar in the theme's stripe colours (M tricolour:
     // light blue, dark blue, red; the last part with an angled end), then a thin white line;
     // large white title in normal case
@@ -152,7 +152,7 @@ function drawPanel(cv, t, x, y, w, h, title) {
         else cv.fillRect(sx, y, sw, 5, c);
     });
     cv.fillRect(x + BW + 2, y + 2, w - BW - 2, 1.5, withAlpha('#ffffff', 0.9));
-    if (title) cv.text(String(title), x + 18, y + 42, 26, t.text, { font: 'bold' });
+    if (title) cv.text(String(title), x + 18, y + 42, 26, t.text, { font: 'bold', literal });
 }
 
 /* ---------------- radial dial ---------------- */

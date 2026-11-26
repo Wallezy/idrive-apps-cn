@@ -226,6 +226,10 @@ struct SceneLayers {
 struct Host {
     Rect rect, src;
     bool shown = true;
+    /* A host from layers with shown 0: hosted and hidden while into is on
+     * screen, rather than shown on its own target (PROTOCOL.md "Hosting
+     * from layers", hide). */
+    bool hide = false;
     VideoEdge edge;
 };
 
@@ -398,7 +402,9 @@ public:
      *
      * Each arrange() decides, from the layers' states then, which host from
      * layers is live (hosts(), the stack, the edge). One is eligible while
-     * it is shown, into is on screen, its layers are not waiting for a
+     * it is shown (or hidden with hide: then one of owner's layers drawn
+     * and seen anywhere on into does instead of one over the rect, and a
+     * shown host on any into wins over it), into is on screen, its layers are not waiting for a
      * scene file there, and owner has a layer drawn and seen over the rect
      * at or above its own topmost exclusive layer (the lowest such is its
      * anchor). Of a target's eligible hosts on one into the one whose
@@ -433,6 +439,7 @@ public:
     /* By (hosted target, owner). */
     const std::map<std::pair<int, uint64_t>, LayerHost> &layer_hosts() const { return layer_hosts_; }
     struct Hosted {
+        uint64_t owner = 0;
         int target = 0, into = 0;   /* the hosted target, and the content's */
         Host host;
     };

@@ -1,6 +1,6 @@
 {
   "name": "redline",
-  "version": "2.0.51",
+  "version": "2.0.55",
   "description": "Full-screen rev tach with shift lights, gear, shift scoring and cold-engine rev guard; HUD by @biscotit",
   "main": "javascript/localized-entry.js",
   "private": false,
@@ -21,6 +21,7 @@
     "backgroundPriority": 200,
     "someipManifest": "manifest.json"
   },
+  "mguAppStartType": "autostart",
   "mguLocalOnly": true,
   "files": [
     "package.json",

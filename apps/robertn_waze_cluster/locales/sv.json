@@ -95,6 +95,7 @@
     "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "Ljudet kan försvinna. Stäng av och slå på Wi-Fi på din iPhone.",
     "Own settings for this driver": "Egna inställningar för den här föraren",
     "Keep HUD map over BMW's pop-ups": "Behåll karta i HUD över BMW:s popup-fönster",
-    "Cluster fullscreen": "Instrumentpanel i helskärm"
+    "Cluster fullscreen": "Instrumentpanel i helskärm",
+    "Driver profile can't be read": "Förarprofilen kan inte läsas"
   }
 }

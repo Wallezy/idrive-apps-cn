@@ -1,7 +1,7 @@
 {
  "id": "car_vitals",
  "title": "M \u8f66\u8f86\u4eea\u8868",
- "version": "2.27.14",
+ "version": "2.27.15",
  "screens": [
   {
    "name": "MAIN",
@@ -111,6 +111,12 @@
      "3.5 bar / 50 psi"
     ]
    ]
+  },
+  {
+   "key": "coldZone",
+   "label": "Cold engine: rpm bar faded yellow from the cold limit to the redline",
+   "type": "bool",
+   "default": true
   },
   {
    "key": "speedUnit",

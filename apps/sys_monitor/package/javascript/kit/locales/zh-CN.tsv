@@ -10,8 +10,12 @@
 - not a real value	非真实读数
 - see Diagnostics page	请查看诊断页面
 - waiting for it to change	等待数值变化
+0 % (empty)	0 %（电量耗尽）
+1	1
+1/2 mile	1/2 英里
 1/4 mile	1/4 英里
 1/8 mile	1/8 英里
+100 ms	100 ms
 12 V SIDE	12 V 侧
 12 V battery	12 V 电池
 12 V battery charge	12 V 电池电量
@@ -21,15 +25,21 @@
 12 V details	12 V 详情
 12 V power	12 V 功率
 12 V side voltage	12 V 侧电压
+15 min	15 分钟
+150 ms	150 ms
 1: Outpost Outbreak	1：前哨危机
+2	2
 2 bars	2 个条形
 2 dials	2 个表盘
 24 cells	24 个单元格
+250-300 km/h window (160-190 mph)	250-300 km/h 区间（160-190 mph）
 2: Military Labs	2：军事实验室
 2WD	两驱
 2WD mode	两驱模式
+3	3
 3 dials	3 个表盘
 3: Event Horizon	3：事件视界
+4	4
 4 numbers	4 个数值
 48 V / 12 V converter	48 V / 12 V 转换器
 48 V SIDE	48 V 侧
@@ -45,8 +55,10 @@
 4: Double Impact	4：双重冲击
 4WD	四驱
 4WD Sport	四驱运动
+50 ms	50 ms
 60-0 / 100-0 mph	60–0／100–0 mph
 64 cells	64 个单元格
+80 ms	80 ms
 80s digital dash	复古数字仪表
 8HP hybrid	8HP 混合动力变速箱
 ; on the HUD only while a tyre is low	；仅胎压偏低时显示
@@ -57,6 +69,7 @@ A value n/a or wrong? Adjust config.battery in apps/edrive/app.json and rebuild.
 ABS status	ABS 状态
 ACC	加速
 ACCEL	加速
+ACCELERATE PAST	加速超过
 ACSM airbag	ACSM 安全气囊
 ACTIVE	当前故障
 ADDED	增加
@@ -71,6 +84,7 @@ ATM telematics	ATM 远程通信
 AVG	平均
 Absent message (exterior light front electronics 1 right status, 0x1E6), BDC is receiver, FLER is transmitter	报文缺失（右前车外照明电子装置 1 状态，0x1E6）：接收方 BDC，发送方 FLER
 Absent message (exterior light front electronics 2 right status, 0x1FD), BDC is receiver, FLER is transmitter	报文缺失（右前车外照明电子装置 2 状态，0x1FD）：接收方 BDC，发送方 FLER
+Accelerate through a window	加速通过一个区间
 Acceleration, forward	纵向加速度
 Acceleration, sideways	横向加速度
 Accelerator pedal	油门踏板
@@ -167,6 +181,8 @@ BRAKE HARD	全力制动
 BRK	制动
 Back	返回
 Back up	后退
+Bank 1	气缸列 1
+Bank 2	气缸列 2
 Bar + 3 numbers	条形 + 3 个数值
 Barometric pressure	大气压力
 Base-point adaptation	基点自适应
@@ -207,6 +223,7 @@ Boost unit	增压单位
 Boost: target vs actual	增压压力：目标值与实际值
 Bosch MG1 · electric flap	博世 MG1：电动阀门
 Bosch MG1 — electric flap	博世 MG1：电动阀门
+Both door lines	两侧车门灯带
 Bottom right corner	右下角
 Brake Test	制动测试
 Brake fade	制动衰减
@@ -262,6 +279,7 @@ CURRENT	电流
 CURRENT  (A, + = INTO THE BATTERY)	电流  （A，+ = 流入电池）
 CURRENT CAPACITY	当前容量
 CURRENT · CHARGE	电流 · 充电
+CUSTOM: "TO" MUST BE ABOVE "FROM"	自定义：终点应大于起点
 Cancel run	取消本次
 Capacity SOH (separate estimate)	容量健康度（单独估算）
 Capacity and resistance	容量和内阻
@@ -269,7 +287,10 @@ Car signals	车辆信号
 Car type	车辆类型
 Catalyst oxygen storage	催化器储氧量
 Catalyst, bank 1 sensor 1	催化器，第 1 列传感器 1
+Cell charge spread	电芯电量差
 Cell indices do not reveal RPM/torque limits.	单元格索引不代表转速或扭矩限值。
+Cell voltage spread	电芯电压差
+Cell voltages	电芯电压
 Cells	电芯
 Celsius	摄氏度
 Central locking drive for tailgate or split door, right: line break or short circuit to battery voltage	尾门或右侧对开门中控锁驱动：断路或对蓄电池正极短路
@@ -316,11 +337,13 @@ Cold KF	冷态 KF
 Cold KF1	冷态 KF1
 Cold KF2	冷态 KF2
 Cold correction (raw units)	冷态修正（原始单位）
+Cold engine zone	冷机转速区
 Cold evaluations	冷态评估次数
 Cold limit	冷机上限
 Cold maps contain single upshifts only	冷态图仅包含逐级升挡
 Cold rev limit	冷机转速上限
 Cold shift counter	冷态换挡计数
+Cold zone	冷机转速区
 Cold-engine rev guard	冷机转速保护
 Cold-engine shift limit	冷机换挡上限
 Colour	颜色
@@ -362,8 +385,12 @@ Coupe / sedan	双门轿跑 / 轿车
 Crash	碰撞
 Currency	货币
 Current	当前
+Custom speed window	自定义速度区间
+Custom window from (km/h or mph)	自定义区间起点（km/h 或 mph）
+Custom window to (km/h or mph)	自定义区间终点（km/h 或 mph）
 Cyan	青色
 Cyl	气缸
+DA	等效高度
 DATE	日期
 DC/DC converter	DC/DC 转换器
 DCS driver camera	DCS 驾驶员摄像头
@@ -382,15 +409,18 @@ DME engine	DME 发动机
 DME took it	DME 已接受
 DME took it (read back)	DME 已接受（已回读）
 DONE	完成
+DOWNHILL	下坡
 DRAWING	用电
 DRIVING	行驶
 DSC brake booster	DSC 制动助力
 DSC brakes	DSC 制动
 DUE NOW	已到期
 DUE SOON	即将到期
+Dash and door lines	仪表台与车门灯带
 Data source: BMW/ZF GSZFBCE rev. 15.000.	数据来源：BMW／ZF GSZFBCE 版本 15.000。
 Debug mode active (SSH open)	调试模式已启用（SSH 已开放）
 Deceleration	减速度
+Decor lights (dash, under the door trim) with	装饰灯跟随分区
 Default	默认
 Delete	删除
 Delete all	删除全部
@@ -434,6 +464,7 @@ Doom stopped	游戏已停止
 Doom stopped:	游戏已停止：
 Door contact, driver's door rear / bottom: Line break or faulty	驾驶员侧后门或下门接触开关：线路断路或故障
 Door switch centre operating facility (SZT), (LIN): No LIN slave present	车门开关控制组件（SZT，LIN）：无 LIN 从节点
+Downhill limit for best times	最佳成绩下坡限制
 Downshift arrows (experimental)	降挡箭头（测试功能）
 Downshifts	降挡
 Drag Timer	加速计时
@@ -469,6 +500,7 @@ EGS oil-service temperature window	EGS 换油温度范围
 EGS operating time (without standby)	EGS 运行时间（不含待机）
 EGS variant	EGS 控制单元版本
 ELECTRIC	纯电
+ELEVATION	高度变化
 ELSV (LIN): LIN slave absent	ELSV（LIN）：LIN 从节点不存在
 EME e-motor	EME 电机
 ENERGY	能量
@@ -594,6 +626,7 @@ Flash length (tap to change)	闪光时长（点击切换）
 Flashes a second	每秒闪光次数
 Flashing headlights on public roads is illegal and dangerous	公共道路禁止使用前灯频闪，
 Following driving mode	跟随驾驶模式
+Footwells, door pockets and handles	脚窝、车门储物格与把手
 From	起始
 From the engine unit	来自发动机控制单元
 From the engine unit (B58 / B48 / B38), read	来自发动机控制单元（B58 / B48 / B38），读取于
@@ -629,6 +662,9 @@ Full screen	全屏
 Full throttle in 3rd gear from ~2000 rpm to the limiter, on a flat road	在平坦封闭道路以三挡从约 2000 转全油门加速至转速上限
 Full:	满电：
 Full: 1920 x 504, every screen pixel	全分辨率：1920 × 504
+Fully electric (BEV)	纯电动车 (BEV)
+Fully electric: range counts down to	纯电动车：续航下限电量
+Fully electric: usable battery when new	纯电动车：新电池可用容量
 G-Force	G 值仪表
 G-force	G 值
 G-force (sideways and braking / accelerating together)	G 值（横向与纵向合成）
@@ -741,6 +777,7 @@ Hybrid battery temperature	混动电池温度
 Hybrid battery voltage	混动电池电压
 Hybrid car? Settings > Hybrid system	混动车型：设置 > 混合动力系统
 Hybrid car? Settings > Hybrid system > Yes	混动车请在“设置 > 混合动力系统”中选择“是”
+Hybrid or electric car? Settings > Drive system	混动或纯电车型：设置 > 驱动系统
 Hybrid system	混合动力系统
 I'm too young to die	入门
 IBS wakeup: line disconnected or short circuit to battery voltage	IBS 唤醒线路：断路或对蓄电池正极短路
@@ -753,6 +790,7 @@ IN IT NOW	当前能量
 IN THE BATTERY NOW	当前电池能量
 INFO MEMORY	信息存储器
 INFO:	信息：
+INVALID RUN	无效成绩
 Ice White	冰晶白
 Ice white	冰晶白
 Identifying control units...	正在识别控制单元…
@@ -782,6 +820,7 @@ Intake manifold pressure	进气歧管压力
 Intake valve lift (Valvetronic)	进气门升程（Valvetronic）
 Intake valve lift target	进气门升程目标值
 Invalid	无效
+IterioDev's Comfort tool has its ambient colour on and changes the same lights, so Ambient config has stopped changing them. Turn its colour and its drive-mode colours off in IterioDev's Ambient Light app (the seats keep working), or uninstall Comfort in the Store (Installed, Head-unit tools, Comfort).	其他舒适功能应用正在控制氛围灯，本应用已暂停调色。请关闭该应用的灯色与驾驶模式配色，座椅功能仍可保留；也可在商店的已安装组件中卸载舒适服务。
 IterioDev's Comfort tool is running. It changes the ambient lights too, so the colours jump between the two apps. Uninstall it in the Store (Installed, Head-unit tools, Comfort) and use one ambient app at a time.	检测到 Comfort 工具同时控制氛围灯，可能导致颜色跳变。请在商店“已安装→车机工具”中卸载 Comfort，仅保留一个氛围灯应用。
 Its own	独立设置
 Its own HUD (set up on HUD looks)	独立 HUD 配置
@@ -850,6 +889,7 @@ Last trips	最近行程
 Launch time	起步成绩
 Launch time (0-100 km/h or 0-60 mph after a standing start, against your best)	起步加速成绩与最佳成绩对比
 Launch when ready	准备好后起步
+Layout	布局
 Layout:	布局：
 Learn from driving (redline, shift points, reaction time)	行驶学习（转速、换挡点、反应时间）
 Learn high beam	识别远光灯
@@ -870,6 +910,9 @@ Left, both, right	左、两侧、右
 Left, right	左、右
 Left, right, both	左、右、两侧
 Left-hander	左弯
+Lever start of the strobe also while driving (only for use on private property)	行驶时允许拨杆启动闪烁（仅限封闭场地）
+Lever start: Off	拨杆启动：关闭
+Lever start: On	拨杆启动：开启
 Light colours	灯光配色
 Light fill	灯光填充
 Light show	灯光秀
@@ -889,6 +932,7 @@ Logs	日志
 Long term fuel trim	长期燃油修正
 Long term fuel trim, bank 1	长期燃油修正，第 1 列
 Long term fuel trim, bank 2	长期燃油修正，第 2 列
+Longest distance	最长距离
 Look	外观
 Look again	重新查找
 Look by driving mode	随驾驶模式切换
@@ -900,10 +944,12 @@ Low pressure fuel	低压燃油
 Low: 960 x 252	低：960 × 252
 Lower	下层
 Lower lights	下层灯带
+Lower lights (like BMW)	下层灯光（原厂方式）
 M (green-yellow-red)	M 样式（绿黄红）
 M Red	M 红色
 M Tricolour	M 三色
 M Vitals	M 车辆仪表
+M-Track (or similar) module: S while S / M flickers	M-Track 等模块：S／M 闪烁时显示 S
 MAP	程序
 MAP –	程序 –
 MEASURED	实测
@@ -979,11 +1025,13 @@ My colour back at each start	启动时恢复自定义颜色
 NET	净值
 NEW BEST	新最佳
 NEW RUN RECORDED	已记录新测试
+NO AIR DATA	无空气数据
 NO DIAGNOSTIC LINK	诊断未连接
 NO LINK	未连接
 NO OIL TEMP	无机油温度
 NO REPLY	无响应
 NO REPLY - SEE DIAGNOSTICS	无响应，请查看诊断
+NO SLOPE	无坡度数据
 NOMINAL CAPACITY	额定容量
 NONE	无
 NOT WARMING	未升温
@@ -1030,6 +1078,7 @@ No pending or confirmed EGS faults returned	未返回待确认或已确认的 EG
 No pull yet	暂无加速测试
 No reset in demo mode	演示模式下不能重置
 No response	无响应
+No runs yet - launch from a stop or accelerate through a rolling window.	暂无测试记录 - 请静止起步，或在行驶中加速通过一个区间。
 No runs yet - stop, launch, and they show up here.	暂无记录，停车后起步即可开始测试。
 No runs yet.	暂无测试记录。
 No shifts yet - go and use the rev range.	暂无换挡记录。
@@ -1072,6 +1121,8 @@ OTHER EGS	其他 EGS
 OUTSIDE	车外温度
 Odometer	总里程
 Off	关闭
+Off (no engine unit requests)	关闭（不查询发动机控制单元）
+Off by day	白天关闭
 Off · nothing is sent (safe)	关闭 · 不发送任何指令（安全）
 Off · nothing is sent to the car (safe)	关闭：不向车辆发送指令（安全）
 Off · the car takes over after ~20 s	关闭：约 20 秒后由车辆控制
@@ -1094,6 +1145,7 @@ Oil warm at	机油暖机温度
 Oil-service speed	油液维护转速
 Oil-service temperature	油液维护温度
 On	开启
+On in the car: one colour on all lights	已开启：整组灯光单色模式
 On · sent again every 15 s	开启：每 15 秒重新发送
 On · xDrive tab, xDrive off until ignition off	开启 · 显示 xDrive 页，关闭 xDrive 直到熄火
 On-board electrics	车载用电
@@ -1105,6 +1157,7 @@ Only what answered	仅显示已应答的项目
 Only when cold or hot	仅低温或高温时
 Open	打开
 Open door red	开门红光
+Open door: the car's own warning (G20 / G26)	开门时保留原车警示灯（G20／G26）
 Open loop (cold)	开环（冷机）
 Open loop (fault)	开环（故障）
 Open loop (load)	开环（负荷）
@@ -1115,6 +1168,7 @@ Original colour (as set in BMW's menu)	使用原车菜单中的颜色
 Output shaft	输出轴
 Outside	车外温度
 Outside (blue at 3 °C / 37 °F and below)	室外温度（3°C 以下蓝色）
+Outside air with each run	每次测试记录车外空气
 Outside temperature	车外温度
 Over its life	使用寿命内
 Overlay ECU torque	叠加 ECU 扭矩
@@ -1210,6 +1264,8 @@ RESISTANCE WHEN NEW	新电池内阻
 RESTING	静置
 RIGHT	右
 RL	左后
+ROLLING START	中途加速
+ROLLOUT	起步豁免
 ROLLOUT 1 FT	起步豁免 1 英尺
 RPM	转速
 RPM AS	转速格式
@@ -1218,6 +1274,7 @@ RPM shows as	转速显示格式
 RPM signal lost · Close paused · the car has the flap	无转速信号：关闭已暂停，由车辆控制阀门
 RPM signal lost · OEM requested · select CLOSE again	无转速信号：已切换为原厂控制，请重新选择关闭
 RR	右后
+RUN	测试
 Race (green-red-blue)	竞速样式（绿红蓝）
 Rain-light-solar-condensation sensor: Implausible signal from rain sensor or driving light sensor	雨量、光照、日照及凝露传感器：雨量或行车灯光照信号不可信
 Rainbow	彩虹
@@ -1242,6 +1299,7 @@ Readout labels	数据标签
 Readouts	数据
 Ready	就绪
 Real electric range	实际纯电续航
+Real range	实际续航
 Rear	后轴
 Rear brakes	后制动器
 Rear driver's side power window regulator: LIN slave missing	驾驶员侧后车窗升降器：LIN 从节点缺失
@@ -1293,6 +1351,8 @@ Road gradient, across	道路横向坡度
 Road gradient, along	道路纵向坡度
 Rocker switch of central locking system in driver's door: Wiring fault or defective	驾驶员门中控锁翘板开关：线路故障或损坏
 Roll rate	侧倾角速度
+Rolling start	中途加速
+Rolling windows	中途加速区间
 Rough running	发动机运转不稳
 Rows and columns are storage-cell indices. Physical RPM/torque breakpoints are not supplied by this record.	行列表示存储单元索引；此记录不提供实际转速／扭矩断点。
 Rows: turbine-speed support-point index. Columns: torque support-point index; physical breakpoints not supplied.	行：涡轮转速支撑点索引；列：扭矩支撑点索引。不提供实际断点。
@@ -1308,17 +1368,24 @@ SHIFT AT	换挡转速
 SHOWS	显示
 SIM	模拟
 SIZE	大小
+SLOPE	坡度
+SLOW DOWN TO ARM	减速以准备
 SM seat module	SM 座椅模块
 SME HV battery	SME 高压电池
 SOC estimate quality	SOC 估算质量
 SOOT	碳烟
+SOOT, BANK 1	碳烟，气缸列 1
+SOOT, BANK 2	碳烟，气缸列 2
 SPARK PLUGS: DRIVEN	火花塞已用里程
 SPARK PLUGS: LEFT	火花塞剩余里程
 SPEED	车速
 SPEED RANGE	车速范围
+SPIN	空转
 SPOT ON	精准
 SPREAD	差值
 SRR corner radar	SRR 角雷达
+STANDING LAUNCH	静止起步
+STANDING LAUNCH (rollout)	静止起步（起步豁免）
 STATE OF CHARGE  (%, FROM THE DME)	荷电状态  （%，来自 DME）
 STATE OF CHARGE, LAST 5	荷电状态，最近 5 次
 STATUS	状态
@@ -1382,9 +1449,11 @@ Short term fuel trim	短期燃油修正
 Short term fuel trim, bank 1	短期燃油修正，第 1 列
 Short term fuel trim, bank 2	短期燃油修正，第 2 列
 Show	显示
+Show (pressure from the engine unit)	显示（大气压力取自发动机控制单元）
 Show on HUD (experimental)	显示到 HUD（测试功能）
 Show peak markers	显示峰值标记
 Show sources and unverified values	显示来源和未验证的数值
+Show, times corrected to standard air (SAE J1349)	显示，时间修正至标准空气（SAE J1349）
 Signals	信号
 Simple	简洁
 Simulated	模拟模式
@@ -1423,12 +1492,15 @@ Stability control (DSC) status	车身稳定控制（DSC）状态
 Stand	停止移动
 Standard	标准
 Standby	待机
+Standing launch	静止起步
+Standing launch (rollout)	静止起步（起步豁免）
 Start evaluations	起步评估次数
 Start page	启动页面
 Start show	启动灯光秀
 Start strobe	启动频闪
 Start the engine first · Max Cooling needs over	请先启动发动机：最大冷却所需转速高于
 Start the engine first — Max Cooling needs over	请先启动发动机：最大冷却所需转速高于
+Start the strobe with the flasher lever	通过远光拨杆启动闪烁
 Started	开始
 State of charge	荷电状态
 State of charge (SOC)	电量（SOC）
@@ -1485,6 +1557,7 @@ TO REGULATED LOW	转为低位调节
 TOP	最高
 TORQUE	扭矩
 TOTAL	总计
+TRAP	终速
 TURBO COOL-DOWN	涡轮冷却中
 Tach	转速表
 Tank	油箱
@@ -1598,9 +1671,10 @@ Update the Renderer in the Store, then use Full layout in Settings.	请在商店
 Updated	更新时间
 Upper	上层
 Upper colour to lower colour and back	在上下层颜色间渐变
-Upper lights	上层灯带
+Upper lights	上层灯光
 Upper temperature bands	高温区间
 Upshifts	升挡
+VALID RUN	有效成绩
 VALUE	数值
 VANOS and Valvetronic	VANOS 与 Valvetronic
 VDP dampers	VDP 减振器
@@ -1629,6 +1703,7 @@ WARM  +	热衰减 +
 WARMING UP	暖机中
 WARNING LAMP	警示灯请求
 WATER	水温
+WHEELSPIN	车轮空转
 WHEN	时间
 WITH ENGINE	发动机运行
 WLAN aerial: Disconnected line	WLAN 天线：线路断路
@@ -1710,6 +1785,7 @@ bytes / raw	字节／原始数据
 car sends	车辆上报
 car sends no torque split	车辆未提供扭矩分配
 cell	电芯
+cell charge	电芯电量
 cell core (battery unit)	电芯核心温度（电池控制单元）
 cells	电芯
 charge	充电
@@ -1747,6 +1823,7 @@ cylinders (engine unit list)	缸（控制单元列表）
 days ago	天前
 diagnostic link down	诊断连接断开
 down	降挡
+down to	续航下限
 drive to warm up	行驶暖机
 driver	驾驶员
 eDrive	EDrive助手
@@ -1831,6 +1908,7 @@ live, at	实时读数，时间
 longitudinal acceleration	纵向加速度
 low	低
 low - use a battery charger	偏低 - 请使用电池充电器
+lowest to highest cell	最低至最高电芯
 lowish - a longer drive helps	偏低 - 长途行驶有帮助
 m ago	分钟前
 map summary	自适应图概览
@@ -1876,6 +1954,7 @@ no link	未连接
 no read	无读数
 no read-back on BM3	BM3 不支持回读
 no read-back on MHD	MHD 不支持回读
+no reading	没有读数
 no reading - see Diagnostics	没有读数，请查看诊断
 no reading from the engine unit	暂无发动机数据
 no reading yet	尚无读数
@@ -2012,6 +2091,7 @@ the high beam's channels are not known yet (Learn)	请先识别远光灯通道
 the high beams did not follow	远光灯未按指令响应
 the lamp test does not light the high beam's channels (Learn again)	灯光测试未点亮远光通道，请重新识别
 there	处
+this app	本应用
 this drive	本次行程
 this unit has no such value	此控制单元没有这个数值
 to other drivers.	以免危及其他驾驶者。

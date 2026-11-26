@@ -1,6 +1,6 @@
 {
   "name": "sys_monitor",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "查看车机内存、处理器、温度和进程占用，支持排序与趋势图；只读监控。",
   "main": "javascript/localized-entry.js",
   "private": false,

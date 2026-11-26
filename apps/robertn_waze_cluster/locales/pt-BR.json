@@ -95,6 +95,7 @@
     "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "O áudio pode falhar. No iPhone, desative e ative o Wi-Fi.",
     "Own settings for this driver": "Configurações próprias para este motorista",
     "Keep HUD map over BMW's pop-ups": "Manter mapa no HUD sobre pop-ups da BMW",
-    "Cluster fullscreen": "Painel de instrumentos em tela cheia"
+    "Cluster fullscreen": "Painel de instrumentos em tela cheia",
+    "Driver profile can't be read": "Não é possível ler o perfil do motorista"
   }
 }

@@ -54,7 +54,13 @@ jobs:
 # Unit tests do not set release-check/cn-integration.
       - name: Ported upstream applications and runtime
         run: |
+          node tools/test_iterio.js
           node tools/test_cauliflower.js
+          node tools/test_live_data_time.js
+          node localized/cauliflower/kit/tools/test_widget_unicode.js
+          node localized/cauliflower/kit/tools/test_signals_poll.js
+          node localized/cauliflower/kit/tools/test_redline_dmegear.js
+          node localized/cauliflower/kit/tools/test_dtc_idle.js
           make -C native/mgu-inputgate test
       - name: Cluster Metrics Chinese Beta
         run: |
@@ -71,6 +77,7 @@ jobs:
       - name: System monitor sampling, lifecycle and Chinese layouts
         run: |
           node tools/test_system_monitor.js
+          node localized/cauliflower/kit/tools/test_monitor_entry.js
           node localized/system-monitor/tests/test_sys_monitor.js
           node localized/system-monitor/tests/test_sys_monitor_layout.js
       - name: BMRMODZ read-only diagnostics and notification services

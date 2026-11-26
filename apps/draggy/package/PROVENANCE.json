@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/cauliflowermossgrape/idrive7-apps",
-  "commit": "454e47f8b6aec5b2e0d7335257d7cc3644d9d858",
+  "commit": "527e9b2514c516a3b43f4a0643452c1ce931eeb6",
   "language": "zh-CN",
   "sdk": "Excluded; donor-linked by mgu-deploy",
   "adaptations": [
@@ -9,13 +9,13 @@
     "Numeric three-part CN versions"
   ],
   "component": "draggy",
-  "upstreamVersion": "2.7.2",
-  "releaseVersion": "2.7.3",
+  "upstreamVersion": "2.7.3",
+  "releaseVersion": "2.7.5",
   "cnRevision": 1,
   "adaptedSourceFilesSha256": {
-    "apps/draggy/app.json": "73c57c29210e2210907450e2e9b87435d352f31e9d8dbd25168ef1e7be85bc5f",
+    "apps/draggy/app.json": "9ec6cbc3a50921079bb65addbcb47ea5330643ccfbb024612d9e64f49e231649",
     "apps/draggy/demo.js": "bdecde9b2d2d4af9cf1411d99520640bbfcefe0cd7b30a83c8468d8b6a6aa42a",
-    "apps/draggy/icon.png": "4d57c4caa4dff86649f7395796c8fbd05eeac035efba6df067f95dd0cf6f160b",
+    "apps/draggy/icon.png": "d02bcf36a0a77c538d31f2ecad0ad25fe028da50df33b641bbfda31cb2a4b104",
     "apps/draggy/main.js": "27fffd265f8dff3914cb69920e131ed30cf3550fc097e103f4f88305a95dc27b",
     "apps/draggy/roll_timer.js": "1967c79bb6b256821ba4c829338a2e03ee71448ed48e755ca5cdfb9290c0c347",
     "apps/draggy/shifts.js": "ef09366e241da77f0ece573a3805e7a1b80cfa3744f0b3aa5aa06b80fc201568",

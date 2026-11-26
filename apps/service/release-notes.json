@@ -1,5 +1,13 @@
 [
   {
+    "version": "1.6.8",
+    "upstreamVersion": "1.6.7",
+    "cnRevision": 1,
+    "changes": [
+      "仅在页面显示时读取保养状态，减少后台占用。"
+    ]
+  },
+  {
     "version": "1.6.7",
     "changes": [
       "完善原作者和来源信息，贡献记录随安装包提供。"

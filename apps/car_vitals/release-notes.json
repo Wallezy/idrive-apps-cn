@@ -1,5 +1,13 @@
 [
   {
+    "version": "2.27.15",
+    "upstreamVersion": "2.27.14",
+    "cnRevision": 1,
+    "changes": [
+      "新增冷机转速区显示开关。"
+    ]
+  },
+  {
     "version": "2.27.14",
     "changes": [
       "完善原作者和来源信息，贡献记录随安装包提供。"

@@ -1,186 +1,185 @@
 {
   "ambient_config": {
-    "upstreamVersion": "2.7.23",
-    "releaseVersion": "2.7.24",
+    "upstreamVersion": "2.7.27",
+    "releaseVersion": "2.7.28",
     "cnRevision": 1,
     "title": "氛围灯设置",
     "description": "自定义氛围灯颜色、亮度与动画，按驾驶模式切换。 简体中文界面，支持在线更新。",
     "englishDescription": "Ambient config with Chinese menus and status text.",
     "changes": [
-      "新增可拖动的车内灯光预览，优化灯带分区提示。",
-      "对开灯前报告异常的灯带自动复查，保留模块查找和离车停止。"
+      "新增白天关闭和两侧车门灯带提示选项。",
+      "完善灯光模块识别、启动重试与灯光效果恢复。"
     ],
-    "upstreamCommit": "454e47f8b6aec5b2e0d7335257d7cc3644d9d858"
+    "upstreamCommit": "527e9b2514c516a3b43f4a0643452c1ce931eeb6"
   },
   "brake_test": {
-    "upstreamVersion": "1.5.23",
-    "releaseVersion": "1.5.24",
+    "upstreamVersion": "1.5.24",
+    "releaseVersion": "1.5.26",
     "cnRevision": 1,
     "title": "制动测试",
     "description": "记录制动距离与时间，查看历史成绩。 简体中文界面，支持在线更新。",
     "englishDescription": "Brake Test with Chinese menus and status text.",
     "changes": [
-      "优化旋钮焦点和选项切换的显示，保留简体中文。"
+      "优化应用图标与后台资源释放。"
     ],
-    "upstreamCommit": "454e47f8b6aec5b2e0d7335257d7cc3644d9d858"
+    "upstreamCommit": "527e9b2514c516a3b43f4a0643452c1ce931eeb6"
   },
   "car_vitals": {
-    "upstreamVersion": "2.27.12",
-    "releaseVersion": "2.27.13",
+    "upstreamVersion": "2.27.14",
+    "releaseVersion": "2.27.15",
     "cnRevision": 1,
     "title": "M 车辆仪表",
     "description": "查看发动机、温度、燃油、点火及底盘实时数据。 简体中文界面，支持在线更新。",
     "englishDescription": "M Vitals with Chinese menus and status text.",
     "changes": [
-      "修复手动挡退出倒挡后挡位仍显示 R 的问题。",
-      "优化选项布局与旋钮焦点显示。"
+      "新增冷机转速区显示开关。"
     ],
-    "upstreamCommit": "454e47f8b6aec5b2e0d7335257d7cc3644d9d858"
+    "upstreamCommit": "527e9b2514c516a3b43f4a0643452c1ce931eeb6"
   },
   "doom": {
-    "upstreamVersion": "1.7.24",
-    "releaseVersion": "1.7.25",
+    "upstreamVersion": "1.7.25",
+    "releaseVersion": "1.7.27",
     "cnRevision": 1,
     "title": "毁灭战士",
     "description": "驻车时游玩 Freedoom，支持全屏画面和旋钮操作。 简体中文界面，支持在线更新。",
     "englishDescription": "Doom with Chinese menus and status text.",
     "changes": [
-      "优化旋钮焦点和选项切换的显示，保留简体中文。"
+      "优化应用图标与后台资源释放。"
     ],
-    "upstreamCommit": "454e47f8b6aec5b2e0d7335257d7cc3644d9d858"
+    "upstreamCommit": "527e9b2514c516a3b43f4a0643452c1ce931eeb6"
   },
   "draggy": {
-    "upstreamVersion": "2.7.2",
-    "releaseVersion": "2.7.3",
+    "upstreamVersion": "2.7.3",
+    "releaseVersion": "2.7.5",
     "cnRevision": 1,
     "title": "弹射模式",
     "description": "测量加速时间，查看历史与最佳成绩。 简体中文界面，支持在线更新。",
     "englishDescription": "Drag Timer with Chinese menus and status text.",
     "changes": [
-      "优化旋钮焦点和选项切换的显示，保留简体中文。"
+      "优化应用图标与后台资源释放。"
     ],
-    "upstreamCommit": "454e47f8b6aec5b2e0d7335257d7cc3644d9d858"
+    "upstreamCommit": "527e9b2514c516a3b43f4a0643452c1ce931eeb6"
   },
   "dtc_scanner": {
-    "upstreamVersion": "2.9.10",
-    "releaseVersion": "2.9.11",
+    "upstreamVersion": "2.9.11",
+    "releaseVersion": "2.9.13",
     "cnRevision": 1,
     "title": "故障检测",
     "description": "读取与清除故障码，查看控制单元和中文故障说明。 简体中文界面，支持在线更新。",
     "englishDescription": "Fault Scanner with Chinese menus and status text.",
     "changes": [
-      "优化旋钮焦点和选项切换的显示，保留简体中文。"
+      "离开页面后停止诊断与状态订阅，减少后台占用。"
     ],
-    "upstreamCommit": "454e47f8b6aec5b2e0d7335257d7cc3644d9d858"
+    "upstreamCommit": "527e9b2514c516a3b43f4a0643452c1ce931eeb6"
   },
   "dyno": {
-    "upstreamVersion": "1.6.5",
-    "releaseVersion": "1.6.6",
+    "upstreamVersion": "1.6.6",
+    "releaseVersion": "1.6.8",
     "cnRevision": 1,
     "title": "虚拟马力机",
     "description": "记录车辆加速过程，估算功率与扭矩并保存结果。 简体中文界面，支持在线更新。",
     "englishDescription": "Virtual Dyno with Chinese menus and status text.",
     "changes": [
-      "优化旋钮焦点和选项切换的显示，保留简体中文。"
+      "优化应用图标与后台资源释放。"
     ],
-    "upstreamCommit": "454e47f8b6aec5b2e0d7335257d7cc3644d9d858"
+    "upstreamCommit": "527e9b2514c516a3b43f4a0643452c1ce931eeb6"
   },
   "edrive": {
-    "upstreamVersion": "2.11.4",
-    "releaseVersion": "2.11.5",
+    "upstreamVersion": "2.11.5",
+    "releaseVersion": "2.11.7",
     "cnRevision": 1,
     "title": "EDrive 助手",
     "description": "查看续航、电池状态、充电记录与实时能耗。 简体中文界面，支持在线更新。",
     "englishDescription": "eDrive with Chinese menus and status text.",
     "changes": [
-      "改善电功率估算与范围判断。",
-      "优化旋钮焦点和中文界面显示。"
+      "优化应用图标与后台资源释放。"
     ],
-    "upstreamCommit": "454e47f8b6aec5b2e0d7335257d7cc3644d9d858"
+    "upstreamCommit": "527e9b2514c516a3b43f4a0643452c1ce931eeb6"
   },
   "gforce": {
-    "upstreamVersion": "1.6.24",
-    "releaseVersion": "1.6.25",
+    "upstreamVersion": "1.6.25",
+    "releaseVersion": "1.6.27",
     "cnRevision": 1,
     "title": "G 值仪表",
     "description": "显示纵横向加速度，查看记录与峰值。 简体中文界面，支持在线更新。",
     "englishDescription": "G-Force with Chinese menus and status text.",
     "changes": [
-      "优化旋钮焦点和选项切换的显示，保留简体中文。"
+      "优化应用图标与后台资源释放。"
     ],
-    "upstreamCommit": "454e47f8b6aec5b2e0d7335257d7cc3644d9d858"
+    "upstreamCommit": "527e9b2514c516a3b43f4a0643452c1ce931eeb6"
   },
   "live_adjustments": {
-    "upstreamVersion": "0.9.12",
-    "releaseVersion": "0.9.13",
+    "upstreamVersion": "0.9.14",
+    "releaseVersion": "0.9.15",
     "cnRevision": 1,
     "title": "发动机设置",
     "description": "控制排气阀门；兼容车辆可使用 BM3、MHD 设置及实验性 xDrive 功能。 简体中文界面，支持在线更新。",
     "englishDescription": "Engine Config with Chinese menus and status text.",
     "changes": [
-      "优化旋钮焦点和选项切换的显示，保留简体中文。"
+      "改善 BM3 状态读取和排气阀控制失败提示。"
     ],
-    "upstreamCommit": "454e47f8b6aec5b2e0d7335257d7cc3644d9d858"
+    "upstreamCommit": "527e9b2514c516a3b43f4a0643452c1ce931eeb6"
   },
   "live_data": {
-    "upstreamVersion": "1.0.20",
-    "releaseVersion": "1.0.21",
+    "upstreamVersion": "1.0.21",
+    "releaseVersion": "1.0.23",
     "cnRevision": 1,
     "title": "实时数据",
     "description": "自定义车辆数据页面，查看行程、信号与控制单元信息。 简体中文界面，支持在线更新。",
     "englishDescription": "Live Data with Chinese menus and status text.",
     "changes": [
-      "优化旋钮焦点和选项切换的显示，保留简体中文。"
+      "行程时间按北京时间（UTC+8）显示，日期使用中文格式。",
+      "优化应用图标与后台资源释放。"
     ],
-    "upstreamCommit": "454e47f8b6aec5b2e0d7335257d7cc3644d9d858"
+    "upstreamCommit": "527e9b2514c516a3b43f4a0643452c1ce931eeb6"
   },
   "redline": {
-    "upstreamVersion": "2.0.49",
-    "releaseVersion": "2.0.50",
+    "upstreamVersion": "2.0.54",
+    "releaseVersion": "2.0.55",
     "cnRevision": 1,
     "title": "换挡转速",
     "description": "显示转速、挡位与换挡提示，支持 HUD 样式设置。 简体中文界面，支持在线更新。",
     "englishDescription": "Redline with Chinese menus and status text.",
     "changes": [
-      "修复手动挡退出倒挡后挡位仍显示 R 的问题。",
-      "优化选项布局与旋钮焦点显示。"
+      "新增冷机转速提示，改善手动挡挡位识别。",
+      "车机启动后恢复已启用的 HUD 显示。"
     ],
-    "upstreamCommit": "454e47f8b6aec5b2e0d7335257d7cc3644d9d858"
+    "upstreamCommit": "527e9b2514c516a3b43f4a0643452c1ce931eeb6"
   },
   "service": {
-    "upstreamVersion": "1.6.5",
-    "releaseVersion": "1.6.6",
+    "upstreamVersion": "1.6.7",
+    "releaseVersion": "1.6.8",
     "cnRevision": 1,
     "title": "保养信息",
     "description": "查看车辆保养项目、剩余里程与到期信息。 简体中文界面，支持在线更新。",
     "englishDescription": "Service with Chinese menus and status text.",
     "changes": [
-      "优化旋钮焦点和选项切换的显示，保留简体中文。"
+      "仅在页面显示时读取保养状态，减少后台占用。"
     ],
-    "upstreamCommit": "454e47f8b6aec5b2e0d7335257d7cc3644d9d858"
+    "upstreamCommit": "527e9b2514c516a3b43f4a0643452c1ce931eeb6"
   },
   "warmup": {
-    "upstreamVersion": "1.9.2",
-    "releaseVersion": "1.9.3",
+    "upstreamVersion": "1.9.3",
+    "releaseVersion": "1.9.5",
     "cnRevision": 1,
     "title": "暖机助手",
     "description": "查看机油与车辆温度，辅助判断暖机状态。 简体中文界面，支持在线更新。",
     "englishDescription": "Warm-Up with Chinese menus and status text.",
     "changes": [
-      "优化旋钮焦点和选项切换的显示，保留简体中文。"
+      "优化应用图标与后台资源释放。"
     ],
-    "upstreamCommit": "454e47f8b6aec5b2e0d7335257d7cc3644d9d858"
+    "upstreamCommit": "527e9b2514c516a3b43f4a0643452c1ce931eeb6"
   },
   "zf8hp": {
-    "upstreamVersion": "1.5.10",
-    "releaseVersion": "1.5.11",
+    "upstreamVersion": "1.5.11",
+    "releaseVersion": "1.5.13",
     "cnRevision": 1,
     "title": "ZF 8HP 变速箱监测",
     "description": "只读查看变速箱实时数据、离合器适配、换挡曲线及油温历史。 简体中文界面，支持在线更新。",
     "englishDescription": "Transmission Config with Chinese menus and status text.",
     "changes": [
-      "优化旋钮焦点和选项切换的显示，保留简体中文。"
+      "优化应用图标与后台资源释放。"
     ],
-    "upstreamCommit": "454e47f8b6aec5b2e0d7335257d7cc3644d9d858"
+    "upstreamCommit": "527e9b2514c516a3b43f4a0643452c1ce931eeb6"
   }
 }

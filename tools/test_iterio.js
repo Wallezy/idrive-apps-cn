@@ -62,5 +62,12 @@ for (const id of ['iteriodev-turnview','iteriodev-drplay']) {
     for (const [file,sha] of Object.entries(prov.binarySha256)) assert.strictEqual(crypto.createHash('sha256').update(fs.readFileSync(path.join(dir,file))).digest('hex'),sha);
 }
 const card=require('../native/iteriodev-turnview/card');
+const { isDesignHost } = require('../native/iteriodev-turnview/turnview');
+assert(isDesignHost('id7', { into: 'panel', app: 'iteriodev-clusterdesign' }));
+assert(!isDesignHost('id7', { into: 'panel', app: 'cluster_themes' }),
+    'a CN theme hosting the map must not select the Iterio design slot');
+assert(!isDesignHost('id7', { into: 'panel' }), 'legacy hosts retain standalone Turn View');
+assert(!isDesignHost('id8', { into: 'panel', app: 'iteriodev-clusterdesign' }));
+assert(!isDesignHost('id7', null), 'leaving the design restores standalone placement');
 for (const notice of Object.keys(card.NOTICES)) assert.strictEqual(card.notice(notice).rgba.length,640*120*4);
 console.log(`Iterio: ${screens} screen variants, ${glyphs} Chinese glyph checks; source-drawn icons, renderer reconnect and parked playback passed`);

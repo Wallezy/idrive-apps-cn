@@ -793,7 +793,7 @@ void Server::op_layer(Client &c, const cr::Json &j, int64_t now_ms)
             {"dirty_threshold", 0, 64, (double)vp.dirty_threshold},
             {"settle_ms", 0, 3600000, (double)vp.dirty_settle_ms},
             {"pan_blocks", 0, 1, vp.pan_blocks ? 1.0 : 0.0}, {"stall_ms", 1000, 600000, (double)vp.stall_ms},
-            {"always_packed", 0, 1, vp.always_packed ? 1.0 : 0.0}};
+            {"always_packed", 0, 1, vp.always_packed ? 1.0 : 0.0}, {"fresh_ms", 0, 1000, (double)vp.fresh_ms}};
         for (auto &e : k)
             if (!num(j, e.key, e.lo, e.hi, &e.cur, &err)) {
                 error(c, "layer", ref, err);
@@ -818,6 +818,7 @@ void Server::op_layer(Client &c, const cr::Json &j, int64_t now_ms)
             return;
         }
         vp.always_packed = k[8].cur != 0;
+        vp.fresh_ms = (int)k[9].cur;
         id = comp_->add_video(c.id, target, lp, vp, now_ms, &err);
     } else if (kind == "image") {
         double iw = lp.rect.w, ih = lp.rect.h, fps = 30;
@@ -934,6 +935,8 @@ void Server::on_json(Client &c, const std::string &body, int64_t now_ms)
                                  {"render_state", "1"},
                                  {"samplers", "1"},
                                  {"host_layers", "1"},
+                                 {"host_hide", "1"},
+                                 {"fresh_ms", "1"},
                                  {"canvas", "1"},
                                  {"curves", "1"},
                                  {"nodes", "1"},
@@ -1478,11 +1481,11 @@ void Server::op_host(Client &c, uint32_t ref, const cr::Json &j)
         return;
     }
     const TargetSpec &from = slots_->targets()[hosted];
-    static const char *const keys[] = {"x", "y", "w", "h", "src_x", "src_y", "src_w", "src_h", "shown"};
-    double v[] = {0, 0, 0, 0, 0, 0, (double)from.width, (double)from.height, 1};
+    static const char *const keys[] = {"x", "y", "w", "h", "src_x", "src_y", "src_w", "src_h", "shown", "hide"};
+    double v[] = {0, 0, 0, 0, 0, 0, (double)from.width, (double)from.height, 1, 0};
     std::string err;
-    for (size_t i = 0; i < 9; i++)
-        if (!num(j, keys[i], 0, i == 8 ? 1 : 65535, &v[i], &err)) {
+    for (size_t i = 0; i < 10; i++)
+        if (!num(j, keys[i], 0, i >= 8 ? 1 : 65535, &v[i], &err)) {
             refuse(err);
             return;
         }
@@ -1504,6 +1507,7 @@ void Server::op_host(Client &c, uint32_t ref, const cr::Json &j)
     h.rect = Rect{(int32_t)v[0], (int32_t)v[1], (uint32_t)v[2], (uint32_t)v[3]};
     h.src = Rect{(int32_t)v[4], (int32_t)v[5], (uint32_t)v[6], (uint32_t)v[7]};
     h.shown = v[8] != 0;
+    h.hide = v[9] != 0;
     h.edge.top = (uint32_t)ev[0];
     h.edge.bottom = (uint32_t)ev[1];
     h.edge.fade = (uint32_t)ev[2];
@@ -1858,6 +1862,7 @@ void Server::report(int64_t now_ms)
             const Host &h = x.host;
             const std::string &name = slots_->targets()[x.target].name;
             hosts_[name] = cr::json_object({{"ev", cr::json_quote("host")},
+                                            {"app", cr::json_quote(app_of(x.owner))},
                                             {"target", cr::json_quote(name)},
                                             {"into", cr::json_quote(slots_->targets()[x.into].name)},
                                             {"shown", h.shown ? "1" : "0"},

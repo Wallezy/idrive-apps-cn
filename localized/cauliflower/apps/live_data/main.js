@@ -625,10 +625,8 @@ mgu.run({
             if (d && d.got && now - d.got.t < 3000) return { lph: d.got.lph, src: 'engine unit' };
             return { lph: null, src: null };
         }
-        const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const pad2 = (n) => (n < 10 ? '0' : '') + n;
-        const clock = (ms) => { const d = new Date(ms); return pad2(d.getHours()) + ':' + pad2(d.getMinutes()); };
-        const day = (ms) => { const d = new Date(ms); return d.getDate() + ' ' + MON[d.getMonth()]; };
+        const { clock, day, year } = require('./trip-time');
         const dur = (ms) => Math.floor(ms / 3600000) + ':' + pad2(Math.floor(ms / 60000) % 60);
         const tripLine = (tr) => tr.km.toFixed(1) + ' km, ' + tr.l.toFixed(2) + ' l' + (TRIPS.per100(tr.km, tr.l) !== null ? ' (' + TRIPS.per100(tr.km, tr.l).toFixed(1) + ' l/100 km)' : '')
             + ', ' + dur(tr.driveMs) + ' h driving, ' + dur(tr.idleMs) + ' h standing, fuel from ' + (tr.src || 'nothing') + (tr.noFuelMs > 60000 ? ' (none for ' + dur(tr.noFuelMs) + ' h)' : '')
@@ -1379,7 +1377,7 @@ mgu.run({
         function drawTrips(cv, t, pg) {
             const now = Date.now(), cur = tc.cur, last = tc.trips[tc.trips.length - 1], tr = cur || last, cu = currency();
             if (pg.p === 1) { drawTotals(cv, t, now, cu); return; }
-            const title = cur ? 'This trip  ·  since ' + clock(cur.start) : last ? 'Last trip  ·  ' + day(last.start) + ', ' + clock(last.start) + ' - ' + clock(last.end) : 'Trip computer';
+            const title = cur ? '本次行程  ·  开始于 ' + clock(cur.start) : last ? 'Last trip  ·  ' + day(last.start) + ', ' + clock(last.start) + ' - ' + clock(last.end) : 'Trip computer';
             G.panel(cv, t, 24, 52, 1552, 196, title);
             titleButtons(cv, t, title, [{ label: 'Totals', run: () => turnPage(1), key: 'totals' }]);
             if (!tr) cv.text(tripsOn() ? 'The first trip starts with the engine: every drive is counted, also while this screen is closed' : 'The trip computer is off (Settings)', 800, 170, 26, t.dim, { align: 'center' });
@@ -1428,7 +1426,7 @@ mgu.run({
                 row('Today', tc.total('today', now)),
                 row('Last 7 days', tc.total('week', now)),
                 row('Last 30 days', tc.total('month', now)),
-                row('All recorded' + (tc.all.since ? ' (since ' + day(tc.all.since) + ' ' + new Date(tc.all.since).getFullYear() + ')' : ''), tc.total('all', now)),
+                row('All recorded' + (tc.all.since ? ' (since ' + day(tc.all.since) + ' ' + year(tc.all.since) + ')' : ''), tc.total('all', now)),
             ];
             G.table(cv, t, 48, 108, 1504, [{ label: '', w: 470 }, { label: 'Trips', w: 130, align: 'right' }, { label: 'Distance', w: 220, align: 'right' },
                 { label: 'Fuel', w: 200, align: 'right' }, { label: 'l/100 km', w: 200, align: 'right' }, { label: 'Cost', w: 284, align: 'right' }], rows, { rowH: 36, size: 24 });

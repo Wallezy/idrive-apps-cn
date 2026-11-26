@@ -5,7 +5,7 @@
     "type": "OnlineApp",
     "name": "sys_monitor",
     "vendor": "custom",
-    "version": "1.0.10",
+    "version": "1.0.11",
     "defaultLanguage": "en_GB",
     "stringBundleUuid": "8989adb3-26b7-5382-85a0-b2b9fbe9eb88",
     "resourceBundleUuid": "b39123c1-bb04-5a16-9998-8fdacc941e51",

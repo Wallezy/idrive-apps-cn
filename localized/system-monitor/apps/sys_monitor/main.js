@@ -23,6 +23,7 @@ const path = require('path');
 const mgu = require('./kit/mgu');
 const { withAlpha } = require('./kit/canvas');
 const G = require('./kit/gauges');
+const { t: translate } = require('./kit/i18n');
 const { Sampler, group, sortRows, SORT_FIRST, breakdown, fmtBytes, fmtAge } = require('./procs');
 const { SampleSampler } = require('./sample');
 
@@ -34,6 +35,7 @@ const TREND_MIN_S = 30;                // growth is shown once a row has been se
 const MB = 1024 * 1024;
 const TOP = 44;                        // panels start under the tab bar
 const CHART_X = 1040;                  // a row's details: what it is on the left, its memory's chart from here
+const processNameStyle = { font: 'bold', literal: true };
 const NAME_W = 760;                    // ...and its name over them, at most this wide (Back comes after it)
 
 /** Memory use's colour: fine, getting full, nearly full. */
@@ -197,10 +199,10 @@ mgu.run({
         /** A row's name in bold, with "(this app)" and an "MGU Store" tag; cut to w. */
         function drawName(cv, t, r, x, y, w, size) {
             const tag = r.store && r.kind === 'app' && !r.self, tw = tag ? 150 : 0;
-            const name = fitText(cv, r.label + (r.self ? '  (this app)' : ''), w - tw, size, { font: 'bold' });
-            cv.text(name, x, y, size, t.text, { font: 'bold' });
+            const name = fitText(cv, r.label + (r.self ? '  (' + translate('this app') + ')' : ''), w - tw, size, processNameStyle);
+            cv.text(name, x, y, size, t.text, processNameStyle);
             if (tag) {
-                const nx = x + cv.textWidth(name, size, { font: 'bold' }) + 14;
+                const nx = x + cv.textWidth(name, size, processNameStyle) + 14;
                 cv.roundRect(nx, y - size * 0.8, 130, size * 0.95, 6, withAlpha(t.accent, 0.22));
                 cv.text('MGU STORE', nx + 65, y - size * 0.12, 16, t.accent, { align: 'center', font: 'bold', spacing: 0.5 });
             }
@@ -220,8 +222,9 @@ mgu.run({
                 used += 8 + cv.textWidth(unit, Math.round(size * 0.5), { font: 'bold' });
             }
             // the note: in what the number leaves free (a list: as many of its names as fit whole)
-            if (Array.isArray(sub)) sub = fitList(cv, sub, w - used - 36, 22);
-            if (sub) cv.text(fitText(cv, sub, w - used - 36, 22), x + w - 18, 142, 22, t.dim, { align: 'right' });
+            const opts = { align: 'right', literal: Array.isArray(sub) };
+            if (opts.literal) sub = fitList(cv, sub, w - used - 36, 22, opts);
+            if (sub) cv.text(fitText(cv, sub, w - used - 36, 22, opts), x + w - 18, 142, 22, t.dim, opts);
         }
 
         /** A coloured dot and its text (legends): returns the width taken. */
@@ -321,7 +324,7 @@ mgu.run({
         function drawProcessor(cv, t) {
             const c = snap.cpu, load = snap.load, tiles = [];
             tiles.push(['Processor', c ? pct(c.busy) + ' %' : '--', snap.ncpu ? snap.ncpu + ' cores' : '', t.cold]);
-            if (load) tiles.push(['Load', load.one.toFixed(2), '15 分钟 ' + load.fifteen.toFixed(2), t.text]);
+            if (load) tiles.push(['Load', load.one.toFixed(2), translate('15 min') + ' ' + load.fifteen.toFixed(2), t.text]);
             // (the head unit may keep its sensors from apps: then no tile, rather than a blank one)
             if (snap.temp) tiles.push(['Temperature', Math.round(snap.temp.c) + ' °C', snap.temp.board ? 'board' : '',snap.temp.c >= 90 ? t.crit : snap.temp.c >= 80 ? t.warn : t.text]);
             if (snap.freq) tiles.push(['Clock', (snap.freq.hz / 1e9).toFixed(2) + ' GHz', snap.freq.max ? 'max ' + (snap.freq.max / 1e9).toFixed(1) + ' GHz' : '', t.text]);
@@ -452,10 +455,10 @@ mgu.run({
         function drawDetail(cv, t) {
             const r = rows(detail.key.indexOf('pid:') !== 0, 'mem').find((g) => g.key === detail.key);
             // (cut to leave room for Back after it, and for the chart beside it)
-            const name = fitText(cv, r ? r.label + (r.self ? '  (this app)' : '') : detail.label, NAME_W, 26, { font: 'bold' });
+            const name = fitText(cv, r ? r.label + (r.self ? '  (' + translate('this app') + ')' : '') : detail.label, NAME_W, 26, processNameStyle);
             if (!r) {
-                const p = G.panel(cv, t, 24, 44, 1552, 468, name);
-                G.button(cv, t, 42 + cv.textWidth(name, 26, { font: 'bold' }) + 28, 57, 0, 40, 'Back', closeDetail, { key: 'back' });
+                const p = G.panel(cv, t, 24, 44, 1552, 468, name, true);
+                G.button(cv, t, 42 + cv.textWidth(name, 26, processNameStyle) + 28, 57, 0, 40, 'Back', closeDetail, { key: 'back' });
                 cv.text('This ' + (detail.key.indexOf('pid:') === 0 ? 'process' : 'program') + ' has ended.', 800, p.y + p.h / 2, 30, t.dim, { align: 'center' });
                 return;
             }
@@ -466,14 +469,14 @@ mgu.run({
             tile(cv, t, 3, 5, 'Processor', r.cpu == null ? '--' : pct(r.cpu) + ' %', '', t.cold);
             tile(cv, t, 4, 5, r.count > 1 ? 'Processes' : 'Threads', String(r.count > 1 ? r.count : r.threads), '', t.text);
 
-            const p = G.panel(cv, t, 24, 176, 1552, 336, name);
+            const p = G.panel(cv, t, 24, 176, 1552, 336, name, true);
             // Back right after the title, as Fault Scanner puts its buttons (where the kit runs the screen; else the bar's page button)
-            G.button(cv, t, 42 + cv.textWidth(name, 26, { font: 'bold' }) + 28, 189, 0, 40, 'Back', closeDetail, { key: 'back' });
+            G.button(cv, t, 42 + cv.textWidth(name, 26, processNameStyle) + 28, 189, 0, 40, 'Back', closeDetail, { key: 'back' });
             drawDetailChart(cv, t, r, CHART_X, 226, p.x + p.w - 24 - CHART_X, p.y + p.h - 22 - 226);
             detailGeo.count = 0;
-            const x = 48, iw = CHART_X - 48 - 48, row = (y, label, value) => {
+            const x = 48, iw = CHART_X - 48 - 48, row = (y, label, value, opts) => {
                 cv.text(label.toUpperCase(), x, y, 20, t.dim, { font: 'bold', spacing: 1.2 });
-                cv.text(fitText(cv, value, iw - 300, 24), x + 280, y, 24, t.text);
+                cv.text(fitText(cv, value, iw - 300, 24, opts), x + 280, y, 24, t.text, opts);
             };
             const uid = r.procs[0] ? r.procs[0].uid : null;
             let y = 262;
@@ -490,7 +493,7 @@ mgu.run({
                 y += 40;
                 if (pr.file != null) { row(y, 'Files, shared', fmtBytes(pr.file) + '  ·  shared memory ' + fmtBytes(pr.shm)); y += 40; }
                 const cmd = sampler.command(pr.pid);
-                if (cmd) row(y, 'Command', cmd);
+                if (cmd) row(y, 'Command', cmd, { literal: true });
                 return;
             }
             // a group: its processes, the largest first; a list that doesn't fit scrolls (a finger, the controller)
@@ -504,7 +507,9 @@ mgu.run({
                 cv.text('PID ' + pr.pid, x, ry, 22, t.dim, { font: 'num' });
                 cv.text(fmtBytes(pr.mem), x + 300, ry, 24, t.text, { align: 'right', font: 'bold' });
                 cv.text(pr.cpu == null ? '--' : pct(pr.cpu) + ' %', x + 430, ry, 22, t.dim, { align: 'right', font: 'num' });
-                cv.text(fitText(cv, sampler.command(pr.pid) || pr.name, iw - 480 - 20, 22), x + 480, ry, 22, t.dim);
+                const opts = { literal: true };
+                const command = fitText(cv, sampler.command(pr.pid) || pr.name, iw - 480 - 20, 22, opts);
+                cv.text(command, x + 480, ry, 22, t.dim, opts);
             });
             // where the list is: a bar at its right edge
             if (procs.length > visible) {

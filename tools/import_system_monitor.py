@@ -2,6 +2,7 @@
 """Package the pinned system monitor with the maintained CN app runtime."""
 import json
 import pathlib
+import re
 import shutil
 import sys
 import tempfile
@@ -38,6 +39,8 @@ def main():
         build.build("sys_monitor", "zh-CN", include_sdk=False)
         app = ROOT / "apps/sys_monitor"
         package = app / "package"
+        old_notes = read(app / "release-notes.json") if (app / "release-notes.json").exists() else []
+        old_changes = (package / "CHANGELOG.md").read_text() if (package / "CHANGELOG.md").exists() else "# Changelog\n\n## Unreleased\n"
         if package.exists():
             shutil.rmtree(package)
         shutil.copytree(pathlib.Path(temp) / "sys_monitor/source", package)
@@ -70,12 +73,12 @@ def main():
         for name in ["LICENSE", "LICENSE.MIT", "NOTICE.zh-CN.md"]:
             shutil.copy2(LOCAL / name, package / name)
         write(package / "PROVENANCE.json", provenance)
-        changes = ["新增系统监控：查看车机内存、处理器、温度和进程占用。",
+        changes = provenance.get("releaseChanges", ["新增系统监控：查看车机内存、处理器、温度和进程占用。",
                    "支持排序、进程详情和近三分钟趋势，离开应用后停止采集。",
-                   "简体中文界面，兼容国内版渲染和旋钮输入。"]
-        (package / "CHANGELOG.md").write_text(
-            "# 系统监控\n\n## Unreleased\n\n## " + version + "\n\n" +
-            "\n".join("- " + change for change in changes) + "\n")
+                   "简体中文界面，兼容国内版渲染和旋钮输入。"])
+        old_changes = re.sub(r"(?m)^## " + re.escape(version) + r"\n[\s\S]*?(?=^## |\Z)", "", old_changes)
+        heading = "## " + version + "\n\n" + "\n".join("- " + change for change in changes) + "\n\n"
+        (package / "CHANGELOG.md").write_text(re.sub(r"## Unreleased\n\s*", "## Unreleased\n\n" + heading, old_changes, count=1))
         (app / "src").mkdir(exist_ok=True)
         shutil.copy2(ROOT / "apps/warmup/src/sdk.js", app / "src/sdk.js")
         write(app / "mgu-app.json", {
@@ -89,9 +92,9 @@ def main():
             "uninstallable": True, "mguHmi": ["ID7"]})
         note = {"version": version, "upstreamVersion": provenance["upstreamVersion"],
                 "cnRevision": 1, "changes": changes}
-        write(app / "release-notes.json", [note])
+        write(app / "release-notes.json", [note] + [n for n in old_notes if n["version"] != version][:15])
         notes = read(ROOT / "release/notes.json")
-        notes["sys_monitor"] = [note]
+        notes["sys_monitor"] = [note] + [n for n in notes.get("sys_monitor", []) if n["version"] != version][:15]
         write(ROOT / "release/notes.json", notes)
     repo = read(ROOT / "release/repo.json")
     repo["unprefixedAppIds"] = sorted(set(repo["unprefixedAppIds"]) | {"sys_monitor"})

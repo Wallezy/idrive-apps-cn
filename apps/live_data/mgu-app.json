@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "id": "live_data",
-  "version": "1.0.22",
+  "version": "1.0.23",
   "tree": "package",
   "modules": [
     "src/sdk.js"

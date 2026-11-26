@@ -1,6 +1,6 @@
 {
   "name": "service",
-  "version": "1.6.7",
+  "version": "1.6.8",
   "description": "Service requirements from the instrument cluster: oil, brakes, brake fluid, vehicle check, inspection - distance, date, details; brake fluid and vehicle check reset",
   "main": "javascript/localized-entry.js",
   "private": false,

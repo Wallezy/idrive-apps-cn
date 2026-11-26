@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/cauliflowermossgrape/idrive7-apps",
-  "commit": "454e47f8b6aec5b2e0d7335257d7cc3644d9d858",
+  "commit": "527e9b2514c516a3b43f4a0643452c1ce931eeb6",
   "language": "zh-CN",
   "sdk": "Excluded; donor-linked by mgu-deploy",
   "adaptations": [
@@ -9,18 +9,18 @@
     "Numeric three-part CN versions"
   ],
   "component": "doom",
-  "upstreamVersion": "1.7.24",
-  "releaseVersion": "1.7.25",
+  "upstreamVersion": "1.7.25",
+  "releaseVersion": "1.7.27",
   "cnRevision": 1,
   "adaptedSourceFilesSha256": {
     "apps/doom/LICENSE": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643",
     "apps/doom/NOTICE": "9b1e4b22ecdaf2fd6f1f0fa897bf643c71d5bbccc81a0e81094c300fca5f29b6",
-    "apps/doom/app.json": "2ff81d3db1b53f067c5ac314d68fd12d8238f3da0316b8901e19811dec15357e",
+    "apps/doom/app.json": "d257ef7ed02469f6a26c935c79d7a48be9ee036b13d62cd544a44ddcacd2801b",
     "apps/doom/controls.js": "1f78de4bdcc9b45f819d84e350243f7f6cebb857ec94a4318cdb99e2a0939bb3",
     "apps/doom/doom-core.js": "49a1cf59a1e5d9d454bdf3b19a5bd8cc6dc6f461397951fa6f6c7792ec085465",
     "apps/doom/doom.wasm": "e0b219906aec1a8344e055abe039fb937cb976a53f481fa224b539d31b1bd5fa",
     "apps/doom/freedoom1.wad": "7323bcc168c5a45ff10749b339960e98314740a734c30d4b9f3337001f9e703d",
-    "apps/doom/icon.png": "4e1059afa6ca3023f873d2d2c7c44843d959b9bd16d4c905da2a3dd05f2a37f2",
+    "apps/doom/icon.png": "25cb66a439641d1c87fbf15da13b0e180fa51e1427335dab23b19d2392ed63e4",
     "apps/doom/main.js": "1f676523df66a2992051e3609c99eb85af8ee28bc30ec3fd7e2b3d66cd21a8f0"
   }
 }

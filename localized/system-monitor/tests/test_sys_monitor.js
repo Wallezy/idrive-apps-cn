@@ -39,7 +39,7 @@ const KB = 1024, MB = 1024 * KB;
         .replace(/\/\*[\s\S]*?\*\//g, '')          // comments may say what it doesn't do
         .replace(/(^|[^:'"\\])\/\/.*$/gm, '$1');
     // the guard itself: each of these must be caught (by a pattern, or by the allowed modules below)
-    const allowedRequire = /require\(\s*['"](fs|os|path|\.\/kit\/(mgu|canvas|gauges)|\.\/(procs|sample))['"]\s*\)/;
+    const allowedRequire = /require\(\s*['"](fs|os|path|\.\/kit\/(mgu|canvas|gauges|i18n)|\.\/(procs|sample))['"]\s*\)/;
     const caught = (src) => FORBIDDEN.some((x) => x[0].test(src)) || (src.match(/require\(\s*['"][^'"]+['"]\s*\)/g) || []).some((r) => !allowedRequire.test(r));
     ["process.kill(pid, 'SIGKILL')", 'process .kill(1)', 'p.kill()', "require('child_process')", "const { exec } = cp; exec('reboot')",
         "cp.execFileSync('kill', ['-9', '1'])", "fs.writeFileSync('/etc/x', 'y')", "fs.unlinkSync('/var/opt/x')", "fs.openSync(f, 'w')",

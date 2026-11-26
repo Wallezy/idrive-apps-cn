@@ -95,6 +95,7 @@
     "Audio may cut out. On your iPhone, turn Wi-Fi off and on.": "Ses kesilebilir. iPhone'unuzda Wi-Fi'yi kapatıp açın.",
     "Own settings for this driver": "Bu sürücüye özel ayarlar",
     "Keep HUD map over BMW's pop-ups": "HUD haritasını BMW açılır pencerelerinin üstünde tut",
-    "Cluster fullscreen": "Gösterge paneli tam ekran"
+    "Cluster fullscreen": "Gösterge paneli tam ekran",
+    "Driver profile can't be read": "Sürücü profili okunamıyor"
   }
 }

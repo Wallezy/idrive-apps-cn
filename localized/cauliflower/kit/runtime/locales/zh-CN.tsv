@@ -25,6 +25,7 @@
 12 V details	12 V 详情
 12 V power	12 V 功率
 12 V side voltage	12 V 侧电压
+15 min	15 分钟
 150 ms	150 ms
 1: Outpost Outbreak	1：前哨危机
 2	2
@@ -222,6 +223,7 @@ Boost unit	增压单位
 Boost: target vs actual	增压压力：目标值与实际值
 Bosch MG1 · electric flap	博世 MG1：电动阀门
 Bosch MG1 — electric flap	博世 MG1：电动阀门
+Both door lines	两侧车门灯带
 Bottom right corner	右下角
 Brake Test	制动测试
 Brake fade	制动衰减
@@ -335,11 +337,13 @@ Cold KF	冷态 KF
 Cold KF1	冷态 KF1
 Cold KF2	冷态 KF2
 Cold correction (raw units)	冷态修正（原始单位）
+Cold engine zone	冷机转速区
 Cold evaluations	冷态评估次数
 Cold limit	冷机上限
 Cold maps contain single upshifts only	冷态图仅包含逐级升挡
 Cold rev limit	冷机转速上限
 Cold shift counter	冷态换挡计数
+Cold zone	冷机转速区
 Cold-engine rev guard	冷机转速保护
 Cold-engine shift limit	冷机换挡上限
 Colour	颜色
@@ -885,6 +889,7 @@ Last trips	最近行程
 Launch time	起步成绩
 Launch time (0-100 km/h or 0-60 mph after a standing start, against your best)	起步加速成绩与最佳成绩对比
 Launch when ready	准备好后起步
+Layout	布局
 Layout:	布局：
 Learn from driving (redline, shift points, reaction time)	行驶学习（转速、换挡点、反应时间）
 Learn high beam	识别远光灯
@@ -1117,6 +1122,7 @@ OUTSIDE	车外温度
 Odometer	总里程
 Off	关闭
 Off (no engine unit requests)	关闭（不查询发动机控制单元）
+Off by day	白天关闭
 Off · nothing is sent (safe)	关闭 · 不发送任何指令（安全）
 Off · nothing is sent to the car (safe)	关闭：不向车辆发送指令（安全）
 Off · the car takes over after ~20 s	关闭：约 20 秒后由车辆控制
@@ -2085,6 +2091,7 @@ the high beam's channels are not known yet (Learn)	请先识别远光灯通道
 the high beams did not follow	远光灯未按指令响应
 the lamp test does not light the high beam's channels (Learn again)	灯光测试未点亮远光通道，请重新识别
 there	处
+this app	本应用
 this drive	本次行程
 this unit has no such value	此控制单元没有这个数值
 to other drivers.	以免危及其他驾驶者。

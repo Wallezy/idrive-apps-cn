@@ -132,13 +132,13 @@ function recorder(w, h) {
 }
 // G.panel draws its title in a cached layer: noted here, where it lands on the page
 const G = Object.assign({}, realG, {
-    panel(cv, t, x, y, w, h, title) {
-        const p = realG.panel(cv, t, x, y, w, h, title);
+    panel(cv, t, x, y, w, h, title, literal) {
+        const p = realG.panel(cv, t, x, y, w, h, title, literal);
         if (frame) {
             frame.panels.push({ x: p.x, y: p.y, w: p.w, h: p.h, title });
             if (title) {
                 const size = Math.max(26, cv.minText || 0);
-                frame.texts.push(box(title, p.x + 18, p.y + 42, size, null, cv.textWidth(String(title), 26, { font: 'bold' })));
+                frame.texts.push(box(title, p.x + 18, p.y + 42, size, null, cv.textWidth(String(title), 26, { font: 'bold', literal })));
             }
         }
         return p;
@@ -186,6 +186,7 @@ async function runApp(m, name) {
             if (req === './kit/mgu') return { run: (x) => { impl = x; } };
             if (req === './kit/canvas') return require(path.join(KIT, 'canvas'));
             if (req === './kit/gauges') return G;
+            if (req === './kit/i18n') return require(path.join(KIT, 'i18n'));
             if (req === './procs') return Object.assign({}, realProcs, { Sampler: NoProc });
             if (req === './sample') return { SampleSampler: FixtureSampler };
         }

@@ -1,7 +1,7 @@
 {
  "id": "sys_monitor",
  "title": "\u7cfb\u7edf\u76d1\u63a7",
- "version": "1.0.10",
+ "version": "1.0.11",
  "screens": [
   {
    "name": "MAIN",
