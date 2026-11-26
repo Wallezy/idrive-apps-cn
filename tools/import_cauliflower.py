@@ -50,7 +50,9 @@ def main():
    (app/'src').mkdir(exist_ok=True);(app/'src/sdk.js').write_bytes((ROOT/'apps/warmup/src/sdk.js').read_bytes())
    write(app/'mgu-app.json',{'schema':1,'id':identity,'version':version,'tree':'package','modules':['src/sdk.js'],'sdk':['oap-sdk/src/core/OnlineApp.js','oap-sdk/src/logging/logging']})
    requires={'mgu-deploy':'0.8.18','mgu-render':'0.6.24','mgu-inputgate':'1.1.1','robertn_store':'0.9.45'}
-   if identity=='redline':requires['cluster-render']='0.6.2'
+   if identity=='redline':
+    requires['cluster-render']='0.6.2'
+    requires['mgu-deploy']='0.8.32'
    write(app/'release.json',{'build':'node ../../tools/build_localized.js','requires':requires,'uninstallable':True,'mguHmi':['ID7']})
    write(app/'release-notes.json',[{'version':version,'upstreamVersion':spec['version'],'cnRevision':item['cnRevision'],'changes':changes}]+[n for n in old_notes if n['version']!=version][:15])
    baseline['components'][identity]=version
