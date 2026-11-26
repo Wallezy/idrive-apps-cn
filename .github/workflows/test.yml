@@ -163,7 +163,7 @@ jobs:
           if make -C native/waze-on-cluster test > "$RUNNER_TEMP/map-tests.log" 2>&1; then
             tail -n 10 "$RUNNER_TEMP/map-tests.log"
           else
-            grep -n -B 8 -A 25 -E 'not ok|AssertionError|error:|make.*\*\*\*|failed|FAILED' "$RUNNER_TEMP/map-tests.log" || true
+            grep -n -B 8 -A 25 -E 'not ok|AssertionError|^Error:|^fatal:|error:|make.*\*\*\*|^FAIL' "$RUNNER_TEMP/map-tests.log" || true
             tail -n 40 "$RUNNER_TEMP/map-tests.log"
             exit 1
           fi

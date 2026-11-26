@@ -149,7 +149,10 @@ var RELEASES = list.map(function (t) { return t.slice('waze-on-cluster@'.length)
     .sort(cmp).filter(function (v) { return BIN || group(v) !== 'A'; });
 function git(args) { return cp.execFileSync('git', args, { cwd: REPO, stdio: ['ignore', 'pipe', 'pipe'] }).toString(); }
 try { git(['cat-file', '-e', CN_REF]); }
-catch (e) { git(['fetch', '--no-tags', '--depth=1', 'origin', CN_REF]); }
+catch (e) {
+    var cnFetchWhy = releaseTags.fetchCommit(CN_REF);
+    if (cnFetchWhy) throw new Error('Cannot fetch historical CN release ' + CN_REF + ': ' + cnFetchWhy);
+}
 RELEASES.push(CN_VERSION);
 RELEASES.forEach(function (v) {
     var d = path.join(dir, 'rel', v);

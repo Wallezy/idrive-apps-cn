@@ -16,6 +16,7 @@
  *   tags.has(tag)        whether the tag is at hand
  *   tags.fetch(pattern)  fetches refs/tags/<pattern> ('waze-on-cluster@0.10.12',
  *                        'waze-on-cluster@*'); '' when it worked, else git's words
+ *   tags.fetchCommit(ref) fetches an immutable historical CN commit from origin
  */
 'use strict';
 
@@ -37,10 +38,10 @@ function has(tag) { var l = list(); return !!l && l.indexOf(tag) >= 0; }
 /* Blocks this process for ms: the test scripts are synchronous here. */
 function pause(ms) { Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms); }
 
-function fetch(pattern) {
+function fetchArgs(remote, refs) {
     var shallow = false;
     try { shallow = git(['rev-parse', '--is-shallow-repository']).trim() === 'true'; } catch (e) {}
-    var args = ['fetch', '--no-tags'].concat(shallow ? ['--depth=1'] : [], [process.env.WOC_RELEASE_REMOTE || 'origin', '+refs/tags/' + pattern + ':refs/tags/' + pattern]);
+    var args = ['fetch', '--no-tags'].concat(shallow ? ['--depth=1'] : [], [remote], refs);
     var end = Date.now() + FETCH_MS, wait = 50;
     for (;;) {
         var r = cp.spawnSync('git', args, { cwd: REPO, encoding: 'utf8' });
@@ -52,4 +53,13 @@ function fetch(pattern) {
     }
 }
 
-module.exports = { list: list, has: has, fetch: fetch, REPO: REPO };
+function fetch(pattern) {
+    return fetchArgs(process.env.WOC_RELEASE_REMOTE || 'origin',
+        ['+refs/tags/' + pattern + ':refs/tags/' + pattern]);
+}
+
+function fetchCommit(ref) {
+    return fetchArgs('origin', [ref]);
+}
+
+module.exports = { list: list, has: has, fetch: fetch, fetchCommit: fetchCommit, REPO: REPO };
