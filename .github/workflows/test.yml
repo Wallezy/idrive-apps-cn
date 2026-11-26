@@ -158,7 +158,23 @@ jobs:
         with:
           node-version: 22.12.0
       - if: needs.changes.outputs.waze-on-cluster == 'true'
-        run: make -C native/waze-on-cluster test
+        name: Map service tests
+        run: |
+          if make -C native/waze-on-cluster test > "$RUNNER_TEMP/map-tests.log" 2>&1; then
+            tail -n 10 "$RUNNER_TEMP/map-tests.log"
+          else
+            grep -n -B 8 -A 25 -E 'not ok|AssertionError|error:|make.*\*\*\*|failed|FAILED' "$RUNNER_TEMP/map-tests.log" || true
+            tail -n 40 "$RUNNER_TEMP/map-tests.log"
+            exit 1
+          fi
+      - name: Retain map test diagnostics
+        if: always() && needs.changes.outputs.waze-on-cluster == 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: map-tests-${{ github.sha }}
+          path: ${{ runner.temp }}/map-tests.log
+          if-no-files-found: error
+          retention-days: 7
       - run: node apps/robertn_waze_cluster/tools/test_control.js
       - run: node apps/robertn_waze_cluster/tools/test_page.js
       - run: node apps/robertn_waze_cluster/tools/test_profiles.js
