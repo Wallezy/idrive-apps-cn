@@ -1862,7 +1862,6 @@ void Server::report(int64_t now_ms)
             const Host &h = x.host;
             const std::string &name = slots_->targets()[x.target].name;
             hosts_[name] = cr::json_object({{"ev", cr::json_quote("host")},
-                                            {"app", cr::json_quote(app_of(x.owner))},
                                             {"target", cr::json_quote(name)},
                                             {"into", cr::json_quote(slots_->targets()[x.into].name)},
                                             {"shown", h.shown ? "1" : "0"},
@@ -1873,7 +1872,8 @@ void Server::report(int64_t now_ms)
                                             {"src_x", std::to_string(h.src.x)},
                                             {"src_y", std::to_string(h.src.y)},
                                             {"src_w", std::to_string(h.src.w)},
-                                            {"src_h", std::to_string(h.src.h)}});
+                                            {"src_h", std::to_string(h.src.h)},
+                                            {"app", cr::json_quote(app_of(x.owner))}});
         }
     }
     /* others_fps (PROTOCOL.md): who holds the others' videos, logged as it

@@ -78,7 +78,7 @@
   },
   {
    "key": "dayOff",
-   "label": "Off by day (on when the car switches to night)",
+   "label": "\u767d\u5929\u5173\u95ed\uff0c\u591c\u95f4\u81ea\u52a8\u5f00\u542f",
    "type": "bool",
    "default": false
   },
@@ -117,7 +117,7 @@
   },
   {
    "key": "blinkBoth",
-   "label": "Turn glow and door red on both strips of a door line (G26: slower blink)",
+   "label": "\u4e24\u4fa7\u8f66\u95e8\u706f\u5e26\u8054\u52a8\uff08G26 \u964d\u4f4e\u95ea\u70c1\u9891\u7387\uff09",
    "type": "bool",
    "default": false
   },

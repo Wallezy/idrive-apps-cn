@@ -338,6 +338,7 @@ Cold KF1	冷态 KF1
 Cold KF2	冷态 KF2
 Cold correction (raw units)	冷态修正（原始单位）
 Cold engine zone	冷机转速区
+Cold engine: rpm bar faded yellow from the cold limit to the redline	冷机转速区渐变黄色提示
 Cold evaluations	冷态评估次数
 Cold limit	冷机上限
 Cold maps contain single upshifts only	冷态图仅包含逐级升挡
@@ -1123,6 +1124,7 @@ Odometer	总里程
 Off	关闭
 Off (no engine unit requests)	关闭（不查询发动机控制单元）
 Off by day	白天关闭
+Off by day (on when the car switches to night)	白天关闭，夜间自动开启
 Off · nothing is sent (safe)	关闭 · 不发送任何指令（安全）
 Off · nothing is sent to the car (safe)	关闭：不向车辆发送指令（安全）
 Off · the car takes over after ~20 s	关闭：约 20 秒后由车辆控制
@@ -1635,6 +1637,7 @@ Try any (unverified)	尝试所有版本（未经验证）
 Tuning software	调校软件
 Turbine / input	涡轮／输入轴
 Turbo cool-down after hard driving	激烈驾驶后涡轮冷却
+Turn glow and door red on both strips of a door line (G26: slower blink)	两侧车门灯带联动（G26 降低闪烁频率）
 Turn left	向左转
 Turn right	向右转
 Turn signal glow	转向绿光

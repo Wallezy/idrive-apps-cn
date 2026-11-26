@@ -2133,6 +2133,9 @@
     "Cold engine zone": "冷机转速区",
     "Cold zone": "冷机转速区",
     "this app": "本应用",
-    "15 min": "15 分钟"
+    "15 min": "15 分钟",
+    "Off by day (on when the car switches to night)": "白天关闭，夜间自动开启",
+    "Turn glow and door red on both strips of a door line (G26: slower blink)": "两侧车门灯带联动（G26 降低闪烁频率）",
+    "Cold engine: rpm bar faded yellow from the cold limit to the redline": "冷机转速区渐变黄色提示"
   }
 }

@@ -28,7 +28,7 @@ try {
         assert.strictEqual(pkg.version, manifest.version);
         assert.strictEqual(pkg.mguLocalOnly, true);
         assert.deepStrictEqual(release.mguHmi, ['ID7']);
-        assert.strictEqual(release.requires['mgu-deploy'], id === 'sys_monitor' ? '0.8.25' :
+        assert.strictEqual(release.requires['mgu-deploy'], id === 'redline' ? '0.8.32' : id === 'sys_monitor' ? '0.8.25' :
             id === 'cluster_metrics' ? '0.8.23' : iterio.has(id) || bmrmodz.has(id) ? '0.8.28' : '0.8.18');
         if (linkedUnits.has(id) || iterio.has(id)) {
             assert(['javascript/app.js', 'javascript/runner.js'].includes(pkg.main));
