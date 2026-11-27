@@ -1,12 +1,20 @@
 [
   {
+    "version": "2.1.2",
+    "changes": [
+      "新增换挡统计与降挡状态显示。"
+    ],
+    "upstreamVersion": "2.1.1",
+    "cnRevision": 1
+  },
+  {
     "version": "2.0.55",
-    "upstreamVersion": "2.0.54",
-    "cnRevision": 1,
     "changes": [
       "新增冷机转速提示，改善手动挡挡位识别。",
       "车机启动后恢复已启用的 HUD 显示。"
-    ]
+    ],
+    "upstreamVersion": "2.0.54",
+    "cnRevision": 1
   },
   {
     "version": "2.0.51",

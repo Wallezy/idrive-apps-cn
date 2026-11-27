@@ -35,12 +35,14 @@ def main():
     spec.loader.exec_module(baker)
     baker.FONTDIR = str(font.parent)
     words = json.loads((ROOT / 'kit/runtime/locales/zh-CN.json').read_text(encoding='utf-8'))
+    translated = ''.join(words.values())
     if diagnostic:
         from build_diagnostic_zh import catalog
-        words.update(catalog())
+        # UI and diagnostic meanings of one English key can use different glyphs.
+        translated += ''.join(catalog().values())
     # Only the app's own translated glyphs, ASCII and its units/symbols: never the full CJK block.
     credit_source = (ROOT / 'kit/localization/credit.zh-CN.json').read_text(encoding='utf-8')
-    chars = ''.join(sorted(set(baker.TEXT + ''.join(words.values()) + credit_source)))
+    chars = ''.join(sorted(set(baker.TEXT + translated + credit_source)))
     for size in (48, 44, 40, 36, 32):
         atlas = baker.bake(font.name, (500,), size, chars)
         if atlas['atlasH'] <= 2048:

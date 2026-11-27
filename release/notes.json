@@ -2,12 +2,12 @@
   "cluster-render": [
     {
       "version": "0.8.15",
-      "upstreamVersion": "0.8.14",
-      "cnRevision": 1,
       "changes": [
         "减少隐藏地图的画面传输，改善切回地图时的恢复。",
         "提供主题身份识别，保留全屏与原厂告警避让。"
-      ]
+      ],
+      "upstreamVersion": "0.8.14",
+      "cnRevision": 1
     },
     {
       "version": "0.8.13",
@@ -109,13 +109,22 @@
   ],
   "waze-on-cluster": [
     {
+      "version": "0.14.20",
+      "changes": [
+        "完善仪表编码兼容判断，改善固件更新与重启后的地图恢复。",
+        "保留仪表全屏、HUD 与原厂告警避让。"
+      ],
+      "upstreamVersion": "0.14.19",
+      "cnRevision": 1
+    },
+    {
       "version": "0.14.18",
-      "upstreamVersion": "0.14.17",
-      "cnRevision": 1,
       "changes": [
         "独立保存驾驶员地图设置，防止设置串用。",
         "降低隐藏地图的绘制开销，改善再次显示时的响应。"
-      ]
+      ],
+      "upstreamVersion": "0.14.17",
+      "cnRevision": 1
     },
     {
       "version": "0.14.15",
@@ -216,13 +225,22 @@
   ],
   "robertn_waze_cluster": [
     {
+      "version": "0.6.24",
+      "changes": [
+        "明确显示内置地图、仪表不支持及需要重新应用的状态。",
+        "保留中文提示、全屏与显示位置设置。"
+      ],
+      "upstreamVersion": "0.6.18",
+      "cnRevision": 1
+    },
+    {
       "version": "0.6.23",
-      "upstreamVersion": "0.6.17",
-      "cnRevision": 1,
       "changes": [
         "改善驾驶员设置读取与切换，增加读取失败提示。",
         "保留仪表全屏、位置与 HUD 设置。"
-      ]
+      ],
+      "upstreamVersion": "0.6.17",
+      "cnRevision": 1
     },
     {
       "version": "0.6.22",
@@ -505,12 +523,12 @@
   "sys_monitor": [
     {
       "version": "1.0.11",
-      "upstreamVersion": "1.0.9",
-      "cnRevision": 1,
       "changes": [
         "修复失效应用入口导致无法打开的问题。",
         "进程名与命令保留原文，改善中文显示。"
-      ]
+      ],
+      "upstreamVersion": "1.0.9",
+      "cnRevision": 1
     },
     {
       "version": "1.0.10",
@@ -545,12 +563,12 @@
   "ambient_config": [
     {
       "version": "2.7.28",
-      "upstreamVersion": "2.7.27",
-      "cnRevision": 1,
       "changes": [
         "新增白天关闭和两侧车门灯带提示选项。",
         "完善灯光模块识别、启动重试与灯光效果恢复。"
-      ]
+      ],
+      "upstreamVersion": "2.7.27",
+      "cnRevision": 1
     },
     {
       "version": "2.7.25",
@@ -644,11 +662,11 @@
   "brake_test": [
     {
       "version": "1.5.26",
-      "upstreamVersion": "1.5.24",
-      "cnRevision": 1,
       "changes": [
         "优化应用图标与后台资源释放。"
-      ]
+      ],
+      "upstreamVersion": "1.5.24",
+      "cnRevision": 1
     },
     {
       "version": "1.5.25",
@@ -695,11 +713,11 @@
   "car_vitals": [
     {
       "version": "2.27.15",
-      "upstreamVersion": "2.27.14",
-      "cnRevision": 1,
       "changes": [
         "新增冷机转速区显示开关。"
-      ]
+      ],
+      "upstreamVersion": "2.27.14",
+      "cnRevision": 1
     },
     {
       "version": "2.27.14",
@@ -755,11 +773,11 @@
   "doom": [
     {
       "version": "1.7.27",
-      "upstreamVersion": "1.7.25",
-      "cnRevision": 1,
       "changes": [
         "优化应用图标与后台资源释放。"
-      ]
+      ],
+      "upstreamVersion": "1.7.25",
+      "cnRevision": 1
     },
     {
       "version": "1.7.26",
@@ -806,11 +824,11 @@
   "draggy": [
     {
       "version": "2.7.5",
-      "upstreamVersion": "2.7.3",
-      "cnRevision": 1,
       "changes": [
         "优化应用图标与后台资源释放。"
-      ]
+      ],
+      "upstreamVersion": "2.7.3",
+      "cnRevision": 1
     },
     {
       "version": "2.7.4",
@@ -866,11 +884,11 @@
   "dtc_scanner": [
     {
       "version": "2.9.13",
-      "upstreamVersion": "2.9.11",
-      "cnRevision": 1,
       "changes": [
         "离开页面后停止诊断与状态订阅，减少后台占用。"
-      ]
+      ],
+      "upstreamVersion": "2.9.11",
+      "cnRevision": 1
     },
     {
       "version": "2.9.12",
@@ -882,11 +900,11 @@
     },
     {
       "version": "2.9.11",
-      "upstreamVersion": "2.9.10",
-      "cnRevision": 1,
       "changes": [
         "优化旋钮焦点和选项切换的显示，保留简体中文。"
-      ]
+      ],
+      "upstreamVersion": "2.9.10",
+      "cnRevision": 1
     },
     {
       "version": "2.9.10",
@@ -926,11 +944,11 @@
   "dyno": [
     {
       "version": "1.6.8",
-      "upstreamVersion": "1.6.6",
-      "cnRevision": 1,
       "changes": [
         "优化应用图标与后台资源释放。"
-      ]
+      ],
+      "upstreamVersion": "1.6.6",
+      "cnRevision": 1
     },
     {
       "version": "1.6.7",
@@ -977,11 +995,11 @@
   "edrive": [
     {
       "version": "2.11.7",
-      "upstreamVersion": "2.11.5",
-      "cnRevision": 1,
       "changes": [
         "优化应用图标与后台资源释放。"
-      ]
+      ],
+      "upstreamVersion": "2.11.5",
+      "cnRevision": 1
     },
     {
       "version": "2.11.6",
@@ -1038,11 +1056,11 @@
   "gforce": [
     {
       "version": "1.6.27",
-      "upstreamVersion": "1.6.25",
-      "cnRevision": 1,
       "changes": [
         "优化应用图标与后台资源释放。"
-      ]
+      ],
+      "upstreamVersion": "1.6.25",
+      "cnRevision": 1
     },
     {
       "version": "1.6.26",
@@ -1089,11 +1107,11 @@
   "live_adjustments": [
     {
       "version": "0.9.15",
-      "upstreamVersion": "0.9.14",
-      "cnRevision": 1,
       "changes": [
         "改善 BM3 状态读取和排气阀控制失败提示。"
-      ]
+      ],
+      "upstreamVersion": "0.9.14",
+      "cnRevision": 1
     },
     {
       "version": "0.9.14",
@@ -1132,12 +1150,12 @@
   "live_data": [
     {
       "version": "1.0.23",
-      "upstreamVersion": "1.0.21",
-      "cnRevision": 1,
       "changes": [
         "行程时间按北京时间（UTC+8）显示，日期使用中文格式。",
         "优化应用图标与后台资源释放。"
-      ]
+      ],
+      "upstreamVersion": "1.0.21",
+      "cnRevision": 1
     },
     {
       "version": "1.0.22",
@@ -1176,12 +1194,12 @@
   "redline": [
     {
       "version": "2.0.55",
-      "upstreamVersion": "2.0.54",
-      "cnRevision": 1,
       "changes": [
         "新增冷机转速提示，改善手动挡挡位识别。",
         "车机启动后恢复已启用的 HUD 显示。"
-      ]
+      ],
+      "upstreamVersion": "2.0.54",
+      "cnRevision": 1
     },
     {
       "version": "2.0.51",
@@ -1238,11 +1256,11 @@
   "service": [
     {
       "version": "1.6.8",
-      "upstreamVersion": "1.6.7",
-      "cnRevision": 1,
       "changes": [
         "仅在页面显示时读取保养状态，减少后台占用。"
-      ]
+      ],
+      "upstreamVersion": "1.6.7",
+      "cnRevision": 1
     },
     {
       "version": "1.6.7",
@@ -1289,11 +1307,11 @@
   "warmup": [
     {
       "version": "1.9.5",
-      "upstreamVersion": "1.9.3",
-      "cnRevision": 1,
       "changes": [
         "优化应用图标与后台资源释放。"
-      ]
+      ],
+      "upstreamVersion": "1.9.3",
+      "cnRevision": 1
     },
     {
       "version": "1.9.4",
@@ -1340,11 +1358,11 @@
   "zf8hp": [
     {
       "version": "1.5.13",
-      "upstreamVersion": "1.5.11",
-      "cnRevision": 1,
       "changes": [
         "优化应用图标与后台资源释放。"
-      ]
+      ],
+      "upstreamVersion": "1.5.11",
+      "cnRevision": 1
     },
     {
       "version": "1.5.12",
@@ -1391,12 +1409,12 @@
     },
     {
       "version": "0.19.11",
-      "upstreamVersion": "0.19.10",
-      "cnRevision": 1,
       "changes": [
         "改善地图在纯图层主题中的显示兼容。",
         "隐藏或退出主题时恢复地图，优化 M 视图布局。"
-      ]
+      ],
+      "upstreamVersion": "0.19.10",
+      "cnRevision": 1
     }
   ],
   "iteriodev_turnview": [
@@ -1456,12 +1474,12 @@
   "iteriodev-turnview": [
     {
       "version": "0.11.1",
-      "upstreamVersion": "0.11.0",
-      "cnRevision": 1,
       "changes": [
         "适配仪表主题嵌入画面，避免误识别其他主题。",
         "优化摄像头画面切换和资源释放。"
-      ]
+      ],
+      "upstreamVersion": "0.11.0",
+      "cnRevision": 1
     },
     {
       "version": "0.10.2",

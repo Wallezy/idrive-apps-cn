@@ -156,6 +156,44 @@
       "broadcasts": [
         "sendTasuResponse"
       ]
+    },
+    "de.bmw.infotainment.KombiIF": {
+      "instances": "1",
+      "attributes": {
+        "statusRangeTankStatus": "rs"
+      }
+    },
+    "de.bmw.infotainment.vehicle.CDS": {
+      "instances": "1",
+      "attributes": {
+        "statusEngineSpeed2": "rs",
+        "statusEngineTemperature": "rs",
+        "statusBattery2": "rs"
+      }
+    },
+    "de.bmw.infotainment.vehicle.Vehicle2": {
+      "instances": "1",
+      "attributes": {
+        "statusCarSpeed2": "rs"
+      }
+    },
+    "de.bmw.infotainment.vehicle.CDS2": {
+      "instances": "1",
+      "attributes": {
+        "statusLongitudinalAccelerationMassCenter": "rs"
+      }
+    },
+    "de.bmw.infotainment.drivingexcitement.FES": {
+      "instances": "1",
+      "attributes": {
+        "statusActualValueTorque2": "rs"
+      }
+    },
+    "de.bmw.infrastructure.VehicleCondition": {
+      "instances": "1",
+      "attributes": {
+        "VehicleCondition": "s"
+      }
     }
   },
   "services": {

@@ -1,7 +1,7 @@
 {
   "name": "redline",
-  "version": "2.0.55",
-  "description": "Full-screen rev tach with shift lights, gear, shift scoring and cold-engine rev guard; HUD by @biscotit",
+  "version": "2.1.2",
+  "description": "Full-screen rev tach with shift lights, gear, shift scoring and cold-engine rev guard; shift times, pull per gear and kickdowns; HUD by @biscotit",
   "main": "javascript/localized-entry.js",
   "private": false,
   "author": "cauliflowermossgrape",

@@ -46,6 +46,7 @@ jobs:
           node localized/cauliflower/kit/tools/test_ambient_rgb.js
           node localized/cauliflower/kit/tools/test_ambient_strobe.js
           node localized/cauliflower/kit/tools/test_ambient_others.js
+          node localized/cauliflower/kit/tools/test_ambient_lamps.js
       - name: Enhanced vehicle applications
         run: |
           node tools/test_redline_enhanced.js
@@ -61,6 +62,14 @@ jobs:
           node localized/cauliflower/kit/tools/test_signals_poll.js
           node localized/cauliflower/kit/tools/test_redline_dmegear.js
           node localized/cauliflower/kit/tools/test_dtc_idle.js
+          node localized/cauliflower/kit/tools/test_safe_boot.js
+          node localized/cauliflower/kit/tools/test_panic.js
+          node localized/cauliflower/kit/tools/test_hud_claim.js
+          node localized/cauliflower/kit/tools/test_signal_hunter.js
+          node localized/cauliflower/kit/tools/test_gforce_recordings.js
+          node localized/cauliflower/kit/tools/test_gforce_recorder.js
+          node localized/cauliflower/kit/tools/test_blend.js
+          node localized/cauliflower/kit/tools/test_redline_shiftlab.js
           make -C native/mgu-inputgate test
       - name: Cluster Metrics Chinese Beta
         run: |

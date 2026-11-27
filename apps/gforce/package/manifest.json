@@ -154,7 +154,15 @@
     "de.bmw.infotainment.vehicle.CDS": {
       "instances": "1",
       "attributes": {
-        "statusEngineSpeed2": "rs"
+        "statusEngineSpeed2": "rs",
+        "statusEngineTemperature": "rs"
+      }
+    },
+    "de.bmw.infotainment.drivingexcitement.FES": {
+      "instances": "1",
+      "attributes": {
+        "statusActualValueTorque2": "rs",
+        "statusFESVehicleDynamicSwitchHMI": "rs"
       }
     }
   },

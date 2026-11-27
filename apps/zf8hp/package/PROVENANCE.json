@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/cauliflowermossgrape/idrive7-apps",
-  "commit": "527e9b2514c516a3b43f4a0643452c1ce931eeb6",
+  "commit": "f54fc279d309ca12eba129b676d755c6f02f5a06",
   "language": "zh-CN",
   "sdk": "Excluded; donor-linked by mgu-deploy",
   "adaptations": [
@@ -9,12 +9,12 @@
     "Numeric three-part CN versions"
   ],
   "component": "zf8hp",
-  "upstreamVersion": "1.5.11",
-  "releaseVersion": "1.5.13",
+  "upstreamVersion": "1.5.13",
+  "releaseVersion": "1.5.14",
   "cnRevision": 1,
   "adaptedSourceFilesSha256": {
     "apps/zf8hp/README.md": "1f23143b1fc2dd0703315b8bf7062277e69fe3fa22cc2e5d4d19c1e7390cbbf5",
-    "apps/zf8hp/app.json": "8fffec9e274bf203e38e1c96834b28c6e8a483dfb2d19bb1848b3cc5b516d525",
+    "apps/zf8hp/app.json": "e7fad470c42e876a5f114b34e1944e354c8bb39065a522c58909e4f33d3467c7",
     "apps/zf8hp/catalog.js": "bd7b3d01094089191ad4be4edc99daf9f8b534945f7505332d5309623a54daaa",
     "apps/zf8hp/demo.js": "b0cdd6f137ce3bf65a4766b7f374222e2e62550647ab0b6c38841d0dc77b7075",
     "apps/zf8hp/egs.js": "1ae6f74dd87d19dc9c7e4c3fae3665dbaef2f6470154a4bdf1a7f92184b3a59a",

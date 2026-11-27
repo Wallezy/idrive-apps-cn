@@ -1,11 +1,19 @@
 [
   {
+    "version": "1.6.9",
+    "changes": [
+      "完善设置历史、异常启动保护与停止功能。"
+    ],
+    "upstreamVersion": "1.6.8",
+    "cnRevision": 1
+  },
+  {
     "version": "1.6.8",
-    "upstreamVersion": "1.6.6",
-    "cnRevision": 1,
     "changes": [
       "优化应用图标与后台资源释放。"
-    ]
+    ],
+    "upstreamVersion": "1.6.6",
+    "cnRevision": 1
   },
   {
     "version": "1.6.7",

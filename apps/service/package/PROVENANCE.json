@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/cauliflowermossgrape/idrive7-apps",
-  "commit": "527e9b2514c516a3b43f4a0643452c1ce931eeb6",
+  "commit": "f54fc279d309ca12eba129b676d755c6f02f5a06",
   "language": "zh-CN",
   "sdk": "Excluded; donor-linked by mgu-deploy",
   "adaptations": [
@@ -9,12 +9,23 @@
     "Numeric three-part CN versions"
   ],
   "component": "service",
-  "upstreamVersion": "1.6.7",
-  "releaseVersion": "1.6.8",
+  "upstreamVersion": "1.7.1",
+  "releaseVersion": "1.7.2",
   "cnRevision": 1,
   "adaptedSourceFilesSha256": {
-    "apps/service/app.json": "a45411fc41612a166abddd842eca7456edf41915f77473612e53481941dd3150",
+    "apps/service/app.json": "4e1f689c4a8a217525729dbf402fe023d2dafaf956fe31955b88db2ef4b51cc5",
+    "apps/service/battery_log.js": "efe771621f7913878fac76fb5bb5690e9d64e58f7ad901065af5cc2e8fe2452c",
+    "apps/service/battery_read.js": "ae9af826de0883c60ad148262723a2afa596db2d45bddd2aab3ca0dcbbf494fe",
+    "apps/service/battery_view.js": "03b266e46df118a16b7b7f3f81465f02c9faedd1f99f4db35ecbdcce8d12af74",
+    "apps/service/extras.js": "b6135b8a088793bee8c6738ea78c2de9d3627d73a852775c975a0e35a4edd524",
+    "apps/service/garage.js": "ad47e4fb5770c16a76237341921519c233c519004395431593f545028b17a4a7",
+    "apps/service/garage_view.js": "4c6870852a8cf7614069bce2b813511012f3743e6d728a4e99024d45dfe9316d",
     "apps/service/icon.png": "44dd4cf41e45412669d17cab15ce9e7878c5b1bf16ab6c5e1deb594660192936",
-    "apps/service/main.js": "bffb22efebd9a54850e65f5775167f08167d99488f391470ff5d8daf98b65598"
+    "apps/service/main.js": "1afd4176f5fb84392a866fc29ebadbe5af91aa5c7d8eada21c5a0fc2180eccd0",
+    "apps/service/more.js": "5c04349d7b5add720fc0510075c9163c6a4761e220df8b5d3c77029ff6288ef3",
+    "apps/service/own_items.js": "7a567032c881abe62254d1ac250773825e9a1abd06e8b814d6be71c37c6ce0ff",
+    "apps/service/own_view.js": "09b6d5bab45f3286f1f3365bd1b52bf94d4197c1e88de98fac7a7f8dd8bdd018",
+    "apps/service/own_wear.js": "b9f3449ed51ca4b50d006de3dbaafd678ece053b82f57c9a96e04e237ee58ff8",
+    "apps/service/own_wheels.js": "fd0f0b900447a5ea0923fe497a0e1adb7e659390571113566a95acc73bda0c81"
   }
 }

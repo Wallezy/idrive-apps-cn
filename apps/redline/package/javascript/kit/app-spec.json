@@ -1,7 +1,7 @@
 {
  "id": "redline",
  "title": "\u6362\u6321\u8f6c\u901f",
- "version": "2.0.55",
+ "version": "2.1.2",
  "screens": [
   {
    "name": "MAIN",
@@ -612,6 +612,21 @@
     60
    ],
    "group": "\u53d1\u52a8\u673a"
+  },
+  {
+   "key": "labMinTorque",
+   "label": "\u6362\u6321\u8ba1\u65f6\u8d77\u59cb\u8d1f\u8f7d",
+   "type": "number",
+   "unit": "Nm",
+   "default": 150,
+   "steps": [
+    80,
+    100,
+    150,
+    200,
+    300
+   ],
+   "group": "\u6362\u6321\u63d0\u793a\u8f6c\u901f"
   },
   {
    "key": "learn",

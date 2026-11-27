@@ -139,6 +139,12 @@
         "UnRegisterShutdownClient"
       ]
     },
+    "de.bmw.infotainment.KombiIF": {
+      "instances": "1",
+      "attributes": {
+        "statusRangeTankStatus": "rs"
+      }
+    },
     "de.bmw.infotainment.vehicle.CDS": {
       "instances": "1",
       "attributes": {

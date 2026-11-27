@@ -1,7 +1,7 @@
 {
  "id": "ambient_config",
  "title": "\u6c1b\u56f4\u706f\u8bbe\u7f6e",
- "version": "2.7.28",
+ "version": "2.8.3",
  "screens": [
   {
    "name": "MAIN",
@@ -133,6 +133,38 @@
    "label": "\u8fdc\u5149\u9891\u95ea\u4e0e\u706f\u5149\u79c0\uff08\u4ec5\u9650\u79c1\u4eba\u573a\u5730\uff09",
    "type": "bool",
    "default": false
+  },
+  {
+   "key": "stealth",
+   "label": "\u9a7b\u8f66\u7184\u706f\uff08\u4ec5\u9650\u79c1\u4eba\u573a\u5730\uff09",
+   "type": "bool",
+   "default": false,
+   "when": {
+    "strobe": [
+     true
+    ]
+   }
+  },
+  {
+   "key": "stealthMin",
+   "label": "\u9a7b\u8f66\u7184\u706f\u65f6\u957f",
+   "type": "choice",
+   "default": "5",
+   "hidden": true,
+   "options": [
+    [
+     "1",
+     "1 \u5206\u949f"
+    ],
+    [
+     "5",
+     "5 \u5206\u949f"
+    ],
+    [
+     "10",
+     "10 \u5206\u949f"
+    ]
+   ]
   },
   {
    "key": "strobeLeverDriving",

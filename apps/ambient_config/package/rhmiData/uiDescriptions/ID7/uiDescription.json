@@ -225,6 +225,28 @@
     },
     "16": {
      "type": "checkBox",
+     "name": "SET_STEALTH",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 2,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text": {
+        "value": "SID_AMBIENT_CONFIG_SET_STEALTH",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
+    "17": {
+     "type": "checkBox",
      "name": "SET_STROBELEVERDRIVING",
      "properties": {
       "Visible": {
@@ -245,7 +267,7 @@
       }
      ]
     },
-    "17": {
+    "18": {
      "type": "dropDownMenu",
      "name": "SET_DRIVE",
      "rows": [
@@ -273,7 +295,7 @@
       }
      }
     },
-    "18": {
+    "19": {
      "type": "button",
      "name": "CN_CREDITS",
      "properties": {
@@ -299,7 +321,7 @@
       }
      ]
     },
-    "19": {
+    "20": {
      "type": "button",
      "name": "REPO_CREDITS",
      "properties": {
@@ -325,7 +347,7 @@
       }
      ]
     },
-    "20": {
+    "21": {
      "type": "title",
      "name": "SETTINGS_TITLE",
      "rows": [

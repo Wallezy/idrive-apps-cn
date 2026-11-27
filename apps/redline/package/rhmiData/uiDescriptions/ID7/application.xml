@@ -32,7 +32,7 @@
     </container>
     <container id="12" type="state" widget="LT_State_Wide">
         <property id="9" value="1"/>
-        <layoutGroup id="102" name="List">
+        <layoutGroup id="103" name="List">
             <property id="3" value="1"/>
             <component id="13" type="dropDownMenu"/>
             <component id="14" type="dropDownMenu"/>
@@ -68,15 +68,15 @@
             <component id="35" type="dropDownMenu"/>
             <component id="36" type="dropDownMenu"/>
             <component id="37" type="dropDownMenu"/>
-            <component id="38" type="checkBox" widget="LT_CheckBox_1Row">
-                <property id="2" value="1"/>
-                <property id="3" value="2"/>
-            </component>
+            <component id="38" type="dropDownMenu"/>
             <component id="39" type="checkBox" widget="LT_CheckBox_1Row">
                 <property id="2" value="1"/>
                 <property id="3" value="2"/>
             </component>
-            <component id="40" type="dropDownMenu"/>
+            <component id="40" type="checkBox" widget="LT_CheckBox_1Row">
+                <property id="2" value="1"/>
+                <property id="3" value="2"/>
+            </component>
             <component id="41" type="dropDownMenu"/>
             <component id="42" type="dropDownMenu"/>
             <component id="43" type="dropDownMenu"/>
@@ -89,10 +89,7 @@
             <component id="50" type="dropDownMenu"/>
             <component id="51" type="dropDownMenu"/>
             <component id="52" type="dropDownMenu"/>
-            <component id="53" type="checkBox" widget="LT_CheckBox_1Row">
-                <property id="2" value="1"/>
-                <property id="3" value="2"/>
-            </component>
+            <component id="53" type="dropDownMenu"/>
             <component id="54" type="checkBox" widget="LT_CheckBox_1Row">
                 <property id="2" value="1"/>
                 <property id="3" value="2"/>
@@ -157,11 +154,11 @@
                 <property id="2" value="1"/>
                 <property id="3" value="2"/>
             </component>
-            <component id="70" type="dropDownMenu"/>
-            <component id="71" type="checkBox" widget="LT_CheckBox_1Row">
+            <component id="70" type="checkBox" widget="LT_CheckBox_1Row">
                 <property id="2" value="1"/>
                 <property id="3" value="2"/>
             </component>
+            <component id="71" type="dropDownMenu"/>
             <component id="72" type="checkBox" widget="LT_CheckBox_1Row">
                 <property id="2" value="1"/>
                 <property id="3" value="2"/>
@@ -186,11 +183,11 @@
                 <property id="2" value="1"/>
                 <property id="3" value="2"/>
             </component>
-            <component id="78" type="dropDownMenu"/>
-            <component id="79" type="checkBox" widget="LT_CheckBox_1Row">
+            <component id="78" type="checkBox" widget="LT_CheckBox_1Row">
                 <property id="2" value="1"/>
                 <property id="3" value="2"/>
             </component>
+            <component id="79" type="dropDownMenu"/>
             <component id="80" type="checkBox" widget="LT_CheckBox_1Row">
                 <property id="2" value="1"/>
                 <property id="3" value="2"/>
@@ -203,11 +200,11 @@
                 <property id="2" value="1"/>
                 <property id="3" value="2"/>
             </component>
-            <component id="83" type="dropDownMenu"/>
-            <component id="84" type="checkBox" widget="LT_CheckBox_1Row">
+            <component id="83" type="checkBox" widget="LT_CheckBox_1Row">
                 <property id="2" value="1"/>
                 <property id="3" value="2"/>
             </component>
+            <component id="84" type="dropDownMenu"/>
             <component id="85" type="checkBox" widget="LT_CheckBox_1Row">
                 <property id="2" value="1"/>
                 <property id="3" value="2"/>
@@ -216,25 +213,25 @@
                 <property id="2" value="1"/>
                 <property id="3" value="2"/>
             </component>
-            <component id="87" type="dropDownMenu"/>
+            <component id="87" type="checkBox" widget="LT_CheckBox_1Row">
+                <property id="2" value="1"/>
+                <property id="3" value="2"/>
+            </component>
             <component id="88" type="dropDownMenu"/>
             <component id="89" type="dropDownMenu"/>
             <component id="90" type="dropDownMenu"/>
             <component id="91" type="dropDownMenu"/>
             <component id="92" type="dropDownMenu"/>
-            <component id="93" type="checkBox" widget="LT_CheckBox_1Row">
+            <component id="93" type="dropDownMenu"/>
+            <component id="94" type="checkBox" widget="LT_CheckBox_1Row">
                 <property id="2" value="1"/>
                 <property id="3" value="2"/>
             </component>
-            <component id="94" type="dropDownMenu"/>
             <component id="95" type="dropDownMenu"/>
             <component id="96" type="dropDownMenu"/>
             <component id="97" type="dropDownMenu"/>
-            <component id="98" type="checkBox" widget="LT_CheckBox_1Row">
-                <property id="2" value="1"/>
-                <property id="3" value="2"/>
-            </component>
-            <component id="99" type="button" widget="LT_Button_2Row_2Text">
+            <component id="98" type="dropDownMenu"/>
+            <component id="99" type="checkBox" widget="LT_CheckBox_1Row">
                 <property id="2" value="1"/>
                 <property id="3" value="2"/>
             </component>
@@ -242,9 +239,13 @@
                 <property id="2" value="1"/>
                 <property id="3" value="2"/>
             </component>
+            <component id="101" type="button" widget="LT_Button_2Row_2Text">
+                <property id="2" value="1"/>
+                <property id="3" value="2"/>
+            </component>
         </layoutGroup>
-        <layoutGroup id="103" name="Titlebar">
-            <component id="101" type="title"/>
+        <layoutGroup id="104" name="Titlebar">
+            <component id="102" type="title"/>
         </layoutGroup>
     </container>
 </application>

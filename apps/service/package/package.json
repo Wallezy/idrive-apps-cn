@@ -1,7 +1,7 @@
 {
   "name": "service",
-  "version": "1.6.8",
-  "description": "Service requirements from the instrument cluster: oil, brakes, brake fluid, vehicle check, inspection - distance, date, details; brake fluid and vehicle check reset",
+  "version": "1.7.2",
+  "description": "Service requirements from the instrument cluster: oil, brakes, brake fluid, vehicle check, inspection - distance, date, details; brake fluid and vehicle check reset; your own intervals, wheels, the 12 V battery, refuels, parts and milestones",
   "main": "javascript/localized-entry.js",
   "private": false,
   "author": "cauliflowermossgrape",
@@ -21,6 +21,7 @@
     "backgroundPriority": 200,
     "someipManifest": "manifest.json"
   },
+  "mguAppStartType": "autostart",
   "mguLocalOnly": true,
   "files": [
     "package.json",

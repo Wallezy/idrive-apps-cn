@@ -1,12 +1,21 @@
 [
   {
+    "version": "1.2.2",
+    "changes": [
+      "新增信号变化记录、标记与回放，便于排查车辆状态。",
+      "行程时间继续按北京时间（UTC+8）显示。"
+    ],
+    "upstreamVersion": "1.2.1",
+    "cnRevision": 1
+  },
+  {
     "version": "1.0.23",
-    "upstreamVersion": "1.0.21",
-    "cnRevision": 1,
     "changes": [
       "行程时间按北京时间（UTC+8）显示，日期使用中文格式。",
       "优化应用图标与后台资源释放。"
-    ]
+    ],
+    "upstreamVersion": "1.0.21",
+    "cnRevision": 1
   },
   {
     "version": "1.0.22",

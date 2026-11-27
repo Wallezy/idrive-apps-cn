@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/cauliflowermossgrape/idrive7-apps",
-  "commit": "527e9b2514c516a3b43f4a0643452c1ce931eeb6",
+  "commit": "f54fc279d309ca12eba129b676d755c6f02f5a06",
   "language": "zh-CN",
   "sdk": "Excluded; donor-linked by mgu-deploy",
   "adaptations": [
@@ -9,13 +9,13 @@
     "Numeric three-part CN versions"
   ],
   "component": "redline",
-  "upstreamVersion": "2.0.54",
-  "releaseVersion": "2.0.55",
+  "upstreamVersion": "2.1.1",
+  "releaseVersion": "2.1.2",
   "cnRevision": 1,
   "adaptedSourceFilesSha256": {
     "apps/redline/MPL-2.0.txt": "3f3d9e0024b1921b067d6f7f88deb4a60cbe7a78e76c64e3f1d7fc3b779b9d04",
-    "apps/redline/README.md": "efc9525dcb2bd0de4f4fa1dd78d3167b559c566e7b23c1739a8e281c52f47c62",
-    "apps/redline/app.json": "d7c7170bcbb515d8fa2b9b7cb1c30f85446709e363df55cf22b67851fa565623",
+    "apps/redline/README.md": "d340d08230623a72175729744a1dbd7f906605da5df232aa9ac67513a96417ac",
+    "apps/redline/app.json": "144e1054dcfd1313c4713b3640ab3396e2960026ca128c2f1f8a5a1741603818",
     "apps/redline/call.js": "87a213fdb41765e92c11daa50d53f91db15707e5eeda4439bef97f6db63950af",
     "apps/redline/cluster_render_client.js": "3ccedc32f28e9d94a29b8b5873011a10405acd55ecebc05e08981ccf13c095a4",
     "apps/redline/dmegear.js": "fb8ad552d247168d49f664f1b7fec088f99264a2ecbef5b8ce1cf915122c6278",
@@ -30,17 +30,21 @@
     "apps/redline/hud-tyres.js": "a06f1e732286c15686b3f69d2e81c997665b14897b4c9ab38a680a583b64544f",
     "apps/redline/hud.js": "1df285ff09cabc90424023eed68ded0a9a9bdcf91c0d199cf146e85c262d0ef8",
     "apps/redline/icon.png": "c438f5f4beef6ac218ac2af5a5fcc6b0e3bae853e7561555d5b2cabf94f148cd",
+    "apps/redline/kickdown.js": "4639896b71f15b535be57ac917cd3eff33c273b7f0373aab7e471d304543c66f",
     "apps/redline/knock.js": "833b46d6e84128c52afb376afe6fe816073b06259adc75890f400556e5f541dd",
     "apps/redline/launch.js": "fc91cb3aed3bc586054d68a0f346bf0c871fba1c7c78922418fc9c2f22a25a1a",
     "apps/redline/limiter.js": "0ee58c81c54f52f748b6dfa560af39ec25b83f257b0fed821593e316e76a82c7",
     "apps/redline/logview.js": "6130e38d82f4b969dab5836c7ed9ef9e8a3be58d9e8207bd857a2a38b183a77f",
-    "apps/redline/main.js": "b43dee15d04fda0f0381009d920abb05a0846886c7cff6c87738832591d8efbd",
+    "apps/redline/main.js": "8f917258a05d7ecd7ae5a7adad136811833c8ba166acc9e051f7b05429e1cd63",
     "apps/redline/nav.js": "2d26bb40d6656342a3866c984216513b0e98bc585cf7f4ff5107da36cf7325ed",
     "apps/redline/navlog.js": "337fc544ed2da1bcc5f3c38b2a84cf25016a75cc8e0b7b2b7b08117935d9665f",
     "apps/redline/powerlog.js": "466ba80a222918409389fa02fe0a15241e029c19507af9d704dc49fc47f032b6",
     "apps/redline/quietlog.js": "81bde0d090c1bb5e97dfe3ba03082709a9dc31bf7729fd7182babac5c3934ed1",
     "apps/redline/shareshift.js": "cfd740c75ed5a4909f4b6ba6b5a290651aaa34c17f9b7cf930d9138eda541b34",
+    "apps/redline/shiftdemo.js": "2127965c46facbbad8001e2b65b47ecc566420c899cf29f95c7af2bb774e88dd",
+    "apps/redline/shiftlab.js": "e3c5344ae589b12689d1b3eb651118fadadcd6886c9c6ec37ef3c7360d643469",
     "apps/redline/shiftmap.js": "aaac445cb2e087c7fb8e84d7d5058d445a3e3276e948bd66e970e85ed6067642",
+    "apps/redline/shiftpages.js": "45231264700850624a55be3b5b8cace587028ee0342d9705f64d21e7588d1ab9",
     "apps/redline/tyres.js": "0299338555afc0c3da63e37fe28af47c8a5da6ad1ff4cfef862bc9d32050e5ba"
   }
 }

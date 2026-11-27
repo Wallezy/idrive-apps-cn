@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application>
+    <container id="500" type="logical">
+        <layoutGroup id="502">
+            <component id="501" type="startWidget">
+                <property id="7" value="1b43d52e-670d-50f5-9e5d-7381871f90bc"/>
+            </component>
+        </layoutGroup>
+    </container>
+</application>

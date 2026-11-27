@@ -1,12 +1,21 @@
 [
   {
+    "version": "0.6.24",
+    "changes": [
+      "明确显示内置地图、仪表不支持及需要重新应用的状态。",
+      "保留中文提示、全屏与显示位置设置。"
+    ],
+    "upstreamVersion": "0.6.18",
+    "cnRevision": 1
+  },
+  {
     "version": "0.6.23",
-    "upstreamVersion": "0.6.17",
-    "cnRevision": 1,
     "changes": [
       "改善驾驶员设置读取与切换，增加读取失败提示。",
       "保留仪表全屏、位置与 HUD 设置。"
-    ]
+    ],
+    "upstreamVersion": "0.6.17",
+    "cnRevision": 1
   },
   {
     "version": "0.6.22",

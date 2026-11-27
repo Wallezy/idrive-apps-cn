@@ -29,7 +29,7 @@
     </container>
     <container id="11" type="state" widget="LT_State_Wide">
         <property id="9" value="1"/>
-        <layoutGroup id="29" name="List">
+        <layoutGroup id="34" name="List">
             <property id="3" value="1"/>
             <component id="12" type="dropDownMenu"/>
             <component id="13" type="checkBox" widget="LT_CheckBox_1Row">
@@ -53,21 +53,32 @@
                 <property id="2" value="1"/>
                 <property id="3" value="2"/>
             </component>
-            <component id="22" type="dropDownMenu"/>
-            <component id="23" type="dropDownMenu"/>
-            <component id="24" type="dropDownMenu"/>
-            <component id="25" type="dropDownMenu"/>
-            <component id="26" type="button" widget="LT_Button_2Row_2Text">
+            <component id="22" type="checkBox" widget="LT_CheckBox_1Row">
                 <property id="2" value="1"/>
                 <property id="3" value="2"/>
             </component>
-            <component id="27" type="button" widget="LT_Button_2Row_2Text">
+            <component id="23" type="dropDownMenu"/>
+            <component id="24" type="dropDownMenu"/>
+            <component id="25" type="dropDownMenu"/>
+            <component id="26" type="checkBox" widget="LT_CheckBox_1Row">
+                <property id="2" value="1"/>
+                <property id="3" value="2"/>
+            </component>
+            <component id="27" type="dropDownMenu"/>
+            <component id="28" type="dropDownMenu"/>
+            <component id="29" type="dropDownMenu"/>
+            <component id="30" type="dropDownMenu"/>
+            <component id="31" type="button" widget="LT_Button_2Row_2Text">
+                <property id="2" value="1"/>
+                <property id="3" value="2"/>
+            </component>
+            <component id="32" type="button" widget="LT_Button_2Row_2Text">
                 <property id="2" value="1"/>
                 <property id="3" value="2"/>
             </component>
         </layoutGroup>
-        <layoutGroup id="30" name="Titlebar">
-            <component id="28" type="title"/>
+        <layoutGroup id="35" name="Titlebar">
+            <component id="33" type="title"/>
         </layoutGroup>
     </container>
 </application>

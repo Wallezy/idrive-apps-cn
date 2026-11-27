@@ -121,10 +121,10 @@
       "instances": "1"
     },
     "de.bmw.infrastructure.EnvironmentalInformation": {
+      "instances": "1",
       "attributes": {
-        "UnitBN2020": "rs"
-      },
-      "instances": "1"
+        "ExteriorTemperature": "s"
+      }
     },
     "org.genivi.nodestatemanager.Consumer": {
       "broadcasts": [
@@ -157,7 +157,28 @@
       "instances": "1",
       "attributes": {
         "ccList": "rs",
-        "newCCMessage": "rs"
+        "newCCMessage": "rs",
+        "cbsDataServiceList": "rs"
+      }
+    },
+    "de.bmw.infotainment.vehicle.CDS": {
+      "instances": "1",
+      "attributes": {
+        "statusBattery2": "rs",
+        "statusEngineSpeed2": "rs",
+        "statusEngineTemperature": "rs"
+      }
+    },
+    "de.bmw.infotainment.vehicle.Vehicle2": {
+      "instances": "1",
+      "attributes": {
+        "statusCarSpeed2": "rs"
+      }
+    },
+    "de.bmw.infotainment.vehicle.CDS2": {
+      "instances": "1",
+      "attributes": {
+        "statusLongitudinalAccelerationMassCenter": "rs"
       }
     }
   },

@@ -1,6 +1,6 @@
 {
   "name": "draggy",
-  "version": "2.7.5",
+  "version": "2.7.6",
   "description": "Standing 0-100 and 1/4 mile, rolling 100-200, valid runs, slope, air and shifts per run, best times",
   "main": "javascript/localized-entry.js",
   "private": false,

@@ -65,6 +65,24 @@
     },
     "5": {
      "type": "button",
+     "name": "BTN_DETAIL",
+     "properties": {
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text": {
+        "value": "SID_DTC_SCANNER_BTN_DETAIL",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
+    "6": {
+     "type": "button",
      "name": "BTN_PAGE",
      "properties": {
       "Focusable": {
@@ -81,7 +99,7 @@
       }
      ]
     },
-    "6": {
+    "7": {
      "type": "button",
      "name": "BTN_SETTINGS",
      "properties": {
@@ -99,7 +117,7 @@
       }
      ]
     },
-    "7": {
+    "8": {
      "type": "title",
      "name": "MAIN_TITLE",
      "rows": [
@@ -113,11 +131,11 @@
     }
    }
   },
-  "11": {
+  "12": {
    "type": "state",
    "name": "SETTINGS",
    "components": {
-    "12": {
+    "13": {
      "type": "dropDownMenu",
      "name": "SET_SCOPE",
      "rows": [
@@ -145,7 +163,7 @@
       }
      }
     },
-    "13": {
+    "14": {
      "type": "checkBox",
      "name": "SET_INFO",
      "properties": {
@@ -167,7 +185,7 @@
       }
      ]
     },
-    "14": {
+    "15": {
      "type": "checkBox",
      "name": "SET_AUTOSCAN",
      "properties": {
@@ -189,7 +207,29 @@
       }
      ]
     },
-    "15": {
+    "16": {
+     "type": "checkBox",
+     "name": "SET_PLAUSIBILITY",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 2,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text": {
+        "value": "SID_DTC_SCANNER_SET_PLAUSIBILITY",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
+    "17": {
      "type": "dropDownMenu",
      "name": "SET_THEME",
      "rows": [
@@ -229,7 +269,7 @@
       }
      }
     },
-    "16": {
+    "18": {
      "type": "dropDownMenu",
      "name": "SET_LAYOUT",
      "rows": [
@@ -257,7 +297,7 @@
       }
      }
     },
-    "17": {
+    "19": {
      "type": "dropDownMenu",
      "name": "SET_RENDERER",
      "rows": [
@@ -285,7 +325,7 @@
       }
      }
     },
-    "18": {
+    "20": {
      "type": "dropDownMenu",
      "name": "SET_DEMO",
      "rows": [
@@ -319,7 +359,7 @@
       }
      }
     },
-    "19": {
+    "21": {
      "type": "button",
      "name": "CN_CREDITS",
      "properties": {
@@ -345,7 +385,7 @@
       }
      ]
     },
-    "20": {
+    "22": {
      "type": "button",
      "name": "REPO_CREDITS",
      "properties": {
@@ -371,7 +411,7 @@
       }
      ]
     },
-    "21": {
+    "23": {
      "type": "title",
      "name": "SETTINGS_TITLE",
      "rows": [

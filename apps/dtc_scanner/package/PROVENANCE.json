@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/cauliflowermossgrape/idrive7-apps",
-  "commit": "527e9b2514c516a3b43f4a0643452c1ce931eeb6",
+  "commit": "f54fc279d309ca12eba129b676d755c6f02f5a06",
   "language": "zh-CN",
   "sdk": "Excluded; donor-linked by mgu-deploy",
   "adaptations": [
@@ -9,16 +9,21 @@
     "Numeric three-part CN versions"
   ],
   "component": "dtc_scanner",
-  "upstreamVersion": "2.9.11",
-  "releaseVersion": "2.9.13",
+  "upstreamVersion": "2.15.1",
+  "releaseVersion": "2.15.2",
   "cnRevision": 1,
   "adaptedSourceFilesSha256": {
-    "apps/dtc_scanner/app.json": "e534ce2f18f6a637bf1d9a3f502043769a6e2e4cea2570f0b300a8dcdeac45ea",
+    "apps/dtc_scanner/app.json": "f16a4f4a8da5e22a2b2603d2bad9f5f390f5aedb6a8af90edead0402586f62c2",
+    "apps/dtc_scanner/context.js": "a7e77bae522f1b03834fbd7c9eb67fbae5de232a7147b5ec68f9a94142228a9d",
     "apps/dtc_scanner/demo.js": "379ae4d0c1c508b17cb6fd2a1ec8b8af6cb04246901cbdbec43bd6daae699e22",
+    "apps/dtc_scanner/devreport.js": "ff094bdaa980259172e15e0788f40a6993a4dbd2c98cd004f1c64c52f56fa5ce",
     "apps/dtc_scanner/diagnostic-text.js": "dae4a84c12f4f4aec23780726b502246e3695d3ec2bdf35a22dd78f8b656849d",
+    "apps/dtc_scanner/dme_ids.js": "e265b71288cdafc07d5f62ff43200bcfc3e15428cbf3de481380d7b35a12688d",
     "apps/dtc_scanner/dtc_db.pack": "206da522f83c48539eb9ac0ee02d7c859a7080b0b1c50cf76df05451a3930c55",
     "apps/dtc_scanner/icon.png": "e32af9aae088f38d40d312aaff61f7e51b14835924b01328039b461d84192171",
     "apps/dtc_scanner/known_texts.js": "c7df2d1905a2b83ca4a98dcc580afd175d515afee08b1e538af53eae5f59e11d",
-    "apps/dtc_scanner/main.js": "8acda67902da648054ef0c7f8e78516896db0bc03999bb414154ef8a13fcf8ad"
+    "apps/dtc_scanner/main.js": "57afa90a57a2cc49991562b65f24ff75d6de496ad6e19e7876ee3716220790f8",
+    "apps/dtc_scanner/plausibility.js": "130190c8dfd298f569d126de08079755ae7aa1fe0ebc95b11ffaa6bf3bde46df",
+    "apps/dtc_scanner/plausibility_view.js": "8471ed9fb6c1b078b0720bb41d10d38a2517b02fb2bb5bd968b799bdd2dddfdf"
   }
 }

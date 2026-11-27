@@ -1,7 +1,7 @@
 {
  "id": "gforce",
  "title": "G \u503c\u4eea\u8868",
- "version": "1.6.27",
+ "version": "1.7.2",
  "screens": [
   {
    "name": "MAIN",
@@ -19,6 +19,18 @@
     [
      "BTN_PREV",
      "\u4e0a\u4e00\u9875"
+    ],
+    [
+     "BTN_PLAY",
+     "\u64ad\u653e\uff0f\u6682\u505c"
+    ],
+    [
+     "BTN_RATE",
+     "\u56de\u653e\u901f\u5ea6"
+    ],
+    [
+     "BTN_START",
+     "\u56de\u5230\u8d77\u70b9"
     ],
     [
      "BTN_SETTINGS",
@@ -80,6 +92,80 @@
      "mph"
     ]
    ]
+  },
+  {
+   "key": "bbRecord",
+   "label": "\u4fdd\u5b58\u6700\u8fd1\u4e00\u5206\u949f",
+   "type": "bool",
+   "default": false
+  },
+  {
+   "key": "bbBrake",
+   "label": "\u6025\u5239\u65f6\u4fdd\u5b58",
+   "type": "bool",
+   "default": true,
+   "when": {
+    "bbRecord": true
+   }
+  },
+  {
+   "key": "bbBrakeG",
+   "label": "\u6025\u5239\u8d77\u59cb\u51cf\u901f\u5ea6",
+   "type": "number",
+   "unit": "g",
+   "default": 0.7,
+   "steps": [
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    1.0
+   ],
+   "when": {
+    "bbRecord": true
+   }
+  },
+  {
+   "key": "bbPower",
+   "label": "\u5168\u529f\u7387\u65f6\u4fdd\u5b58",
+   "type": "bool",
+   "default": false,
+   "when": {
+    "bbRecord": true
+   }
+  },
+  {
+   "key": "bbSport",
+   "label": "\u8bb0\u5f55\u6bcf\u6bb5\u8fd0\u52a8\u6a21\u5f0f",
+   "type": "bool",
+   "default": false,
+   "when": {
+    "bbRecord": true
+   }
+  },
+  {
+   "key": "bbKeep",
+   "label": "\u4fdd\u7559\u8bb0\u5f55\u6570",
+   "type": "number",
+   "default": 30,
+   "steps": [
+    10,
+    20,
+    30,
+    50
+   ],
+   "when": {
+    "bbRecord": true
+   }
+  },
+  {
+   "key": "bbPeakKw",
+   "label": "\u8bb0\u5f55\u5230\u6700\u5927\u529f\u7387\u65f6",
+   "type": "number",
+   "unit": "kW",
+   "default": 0,
+   "hidden": true
   },
   {
    "key": "advanced",
@@ -186,6 +272,6 @@
  "startWidget": null,
  "stateIds": {
   "MAIN": 1,
-  "SETTINGS": 11
+  "SETTINGS": 14
  }
 }

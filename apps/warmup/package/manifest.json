@@ -121,10 +121,10 @@
       "instances": "1"
     },
     "de.bmw.infrastructure.EnvironmentalInformation": {
+      "instances": "1",
       "attributes": {
-        "UnitBN2020": "rs"
-      },
-      "instances": "1"
+        "ExteriorTemperature": "s"
+      }
     },
     "org.genivi.nodestatemanager.Consumer": {
       "broadcasts": [
@@ -142,7 +142,28 @@
       "instances": "1",
       "attributes": {
         "statusEngineSpeed2": "rs",
-        "statusEngineTemperature": "rs"
+        "statusEngineTemperature": "rs",
+        "statusBattery2": "rs"
+      }
+    },
+    "de.bmw.infotainment.vehicle.CDS2": {
+      "instances": "1",
+      "attributes": {
+        "statusLongitudinalAccelerationMassCenter": "rs",
+        "statusLateralAccelerationMassCenter": "rs"
+      }
+    },
+    "de.bmw.infotainment.KombiIF": {
+      "instances": "1",
+      "attributes": {
+        "statusRangeTankStatus": "rs"
+      }
+    },
+    "de.bmw.infotainment.vehicle.TPMS": {
+      "instances": "1",
+      "attributes": {
+        "statusTyrePressure": "rs",
+        "statusTargetTyrePressure": "rs"
       }
     },
     "de.bmw.infotainment.vehicle.Vehicle2": {

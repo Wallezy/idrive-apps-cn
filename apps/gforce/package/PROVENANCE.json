@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/cauliflowermossgrape/idrive7-apps",
-  "commit": "527e9b2514c516a3b43f4a0643452c1ce931eeb6",
+  "commit": "f54fc279d309ca12eba129b676d755c6f02f5a06",
   "language": "zh-CN",
   "sdk": "Excluded; donor-linked by mgu-deploy",
   "adaptations": [
@@ -9,12 +9,14 @@
     "Numeric three-part CN versions"
   ],
   "component": "gforce",
-  "upstreamVersion": "1.6.25",
-  "releaseVersion": "1.6.27",
+  "upstreamVersion": "1.7.1",
+  "releaseVersion": "1.7.2",
   "cnRevision": 1,
   "adaptedSourceFilesSha256": {
-    "apps/gforce/app.json": "6cac40e0287da6d2a8ad25cd639586e90c9ddae2959c9e5c42657a10b63febbe",
+    "apps/gforce/app.json": "5dfc169093378a1fd2da1db6fa758b7ffd38a384a19ae88ceafadd184dcdd353",
+    "apps/gforce/bbview.js": "33b21ee1cb7f487e4a16d223c8b87b8123db1b8c333da4210285e6483d26342b",
     "apps/gforce/icon.png": "314f59418d5c9aaaa3abfb93e5e5d037b3ce8cf01b9caa57db5074575b7871c1",
-    "apps/gforce/main.js": "1a360eb78fe31d060f315ce2fe2cb10c97d65a5e257877778db60e4e9be53edb"
+    "apps/gforce/main.js": "ef162b49ebf410cacfb335184dab37f4f15ac2d6d9d649439dbb031ef7842f7b",
+    "apps/gforce/recorder.js": "d52a8c0b4a9766a8a8536419266891538a10f9438012ec83a1967006d5accf81"
   }
 }

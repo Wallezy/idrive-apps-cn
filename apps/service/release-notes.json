@@ -1,11 +1,19 @@
 [
   {
+    "version": "1.7.2",
+    "changes": [
+      "新增自定义保养周期、轮胎、电瓶及加油记录。"
+    ],
+    "upstreamVersion": "1.7.1",
+    "cnRevision": 1
+  },
+  {
     "version": "1.6.8",
-    "upstreamVersion": "1.6.7",
-    "cnRevision": 1,
     "changes": [
       "仅在页面显示时读取保养状态，减少后台占用。"
-    ]
+    ],
+    "upstreamVersion": "1.6.7",
+    "cnRevision": 1
   },
   {
     "version": "1.6.7",

@@ -1,11 +1,19 @@
 [
   {
+    "version": "2.15.2",
+    "changes": [
+      "新增故障上下文、诊断报告与信号合理性检查。"
+    ],
+    "upstreamVersion": "2.15.1",
+    "cnRevision": 1
+  },
+  {
     "version": "2.9.13",
-    "upstreamVersion": "2.9.11",
-    "cnRevision": 1,
     "changes": [
       "离开页面后停止诊断与状态订阅，减少后台占用。"
-    ]
+    ],
+    "upstreamVersion": "2.9.11",
+    "cnRevision": 1
   },
   {
     "version": "2.9.12",
@@ -17,11 +25,11 @@
   },
   {
     "version": "2.9.11",
-    "upstreamVersion": "2.9.10",
-    "cnRevision": 1,
     "changes": [
       "优化旋钮焦点和选项切换的显示，保留简体中文。"
-    ]
+    ],
+    "upstreamVersion": "2.9.10",
+    "cnRevision": 1
   },
   {
     "version": "2.9.10",

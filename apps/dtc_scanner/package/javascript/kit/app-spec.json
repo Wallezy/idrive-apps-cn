@@ -1,7 +1,7 @@
 {
  "id": "dtc_scanner",
  "title": "\u6545\u969c\u68c0\u6d4b",
- "version": "2.9.13",
+ "version": "2.15.2",
  "screens": [
   {
    "name": "MAIN",
@@ -15,6 +15,10 @@
     [
      "BTN_CLEAR",
      "\u6e05\u9664\u5168\u90e8"
+    ],
+    [
+     "BTN_DETAIL",
+     "\u6545\u969c\u8be6\u60c5"
     ],
     [
      "BTN_PAGE",
@@ -53,6 +57,12 @@
   {
    "key": "autoScan",
    "label": "\u6253\u5f00\u65f6\u626b\u63cf",
+   "type": "bool",
+   "default": true
+  },
+  {
+   "key": "plausibility",
+   "label": "\u4fe1\u53f7\u5408\u7406\u6027\u68c0\u67e5",
    "type": "bool",
    "default": true
   },
@@ -137,6 +147,6 @@
  "startWidget": null,
  "stateIds": {
   "MAIN": 1,
-  "SETTINGS": 11
+  "SETTINGS": 12
  }
 }

@@ -1,12 +1,12 @@
 [
   {
     "version": "1.0.11",
-    "upstreamVersion": "1.0.9",
-    "cnRevision": 1,
     "changes": [
       "修复失效应用入口导致无法打开的问题。",
       "进程名与命令保留原文，改善中文显示。"
-    ]
+    ],
+    "upstreamVersion": "1.0.9",
+    "cnRevision": 1
   },
   {
     "version": "1.0.10",

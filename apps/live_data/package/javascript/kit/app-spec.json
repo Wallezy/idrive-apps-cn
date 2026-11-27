@@ -1,7 +1,7 @@
 {
  "id": "live_data",
  "title": "\u5b9e\u65f6\u6570\u636e",
- "version": "1.0.23",
+ "version": "1.2.2",
  "screens": [
   {
    "name": "MAIN",
@@ -256,6 +256,100 @@
    "label": "\u9ad8\u7ea7\u8bbe\u7f6e",
    "type": "bool",
    "default": false
+  },
+  {
+   "key": "hunter",
+   "label": "\u4fe1\u53f7\u6355\u83b7\u9875\uff08\u5f00\u53d1\u8005\uff09",
+   "type": "bool",
+   "default": false,
+   "when": {
+    "advanced": true
+   }
+  },
+  {
+   "key": "hunterLabel",
+   "label": "\u4fe1\u53f7\u6355\u83b7\uff1a\u6807\u8bb0",
+   "type": "choice",
+   "default": "door",
+   "when": {
+    "advanced": true,
+    "hunter": true
+   },
+   "options": [
+    [
+     "door",
+     "\u8f66\u95e8"
+    ],
+    [
+     "window",
+     "\u8f66\u7a97"
+    ],
+    [
+     "climate",
+     "\u7a7a\u8c03"
+    ],
+    [
+     "wiper",
+     "\u96e8\u5237"
+    ],
+    [
+     "light",
+     "\u706f\u5149"
+    ],
+    [
+     "button",
+     "\u6309\u94ae"
+    ],
+    [
+     "mode",
+     "\u6a21\u5f0f"
+    ],
+    [
+     "other",
+     "\u5176\u4ed6"
+    ]
+   ]
+  },
+  {
+   "key": "hunterWindow",
+   "label": "\u4fe1\u53f7\u6355\u83b7\uff1a\u8bb0\u5f55\u65f6\u957f",
+   "type": "number",
+   "unit": "s",
+   "default": 30,
+   "steps": [
+    10,
+    20,
+    30
+   ],
+   "when": {
+    "advanced": true,
+    "hunter": true
+   }
+  },
+  {
+   "key": "hunterSpeed",
+   "label": "\u4fe1\u53f7\u6355\u83b7\uff1a\u56de\u653e\u901f\u5ea6",
+   "type": "number",
+   "unit": "x",
+   "default": 0.25,
+   "steps": [
+    0.25,
+    1
+   ],
+   "when": {
+    "advanced": true,
+    "hunter": true
+   }
+  },
+  {
+   "key": "hunterNoisy",
+   "label": "\u4fe1\u53f7\u6355\u83b7\uff1a\u663e\u793a\u566a\u58f0\u503c",
+   "type": "bool",
+   "default": false,
+   "when": {
+    "advanced": true,
+    "hunter": true
+   }
   },
   {
    "key": "theme",

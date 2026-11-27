@@ -1,7 +1,7 @@
 {
   "name": "gforce",
-  "version": "1.6.27",
-  "description": "Friction circle with grip envelope, peak g per direction and session records",
+  "version": "1.7.2",
+  "description": "Friction circle with grip envelope, peak g per direction and session records, and the last minute of driving saved when it matters, with replay",
   "main": "javascript/localized-entry.js",
   "private": false,
   "author": "cauliflowermossgrape",
@@ -21,6 +21,7 @@
     "backgroundPriority": 200,
     "someipManifest": "manifest.json"
   },
+  "mguAppStartType": "autostart",
   "mguLocalOnly": true,
   "files": [
     "package.json",

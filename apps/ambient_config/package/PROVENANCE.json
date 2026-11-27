@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/cauliflowermossgrape/idrive7-apps",
-  "commit": "527e9b2514c516a3b43f4a0643452c1ce931eeb6",
+  "commit": "f54fc279d309ca12eba129b676d755c6f02f5a06",
   "language": "zh-CN",
   "sdk": "Excluded; donor-linked by mgu-deploy",
   "adaptations": [
@@ -9,22 +9,25 @@
     "Numeric three-part CN versions"
   ],
   "component": "ambient_config",
-  "upstreamVersion": "2.7.27",
-  "releaseVersion": "2.7.28",
+  "upstreamVersion": "2.8.2",
+  "releaseVersion": "2.8.3",
   "cnRevision": 1,
   "adaptedSourceFilesSha256": {
     "apps/ambient_config/ambient.js": "040dcf39c8011fdd22247406eacc1a5f08ca935da14859968265b4bf907b5e7f",
-    "apps/ambient_config/app.json": "6df6eaacc2bb4b4ecd1c2b3afd76482935bfe7d0e2ff985459df75e650902b5c",
+    "apps/ambient_config/app.json": "93b57baa1f8a62b3f0cc4734d8c8814d936f2819f3b9a5f2ad5df8549a0f2d3a",
     "apps/ambient_config/cabin.js": "b947ba35a338ce410df193444fda5c21046f17b5f33d5fa992f3595b0675d12a",
     "apps/ambient_config/carview.js": "285fbfcf352f76d750b99ab0dcd6f9b23841b18ff6466759a23a1cc0f8bc7b36",
     "apps/ambient_config/control.js": "f226f142389ed1120a08d88b6909e2ce30eba24d4f5369d7618cd03599678751",
     "apps/ambient_config/icon.png": "a39a65688fad29fc55c10660e964748921578e3998f262b2ba0650647d504516",
+    "apps/ambient_config/lamps.js": "a8899a96bbd17af5351a38c1f4b331c8d6e8f7d4bb3f73c9911b2d0d820fc21d",
     "apps/ambient_config/lever.js": "8913d21c5d0751fcf9eb3ba65025c018c3e8c3965953f74bab4a314319a8a5ad",
-    "apps/ambient_config/lights.js": "4634529cca86a2d232b0c2568790e5f2556ce336b0bfba1a1b7c00a981267c9c",
+    "apps/ambient_config/lights.js": "5a0ac603fa909bfbdcf264d06d0d59ea0a561080b43d07570b921b1c0162774e",
     "apps/ambient_config/lin.js": "58054dc178ddf3e809584b9f5f43f41774db64c216bb4643d372ad70c20b5231",
-    "apps/ambient_config/main.js": "54f70949fdae5dabd12fcb7fd2a66c64af71083d6ba016f69f3d51a1a29929cf",
+    "apps/ambient_config/main.js": "6c9e6b0a5d3bc21735cd355ca9d9e1163d33170878749e8007e1a2fe1700bff8",
     "apps/ambient_config/others.js": "a5a243eaead4f8b058664a41c78a781bee920c46fbff78500e56910d85caf49c",
+    "apps/ambient_config/presets.js": "217d7123c31e7074dd4f9e06b87d8874abdc479a4ff2a31130c265faefd68881",
     "apps/ambient_config/scenes.js": "4488a249d8fc309d4d3695862c98759a9844be42339815ea35ab9080acedecb2",
-    "apps/ambient_config/strobe.js": "54e9570447825ec5b47b2dfa9c0d316754e8262ca1a42d1a54190260375cd566"
+    "apps/ambient_config/seqview.js": "b7f8a76d87d8d102c1772d31c759f7f733003b2ba082ff30194aef3bfcb86924",
+    "apps/ambient_config/strobe.js": "20b4e7ef2f5b26f576bf2a30caa68bbff75aef528532e7425d7feecce38aeb1d"
   }
 }

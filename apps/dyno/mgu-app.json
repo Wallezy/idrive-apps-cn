@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "id": "dyno",
-  "version": "1.6.8",
+  "version": "1.6.9",
   "tree": "package",
   "modules": [
     "src/sdk.js"

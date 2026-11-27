@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "id": "car_vitals",
-  "version": "2.27.15",
+  "version": "2.28.1",
   "tree": "package",
   "modules": [
     "src/sdk.js"

@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/cauliflowermossgrape/idrive7-apps",
-  "commit": "527e9b2514c516a3b43f4a0643452c1ce931eeb6",
+  "commit": "f54fc279d309ca12eba129b676d755c6f02f5a06",
   "language": "zh-CN",
   "sdk": "Excluded; donor-linked by mgu-deploy",
   "adaptations": [
@@ -9,14 +9,17 @@
     "Numeric three-part CN versions"
   ],
   "component": "warmup",
-  "upstreamVersion": "1.9.3",
-  "releaseVersion": "1.9.5",
+  "upstreamVersion": "1.12.1",
+  "releaseVersion": "1.12.2",
   "cnRevision": 1,
   "adaptedSourceFilesSha256": {
-    "apps/warmup/app.json": "7384947761f4b63af8c775606c67fbb2fece9d34c554bea7d7614aa2e556b993",
+    "apps/warmup/app.json": "1ca51d9e339c67d80d0d223b3ef7d47c2347933a1437cbd32c6d4809f4f65a96",
     "apps/warmup/coldstarts.js": "3384ce7b742351b514e32cdaa9b23f36e77fe96af04d71b738ebf2c9f6303c28",
+    "apps/warmup/diff.js": "dafc15cef5287613b06bebbe6138caae6b5a388f54ba8718b2b9fa05394758de",
+    "apps/warmup/drives.js": "a2fb1c3c9b0689227be587abe88a11e859b41a513e1b5a257eb505f67ccf894c",
     "apps/warmup/gearbox.js": "046127d5565c009b9515f3bd9318454d0a079df36dd21d90babba67b9de7a867",
     "apps/warmup/icon.png": "56abdf92147c11c4e750316873363ac4fd72693212c71e5dc30933f80dca5d4e",
-    "apps/warmup/main.js": "e916db90a66dbdd166a4b495c65d62efd8fa4a67a249d434b44b9120ab9403a8"
+    "apps/warmup/main.js": "2a6cd5256b5322597ede89aeb4a477a082e5c126407ad2a5983d907f03dedfcb",
+    "apps/warmup/ready.js": "83577004531f2a585ba9fba1cf73a1bb1b182a295310c3298cc6d65eefcca639"
   }
 }

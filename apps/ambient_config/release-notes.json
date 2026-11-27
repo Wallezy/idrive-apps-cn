@@ -1,12 +1,21 @@
 [
   {
+    "version": "2.8.3",
+    "changes": [
+      "新增灯光序列编辑与驻车灯光预览，完善异常退出恢复。",
+      "修复灯带续期时短暂串色，改善分区颜色显示。"
+    ],
+    "upstreamVersion": "2.8.2",
+    "cnRevision": 1
+  },
+  {
     "version": "2.7.28",
-    "upstreamVersion": "2.7.27",
-    "cnRevision": 1,
     "changes": [
       "新增白天关闭和两侧车门灯带提示选项。",
       "完善灯光模块识别、启动重试与灯光效果恢复。"
-    ]
+    ],
+    "upstreamVersion": "2.7.27",
+    "cnRevision": 1
   },
   {
     "version": "2.7.25",

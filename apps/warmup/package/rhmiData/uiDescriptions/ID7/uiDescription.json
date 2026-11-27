@@ -29,6 +29,78 @@
     },
     "3": {
      "type": "button",
+     "name": "BTN_PREV",
+     "properties": {
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text": {
+        "value": "SID_WARMUP_BTN_PREV",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
+    "4": {
+     "type": "button",
+     "name": "BTN_NEXT",
+     "properties": {
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text": {
+        "value": "SID_WARMUP_BTN_NEXT",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
+    "5": {
+     "type": "button",
+     "name": "BTN_VIEW",
+     "properties": {
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text": {
+        "value": "SID_WARMUP_BTN_VIEW",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
+    "6": {
+     "type": "button",
+     "name": "BTN_MARK",
+     "properties": {
+      "Focusable": {
+       "value": 3,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text": {
+        "value": "SID_WARMUP_BTN_MARK",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
+    "7": {
+     "type": "button",
      "name": "BTN_SETTINGS",
      "properties": {
       "Focusable": {
@@ -45,7 +117,7 @@
       }
      ]
     },
-    "4": {
+    "8": {
      "type": "title",
      "name": "MAIN_TITLE",
      "rows": [
@@ -59,11 +131,11 @@
     }
    }
   },
-  "8": {
+  "12": {
    "type": "state",
    "name": "SETTINGS",
    "components": {
-    "9": {
+    "13": {
      "type": "dropDownMenu",
      "name": "SET_WARMOIL",
      "rows": [
@@ -121,7 +193,7 @@
       }
      }
     },
-    "10": {
+    "14": {
      "type": "dropDownMenu",
      "name": "SET_WARMCOOLANT",
      "rows": [
@@ -173,7 +245,7 @@
       }
      }
     },
-    "11": {
+    "15": {
      "type": "dropDownMenu",
      "name": "SET_WARMGEARBOX",
      "rows": [
@@ -219,7 +291,7 @@
       }
      }
     },
-    "12": {
+    "16": {
      "type": "dropDownMenu",
      "name": "SET_ENGINE",
      "rows": [
@@ -253,7 +325,7 @@
       }
      }
     },
-    "13": {
+    "17": {
      "type": "dropDownMenu",
      "name": "SET_COLDLIMIT",
      "rows": [
@@ -323,7 +395,7 @@
       }
      }
     },
-    "14": {
+    "18": {
      "type": "dropDownMenu",
      "name": "SET_REDLINE",
      "rows": [
@@ -441,7 +513,7 @@
       }
      }
     },
-    "15": {
+    "19": {
      "type": "checkBox",
      "name": "SET_COOLDOWN",
      "properties": {
@@ -463,9 +535,31 @@
       }
      ]
     },
-    "16": {
+    "20": {
+     "type": "checkBox",
+     "name": "SET_DRIVECSV",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 2,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text": {
+        "value": "SID_WARMUP_SET_DRIVECSV",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
+    "21": {
      "type": "dropDownMenu",
-     "name": "SET_TEMPUNIT",
+     "name": "SET_COMPAREWITH",
      "rows": [
       {
        "ItemText": {
@@ -491,9 +585,9 @@
       }
      }
     },
-    "17": {
+    "22": {
      "type": "dropDownMenu",
-     "name": "SET_THEME",
+     "name": "SET_MARKLABEL",
      "rows": [
       {
        "ItemText": {
@@ -518,39 +612,23 @@
         "value": "SID_CN_STATIC_0059",
         "type": "StringId"
        }
-      }
-     ],
-     "cells": {
-      "HeaderText": {
-       "value": "SID_CN_STATIC_0060",
-       "type": "StringId"
       },
-      "SelectedItem": {
-       "value": 1,
-       "type": "UInt"
-      }
-     }
-    },
-    "18": {
-     "type": "dropDownMenu",
-     "name": "SET_LAYOUT",
-     "rows": [
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0060",
+        "type": "StringId"
+       }
+      },
       {
        "ItemText": {
         "value": "SID_CN_STATIC_0061",
         "type": "StringId"
        }
-      },
-      {
-       "ItemText": {
-        "value": "SID_CN_STATIC_0062",
-        "type": "StringId"
-       }
       }
      ],
      "cells": {
       "HeaderText": {
-       "value": "SID_CN_STATIC_0063",
+       "value": "SID_CN_STATIC_0062",
        "type": "StringId"
       },
       "SelectedItem": {
@@ -559,10 +637,16 @@
       }
      }
     },
-    "19": {
+    "23": {
      "type": "dropDownMenu",
-     "name": "SET_RENDERER",
+     "name": "SET_COMPAREKIND",
      "rows": [
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0063",
+        "type": "StringId"
+       }
+      },
       {
        "ItemText": {
         "value": "SID_CN_STATIC_0064",
@@ -587,9 +671,9 @@
       }
      }
     },
-    "20": {
+    "24": {
      "type": "dropDownMenu",
-     "name": "SET_DEMO",
+     "name": "SET_WIDGETFIT",
      "rows": [
       {
        "ItemText": {
@@ -621,7 +705,165 @@
       }
      }
     },
-    "21": {
+    "25": {
+     "type": "dropDownMenu",
+     "name": "SET_TEMPUNIT",
+     "rows": [
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0071",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0072",
+        "type": "StringId"
+       }
+      }
+     ],
+     "cells": {
+      "HeaderText": {
+       "value": "SID_CN_STATIC_0073",
+       "type": "StringId"
+      },
+      "SelectedItem": {
+       "value": 0,
+       "type": "UInt"
+      }
+     }
+    },
+    "26": {
+     "type": "dropDownMenu",
+     "name": "SET_THEME",
+     "rows": [
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0074",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0075",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0076",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0077",
+        "type": "StringId"
+       }
+      }
+     ],
+     "cells": {
+      "HeaderText": {
+       "value": "SID_CN_STATIC_0078",
+       "type": "StringId"
+      },
+      "SelectedItem": {
+       "value": 1,
+       "type": "UInt"
+      }
+     }
+    },
+    "27": {
+     "type": "dropDownMenu",
+     "name": "SET_LAYOUT",
+     "rows": [
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0079",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0080",
+        "type": "StringId"
+       }
+      }
+     ],
+     "cells": {
+      "HeaderText": {
+       "value": "SID_CN_STATIC_0081",
+       "type": "StringId"
+      },
+      "SelectedItem": {
+       "value": 0,
+       "type": "UInt"
+      }
+     }
+    },
+    "28": {
+     "type": "dropDownMenu",
+     "name": "SET_RENDERER",
+     "rows": [
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0082",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0083",
+        "type": "StringId"
+       }
+      }
+     ],
+     "cells": {
+      "HeaderText": {
+       "value": "SID_CN_STATIC_0084",
+       "type": "StringId"
+      },
+      "SelectedItem": {
+       "value": 0,
+       "type": "UInt"
+      }
+     }
+    },
+    "29": {
+     "type": "dropDownMenu",
+     "name": "SET_DEMO",
+     "rows": [
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0085",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0086",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0087",
+        "type": "StringId"
+       }
+      }
+     ],
+     "cells": {
+      "HeaderText": {
+       "value": "SID_CN_STATIC_0088",
+       "type": "StringId"
+      },
+      "SelectedItem": {
+       "value": 2,
+       "type": "UInt"
+      }
+     }
+    },
+    "30": {
      "type": "button",
      "name": "CN_CREDITS",
      "properties": {
@@ -647,7 +889,7 @@
       }
      ]
     },
-    "22": {
+    "31": {
      "type": "button",
      "name": "REPO_CREDITS",
      "properties": {
@@ -673,7 +915,7 @@
       }
      ]
     },
-    "23": {
+    "32": {
      "type": "title",
      "name": "SETTINGS_TITLE",
      "rows": [

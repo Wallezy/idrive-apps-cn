@@ -2,6 +2,129 @@
   "rhmiLoadingEnabled": true,
   "entryPointLoadingEnabled": true,
   "settings": {
-    "service": {}
+    "service": {
+      "comment": "battery.v12: the 12 V voltage candidates for the Battery page, copied as they are from eDrive's app.json (config.battery.v12); the first that answers is kept",
+      "battery": {
+        "v12": [
+          {
+            "ecu": 18,
+            "did": "F442",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.001,
+            "offset": 0,
+            "min": 5,
+            "max": 18
+          },
+          {
+            "ecu": 7,
+            "did": "F442",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.001,
+            "offset": 0,
+            "min": 5,
+            "max": 18
+          },
+          {
+            "ecu": 18,
+            "obd": "42",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.001,
+            "offset": 0,
+            "min": 5,
+            "max": 18,
+            "note": "the same PID with OBD service 01, for engine units that refuse F442 with NRC 31"
+          },
+          {
+            "ecu": 19,
+            "did": "F442",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.001,
+            "offset": 0,
+            "min": 5,
+            "max": 18,
+            "note": "second engine unit (0x13), on cars that have one"
+          },
+          {
+            "ecu": 19,
+            "obd": "42",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.001,
+            "offset": 0,
+            "min": 5,
+            "max": 18
+          },
+          {
+            "ecu": 24,
+            "did": "F442",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.001,
+            "offset": 0,
+            "min": 5,
+            "max": 18,
+            "note": "transmission unit EGS (0x18): control module voltage too, when the engine unit doesn't answer (e.g. G06 N63)"
+          },
+          {
+            "ecu": 24,
+            "obd": "42",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.001,
+            "offset": 0,
+            "min": 5,
+            "max": 18
+          },
+          {
+            "ecu": 18,
+            "did": "402B",
+            "bytes": 2,
+            "at": 2,
+            "factor": 0.00025,
+            "offset": 6,
+            "min": 5,
+            "max": 18,
+            "note": "the battery sensor (IBS) itself; a G20 320i's engine unit answers all FF (out of range): then the ones above"
+          },
+          {
+            "ecu": 18,
+            "did": "5853",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.001,
+            "offset": 0,
+            "min": 5,
+            "max": 18,
+            "note": "battery voltage from the battery sensor, 1 mV (seen on F32 DMEs)"
+          },
+          {
+            "ecu": 64,
+            "did": "F442",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.001,
+            "offset": 0,
+            "min": 5,
+            "max": 18,
+            "note": "body domain controller BDC (0x40), not yet confirmed on a car"
+          },
+          {
+            "ecu": 26,
+            "did": "F442",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.001,
+            "offset": 0,
+            "min": 5,
+            "max": 18,
+            "note": "electric drive unit EME (0x1A, holds the DC/DC converter on fully electric cars), not yet confirmed on a car"
+          }
+        ]
+      }
+    }
   }
 }

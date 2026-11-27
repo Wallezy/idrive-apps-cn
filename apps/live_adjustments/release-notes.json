@@ -1,11 +1,19 @@
 [
   {
+    "version": "0.9.17",
+    "changes": [
+      "完善设置恢复、异常启动保护与停止功能。"
+    ],
+    "upstreamVersion": "0.9.16",
+    "cnRevision": 1
+  },
+  {
     "version": "0.9.15",
-    "upstreamVersion": "0.9.14",
-    "cnRevision": 1,
     "changes": [
       "改善 BM3 状态读取和排气阀控制失败提示。"
-    ]
+    ],
+    "upstreamVersion": "0.9.14",
+    "cnRevision": 1
   },
   {
     "version": "0.9.14",

@@ -1,11 +1,19 @@
 [
   {
+    "version": "2.28.1",
+    "changes": [
+      "新增自选混合仪表，支持组合常用车辆数据。"
+    ],
+    "upstreamVersion": "2.28.0",
+    "cnRevision": 1
+  },
+  {
     "version": "2.27.15",
-    "upstreamVersion": "2.27.14",
-    "cnRevision": 1,
     "changes": [
       "新增冷机转速区显示开关。"
-    ]
+    ],
+    "upstreamVersion": "2.27.14",
+    "cnRevision": 1
   },
   {
     "version": "2.27.14",

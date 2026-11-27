@@ -1,7 +1,7 @@
 {
   "name": "warmup",
-  "version": "1.9.5",
-  "description": "Oil and coolant warm-up calculator (time to ready), safe rev limit, turbo cool-down and a cold start counter",
+  "version": "1.12.2",
+  "description": "Oil and coolant warm-up calculator (time to ready), ready for harder driving, safe rev limit, turbo cool-down, a cold start counter, and each drive summed up, compared and before / after a change",
   "main": "javascript/localized-entry.js",
   "private": false,
   "author": "cauliflowermossgrape",
@@ -35,6 +35,7 @@
     "NOTICE.zh-CN.md",
     "PROVENANCE.json",
     "CHANGELOG.md",
+    "rhmiDataStartWidget",
     "ATTRIBUTION.json",
     "CONTRIBUTORS.zh-CN.md"
   ]

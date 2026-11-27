@@ -5,7 +5,7 @@
     "type": "OnlineApp",
     "name": "live_data",
     "vendor": "custom",
-    "version": "1.0.23",
+    "version": "1.2.2",
     "defaultLanguage": "en_GB",
     "stringBundleUuid": "9be67000-5332-5076-b423-c1f902432929",
     "resourceBundleUuid": "afbe480e-ca46-5150-8eaa-1f5fd50445d4",

@@ -1,7 +1,7 @@
 {
  "id": "car_vitals",
  "title": "M \u8f66\u8f86\u4eea\u8868",
- "version": "2.27.15",
+ "version": "2.28.1",
  "screens": [
   {
    "name": "MAIN",
@@ -47,6 +47,115 @@
      "\u5e95\u76d8"
     ]
    ]
+  },
+  {
+   "key": "flexBlend",
+   "label": "\u71c3\u6cb9\u6df7\u5408\u9875\uff1aE85 \u914d\u6bd4\u8ba1\u7b97",
+   "type": "bool",
+   "default": false
+  },
+  {
+   "key": "tankSize",
+   "label": "\u6cb9\u7bb1\u5bb9\u91cf",
+   "type": "number",
+   "unit": "l",
+   "default": 60,
+   "steps": [
+    40,
+    42,
+    45,
+    50,
+    52,
+    55,
+    57,
+    59,
+    60,
+    63,
+    65,
+    68,
+    70,
+    74,
+    78,
+    80,
+    85,
+    90,
+    100
+   ],
+   "when": {
+    "flexBlend": [
+     true
+    ]
+   }
+  },
+  {
+   "key": "e85Share",
+   "label": "\u52a0\u6cb9\u7ad9 E85 \u4e59\u9187\u6bd4\u4f8b",
+   "type": "number",
+   "unit": "%",
+   "default": 85,
+   "steps": [
+    50,
+    55,
+    60,
+    65,
+    70,
+    75,
+    80,
+    85,
+    90,
+    95,
+    100
+   ],
+   "when": {
+    "flexBlend": [
+     true
+    ]
+   }
+  },
+  {
+   "key": "pumpShare",
+   "label": "\u52a0\u6ce8\u71c3\u6cb9\u4e59\u9187\u6bd4\u4f8b",
+   "type": "choice",
+   "default": "10",
+   "options": [
+    [
+     "0",
+     "\u4e0d\u542b\u4e59\u9187\uff08E0\uff09"
+    ],
+    [
+     "5",
+     "E5"
+    ],
+    [
+     "10",
+     "E10"
+    ],
+    [
+     "15",
+     "E15"
+    ]
+   ],
+   "when": {
+    "flexBlend": [
+     true
+    ]
+   }
+  },
+  {
+   "key": "mixNow",
+   "label": "\u5f53\u524d\u6cb9\u7bb1\u4e59\u9187\u6bd4\u4f8b",
+   "type": "number",
+   "unit": "%",
+   "default": 10,
+   "hidden": true
+  },
+  {
+   "key": "mixTarget",
+   "label": "\u76ee\u6807\u4e59\u9187\u6bd4\u4f8b",
+   "type": "number",
+   "unit": "%",
+   "default": 30,
+   "hidden": true
   },
   {
    "key": "tempUnit",

@@ -1,11 +1,19 @@
 [
   {
+    "version": "1.12.2",
+    "changes": [
+      "新增行程对比与暖机就绪状态。"
+    ],
+    "upstreamVersion": "1.12.1",
+    "cnRevision": 1
+  },
+  {
     "version": "1.9.5",
-    "upstreamVersion": "1.9.3",
-    "cnRevision": 1,
     "changes": [
       "优化应用图标与后台资源释放。"
-    ]
+    ],
+    "upstreamVersion": "1.9.3",
+    "cnRevision": 1
   },
   {
     "version": "1.9.4",
