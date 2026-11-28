@@ -23,7 +23,7 @@
     "live_adjustments": "0.9.17",
     "live_data": "1.2.2",
     "mgu-inputgate": "1.2.2",
-    "cluster_metrics": "0.9.5",
+    "cluster_metrics": "0.9.6",
     "ram_mic_calibration": "0.4.2",
     "dpf_monitor": "0.4.2",
     "green_light_alert": "0.2.7",

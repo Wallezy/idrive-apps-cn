@@ -109,17 +109,14 @@
     </container>
     <container id="40" type="state" widget="LT_State_Wide">
         <property id="9" value="1"/>
-        <layoutGroup id="58" name="List">
+        <layoutGroup id="61" name="List">
             <property id="3" value="1"/>
             <component id="41" type="dropDownMenu"/>
             <component id="42" type="checkBox" widget="LT_CheckBox_1Row">
                 <property id="2" value="1"/>
                 <property id="3" value="2"/>
             </component>
-            <component id="43" type="checkBox" widget="LT_CheckBox_1Row">
-                <property id="2" value="1"/>
-                <property id="3" value="2"/>
-            </component>
+            <component id="43" type="dropDownMenu"/>
             <component id="44" type="checkBox" widget="LT_CheckBox_1Row">
                 <property id="2" value="1"/>
                 <property id="3" value="2"/>
@@ -128,68 +125,68 @@
                 <property id="2" value="1"/>
                 <property id="3" value="2"/>
             </component>
-            <component id="46" type="dropDownMenu"/>
-            <component id="47" type="dropDownMenu"/>
-            <component id="48" type="dropDownMenu"/>
-            <component id="49" type="checkBox" widget="LT_CheckBox_1Row">
+            <component id="46" type="checkBox" widget="LT_CheckBox_1Row">
                 <property id="2" value="1"/>
                 <property id="3" value="2"/>
             </component>
-            <component id="50" type="checkBox" widget="LT_CheckBox_1Row">
+            <component id="47" type="checkBox" widget="LT_CheckBox_1Row">
                 <property id="2" value="1"/>
                 <property id="3" value="2"/>
             </component>
+            <component id="48" type="checkBox" widget="LT_CheckBox_1Row">
+                <property id="2" value="1"/>
+                <property id="3" value="2"/>
+            </component>
+            <component id="49" type="dropDownMenu"/>
+            <component id="50" type="dropDownMenu"/>
             <component id="51" type="dropDownMenu"/>
             <component id="52" type="checkBox" widget="LT_CheckBox_1Row">
                 <property id="2" value="1"/>
                 <property id="3" value="2"/>
             </component>
-            <component id="53" type="dropDownMenu"/>
+            <component id="53" type="checkBox" widget="LT_CheckBox_1Row">
+                <property id="2" value="1"/>
+                <property id="3" value="2"/>
+            </component>
             <component id="54" type="dropDownMenu"/>
-            <component id="55" type="dropDownMenu"/>
+            <component id="55" type="checkBox" widget="LT_CheckBox_1Row">
+                <property id="2" value="1"/>
+                <property id="3" value="2"/>
+            </component>
             <component id="56" type="dropDownMenu"/>
+            <component id="57" type="dropDownMenu"/>
+            <component id="58" type="dropDownMenu"/>
+            <component id="59" type="dropDownMenu"/>
         </layoutGroup>
-        <layoutGroup id="59" name="Titlebar">
-            <component id="57" type="title"/>
+        <layoutGroup id="62" name="Titlebar">
+            <component id="60" type="title"/>
         </layoutGroup>
     </container>
-    <container id="60" type="state" widget="LT_State_Wide">
+    <container id="63" type="state" widget="LT_State_Wide">
         <property id="9" value="1"/>
-        <layoutGroup id="69" name="List">
+        <layoutGroup id="72" name="List">
             <property id="3" value="1"/>
-            <component id="61" type="dropDownMenu"/>
-            <component id="62" type="dropDownMenu"/>
-            <component id="63" type="dropDownMenu"/>
             <component id="64" type="dropDownMenu"/>
             <component id="65" type="dropDownMenu"/>
             <component id="66" type="dropDownMenu"/>
             <component id="67" type="dropDownMenu"/>
+            <component id="68" type="dropDownMenu"/>
+            <component id="69" type="dropDownMenu"/>
+            <component id="70" type="dropDownMenu"/>
         </layoutGroup>
-        <layoutGroup id="70" name="Titlebar">
-            <component id="68" type="title"/>
+        <layoutGroup id="73" name="Titlebar">
+            <component id="71" type="title"/>
         </layoutGroup>
     </container>
-    <container id="71" type="state" widget="LT_State_Wide">
+    <container id="74" type="state" widget="LT_State_Wide">
         <property id="9" value="1"/>
-        <layoutGroup id="86" name="List">
+        <layoutGroup id="89" name="List">
             <property id="3" value="1"/>
-            <component id="72" type="button" widget="LT_Button_1Row">
+            <component id="75" type="button" widget="LT_Button_1Row">
                 <property id="2" value="1"/>
                 <property id="3" value="2"/>
             </component>
-            <component id="73" type="button" widget="LT_Button_1Row">
-                <property id="2" value="1"/>
-                <property id="3" value="2"/>
-            </component>
-            <component id="74" type="button" widget="LT_Button_2Row_2Text">
-                <property id="2" value="1"/>
-                <property id="3" value="2"/>
-            </component>
-            <component id="75" type="button" widget="LT_Button_2Row_2Text">
-                <property id="2" value="1"/>
-                <property id="3" value="2"/>
-            </component>
-            <component id="76" type="button" widget="LT_Button_2Row_2Text">
+            <component id="76" type="button" widget="LT_Button_1Row">
                 <property id="2" value="1"/>
                 <property id="3" value="2"/>
             </component>
@@ -225,9 +222,21 @@
                 <property id="2" value="1"/>
                 <property id="3" value="2"/>
             </component>
+            <component id="85" type="button" widget="LT_Button_2Row_2Text">
+                <property id="2" value="1"/>
+                <property id="3" value="2"/>
+            </component>
+            <component id="86" type="button" widget="LT_Button_2Row_2Text">
+                <property id="2" value="1"/>
+                <property id="3" value="2"/>
+            </component>
+            <component id="87" type="button" widget="LT_Button_2Row_2Text">
+                <property id="2" value="1"/>
+                <property id="3" value="2"/>
+            </component>
         </layoutGroup>
-        <layoutGroup id="87" name="Titlebar">
-            <component id="85" type="title"/>
+        <layoutGroup id="90" name="Titlebar">
+            <component id="88" type="title"/>
         </layoutGroup>
     </container>
 </application>

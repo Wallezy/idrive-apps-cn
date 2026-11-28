@@ -15,6 +15,7 @@
  */
 
 const fs = require('fs');
+const { decodeDestinationInfo, etaSnapshot } = require('./nav_cards');
 const {
     decodeEvent: baseDecodeEvent,
     metres,
@@ -466,6 +467,7 @@ class NavTracker {
         this.renderedTurnAt = -Infinity;
         this.nextInt = null;
         this.nextIntAt = -Infinity;
+        this.destinations = {};
         this.lanes = null;
         this.lanesAt = -Infinity;
         this.lanePromo = null;
@@ -489,6 +491,7 @@ class NavTracker {
         this._subs = [];
         this._elTimer = null;
         this._stopped = false;
+        this._generation = 0;
     }
 
     routeSure() {
@@ -536,6 +539,7 @@ class NavTracker {
     }
 
     _reset(nowMs, keepBmwDart) {
+        this.destinations = {};
         this.turn = null;
         if (!keepBmwDart) {
             this.dart = null;
@@ -639,6 +643,10 @@ class NavTracker {
 
         if (name === 'available') {
             if (v !== false) return;
+            const guide = this.guideSource();
+            if ((src === 'carplay' && guide !== 'CAR_PLAY') ||
+                (src === 'androidauto' && guide !== 'ANDROID_AUTO')) return;
+            this._reset(now, false);
             if (src === 'carplay') this.route.carplay = false;
             else if (src === 'androidauto') this.route.aa = false;
             else if (src === 'guidance') { this.route.state = null; this.route.provider = null; this.dart = null; this.nextInt = null; }
@@ -701,6 +709,12 @@ class NavTracker {
             const ni = decodeNextIntersection(v);
             this.nextInt = ni;
             this.nextIntAt = now;
+        } else if (name === 'waypoints' || name === 'finalDestinationInfo' || name === 'nextDestinationInfo') {
+            if (!this.routing() || this.phonesMismatch()) return;
+            if (src === 'phone' && this.guideSource() === 'BMW') return;
+            const dest = decodeDestinationInfo(v);
+            if (dest) this.destinations[name] = { at: now, value: dest };
+            else delete this.destinations[name];
         }
 
         if (this.routeSure()) this.route.sureSeen = true;
@@ -786,7 +800,7 @@ class NavTracker {
         }
     }
 
-    snapshot(nowWallMs, nowMonoMs) {
+    snapshot(nowWallMs, nowMonoMs, localClockOffsetMin) {
         const wall = typeof nowWallMs === 'number' ? nowWallMs : Date.now();
         const mNow = typeof nowMonoMs === 'number' ? nowMonoMs : mono();
         this._pollStatusFiles(wall);
@@ -802,6 +816,13 @@ class NavTracker {
         const hasStackedLanes = Boolean(hasLanes && show.lanes.next && show.lanes.next.lanes && show.lanes.next.lanes.length > 0);
         const laneAnimating = Boolean(hasLanes && show.lanes.anim && show.lanes.anim.t >= 0 && show.lanes.anim.t < 1);
         const guide = routeActive ? this.guideSource() : 'NONE';
+        const eta = routeActive ? etaSnapshot(this.destinations, wall, mNow, localClockOffsetMin) : null;
+        // Cluster cards need a fresh real maneuver, including its direction.
+        // A next-intersection road name alone cannot supply a turn arrow.
+        const cardTurn = !routeActive ? null
+            : (this.turn && mNow - this.turnAt <= STALE_MS ? this.turn
+                : (this.dart && mNow - this.dartAt <= STALE_MS ? this.dart
+                    : (this.renderedTurn && mNow - this.renderedTurnAt <= STALE_MS ? this.renderedTurn : null)));
 
         let miniMapActive = false;
         let miniMapReason = '';
@@ -843,6 +864,8 @@ class NavTracker {
             routeActive,
             guide,
             show,
+            cardTurn,
+            eta,
             hasLanes,
             hasStackedLanes,
             laneAnimating,
@@ -859,19 +882,28 @@ class NavTracker {
 
     start(ctx, log, wantedFn) {
         this._stopped = false;
+        const generation = ++this._generation;
+        const active = () => !this._stopped && this._generation === generation;
         if (!ctx || !ctx.signals || typeof ctx.signals.watch !== 'function') return;
+        const observeAvailability = (S, res) => {
+            if (!res || !res.proxy || typeof ctx.signals.onAvailable !== 'function') return;
+            Promise.resolve(ctx.signals.onAvailable(res.proxy, (available) => {
+                if (active() && available === false) this.feedField(S.name, 'available', false, mono());
+            })).catch(() => {});
+        };
         const sources = [
             {
                 name: 'guidance',
                 iface: 'de.bmw.infotainment.navigation.guiding.Guidance',
                 inst: 'Main_Instance',
-                fields: ['guidanceState', 'guidingProvider', 'conclusiveDart', 'currentLaneGuiding', 'nextIntersection'],
+                fields: ['guidanceState', 'guidingProvider', 'conclusiveDart', 'currentLaneGuiding', 'nextIntersection',
+                    'finalDestinationInfo', 'nextDestinationInfo'],
             },
             {
                 name: 'phone',
                 iface: 'de.bmw.infotainment.navigation.projectedmodeguiding.ProjectedModeGuiding',
                 inst: 'Main_Instance',
-                fields: ['currentLaneGuiding'],
+                fields: ['currentLaneGuiding', 'waypoints'],
             },
             {
                 name: 'carplay',
@@ -892,22 +924,24 @@ class NavTracker {
             const handlers = {};
             for (let j = 0; j < S.fields.length; j++) {
                 const f = S.fields[j];
-                handlers[f] = (v) => this.feedField(S.name, f, v, mono());
+                handlers[f] = (v) => { if (active()) this.feedField(S.name, f, v, mono()); };
             }
-            const watchOpts = S.name === 'guidance' ? { pollMs: 3000 } : undefined;
+            const watchOpts = S.name === 'guidance' || S.name === 'phone' ? { pollMs: 3000 } : undefined;
             try {
                 const p = ctx.signals.watch(S.iface, S.inst, handlers, log, watchOpts);
                 if (p && typeof p.then === 'function') {
                     p.then((res) => {
                         if (!res) return;
-                        if (this._stopped) {
+                        if (!active()) {
                             try { if (res.shutdown) res.shutdown(); } catch (e) { /* ignore */ }
                             return;
                         }
                         this._subs.push(res);
+                        observeAvailability(S, res);
                     }).catch(() => {});
                 } else if (p) {
                     this._subs.push(p);
+                    observeAvailability(S, p);
                 }
             } catch (e) { /* optional signal */ }
         }
@@ -919,7 +953,7 @@ class NavTracker {
         const pollHudViewContent = (id) => {
             if (!id || !rcProxy || !ctx.signals.call) return Promise.resolve();
             return ctx.signals.call(rcProxy, 'getViewContent', { viewId: id }, 900)
-                .then((cntReply) => { this.feedRenderedContent(id, cntReply, mono()); })
+                .then((cntReply) => { if (active()) this.feedRenderedContent(id, cntReply, mono()); })
                 .catch(() => {});
         };
         const inspectViewId = (vid) => {
@@ -930,6 +964,7 @@ class NavTracker {
             queriedConfigs[id] = true;
             ctx.signals.call(rcProxy, 'getViewConfig', { viewId: id }, 1500)
                 .then((cfgReply) => {
+                    if (!active()) return null;
                     this.feedRenderedConfig(id, cfgReply);
                     if (this._isHudView(id, this.viewStates[id])) {
                         return pollHudViewContent(id);
@@ -945,6 +980,7 @@ class NavTracker {
                 'Main_Instance',
                 {
                     registeredViews: (v) => {
+                        if (!active()) return;
                         const list = Array.isArray(v) ? v : (isObj(v) && Array.isArray(v.registeredViews) ? v.registeredViews : []);
                         for (let i = 0; i < list.length; i++) inspectViewId(list[i]);
                     },
@@ -953,7 +989,7 @@ class NavTracker {
             );
             Promise.resolve(rcWatch).then((res) => {
                 if (!res) return;
-                if (this._stopped) {
+                if (!active()) {
                     try { if (res.shutdown) res.shutdown(); } catch (e) { /* ignore */ }
                     return;
                 }
@@ -963,6 +999,7 @@ class NavTracker {
                     Object.keys(knownViewIds).forEach((id) => inspectViewId(id));
                     if (typeof ctx.signals.on === 'function') {
                         ctx.signals.on(rcProxy, 'viewContentChanged', (arg0, arg1) => {
+                            if (!active()) return;
                             let vid = '';
                             let payload = arg0;
                             if (typeof arg0 === 'string') {
@@ -989,7 +1026,7 @@ class NavTracker {
 
         const ask = () => {
             const now = mono();
-            if (this._stopped || !this.routing() || !want()) return;
+            if (!active() || !this.routing() || !want()) return;
             if (rcProxy && !rcPolling && ctx.signals.call) {
                 const vIds = Object.keys(knownViewIds);
                 const hudIds = vIds.filter((id) => !queriedConfigs[id] || this._isHudView(id, this.viewStates[id]));
@@ -1013,6 +1050,7 @@ class NavTracker {
                     .then((px) => { elProxy = px; return px; }, (err) => { proxyFailedAt = mono(); throw err; });
             }).then((px) => ctx.signals.call(px, 'queryContent', eventQuery(), QUERY_TIMEOUT_MS))
                 .then((reply) => {
+                    if (!active()) return;
                     callFails = 0;
                     this.feedEvents(reply, mono(), askedAt);
                 }).catch((err) => {
@@ -1035,6 +1073,8 @@ class NavTracker {
 
     stop() {
         this._stopped = true;
+        this._generation++;
+        this._reset(mono(), false);
         if (this._elTimer) {
             clearInterval(this._elTimer);
             this._elTimer = null;

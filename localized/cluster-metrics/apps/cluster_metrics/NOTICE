@@ -7,3 +7,10 @@ Bundled runtime dependencies retain their upstream licenses:
 - jpeg_decoder.js (jpeg-js 0.4.4): Apache-2.0 / BSD-3-Clause
 - kit/fonts/{bold,gear,label,light,num}.json: Ubuntu Font Licence 1.0 (LICENSE-UbuntuFont.txt)
 - kit/fonts/cjk.json: SIL Open Font License 1.1 (LICENSE-NotoSansCJK.txt)
+
+Navigation cards and arrival-data decoding:
+Hyperionism/idrive7-cockpit-plus, GPL-3.0-only.
+https://github.com/Hyperionism/idrive7-cockpit-plus
+Source commit: 0ba2af68b4fe4c4825b2db2f69dab174cc617209
+Files: apps/id7_cockpit_plus/{nav_tracker.js,overlay_renderer.js}
+Retains the Cluster Metrics (chyiz) and bundled dependency notices above.

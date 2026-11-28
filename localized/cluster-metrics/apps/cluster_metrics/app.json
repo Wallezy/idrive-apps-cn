@@ -15,7 +15,9 @@
     "- cluster_render_client.js: MPL-2.0, Copyright (C) 2026 Robert Nisipeanu",
     "- jpeg_decoder.js (jpeg-js 0.4.4): Apache-2.0 / BSD-3-Clause",
     "- kit/fonts/{bold,gear,label,light,num}.json: Ubuntu Font Licence 1.0 (LICENSE-UbuntuFont.txt)",
-    "- latin_auto.pack, kit/fonts/cjk.json & cjk_gothic.pack: Noto Sans & Noto Sans CJK (SC/JP/TC/KR), SIL Open Font License 1.1 (LICENSE-NotoSansCJK.txt)"
+    "- latin_auto.pack, kit/fonts/cjk.json & cjk_gothic.pack: Noto Sans & Noto Sans CJK (SC/JP/TC/KR), SIL Open Font License 1.1 (LICENSE-NotoSansCJK.txt)",
+    "",
+    "Navigation cards and arrival-data decoding adapted from Hyperionism/idrive7-cockpit-plus (GPL-3.0-only), commit 0ba2af68b4fe4c4825b2db2f69dab174cc617209."
   ],
   "repoTitle": "GitHub Repository",
   "repoLink": "github.com/chyiz/mgu-apps",
@@ -97,7 +99,9 @@
       "guidingProvider": "rs",
       "conclusiveDart": "rs",
       "currentLaneGuiding": "rs",
-      "nextIntersection": "rs"
+      "nextIntersection": "rs",
+      "finalDestinationInfo": "rs",
+      "nextDestinationInfo": "rs"
     },
     "de.bmw.infotainment.navigation.guiding.GuidanceEventList": {
       "_optional": "read turn-by-turn maneuvers for HUD navigation re-rendering",
@@ -121,7 +125,8 @@
     "de.bmw.infotainment.navigation.projectedmodeguiding.ProjectedModeGuiding": {
       "_optional": "detect CarPlay / Android Auto lane guidance",
       "_instances": "Main_Instance",
-      "currentLaneGuiding": "rs"
+      "currentLaneGuiding": "rs",
+      "waypoints": "rs"
     },
     "de.bmw.infotainment.a4a.carplay.CarPlayManager": {
       "_optional": "detect active Apple Maps / CarPlay route guidance",
@@ -350,6 +355,9 @@
       "repoLink": false,
       "settings": [
         "clusterSlotMode",
+        "clusterTurnCard",
+        "turnCardTriggerM",
+        "clusterEtaPill",
         "widgetMedia",
         "widgetTrip",
         "widgetTpms",
@@ -1099,6 +1107,46 @@
           "Off"
         ]
       ]
+    },
+    {
+      "key": "clusterTurnCard",
+      "label": "Cluster turn card",
+      "type": "bool",
+      "default": false
+    },
+    {
+      "key": "turnCardTriggerM",
+      "label": "Turn card distance",
+      "type": "choice",
+      "default": "always",
+      "options": [
+        [
+          "always",
+          "Throughout navigation"
+        ],
+        [
+          "200",
+          "Within 200 m"
+        ],
+        [
+          "350",
+          "Within 350 m"
+        ],
+        [
+          "500",
+          "Within 500 m"
+        ],
+        [
+          "800",
+          "Within 800 m"
+        ]
+      ]
+    },
+    {
+      "key": "clusterEtaPill",
+      "label": "Cluster arrival information",
+      "type": "bool",
+      "default": false
     }
   ],
   "config": {

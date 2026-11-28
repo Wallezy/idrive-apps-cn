@@ -24,6 +24,12 @@ cluster-render 渲染客户端；保留 MPL-2.0 声明。
 
 来源：https://github.com/robertnisipeanu/idrive-apps
 
+## 适配与维护：Hyperionism
+
+仪表转向提示、到达信息的绘制和导航数据处理参考实现。
+
+来源：https://github.com/Hyperionism/idrive7-cockpit-plus
+
 ## 适配与维护：Wallezy
 
 CN 商店打包、依赖与 SDK 链接适配、兼容修复及发行维护。

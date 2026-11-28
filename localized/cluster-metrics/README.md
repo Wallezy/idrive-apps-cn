@@ -1,5 +1,23 @@
 # idrive7-cluster-metrics
 
+## CN 仪表导航卡片
+
+在商店更新“组合仪表数据”，打开应用的“仪表”设置，可分别开启“仪表转向提示”
+和“仪表到达信息”。转向提示显示方向、距离和道路名；到达信息显示预计到达时间、
+剩余时长及距离。两个开关初始关闭，转向提示可选择导航期间显示或按距离显示。
+
+卡片使用现有 cluster-render 的 panel 图层，可与现有 Waze 全屏地图配合。
+仅 HUD、仅地图区域及应用关闭时不显示卡片。手机导航必须提供车机可读取的结构化
+导航数据；只有投屏画面时不显示。导航取消、服务断开或数据过期时清除卡片。
+导航提供的到达时间保持其本地时间；推算时间使用车机时区，缺失时采用 UTC+8。
+
+卡片位置以 KOMBI4 的 1920×720 布局为基础，保留现有仪表偏移设置和渲染服务的
+原厂内容避让。其他仪表布局、手机导航来源及与原厂告警共存的真车效果仍需验证。
+
+参考实现：Hyperionism/idrive7-cockpit-plus，提交
+`0ba2af68b4fe4c4825b2db2f69dab174cc617209`，GPL-3.0-only。
+仅复用导航卡片及到达数据处理，不依赖其配套 FullView 工具。
+
 > [!WARNING]
 > **Disclaimer**: This is an independent personal project and has **only been tested on a BMW G30 (530e) with iDrive 7**. It is not affiliated with, endorsed by, or supported by BMW or any equipment supplier. Everything in this repository is provided **"as is"** without warranty of any kind — modifying vehicle software or displays can cause unexpected behavior, distract the driver, or void warranties. Use entirely at your own risk.
 

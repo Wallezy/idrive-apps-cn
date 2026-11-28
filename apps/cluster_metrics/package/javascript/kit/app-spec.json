@@ -1,1128 +1,1171 @@
 {
- "id": "cluster_metrics",
- "title": "\u7ec4\u5408\u4eea\u8868\u6570\u636e",
- "version": "0.9.5",
- "screens": [
-  {
-   "name": "MAIN",
-   "kind": "menu",
-   "title": "\u7ec4\u5408\u4eea\u8868\u6570\u636e",
-   "settings": false,
-   "repoLink": false,
-   "items": [
-    [
-     "tworow",
-     "STATUS_SUMMARY",
-     "\u7ec4\u5408\u4eea\u8868\u72b6\u6001"
-    ],
-    [
-     "tworow",
-     "TAB_GENERAL",
-     "\u901a\u7528"
-    ],
-    [
-     "tworow",
-     "TAB_CLUSTER",
-     "\u4eea\u8868\u76d8"
-    ],
-    [
-     "tworow",
-     "TAB_HUD",
-     "\u62ac\u5934\u663e\u793a"
-    ],
-    [
-     "button",
-     "BTN_DIAG",
-     "\u5b9e\u65f6\u6570\u636e\u4e0e\u8bca\u65ad"
-    ]
-   ]
+  "id": "cluster_metrics",
+  "title": "组合仪表数据",
+  "version": "0.9.6",
+  "screens": [
+    {
+      "name": "MAIN",
+      "kind": "menu",
+      "title": "组合仪表数据",
+      "settings": false,
+      "repoLink": false,
+      "items": [
+        [
+          "tworow",
+          "STATUS_SUMMARY",
+          "组合仪表状态"
+        ],
+        [
+          "tworow",
+          "TAB_GENERAL",
+          "通用"
+        ],
+        [
+          "tworow",
+          "TAB_CLUSTER",
+          "仪表盘"
+        ],
+        [
+          "tworow",
+          "TAB_HUD",
+          "抬头显示"
+        ],
+        [
+          "button",
+          "BTN_DIAG",
+          "实时数据与诊断"
+        ]
+      ]
+    },
+    {
+      "name": "GENERAL",
+      "kind": "menu",
+      "title": "通用",
+      "repoLink": true,
+      "settings": [
+        "enabled",
+        "displayTarget",
+        "smartAlerts",
+        [
+          "button",
+          "BTN_ALERTS_MENU",
+          "Preview smart alerts..."
+        ],
+        "unitSystem",
+        "tempUnit",
+        "evEffUnit",
+        "fuelEffUnit",
+        "pressUnit",
+        "coldOilC",
+        "vehicle",
+        "demo"
+      ]
+    },
+    {
+      "name": "ALERTS",
+      "kind": "menu",
+      "title": "车辆提醒预览",
+      "repoLink": false,
+      "items": [
+        [
+          "tworow",
+          "ALERT_PREVIEW_STATUS",
+          "当前提醒预览"
+        ],
+        [
+          "button",
+          "ALERT_TPMS_LOW",
+          "胎压偏低（黄色）"
+        ],
+        [
+          "button",
+          "ALERT_TPMS_CRIT",
+          "轮胎严重缺气（红色）"
+        ],
+        [
+          "button",
+          "ALERT_TPMS_HOT",
+          "轮胎温度偏高（黄色）"
+        ],
+        [
+          "button",
+          "ALERT_GBX_WARN",
+          "变速箱温度偏高（黄色）"
+        ],
+        [
+          "button",
+          "ALERT_GBX_CRIT",
+          "变速箱温度过高（红色）"
+        ],
+        [
+          "button",
+          "ALERT_12V_SOC",
+          "12V 电量偏低（黄色）"
+        ],
+        [
+          "button",
+          "ALERT_12V_VOLT",
+          "12V 电压过低（红色）"
+        ],
+        [
+          "button",
+          "ALERT_CLEAR",
+          "结束提醒预览"
+        ]
+      ]
+    },
+    {
+      "name": "CLUSTER",
+      "kind": "menu",
+      "title": "仪表盘",
+      "repoLink": false,
+      "settings": [
+        "clusterSlotMode",
+        "clusterTurnCard",
+        "turnCardTriggerM",
+        "clusterEtaPill",
+        "widgetMedia",
+        "widgetTrip",
+        "widgetTpms",
+        [
+          "checkbox",
+          "WIDGET_CHARGING",
+          "Right widget: Charging finish time (auto)"
+        ],
+        "belowSpeedLine1",
+        "belowSpeedLine2",
+        "gearDisplay",
+        "cabinTempDisplay",
+        "hvSocGauge",
+        "brakeIndicator",
+        "iceChargeBar",
+        "cornerRightDisplay",
+        "cornerLeftDisplay",
+        "clusterNudgeX",
+        "clusterNudgeY"
+      ]
+    },
+    {
+      "name": "HUD",
+      "kind": "menu",
+      "title": "抬头显示",
+      "repoLink": false,
+      "settings": [
+        "hudNavMode",
+        "hudHeadway",
+        "hudLine1",
+        "hudLine2",
+        "hudLine3",
+        "hudNudgeX",
+        "hudNudgeY"
+      ]
+    },
+    {
+      "name": "DIAG",
+      "kind": "menu",
+      "title": "实时数据与诊断",
+      "repoLink": false,
+      "items": [
+        [
+          "button",
+          "BTN_READ_NOW",
+          "立即读取传感器"
+        ],
+        [
+          "button",
+          "BTN_PROBE_BRAKE",
+          "记录 30 秒制动与导航数据"
+        ],
+        [
+          "tworow",
+          "DIAG_RENDER",
+          "仪表与抬头显示服务"
+        ],
+        [
+          "tworow",
+          "DIAG_NAV",
+          "抬头导航与路口地图"
+        ],
+        [
+          "tworow",
+          "DIAG_HEADWAY",
+          "抬头显示跟车距离"
+        ],
+        [
+          "tworow",
+          "DIAG_MEDIA",
+          "右侧信息（媒体与 BC 按键）"
+        ],
+        [
+          "tworow",
+          "DIAG_CHARGING",
+          "充电与预计完成时间"
+        ],
+        [
+          "tworow",
+          "DIAG_BRAKE_ECU",
+          "制动模块（液压与能量回收）"
+        ],
+        [
+          "tworow",
+          "DIAG_POWERTRAIN",
+          "动力系统与实时能耗"
+        ],
+        [
+          "tworow",
+          "DIAG_BATTERY",
+          "动力电池（电量／功率／温度）"
+        ],
+        [
+          "tworow",
+          "DIAG_TEMPS",
+          "发动机与变速箱温度"
+        ],
+        [
+          "tworow",
+          "DIAG_CHASSIS",
+          "挡位与机械制动"
+        ],
+        [
+          "tworow",
+          "DIAG_UDS",
+          "只读诊断与辅助数据"
+        ]
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "key": "enabled",
+      "label": "启用组合仪表数据",
+      "type": "bool",
+      "default": false
+    },
+    {
+      "key": "displayTarget",
+      "label": "显示位置",
+      "type": "choice",
+      "default": "both",
+      "options": [
+        [
+          "both",
+          "仪表与抬头显示"
+        ],
+        [
+          "cluster",
+          "仅仪表"
+        ],
+        [
+          "hud",
+          "仅抬头显示"
+        ]
+      ]
+    },
+    {
+      "key": "clusterSlotMode",
+      "label": "仪表显示方式",
+      "type": "choice",
+      "default": "panel_only",
+      "reset": 3,
+      "options": [
+        [
+          "panel_only",
+          "全仪表（全部叠加信息与右侧组件）"
+        ],
+        [
+          "map_only",
+          "仅中央地图区（保留原厂行车信息）"
+        ]
+      ]
+    },
+    {
+      "key": "widgetMedia",
+      "label": "右侧信息：媒体播放",
+      "type": "bool",
+      "default": true
+    },
+    {
+      "key": "widgetTrip",
+      "label": "右侧信息：行程与车辆",
+      "type": "bool",
+      "default": true
+    },
+    {
+      "key": "widgetTpms",
+      "label": "右侧信息：胎压与提醒",
+      "type": "bool",
+      "default": true
+    },
+    {
+      "key": "hudNavMode",
+      "label": "导航时的抬头显示",
+      "type": "choice",
+      "default": "yield_route",
+      "reset": 2,
+      "options": [
+        [
+          "own_nav_minimap",
+          "显示导航，遇路口地图时让位"
+        ],
+        [
+          "own_nav_keep",
+          "持续显示应用导航与数据"
+        ],
+        [
+          "yield_lanes",
+          "显示导航，遇车道或路口地图时让位"
+        ],
+        [
+          "yield_route",
+          "导航期间隐藏应用抬头内容"
+        ]
+      ]
+    },
+    {
+      "key": "hudHeadway",
+      "label": "跟车距离（抬头显示）",
+      "type": "choice",
+      "default": "full",
+      "options": [
+        [
+          "full",
+          "时距、距离与接近速度"
+        ],
+        [
+          "compact",
+          "仅时距与距离"
+        ],
+        [
+          "off",
+          "关闭"
+        ]
+      ]
+    },
+    {
+      "key": "hudLine1",
+      "label": "抬头显示第一行",
+      "type": "choice",
+      "default": "efficiency_gear",
+      "reset": 2,
+      "options": [
+        [
+          "efficiency_gear",
+          "能耗与挡位"
+        ],
+        [
+          "efficiency",
+          "实时能耗（跟随所选单位）"
+        ],
+        [
+          "power_gear",
+          "功率／增压与挡位"
+        ],
+        [
+          "gear",
+          "当前挡位（D1–D8）"
+        ],
+        [
+          "soc",
+          "动力电池电量"
+        ],
+        [
+          "soc12",
+          "12V 电池电量"
+        ],
+        [
+          "headway",
+          "跟车距离"
+        ],
+        [
+          "temps",
+          "机油与冷却液温度"
+        ],
+        [
+          "off",
+          "关闭"
+        ]
+      ]
+    },
+    {
+      "key": "hudLine2",
+      "label": "抬头显示第二行",
+      "type": "choice",
+      "default": "power",
+      "reset": 2,
+      "options": [
+        [
+          "power",
+          "功率／转速与增压"
+        ],
+        [
+          "power_gear",
+          "功率／增压与挡位"
+        ],
+        [
+          "gear",
+          "当前挡位（D1–D8）"
+        ],
+        [
+          "soc",
+          "动力电池电量"
+        ],
+        [
+          "soc12",
+          "12V 电池电量"
+        ],
+        [
+          "soc_oil",
+          "动力电池电量与油温"
+        ],
+        [
+          "headway",
+          "跟车距离"
+        ],
+        [
+          "temps",
+          "机油与冷却液温度"
+        ],
+        [
+          "off",
+          "关闭"
+        ]
+      ]
+    },
+    {
+      "key": "hudLine3",
+      "label": "抬头显示第三行",
+      "type": "choice",
+      "default": "brake",
+      "options": [
+        [
+          "brake",
+          "机械制动强度条"
+        ],
+        [
+          "soc",
+          "动力电池电量"
+        ],
+        [
+          "temps",
+          "机油与冷却液温度"
+        ],
+        [
+          "soc_oil",
+          "动力电池电量与油温"
+        ],
+        [
+          "soc12",
+          "12V 电池电量"
+        ],
+        [
+          "headway",
+          "跟车距离"
+        ],
+        [
+          "gear",
+          "当前挡位（D1–D8）"
+        ],
+        [
+          "off",
+          "关闭"
+        ]
+      ]
+    },
+    {
+      "key": "cabinTempDisplay",
+      "label": "车内温度（外温左侧）",
+      "type": "bool",
+      "default": true
+    },
+    {
+      "key": "hvSocGauge",
+      "label": "高压电池电量表（插混）",
+      "type": "bool",
+      "default": true
+    },
+    {
+      "key": "cornerRightDisplay",
+      "label": "右下角数据",
+      "type": "choice",
+      "default": "auto",
+      "reset": 2,
+      "options": [
+        [
+          "auto",
+          "自动（12V 电量／电压／进气温度）"
+        ],
+        [
+          "soc12",
+          "12V 电池电量"
+        ],
+        [
+          "batt",
+          "高压电池温度"
+        ],
+        [
+          "gbx",
+          "变速箱油温"
+        ],
+        [
+          "v12",
+          "12V 电池电压"
+        ],
+        [
+          "iat",
+          "进气温度"
+        ],
+        [
+          "soc",
+          "高压电池电量（底角）"
+        ],
+        [
+          "off",
+          "关闭"
+        ]
+      ]
+    },
+    {
+      "key": "cornerLeftDisplay",
+      "label": "左下角温度",
+      "type": "choice",
+      "default": "oil_cool",
+      "options": [
+        [
+          "oil_cool",
+          "机油与冷却液"
+        ],
+        [
+          "oil_gbx",
+          "机油与变速箱油温"
+        ],
+        [
+          "off",
+          "关闭"
+        ]
+      ]
+    },
+    {
+      "key": "belowSpeedLine1",
+      "label": "车速下方第一行",
+      "type": "choice",
+      "default": "efficiency",
+      "options": [
+        [
+          "efficiency",
+          "能耗／充电功率"
+        ],
+        [
+          "off",
+          "关闭"
+        ]
+      ]
+    },
+    {
+      "key": "belowSpeedLine2",
+      "label": "车速下方第二行",
+      "type": "choice",
+      "default": "power",
+      "options": [
+        [
+          "power",
+          "功率／转速与增压"
+        ],
+        [
+          "off",
+          "关闭"
+        ]
+      ]
+    },
+    {
+      "key": "gearDisplay",
+      "label": "前进挡位（1–8 挡）",
+      "type": "choice",
+      "default": "next_to_d",
+      "options": [
+        [
+          "next_to_d",
+          "显示在底部 D 挡旁"
+        ],
+        [
+          "below_speed",
+          "显示在车速下方"
+        ],
+        [
+          "off",
+          "关闭"
+        ]
+      ]
+    },
+    {
+      "key": "brakeIndicator",
+      "label": "机械制动指示",
+      "type": "choice",
+      "default": "bar_num",
+      "options": [
+        [
+          "bar_num",
+          "强度条与压力／减速度"
+        ],
+        [
+          "bar_only",
+          "仅强度条"
+        ],
+        [
+          "off",
+          "关闭"
+        ]
+      ]
+    },
+    {
+      "key": "iceChargeBar",
+      "label": "发动机充电功率条（插混）",
+      "type": "bool",
+      "default": true
+    },
+    {
+      "key": "smartAlerts",
+      "label": "异常提醒（胎压／12V 电池／变速箱）",
+      "type": "bool",
+      "default": true
+    },
+    {
+      "key": "unitSystem",
+      "label": "单位制",
+      "type": "choice",
+      "default": "auto",
+      "options": [
+        [
+          "auto",
+          "自动跟随车辆"
+        ],
+        [
+          "us",
+          "美制（mph／MPG／°F／psi）"
+        ],
+        [
+          "metric",
+          "公制（km/h／L/100km／°C／bar）"
+        ],
+        [
+          "uk",
+          "英制（mph／英制 MPG／°C／psi）"
+        ]
+      ]
+    },
+    {
+      "key": "tempUnit",
+      "label": "温度单位",
+      "type": "choice",
+      "default": "auto",
+      "options": [
+        [
+          "auto",
+          "自动"
+        ],
+        [
+          "F",
+          "华氏度"
+        ],
+        [
+          "C",
+          "摄氏度"
+        ]
+      ]
+    },
+    {
+      "key": "evEffUnit",
+      "label": "电耗单位",
+      "type": "choice",
+      "default": "auto",
+      "options": [
+        [
+          "auto",
+          "自动"
+        ],
+        [
+          "mi_kwh",
+          "mi/kWh"
+        ],
+        [
+          "kwh_100km",
+          "kWh/100km"
+        ],
+        [
+          "wh_mi",
+          "Wh/mi"
+        ]
+      ]
+    },
+    {
+      "key": "fuelEffUnit",
+      "label": "油耗单位",
+      "type": "choice",
+      "default": "auto",
+      "options": [
+        [
+          "auto",
+          "自动"
+        ],
+        [
+          "mpg_us",
+          "MPG（美制）"
+        ],
+        [
+          "mpg_uk",
+          "MPG（英制）"
+        ],
+        [
+          "l_100km",
+          "L/100km"
+        ],
+        [
+          "km_l",
+          "km/L"
+        ]
+      ]
+    },
+    {
+      "key": "pressUnit",
+      "label": "增压与压力单位",
+      "type": "choice",
+      "default": "auto",
+      "options": [
+        [
+          "auto",
+          "自动"
+        ],
+        [
+          "psi",
+          "psi"
+        ],
+        [
+          "bar",
+          "bar"
+        ]
+      ]
+    },
+    {
+      "key": "vehicle",
+      "label": "动力类型",
+      "type": "choice",
+      "default": "auto",
+      "options": [
+        [
+          "auto",
+          "自动识别插混／燃油车"
+        ],
+        [
+          "phev",
+          "插电混动（530e／330e／45e）"
+        ],
+        [
+          "ice",
+          "汽油／柴油车"
+        ]
+      ]
+    },
+    {
+      "key": "coldOilC",
+      "label": "机油暖机温度",
+      "type": "number",
+      "unit": "degC",
+      "default": 75,
+      "steps": [
+        65,
+        70,
+        75,
+        80,
+        85
+      ]
+    },
+    {
+      "key": "hudNudgeX",
+      "label": "抬头显示水平偏移",
+      "type": "number",
+      "unit": "px",
+      "default": 0,
+      "steps": [
+        -40,
+        -30,
+        -20,
+        -10,
+        0,
+        10,
+        20,
+        30,
+        40
+      ]
+    },
+    {
+      "key": "hudNudgeY",
+      "label": "抬头显示垂直偏移",
+      "type": "number",
+      "unit": "px",
+      "default": 0,
+      "steps": [
+        -40,
+        -30,
+        -20,
+        -10,
+        0,
+        10,
+        20,
+        30,
+        40
+      ]
+    },
+    {
+      "key": "clusterNudgeX",
+      "label": "仪表数据水平偏移",
+      "type": "number",
+      "unit": "px",
+      "default": 0,
+      "steps": [
+        -12,
+        -8,
+        -4,
+        0,
+        4,
+        8,
+        12
+      ]
+    },
+    {
+      "key": "clusterNudgeY",
+      "label": "仪表数据垂直偏移",
+      "type": "number",
+      "unit": "px",
+      "default": 0,
+      "steps": [
+        -12,
+        -8,
+        -4,
+        0,
+        4,
+        8,
+        12
+      ]
+    },
+    {
+      "key": "demo",
+      "label": "演示数据",
+      "type": "choice",
+      "default": "auto",
+      "options": [
+        [
+          "auto",
+          "离车时自动演示"
+        ],
+        [
+          "phev",
+          "插混演示（530e）"
+        ],
+        [
+          "charging",
+          "演示插混充电"
+        ],
+        [
+          "ice",
+          "燃油车演示（B48／B58）"
+        ],
+        [
+          "off",
+          "关闭"
+        ]
+      ]
+    },
+    {
+      "key": "clusterTurnCard",
+      "label": "仪表转向提示",
+      "type": "bool",
+      "default": false
+    },
+    {
+      "key": "turnCardTriggerM",
+      "label": "转向提示距离",
+      "type": "choice",
+      "default": "always",
+      "options": [
+        [
+          "always",
+          "导航期间显示"
+        ],
+        [
+          "200",
+          "200 米以内"
+        ],
+        [
+          "350",
+          "350 米以内"
+        ],
+        [
+          "500",
+          "500 米以内"
+        ],
+        [
+          "800",
+          "800 米以内"
+        ]
+      ]
+    },
+    {
+      "key": "clusterEtaPill",
+      "label": "仪表到达信息",
+      "type": "bool",
+      "default": false
+    }
+  ],
+  "config": {
+    "scaling": {
+      "rpm": {
+        "factor": 0.25,
+        "offset": 0,
+        "invalid": 65535
+      },
+      "speed": {
+        "factor": 0.015625,
+        "offset": 0,
+        "invalid": 65535
+      },
+      "accel": {
+        "factor": 0.002,
+        "offset": -65,
+        "invalid": 65535
+      },
+      "temp": {
+        "factor": 1,
+        "offset": -48,
+        "invalid": 255
+      },
+      "boost": {
+        "factor": 0.01,
+        "offset": 0,
+        "invalid": 255
+      },
+      "batteryTemp": {
+        "factor": 1,
+        "offset": -50,
+        "invalid": 255
+      },
+      "ambient": {
+        "factor": 0.5,
+        "offset": -40,
+        "invalid": 255
+      },
+      "cabin": {
+        "factor": 0.5,
+        "offset": -40,
+        "invalid": 255
+      },
+      "pedal": {
+        "factor": 0.025,
+        "offset": 0,
+        "invalid": 65535
+      },
+      "torque": {
+        "factor": 0.5,
+        "offset": -1023.5,
+        "invalidFrom": 4095
+      }
+    },
+    "dids": {
+      "powerSign": -1,
+      "sme": {
+        "ecu": 7,
+        "hvV": [
+          {
+            "did": "DDB4",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.01,
+            "min": 150,
+            "max": 500,
+            "timeoutMs": 800
+          },
+          {
+            "did": "DD68",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.01,
+            "min": 150,
+            "max": 500,
+            "timeoutMs": 800
+          },
+          {
+            "did": "DD66",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.01,
+            "min": 150,
+            "max": 500,
+            "timeoutMs": 800
+          },
+          {
+            "did": "DDEF",
+            "bytes": 2,
+            "at": 0,
+            "factor": 1,
+            "min": 150,
+            "max": 500,
+            "timeoutMs": 800
+          }
+        ],
+        "hvI": [
+          {
+            "did": "DD69",
+            "bytes": 4,
+            "at": 0,
+            "factor": 0.01,
+            "signed": true,
+            "min": -800,
+            "max": 800,
+            "timeoutMs": 800
+          }
+        ],
+        "soc": [
+          {
+            "did": "DDBC",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.1,
+            "min": 0,
+            "max": 100,
+            "timeoutMs": 1200
+          }
+        ],
+        "cellT": [
+          {
+            "did": "DDC0",
+            "at": 4,
+            "bytes": 2,
+            "factor": 0.01,
+            "signed": true,
+            "min": -40,
+            "max": 80,
+            "timeoutMs": 1200
+          }
+        ]
+      },
+      "dme": {
+        "ecu": 18,
+        "fuelRate": [
+          {
+            "did": "5656",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.00429153,
+            "min": 0,
+            "max": 150,
+            "timeoutMs": 900
+          },
+          {
+            "obd": "5E",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.05,
+            "min": 0,
+            "max": 150,
+            "timeoutMs": 900
+          },
+          {
+            "did": "4521",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.134228,
+            "min": 0,
+            "max": 150,
+            "timeoutMs": 900
+          }
+        ],
+        "v12": [
+          {
+            "did": "F442",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.001,
+            "min": 5,
+            "max": 18,
+            "timeoutMs": 1000
+          },
+          {
+            "ecu": 7,
+            "did": "F442",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.001,
+            "min": 5,
+            "max": 18,
+            "timeoutMs": 1000
+          },
+          {
+            "obd": "42",
+            "bytes": 2,
+            "at": 0,
+            "factor": 0.001,
+            "min": 5,
+            "max": 18,
+            "timeoutMs": 1000
+          }
+        ],
+        "iat": [
+          {
+            "did": "F40F",
+            "bytes": 1,
+            "at": 0,
+            "factor": 1,
+            "offset": -40,
+            "min": -40,
+            "max": 150,
+            "timeoutMs": 1000
+          },
+          {
+            "obd": "0F",
+            "bytes": 1,
+            "at": 0,
+            "factor": 1,
+            "offset": -40,
+            "min": -40,
+            "max": 150,
+            "timeoutMs": 1000
+          }
+        ],
+        "oil": [
+          {
+            "obd": "5C",
+            "bytes": 1,
+            "at": 0,
+            "factor": 1,
+            "offset": -40,
+            "min": -40,
+            "max": 170,
+            "timeoutMs": 1000
+          }
+        ]
+      },
+      "egs": {
+        "ecu": 24,
+        "gearboxOil": [
+          {
+            "did": "6000",
+            "bytes": 1,
+            "at": 0,
+            "factor": 1,
+            "offset": -40,
+            "min": -40,
+            "max": 160,
+            "timeoutMs": 1000
+          }
+        ]
+      }
+    }
   },
-  {
-   "name": "GENERAL",
-   "kind": "menu",
-   "title": "\u901a\u7528",
-   "repoLink": true,
-   "settings": [
-    "enabled",
-    "displayTarget",
-    "smartAlerts",
-    [
-     "button",
-     "BTN_ALERTS_MENU",
-     "Preview smart alerts..."
-    ],
-    "unitSystem",
-    "tempUnit",
-    "evEffUnit",
-    "fuelEffUnit",
-    "pressUnit",
-    "coldOilC",
-    "vehicle",
-    "demo"
-   ]
-  },
-  {
-   "name": "ALERTS",
-   "kind": "menu",
-   "title": "\u8f66\u8f86\u63d0\u9192\u9884\u89c8",
-   "repoLink": false,
-   "items": [
-    [
-     "tworow",
-     "ALERT_PREVIEW_STATUS",
-     "\u5f53\u524d\u63d0\u9192\u9884\u89c8"
-    ],
-    [
-     "button",
-     "ALERT_TPMS_LOW",
-     "\u80ce\u538b\u504f\u4f4e\uff08\u9ec4\u8272\uff09"
-    ],
-    [
-     "button",
-     "ALERT_TPMS_CRIT",
-     "\u8f6e\u80ce\u4e25\u91cd\u7f3a\u6c14\uff08\u7ea2\u8272\uff09"
-    ],
-    [
-     "button",
-     "ALERT_TPMS_HOT",
-     "\u8f6e\u80ce\u6e29\u5ea6\u504f\u9ad8\uff08\u9ec4\u8272\uff09"
-    ],
-    [
-     "button",
-     "ALERT_GBX_WARN",
-     "\u53d8\u901f\u7bb1\u6e29\u5ea6\u504f\u9ad8\uff08\u9ec4\u8272\uff09"
-    ],
-    [
-     "button",
-     "ALERT_GBX_CRIT",
-     "\u53d8\u901f\u7bb1\u6e29\u5ea6\u8fc7\u9ad8\uff08\u7ea2\u8272\uff09"
-    ],
-    [
-     "button",
-     "ALERT_12V_SOC",
-     "12V \u7535\u91cf\u504f\u4f4e\uff08\u9ec4\u8272\uff09"
-    ],
-    [
-     "button",
-     "ALERT_12V_VOLT",
-     "12V \u7535\u538b\u8fc7\u4f4e\uff08\u7ea2\u8272\uff09"
-    ],
-    [
-     "button",
-     "ALERT_CLEAR",
-     "\u7ed3\u675f\u63d0\u9192\u9884\u89c8"
-    ]
-   ]
-  },
-  {
-   "name": "CLUSTER",
-   "kind": "menu",
-   "title": "\u4eea\u8868\u76d8",
-   "repoLink": false,
-   "settings": [
-    "clusterSlotMode",
-    "widgetMedia",
-    "widgetTrip",
-    "widgetTpms",
-    [
-     "checkbox",
-     "WIDGET_CHARGING",
-     "Right widget: Charging finish time (auto)"
-    ],
-    "belowSpeedLine1",
-    "belowSpeedLine2",
-    "gearDisplay",
-    "cabinTempDisplay",
-    "hvSocGauge",
-    "brakeIndicator",
-    "iceChargeBar",
-    "cornerRightDisplay",
-    "cornerLeftDisplay",
-    "clusterNudgeX",
-    "clusterNudgeY"
-   ]
-  },
-  {
-   "name": "HUD",
-   "kind": "menu",
-   "title": "\u62ac\u5934\u663e\u793a",
-   "repoLink": false,
-   "settings": [
-    "hudNavMode",
-    "hudHeadway",
-    "hudLine1",
-    "hudLine2",
-    "hudLine3",
-    "hudNudgeX",
-    "hudNudgeY"
-   ]
-  },
-  {
-   "name": "DIAG",
-   "kind": "menu",
-   "title": "\u5b9e\u65f6\u6570\u636e\u4e0e\u8bca\u65ad",
-   "repoLink": false,
-   "items": [
-    [
-     "button",
-     "BTN_READ_NOW",
-     "\u7acb\u5373\u8bfb\u53d6\u4f20\u611f\u5668"
-    ],
-    [
-     "button",
-     "BTN_PROBE_BRAKE",
-     "\u8bb0\u5f55 30 \u79d2\u5236\u52a8\u4e0e\u5bfc\u822a\u6570\u636e"
-    ],
-    [
-     "tworow",
-     "DIAG_RENDER",
-     "\u4eea\u8868\u4e0e\u62ac\u5934\u663e\u793a\u670d\u52a1"
-    ],
-    [
-     "tworow",
-     "DIAG_NAV",
-     "\u62ac\u5934\u5bfc\u822a\u4e0e\u8def\u53e3\u5730\u56fe"
-    ],
-    [
-     "tworow",
-     "DIAG_HEADWAY",
-     "\u62ac\u5934\u663e\u793a\u8ddf\u8f66\u8ddd\u79bb"
-    ],
-    [
-     "tworow",
-     "DIAG_MEDIA",
-     "\u53f3\u4fa7\u4fe1\u606f\uff08\u5a92\u4f53\u4e0e BC \u6309\u952e\uff09"
-    ],
-    [
-     "tworow",
-     "DIAG_CHARGING",
-     "\u5145\u7535\u4e0e\u9884\u8ba1\u5b8c\u6210\u65f6\u95f4"
-    ],
-    [
-     "tworow",
-     "DIAG_BRAKE_ECU",
-     "\u5236\u52a8\u6a21\u5757\uff08\u6db2\u538b\u4e0e\u80fd\u91cf\u56de\u6536\uff09"
-    ],
-    [
-     "tworow",
-     "DIAG_POWERTRAIN",
-     "\u52a8\u529b\u7cfb\u7edf\u4e0e\u5b9e\u65f6\u80fd\u8017"
-    ],
-    [
-     "tworow",
-     "DIAG_BATTERY",
-     "\u52a8\u529b\u7535\u6c60\uff08\u7535\u91cf\uff0f\u529f\u7387\uff0f\u6e29\u5ea6\uff09"
-    ],
-    [
-     "tworow",
-     "DIAG_TEMPS",
-     "\u53d1\u52a8\u673a\u4e0e\u53d8\u901f\u7bb1\u6e29\u5ea6"
-    ],
-    [
-     "tworow",
-     "DIAG_CHASSIS",
-     "\u6321\u4f4d\u4e0e\u673a\u68b0\u5236\u52a8"
-    ],
-    [
-     "tworow",
-     "DIAG_UDS",
-     "\u53ea\u8bfb\u8bca\u65ad\u4e0e\u8f85\u52a9\u6570\u636e"
-    ]
-   ]
+  "startWidget": null,
+  "stateIds": {
+    "MAIN": 1,
+    "GENERAL": 10,
+    "ALERTS": 27,
+    "CLUSTER": 40,
+    "HUD": 63,
+    "DIAG": 74
   }
- ],
- "settings": [
-  {
-   "key": "enabled",
-   "label": "\u542f\u7528\u7ec4\u5408\u4eea\u8868\u6570\u636e",
-   "type": "bool",
-   "default": false
-  },
-  {
-   "key": "displayTarget",
-   "label": "\u663e\u793a\u4f4d\u7f6e",
-   "type": "choice",
-   "default": "both",
-   "options": [
-    [
-     "both",
-     "\u4eea\u8868\u4e0e\u62ac\u5934\u663e\u793a"
-    ],
-    [
-     "cluster",
-     "\u4ec5\u4eea\u8868"
-    ],
-    [
-     "hud",
-     "\u4ec5\u62ac\u5934\u663e\u793a"
-    ]
-   ]
-  },
-  {
-   "key": "clusterSlotMode",
-   "label": "\u4eea\u8868\u663e\u793a\u65b9\u5f0f",
-   "type": "choice",
-   "default": "panel_only",
-   "reset": 3,
-   "options": [
-    [
-     "panel_only",
-     "\u5168\u4eea\u8868\uff08\u5168\u90e8\u53e0\u52a0\u4fe1\u606f\u4e0e\u53f3\u4fa7\u7ec4\u4ef6\uff09"
-    ],
-    [
-     "map_only",
-     "\u4ec5\u4e2d\u592e\u5730\u56fe\u533a\uff08\u4fdd\u7559\u539f\u5382\u884c\u8f66\u4fe1\u606f\uff09"
-    ]
-   ]
-  },
-  {
-   "key": "widgetMedia",
-   "label": "\u53f3\u4fa7\u4fe1\u606f\uff1a\u5a92\u4f53\u64ad\u653e",
-   "type": "bool",
-   "default": true
-  },
-  {
-   "key": "widgetTrip",
-   "label": "\u53f3\u4fa7\u4fe1\u606f\uff1a\u884c\u7a0b\u4e0e\u8f66\u8f86",
-   "type": "bool",
-   "default": true
-  },
-  {
-   "key": "widgetTpms",
-   "label": "\u53f3\u4fa7\u4fe1\u606f\uff1a\u80ce\u538b\u4e0e\u63d0\u9192",
-   "type": "bool",
-   "default": true
-  },
-  {
-   "key": "hudNavMode",
-   "label": "\u5bfc\u822a\u65f6\u7684\u62ac\u5934\u663e\u793a",
-   "type": "choice",
-   "default": "yield_route",
-   "reset": 2,
-   "options": [
-    [
-     "own_nav_minimap",
-     "\u663e\u793a\u5bfc\u822a\uff0c\u9047\u8def\u53e3\u5730\u56fe\u65f6\u8ba9\u4f4d"
-    ],
-    [
-     "own_nav_keep",
-     "\u6301\u7eed\u663e\u793a\u5e94\u7528\u5bfc\u822a\u4e0e\u6570\u636e"
-    ],
-    [
-     "yield_lanes",
-     "\u663e\u793a\u5bfc\u822a\uff0c\u9047\u8f66\u9053\u6216\u8def\u53e3\u5730\u56fe\u65f6\u8ba9\u4f4d"
-    ],
-    [
-     "yield_route",
-     "\u5bfc\u822a\u671f\u95f4\u9690\u85cf\u5e94\u7528\u62ac\u5934\u5185\u5bb9"
-    ]
-   ]
-  },
-  {
-   "key": "hudHeadway",
-   "label": "\u8ddf\u8f66\u8ddd\u79bb\uff08\u62ac\u5934\u663e\u793a\uff09",
-   "type": "choice",
-   "default": "full",
-   "options": [
-    [
-     "full",
-     "\u65f6\u8ddd\u3001\u8ddd\u79bb\u4e0e\u63a5\u8fd1\u901f\u5ea6"
-    ],
-    [
-     "compact",
-     "\u4ec5\u65f6\u8ddd\u4e0e\u8ddd\u79bb"
-    ],
-    [
-     "off",
-     "\u5173\u95ed"
-    ]
-   ]
-  },
-  {
-   "key": "hudLine1",
-   "label": "\u62ac\u5934\u663e\u793a\u7b2c\u4e00\u884c",
-   "type": "choice",
-   "default": "efficiency_gear",
-   "reset": 2,
-   "options": [
-    [
-     "efficiency_gear",
-     "\u80fd\u8017\u4e0e\u6321\u4f4d"
-    ],
-    [
-     "efficiency",
-     "\u5b9e\u65f6\u80fd\u8017\uff08\u8ddf\u968f\u6240\u9009\u5355\u4f4d\uff09"
-    ],
-    [
-     "power_gear",
-     "\u529f\u7387\uff0f\u589e\u538b\u4e0e\u6321\u4f4d"
-    ],
-    [
-     "gear",
-     "\u5f53\u524d\u6321\u4f4d\uff08D1\u2013D8\uff09"
-    ],
-    [
-     "soc",
-     "\u52a8\u529b\u7535\u6c60\u7535\u91cf"
-    ],
-    [
-     "soc12",
-     "12V \u7535\u6c60\u7535\u91cf"
-    ],
-    [
-     "headway",
-     "\u8ddf\u8f66\u8ddd\u79bb"
-    ],
-    [
-     "temps",
-     "\u673a\u6cb9\u4e0e\u51b7\u5374\u6db2\u6e29\u5ea6"
-    ],
-    [
-     "off",
-     "\u5173\u95ed"
-    ]
-   ]
-  },
-  {
-   "key": "hudLine2",
-   "label": "\u62ac\u5934\u663e\u793a\u7b2c\u4e8c\u884c",
-   "type": "choice",
-   "default": "power",
-   "reset": 2,
-   "options": [
-    [
-     "power",
-     "\u529f\u7387\uff0f\u8f6c\u901f\u4e0e\u589e\u538b"
-    ],
-    [
-     "power_gear",
-     "\u529f\u7387\uff0f\u589e\u538b\u4e0e\u6321\u4f4d"
-    ],
-    [
-     "gear",
-     "\u5f53\u524d\u6321\u4f4d\uff08D1\u2013D8\uff09"
-    ],
-    [
-     "soc",
-     "\u52a8\u529b\u7535\u6c60\u7535\u91cf"
-    ],
-    [
-     "soc12",
-     "12V \u7535\u6c60\u7535\u91cf"
-    ],
-    [
-     "soc_oil",
-     "\u52a8\u529b\u7535\u6c60\u7535\u91cf\u4e0e\u6cb9\u6e29"
-    ],
-    [
-     "headway",
-     "\u8ddf\u8f66\u8ddd\u79bb"
-    ],
-    [
-     "temps",
-     "\u673a\u6cb9\u4e0e\u51b7\u5374\u6db2\u6e29\u5ea6"
-    ],
-    [
-     "off",
-     "\u5173\u95ed"
-    ]
-   ]
-  },
-  {
-   "key": "hudLine3",
-   "label": "\u62ac\u5934\u663e\u793a\u7b2c\u4e09\u884c",
-   "type": "choice",
-   "default": "brake",
-   "options": [
-    [
-     "brake",
-     "\u673a\u68b0\u5236\u52a8\u5f3a\u5ea6\u6761"
-    ],
-    [
-     "soc",
-     "\u52a8\u529b\u7535\u6c60\u7535\u91cf"
-    ],
-    [
-     "temps",
-     "\u673a\u6cb9\u4e0e\u51b7\u5374\u6db2\u6e29\u5ea6"
-    ],
-    [
-     "soc_oil",
-     "\u52a8\u529b\u7535\u6c60\u7535\u91cf\u4e0e\u6cb9\u6e29"
-    ],
-    [
-     "soc12",
-     "12V \u7535\u6c60\u7535\u91cf"
-    ],
-    [
-     "headway",
-     "\u8ddf\u8f66\u8ddd\u79bb"
-    ],
-    [
-     "gear",
-     "\u5f53\u524d\u6321\u4f4d\uff08D1\u2013D8\uff09"
-    ],
-    [
-     "off",
-     "\u5173\u95ed"
-    ]
-   ]
-  },
-  {
-   "key": "cabinTempDisplay",
-   "label": "\u8f66\u5185\u6e29\u5ea6\uff08\u5916\u6e29\u5de6\u4fa7\uff09",
-   "type": "bool",
-   "default": true
-  },
-  {
-   "key": "hvSocGauge",
-   "label": "\u9ad8\u538b\u7535\u6c60\u7535\u91cf\u8868\uff08\u63d2\u6df7\uff09",
-   "type": "bool",
-   "default": true
-  },
-  {
-   "key": "cornerRightDisplay",
-   "label": "\u53f3\u4e0b\u89d2\u6570\u636e",
-   "type": "choice",
-   "default": "auto",
-   "reset": 2,
-   "options": [
-    [
-     "auto",
-     "\u81ea\u52a8\uff0812V \u7535\u91cf\uff0f\u7535\u538b\uff0f\u8fdb\u6c14\u6e29\u5ea6\uff09"
-    ],
-    [
-     "soc12",
-     "12V \u7535\u6c60\u7535\u91cf"
-    ],
-    [
-     "batt",
-     "\u9ad8\u538b\u7535\u6c60\u6e29\u5ea6"
-    ],
-    [
-     "gbx",
-     "\u53d8\u901f\u7bb1\u6cb9\u6e29"
-    ],
-    [
-     "v12",
-     "12V \u7535\u6c60\u7535\u538b"
-    ],
-    [
-     "iat",
-     "\u8fdb\u6c14\u6e29\u5ea6"
-    ],
-    [
-     "soc",
-     "\u9ad8\u538b\u7535\u6c60\u7535\u91cf\uff08\u5e95\u89d2\uff09"
-    ],
-    [
-     "off",
-     "\u5173\u95ed"
-    ]
-   ]
-  },
-  {
-   "key": "cornerLeftDisplay",
-   "label": "\u5de6\u4e0b\u89d2\u6e29\u5ea6",
-   "type": "choice",
-   "default": "oil_cool",
-   "options": [
-    [
-     "oil_cool",
-     "\u673a\u6cb9\u4e0e\u51b7\u5374\u6db2"
-    ],
-    [
-     "oil_gbx",
-     "\u673a\u6cb9\u4e0e\u53d8\u901f\u7bb1\u6cb9\u6e29"
-    ],
-    [
-     "off",
-     "\u5173\u95ed"
-    ]
-   ]
-  },
-  {
-   "key": "belowSpeedLine1",
-   "label": "\u8f66\u901f\u4e0b\u65b9\u7b2c\u4e00\u884c",
-   "type": "choice",
-   "default": "efficiency",
-   "options": [
-    [
-     "efficiency",
-     "\u80fd\u8017\uff0f\u5145\u7535\u529f\u7387"
-    ],
-    [
-     "off",
-     "\u5173\u95ed"
-    ]
-   ]
-  },
-  {
-   "key": "belowSpeedLine2",
-   "label": "\u8f66\u901f\u4e0b\u65b9\u7b2c\u4e8c\u884c",
-   "type": "choice",
-   "default": "power",
-   "options": [
-    [
-     "power",
-     "\u529f\u7387\uff0f\u8f6c\u901f\u4e0e\u589e\u538b"
-    ],
-    [
-     "off",
-     "\u5173\u95ed"
-    ]
-   ]
-  },
-  {
-   "key": "gearDisplay",
-   "label": "\u524d\u8fdb\u6321\u4f4d\uff081\u20138 \u6321\uff09",
-   "type": "choice",
-   "default": "next_to_d",
-   "options": [
-    [
-     "next_to_d",
-     "\u663e\u793a\u5728\u5e95\u90e8 D \u6321\u65c1"
-    ],
-    [
-     "below_speed",
-     "\u663e\u793a\u5728\u8f66\u901f\u4e0b\u65b9"
-    ],
-    [
-     "off",
-     "\u5173\u95ed"
-    ]
-   ]
-  },
-  {
-   "key": "brakeIndicator",
-   "label": "\u673a\u68b0\u5236\u52a8\u6307\u793a",
-   "type": "choice",
-   "default": "bar_num",
-   "options": [
-    [
-     "bar_num",
-     "\u5f3a\u5ea6\u6761\u4e0e\u538b\u529b\uff0f\u51cf\u901f\u5ea6"
-    ],
-    [
-     "bar_only",
-     "\u4ec5\u5f3a\u5ea6\u6761"
-    ],
-    [
-     "off",
-     "\u5173\u95ed"
-    ]
-   ]
-  },
-  {
-   "key": "iceChargeBar",
-   "label": "\u53d1\u52a8\u673a\u5145\u7535\u529f\u7387\u6761\uff08\u63d2\u6df7\uff09",
-   "type": "bool",
-   "default": true
-  },
-  {
-   "key": "smartAlerts",
-   "label": "\u5f02\u5e38\u63d0\u9192\uff08\u80ce\u538b\uff0f12V \u7535\u6c60\uff0f\u53d8\u901f\u7bb1\uff09",
-   "type": "bool",
-   "default": true
-  },
-  {
-   "key": "unitSystem",
-   "label": "\u5355\u4f4d\u5236",
-   "type": "choice",
-   "default": "auto",
-   "options": [
-    [
-     "auto",
-     "\u81ea\u52a8\u8ddf\u968f\u8f66\u8f86"
-    ],
-    [
-     "us",
-     "\u7f8e\u5236\uff08mph\uff0fMPG\uff0f\u00b0F\uff0fpsi\uff09"
-    ],
-    [
-     "metric",
-     "\u516c\u5236\uff08km/h\uff0fL/100km\uff0f\u00b0C\uff0fbar\uff09"
-    ],
-    [
-     "uk",
-     "\u82f1\u5236\uff08mph\uff0f\u82f1\u5236 MPG\uff0f\u00b0C\uff0fpsi\uff09"
-    ]
-   ]
-  },
-  {
-   "key": "tempUnit",
-   "label": "\u6e29\u5ea6\u5355\u4f4d",
-   "type": "choice",
-   "default": "auto",
-   "options": [
-    [
-     "auto",
-     "\u81ea\u52a8"
-    ],
-    [
-     "F",
-     "\u534e\u6c0f\u5ea6"
-    ],
-    [
-     "C",
-     "\u6444\u6c0f\u5ea6"
-    ]
-   ]
-  },
-  {
-   "key": "evEffUnit",
-   "label": "\u7535\u8017\u5355\u4f4d",
-   "type": "choice",
-   "default": "auto",
-   "options": [
-    [
-     "auto",
-     "\u81ea\u52a8"
-    ],
-    [
-     "mi_kwh",
-     "mi/kWh"
-    ],
-    [
-     "kwh_100km",
-     "kWh/100km"
-    ],
-    [
-     "wh_mi",
-     "Wh/mi"
-    ]
-   ]
-  },
-  {
-   "key": "fuelEffUnit",
-   "label": "\u6cb9\u8017\u5355\u4f4d",
-   "type": "choice",
-   "default": "auto",
-   "options": [
-    [
-     "auto",
-     "\u81ea\u52a8"
-    ],
-    [
-     "mpg_us",
-     "MPG\uff08\u7f8e\u5236\uff09"
-    ],
-    [
-     "mpg_uk",
-     "MPG\uff08\u82f1\u5236\uff09"
-    ],
-    [
-     "l_100km",
-     "L/100km"
-    ],
-    [
-     "km_l",
-     "km/L"
-    ]
-   ]
-  },
-  {
-   "key": "pressUnit",
-   "label": "\u589e\u538b\u4e0e\u538b\u529b\u5355\u4f4d",
-   "type": "choice",
-   "default": "auto",
-   "options": [
-    [
-     "auto",
-     "\u81ea\u52a8"
-    ],
-    [
-     "psi",
-     "psi"
-    ],
-    [
-     "bar",
-     "bar"
-    ]
-   ]
-  },
-  {
-   "key": "vehicle",
-   "label": "\u52a8\u529b\u7c7b\u578b",
-   "type": "choice",
-   "default": "auto",
-   "options": [
-    [
-     "auto",
-     "\u81ea\u52a8\u8bc6\u522b\u63d2\u6df7\uff0f\u71c3\u6cb9\u8f66"
-    ],
-    [
-     "phev",
-     "\u63d2\u7535\u6df7\u52a8\uff08530e\uff0f330e\uff0f45e\uff09"
-    ],
-    [
-     "ice",
-     "\u6c7d\u6cb9\uff0f\u67f4\u6cb9\u8f66"
-    ]
-   ]
-  },
-  {
-   "key": "coldOilC",
-   "label": "\u673a\u6cb9\u6696\u673a\u6e29\u5ea6",
-   "type": "number",
-   "unit": "degC",
-   "default": 75,
-   "steps": [
-    65,
-    70,
-    75,
-    80,
-    85
-   ]
-  },
-  {
-   "key": "hudNudgeX",
-   "label": "\u62ac\u5934\u663e\u793a\u6c34\u5e73\u504f\u79fb",
-   "type": "number",
-   "unit": "px",
-   "default": 0,
-   "steps": [
-    -40,
-    -30,
-    -20,
-    -10,
-    0,
-    10,
-    20,
-    30,
-    40
-   ]
-  },
-  {
-   "key": "hudNudgeY",
-   "label": "\u62ac\u5934\u663e\u793a\u5782\u76f4\u504f\u79fb",
-   "type": "number",
-   "unit": "px",
-   "default": 0,
-   "steps": [
-    -40,
-    -30,
-    -20,
-    -10,
-    0,
-    10,
-    20,
-    30,
-    40
-   ]
-  },
-  {
-   "key": "clusterNudgeX",
-   "label": "\u4eea\u8868\u6570\u636e\u6c34\u5e73\u504f\u79fb",
-   "type": "number",
-   "unit": "px",
-   "default": 0,
-   "steps": [
-    -12,
-    -8,
-    -4,
-    0,
-    4,
-    8,
-    12
-   ]
-  },
-  {
-   "key": "clusterNudgeY",
-   "label": "\u4eea\u8868\u6570\u636e\u5782\u76f4\u504f\u79fb",
-   "type": "number",
-   "unit": "px",
-   "default": 0,
-   "steps": [
-    -12,
-    -8,
-    -4,
-    0,
-    4,
-    8,
-    12
-   ]
-  },
-  {
-   "key": "demo",
-   "label": "\u6f14\u793a\u6570\u636e",
-   "type": "choice",
-   "default": "auto",
-   "options": [
-    [
-     "auto",
-     "\u79bb\u8f66\u65f6\u81ea\u52a8\u6f14\u793a"
-    ],
-    [
-     "phev",
-     "\u63d2\u6df7\u6f14\u793a\uff08530e\uff09"
-    ],
-    [
-     "charging",
-     "\u6f14\u793a\u63d2\u6df7\u5145\u7535"
-    ],
-    [
-     "ice",
-     "\u71c3\u6cb9\u8f66\u6f14\u793a\uff08B48\uff0fB58\uff09"
-    ],
-    [
-     "off",
-     "\u5173\u95ed"
-    ]
-   ]
-  }
- ],
- "config": {
-  "scaling": {
-   "rpm": {
-    "factor": 0.25,
-    "offset": 0,
-    "invalid": 65535
-   },
-   "speed": {
-    "factor": 0.015625,
-    "offset": 0,
-    "invalid": 65535
-   },
-   "accel": {
-    "factor": 0.002,
-    "offset": -65,
-    "invalid": 65535
-   },
-   "temp": {
-    "factor": 1,
-    "offset": -48,
-    "invalid": 255
-   },
-   "boost": {
-    "factor": 0.01,
-    "offset": 0,
-    "invalid": 255
-   },
-   "batteryTemp": {
-    "factor": 1,
-    "offset": -50,
-    "invalid": 255
-   },
-   "ambient": {
-    "factor": 0.5,
-    "offset": -40,
-    "invalid": 255
-   },
-   "cabin": {
-    "factor": 0.5,
-    "offset": -40,
-    "invalid": 255
-   },
-   "pedal": {
-    "factor": 0.025,
-    "offset": 0,
-    "invalid": 65535
-   },
-   "torque": {
-    "factor": 0.5,
-    "offset": -1023.5,
-    "invalidFrom": 4095
-   }
-  },
-  "dids": {
-   "powerSign": -1,
-   "sme": {
-    "ecu": 7,
-    "hvV": [
-     {
-      "did": "DDB4",
-      "bytes": 2,
-      "at": 0,
-      "factor": 0.01,
-      "min": 150,
-      "max": 500,
-      "timeoutMs": 800
-     },
-     {
-      "did": "DD68",
-      "bytes": 2,
-      "at": 0,
-      "factor": 0.01,
-      "min": 150,
-      "max": 500,
-      "timeoutMs": 800
-     },
-     {
-      "did": "DD66",
-      "bytes": 2,
-      "at": 0,
-      "factor": 0.01,
-      "min": 150,
-      "max": 500,
-      "timeoutMs": 800
-     },
-     {
-      "did": "DDEF",
-      "bytes": 2,
-      "at": 0,
-      "factor": 1,
-      "min": 150,
-      "max": 500,
-      "timeoutMs": 800
-     }
-    ],
-    "hvI": [
-     {
-      "did": "DD69",
-      "bytes": 4,
-      "at": 0,
-      "factor": 0.01,
-      "signed": true,
-      "min": -800,
-      "max": 800,
-      "timeoutMs": 800
-     }
-    ],
-    "soc": [
-     {
-      "did": "DDBC",
-      "bytes": 2,
-      "at": 0,
-      "factor": 0.1,
-      "min": 0,
-      "max": 100,
-      "timeoutMs": 1200
-     }
-    ],
-    "cellT": [
-     {
-      "did": "DDC0",
-      "at": 4,
-      "bytes": 2,
-      "factor": 0.01,
-      "signed": true,
-      "min": -40,
-      "max": 80,
-      "timeoutMs": 1200
-     }
-    ]
-   },
-   "dme": {
-    "ecu": 18,
-    "fuelRate": [
-     {
-      "did": "5656",
-      "bytes": 2,
-      "at": 0,
-      "factor": 0.00429153,
-      "min": 0,
-      "max": 150,
-      "timeoutMs": 900
-     },
-     {
-      "obd": "5E",
-      "bytes": 2,
-      "at": 0,
-      "factor": 0.05,
-      "min": 0,
-      "max": 150,
-      "timeoutMs": 900
-     },
-     {
-      "did": "4521",
-      "bytes": 2,
-      "at": 0,
-      "factor": 0.134228,
-      "min": 0,
-      "max": 150,
-      "timeoutMs": 900
-     }
-    ],
-    "v12": [
-     {
-      "did": "F442",
-      "bytes": 2,
-      "at": 0,
-      "factor": 0.001,
-      "min": 5,
-      "max": 18,
-      "timeoutMs": 1000
-     },
-     {
-      "ecu": 7,
-      "did": "F442",
-      "bytes": 2,
-      "at": 0,
-      "factor": 0.001,
-      "min": 5,
-      "max": 18,
-      "timeoutMs": 1000
-     },
-     {
-      "obd": "42",
-      "bytes": 2,
-      "at": 0,
-      "factor": 0.001,
-      "min": 5,
-      "max": 18,
-      "timeoutMs": 1000
-     }
-    ],
-    "iat": [
-     {
-      "did": "F40F",
-      "bytes": 1,
-      "at": 0,
-      "factor": 1,
-      "offset": -40,
-      "min": -40,
-      "max": 150,
-      "timeoutMs": 1000
-     },
-     {
-      "obd": "0F",
-      "bytes": 1,
-      "at": 0,
-      "factor": 1,
-      "offset": -40,
-      "min": -40,
-      "max": 150,
-      "timeoutMs": 1000
-     }
-    ],
-    "oil": [
-     {
-      "obd": "5C",
-      "bytes": 1,
-      "at": 0,
-      "factor": 1,
-      "offset": -40,
-      "min": -40,
-      "max": 170,
-      "timeoutMs": 1000
-     }
-    ]
-   },
-   "egs": {
-    "ecu": 24,
-    "gearboxOil": [
-     {
-      "did": "6000",
-      "bytes": 1,
-      "at": 0,
-      "factor": 1,
-      "offset": -40,
-      "min": -40,
-      "max": 160,
-      "timeoutMs": 1000
-     }
-    ]
-   }
-  }
- },
- "startWidget": null,
- "stateIds": {
-  "MAIN": 1,
-  "GENERAL": 10,
-  "ALERTS": 27,
-  "CLUSTER": 40,
-  "HUD": 60,
-  "DIAG": 71
- }
 }

@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "id": "cluster_metrics",
-  "version": "0.9.5",
+  "version": "0.9.6",
   "tree": "package",
   "modules": [
     "src/sdk.js"

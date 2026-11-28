@@ -2152,7 +2152,10 @@ class SignalHub {
         const wantGapAhead = (enabled && wantHud && ((s.hudHeadway || 'full') !== 'off' || anyHudHeadway)) || forceAll;
         const wantClimate = (enabled && wantPanel && s.cabinTempDisplay !== false) || forceAll;
         const wantMedia = (enabled && wantPanel && (s.widgetMedia !== false || s.widgetTrip !== false)) || forceAll;
-        const wantNav = (enabled && wantHud && (s.hudNavMode || 'own_nav_minimap') !== 'yield_route') || forceAll;
+        const wantNav = (enabled && (
+            (wantHud && (s.hudNavMode || 'own_nav_minimap') !== 'yield_route') ||
+            (wantPanel && (s.clusterTurnCard === true || s.clusterEtaPill === true))
+        )) || forceAll;
 
         const crMode = s.cornerRightDisplay || 'auto';
         const clMode = s.cornerLeftDisplay || 'oil_cool';
@@ -3042,11 +3045,11 @@ class SignalHub {
             brakeBar,
         });
 
-        const hudNav = this.navTracker.snapshot(now);
-        const navRouteActive = hudNav.routeActive;
-        const navHasLanes = hudNav.hasLanes;
         const localClockOffsetMin = (typeof l.carClockOffsetMin === 'number' && isFinite(l.carClockOffsetMin))
             ? l.carClockOffsetMin : null;
+        const hudNav = this.navTracker.snapshot(now, undefined, localClockOffsetMin);
+        const navRouteActive = hudNav.routeActive;
+        const navHasLanes = hudNav.hasLanes;
         const charging = computeChargingState(this.chargingRaw, {
             speedKmh,
             rpm: l.rpm !== undefined ? l.rpm : 0,

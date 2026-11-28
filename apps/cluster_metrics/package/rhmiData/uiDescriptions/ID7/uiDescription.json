@@ -875,7 +875,7 @@
     },
     "42": {
      "type": "checkBox",
-     "name": "SET_WIDGETMEDIA",
+     "name": "SET_CLUSTERTURNCARD",
      "properties": {
       "Visible": {
        "value": 1,
@@ -889,81 +889,15 @@
      "rows": [
       {
        "Text": {
-        "value": "SID_CLUSTER_METRICS_SET_WIDGETMEDIA",
+        "value": "SID_CLUSTER_METRICS_SET_CLUSTERTURNCARD",
         "type": "StringId"
        }
       }
      ]
     },
     "43": {
-     "type": "checkBox",
-     "name": "SET_WIDGETTRIP",
-     "properties": {
-      "Visible": {
-       "value": 1,
-       "type": "UInt"
-      },
-      "Focusable": {
-       "value": 2,
-       "type": "UInt"
-      }
-     },
-     "rows": [
-      {
-       "Text": {
-        "value": "SID_CLUSTER_METRICS_SET_WIDGETTRIP",
-        "type": "StringId"
-       }
-      }
-     ]
-    },
-    "44": {
-     "type": "checkBox",
-     "name": "SET_WIDGETTPMS",
-     "properties": {
-      "Visible": {
-       "value": 1,
-       "type": "UInt"
-      },
-      "Focusable": {
-       "value": 2,
-       "type": "UInt"
-      }
-     },
-     "rows": [
-      {
-       "Text": {
-        "value": "SID_CLUSTER_METRICS_SET_WIDGETTPMS",
-        "type": "StringId"
-       }
-      }
-     ]
-    },
-    "45": {
-     "type": "checkBox",
-     "name": "WIDGET_CHARGING",
-     "properties": {
-      "Visible": {
-       "value": 1,
-       "type": "UInt"
-      },
-      "Focusable": {
-       "value": 2,
-       "type": "UInt"
-      }
-     },
-     "rows": [
-      {
-       "Text": {
-        "value": "SID_CLUSTER_METRICS_WIDGET_CHARGING",
-        "type": "StringId"
-       }
-      }
-     ]
-    },
-    "46": {
      "type": "dropDownMenu",
-     "name": "SET_BELOWSPEEDLINE1",
+     "name": "SET_TURNCARDTRIGGERM",
      "rows": [
       {
        "ItemText": {
@@ -976,23 +910,13 @@
         "value": "SID_CN_STATIC_0053",
         "type": "StringId"
        }
-      }
-     ],
-     "cells": {
-      "HeaderText": {
-       "value": "SID_CN_STATIC_0054",
-       "type": "StringId"
       },
-      "SelectedItem": {
-       "value": 0,
-       "type": "UInt"
-      }
-     }
-    },
-    "47": {
-     "type": "dropDownMenu",
-     "name": "SET_BELOWSPEEDLINE2",
-     "rows": [
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0054",
+        "type": "StringId"
+       }
+      },
       {
        "ItemText": {
         "value": "SID_CN_STATIC_0055",
@@ -1017,9 +941,119 @@
       }
      }
     },
+    "44": {
+     "type": "checkBox",
+     "name": "SET_CLUSTERETAPILL",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 2,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text": {
+        "value": "SID_CLUSTER_METRICS_SET_CLUSTERETAPILL",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
+    "45": {
+     "type": "checkBox",
+     "name": "SET_WIDGETMEDIA",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 2,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text": {
+        "value": "SID_CLUSTER_METRICS_SET_WIDGETMEDIA",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
+    "46": {
+     "type": "checkBox",
+     "name": "SET_WIDGETTRIP",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 2,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text": {
+        "value": "SID_CLUSTER_METRICS_SET_WIDGETTRIP",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
+    "47": {
+     "type": "checkBox",
+     "name": "SET_WIDGETTPMS",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 2,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text": {
+        "value": "SID_CLUSTER_METRICS_SET_WIDGETTPMS",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
     "48": {
+     "type": "checkBox",
+     "name": "WIDGET_CHARGING",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 2,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text": {
+        "value": "SID_CLUSTER_METRICS_WIDGET_CHARGING",
+        "type": "StringId"
+       }
+      }
+     ]
+    },
+    "49": {
      "type": "dropDownMenu",
-     "name": "SET_GEARDISPLAY",
+     "name": "SET_BELOWSPEEDLINE1",
      "rows": [
       {
        "ItemText": {
@@ -1032,17 +1066,11 @@
         "value": "SID_CN_STATIC_0059",
         "type": "StringId"
        }
-      },
-      {
-       "ItemText": {
-        "value": "SID_CN_STATIC_0060",
-        "type": "StringId"
-       }
       }
      ],
      "cells": {
       "HeaderText": {
-       "value": "SID_CN_STATIC_0061",
+       "value": "SID_CN_STATIC_0060",
        "type": "StringId"
       },
       "SelectedItem": {
@@ -1051,7 +1079,69 @@
       }
      }
     },
-    "49": {
+    "50": {
+     "type": "dropDownMenu",
+     "name": "SET_BELOWSPEEDLINE2",
+     "rows": [
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0061",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0062",
+        "type": "StringId"
+       }
+      }
+     ],
+     "cells": {
+      "HeaderText": {
+       "value": "SID_CN_STATIC_0063",
+       "type": "StringId"
+      },
+      "SelectedItem": {
+       "value": 0,
+       "type": "UInt"
+      }
+     }
+    },
+    "51": {
+     "type": "dropDownMenu",
+     "name": "SET_GEARDISPLAY",
+     "rows": [
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0064",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0065",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0066",
+        "type": "StringId"
+       }
+      }
+     ],
+     "cells": {
+      "HeaderText": {
+       "value": "SID_CN_STATIC_0067",
+       "type": "StringId"
+      },
+      "SelectedItem": {
+       "value": 0,
+       "type": "UInt"
+      }
+     }
+    },
+    "52": {
      "type": "checkBox",
      "name": "SET_CABINTEMPDISPLAY",
      "properties": {
@@ -1073,7 +1163,7 @@
       }
      ]
     },
-    "50": {
+    "53": {
      "type": "checkBox",
      "name": "SET_HVSOCGAUGE",
      "properties": {
@@ -1095,32 +1185,32 @@
       }
      ]
     },
-    "51": {
+    "54": {
      "type": "dropDownMenu",
      "name": "SET_BRAKEINDICATOR",
      "rows": [
       {
        "ItemText": {
-        "value": "SID_CN_STATIC_0062",
+        "value": "SID_CN_STATIC_0068",
         "type": "StringId"
        }
       },
       {
        "ItemText": {
-        "value": "SID_CN_STATIC_0063",
+        "value": "SID_CN_STATIC_0069",
         "type": "StringId"
        }
       },
       {
        "ItemText": {
-        "value": "SID_CN_STATIC_0064",
+        "value": "SID_CN_STATIC_0070",
         "type": "StringId"
        }
       }
      ],
      "cells": {
       "HeaderText": {
-       "value": "SID_CN_STATIC_0065",
+       "value": "SID_CN_STATIC_0071",
        "type": "StringId"
       },
       "SelectedItem": {
@@ -1129,7 +1219,7 @@
       }
      }
     },
-    "52": {
+    "55": {
      "type": "checkBox",
      "name": "SET_ICECHARGEBAR",
      "properties": {
@@ -1151,46 +1241,10 @@
       }
      ]
     },
-    "53": {
+    "56": {
      "type": "dropDownMenu",
      "name": "SET_CORNERRIGHTDISPLAY",
      "rows": [
-      {
-       "ItemText": {
-        "value": "SID_CN_STATIC_0066",
-        "type": "StringId"
-       }
-      },
-      {
-       "ItemText": {
-        "value": "SID_CN_STATIC_0067",
-        "type": "StringId"
-       }
-      },
-      {
-       "ItemText": {
-        "value": "SID_CN_STATIC_0068",
-        "type": "StringId"
-       }
-      },
-      {
-       "ItemText": {
-        "value": "SID_CN_STATIC_0069",
-        "type": "StringId"
-       }
-      },
-      {
-       "ItemText": {
-        "value": "SID_CN_STATIC_0070",
-        "type": "StringId"
-       }
-      },
-      {
-       "ItemText": {
-        "value": "SID_CN_STATIC_0071",
-        "type": "StringId"
-       }
-      },
       {
        "ItemText": {
         "value": "SID_CN_STATIC_0072",
@@ -1202,23 +1256,13 @@
         "value": "SID_CN_STATIC_0073",
         "type": "StringId"
        }
-      }
-     ],
-     "cells": {
-      "HeaderText": {
-       "value": "SID_CN_STATIC_0074",
-       "type": "StringId"
       },
-      "SelectedItem": {
-       "value": 0,
-       "type": "UInt"
-      }
-     }
-    },
-    "54": {
-     "type": "dropDownMenu",
-     "name": "SET_CORNERLEFTDISPLAY",
-     "rows": [
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0074",
+        "type": "StringId"
+       }
+      },
       {
        "ItemText": {
         "value": "SID_CN_STATIC_0075",
@@ -1236,11 +1280,23 @@
         "value": "SID_CN_STATIC_0077",
         "type": "StringId"
        }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0078",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0079",
+        "type": "StringId"
+       }
       }
      ],
      "cells": {
       "HeaderText": {
-       "value": "SID_CN_STATIC_0078",
+       "value": "SID_CN_STATIC_0080",
        "type": "StringId"
       },
       "SelectedItem": {
@@ -1249,22 +1305,10 @@
       }
      }
     },
-    "55": {
+    "57": {
      "type": "dropDownMenu",
-     "name": "SET_CLUSTERNUDGEX",
+     "name": "SET_CORNERLEFTDISPLAY",
      "rows": [
-      {
-       "ItemText": {
-        "value": "SID_CN_STATIC_0079",
-        "type": "StringId"
-       }
-      },
-      {
-       "ItemText": {
-        "value": "SID_CN_STATIC_0080",
-        "type": "StringId"
-       }
-      },
       {
        "ItemText": {
         "value": "SID_CN_STATIC_0081",
@@ -1282,35 +1326,35 @@
         "value": "SID_CN_STATIC_0083",
         "type": "StringId"
        }
+      }
+     ],
+     "cells": {
+      "HeaderText": {
+       "value": "SID_CN_STATIC_0084",
+       "type": "StringId"
       },
-      {
-       "ItemText": {
-        "value": "SID_CN_STATIC_0084",
-        "type": "StringId"
-       }
-      },
+      "SelectedItem": {
+       "value": 0,
+       "type": "UInt"
+      }
+     }
+    },
+    "58": {
+     "type": "dropDownMenu",
+     "name": "SET_CLUSTERNUDGEX",
+     "rows": [
       {
        "ItemText": {
         "value": "SID_CN_STATIC_0085",
         "type": "StringId"
        }
-      }
-     ],
-     "cells": {
-      "HeaderText": {
-       "value": "SID_CN_STATIC_0086",
-       "type": "StringId"
       },
-      "SelectedItem": {
-       "value": 3,
-       "type": "UInt"
-      }
-     }
-    },
-    "56": {
-     "type": "dropDownMenu",
-     "name": "SET_CLUSTERNUDGEY",
-     "rows": [
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0086",
+        "type": "StringId"
+       }
+      },
       {
        "ItemText": {
         "value": "SID_CN_STATIC_0087",
@@ -1340,23 +1384,11 @@
         "value": "SID_CN_STATIC_0091",
         "type": "StringId"
        }
-      },
-      {
-       "ItemText": {
-        "value": "SID_CN_STATIC_0092",
-        "type": "StringId"
-       }
-      },
-      {
-       "ItemText": {
-        "value": "SID_CN_STATIC_0093",
-        "type": "StringId"
-       }
       }
      ],
      "cells": {
       "HeaderText": {
-       "value": "SID_CN_STATIC_0094",
+       "value": "SID_CN_STATIC_0092",
        "type": "StringId"
       },
       "SelectedItem": {
@@ -1365,34 +1397,22 @@
       }
      }
     },
-    "57": {
-     "type": "title",
-     "name": "CLUSTER_TITLE",
+    "59": {
+     "type": "dropDownMenu",
+     "name": "SET_CLUSTERNUDGEY",
      "rows": [
       {
-       "Text": {
-        "value": "SID_CLUSTER_METRICS_CLUSTER_TITLE",
+       "ItemText": {
+        "value": "SID_CN_STATIC_0093",
         "type": "StringId"
        }
-      }
-     ]
-    }
-   },
-   "properties": {
-    "ParentState": {
-     "value": 1,
-     "type": "UInt"
-    }
-   }
-  },
-  "60": {
-   "type": "state",
-   "name": "HUD",
-   "components": {
-    "61": {
-     "type": "dropDownMenu",
-     "name": "SET_HUDNAVMODE",
-     "rows": [
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0094",
+        "type": "StringId"
+       }
+      },
       {
        "ItemText": {
         "value": "SID_CN_STATIC_0095",
@@ -1416,11 +1436,17 @@
         "value": "SID_CN_STATIC_0098",
         "type": "StringId"
        }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0099",
+        "type": "StringId"
+       }
       }
      ],
      "cells": {
       "HeaderText": {
-       "value": "SID_CN_STATIC_0099",
+       "value": "SID_CN_STATIC_0100",
        "type": "StringId"
       },
       "SelectedItem": {
@@ -1429,16 +1455,34 @@
       }
      }
     },
-    "62": {
-     "type": "dropDownMenu",
-     "name": "SET_HUDHEADWAY",
+    "60": {
+     "type": "title",
+     "name": "CLUSTER_TITLE",
      "rows": [
       {
-       "ItemText": {
-        "value": "SID_CN_STATIC_0100",
+       "Text": {
+        "value": "SID_CLUSTER_METRICS_CLUSTER_TITLE",
         "type": "StringId"
        }
-      },
+      }
+     ]
+    }
+   },
+   "properties": {
+    "ParentState": {
+     "value": 1,
+     "type": "UInt"
+    }
+   }
+  },
+  "63": {
+   "type": "state",
+   "name": "HUD",
+   "components": {
+    "64": {
+     "type": "dropDownMenu",
+     "name": "SET_HUDNAVMODE",
+     "rows": [
       {
        "ItemText": {
         "value": "SID_CN_STATIC_0101",
@@ -1450,35 +1494,35 @@
         "value": "SID_CN_STATIC_0102",
         "type": "StringId"
        }
-      }
-     ],
-     "cells": {
-      "HeaderText": {
-       "value": "SID_CN_STATIC_0103",
-       "type": "StringId"
       },
-      "SelectedItem": {
-       "value": 0,
-       "type": "UInt"
-      }
-     }
-    },
-    "63": {
-     "type": "dropDownMenu",
-     "name": "SET_HUDLINE1",
-     "rows": [
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0103",
+        "type": "StringId"
+       }
+      },
       {
        "ItemText": {
         "value": "SID_CN_STATIC_0104",
         "type": "StringId"
        }
+      }
+     ],
+     "cells": {
+      "HeaderText": {
+       "value": "SID_CN_STATIC_0105",
+       "type": "StringId"
       },
-      {
-       "ItemText": {
-        "value": "SID_CN_STATIC_0105",
-        "type": "StringId"
-       }
-      },
+      "SelectedItem": {
+       "value": 3,
+       "type": "UInt"
+      }
+     }
+    },
+    "65": {
+     "type": "dropDownMenu",
+     "name": "SET_HUDHEADWAY",
+     "rows": [
       {
        "ItemText": {
         "value": "SID_CN_STATIC_0106",
@@ -1496,13 +1540,23 @@
         "value": "SID_CN_STATIC_0108",
         "type": "StringId"
        }
+      }
+     ],
+     "cells": {
+      "HeaderText": {
+       "value": "SID_CN_STATIC_0109",
+       "type": "StringId"
       },
-      {
-       "ItemText": {
-        "value": "SID_CN_STATIC_0109",
-        "type": "StringId"
-       }
-      },
+      "SelectedItem": {
+       "value": 0,
+       "type": "UInt"
+      }
+     }
+    },
+    "66": {
+     "type": "dropDownMenu",
+     "name": "SET_HUDLINE1",
+     "rows": [
       {
        "ItemText": {
         "value": "SID_CN_STATIC_0110",
@@ -1520,23 +1574,13 @@
         "value": "SID_CN_STATIC_0112",
         "type": "StringId"
        }
-      }
-     ],
-     "cells": {
-      "HeaderText": {
-       "value": "SID_CN_STATIC_0113",
-       "type": "StringId"
       },
-      "SelectedItem": {
-       "value": 0,
-       "type": "UInt"
-      }
-     }
-    },
-    "64": {
-     "type": "dropDownMenu",
-     "name": "SET_HUDLINE2",
-     "rows": [
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0113",
+        "type": "StringId"
+       }
+      },
       {
        "ItemText": {
         "value": "SID_CN_STATIC_0114",
@@ -1566,13 +1610,23 @@
         "value": "SID_CN_STATIC_0118",
         "type": "StringId"
        }
+      }
+     ],
+     "cells": {
+      "HeaderText": {
+       "value": "SID_CN_STATIC_0119",
+       "type": "StringId"
       },
-      {
-       "ItemText": {
-        "value": "SID_CN_STATIC_0119",
-        "type": "StringId"
-       }
-      },
+      "SelectedItem": {
+       "value": 0,
+       "type": "UInt"
+      }
+     }
+    },
+    "67": {
+     "type": "dropDownMenu",
+     "name": "SET_HUDLINE2",
+     "rows": [
       {
        "ItemText": {
         "value": "SID_CN_STATIC_0120",
@@ -1590,23 +1644,13 @@
         "value": "SID_CN_STATIC_0122",
         "type": "StringId"
        }
-      }
-     ],
-     "cells": {
-      "HeaderText": {
-       "value": "SID_CN_STATIC_0123",
-       "type": "StringId"
       },
-      "SelectedItem": {
-       "value": 0,
-       "type": "UInt"
-      }
-     }
-    },
-    "65": {
-     "type": "dropDownMenu",
-     "name": "SET_HUDLINE3",
-     "rows": [
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0123",
+        "type": "StringId"
+       }
+      },
       {
        "ItemText": {
         "value": "SID_CN_STATIC_0124",
@@ -1636,13 +1680,23 @@
         "value": "SID_CN_STATIC_0128",
         "type": "StringId"
        }
+      }
+     ],
+     "cells": {
+      "HeaderText": {
+       "value": "SID_CN_STATIC_0129",
+       "type": "StringId"
       },
-      {
-       "ItemText": {
-        "value": "SID_CN_STATIC_0129",
-        "type": "StringId"
-       }
-      },
+      "SelectedItem": {
+       "value": 0,
+       "type": "UInt"
+      }
+     }
+    },
+    "68": {
+     "type": "dropDownMenu",
+     "name": "SET_HUDLINE3",
+     "rows": [
       {
        "ItemText": {
         "value": "SID_CN_STATIC_0130",
@@ -1654,23 +1708,13 @@
         "value": "SID_CN_STATIC_0131",
         "type": "StringId"
        }
-      }
-     ],
-     "cells": {
-      "HeaderText": {
-       "value": "SID_CN_STATIC_0132",
-       "type": "StringId"
       },
-      "SelectedItem": {
-       "value": 0,
-       "type": "UInt"
-      }
-     }
-    },
-    "66": {
-     "type": "dropDownMenu",
-     "name": "SET_HUDNUDGEX",
-     "rows": [
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0132",
+        "type": "StringId"
+       }
+      },
       {
        "ItemText": {
         "value": "SID_CN_STATIC_0133",
@@ -1700,13 +1744,23 @@
         "value": "SID_CN_STATIC_0137",
         "type": "StringId"
        }
+      }
+     ],
+     "cells": {
+      "HeaderText": {
+       "value": "SID_CN_STATIC_0138",
+       "type": "StringId"
       },
-      {
-       "ItemText": {
-        "value": "SID_CN_STATIC_0138",
-        "type": "StringId"
-       }
-      },
+      "SelectedItem": {
+       "value": 0,
+       "type": "UInt"
+      }
+     }
+    },
+    "69": {
+     "type": "dropDownMenu",
+     "name": "SET_HUDNUDGEX",
+     "rows": [
       {
        "ItemText": {
         "value": "SID_CN_STATIC_0139",
@@ -1724,23 +1778,13 @@
         "value": "SID_CN_STATIC_0141",
         "type": "StringId"
        }
-      }
-     ],
-     "cells": {
-      "HeaderText": {
-       "value": "SID_CN_STATIC_0142",
-       "type": "StringId"
       },
-      "SelectedItem": {
-       "value": 4,
-       "type": "UInt"
-      }
-     }
-    },
-    "67": {
-     "type": "dropDownMenu",
-     "name": "SET_HUDNUDGEY",
-     "rows": [
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0142",
+        "type": "StringId"
+       }
+      },
       {
        "ItemText": {
         "value": "SID_CN_STATIC_0143",
@@ -1770,13 +1814,23 @@
         "value": "SID_CN_STATIC_0147",
         "type": "StringId"
        }
+      }
+     ],
+     "cells": {
+      "HeaderText": {
+       "value": "SID_CN_STATIC_0148",
+       "type": "StringId"
       },
-      {
-       "ItemText": {
-        "value": "SID_CN_STATIC_0148",
-        "type": "StringId"
-       }
-      },
+      "SelectedItem": {
+       "value": 4,
+       "type": "UInt"
+      }
+     }
+    },
+    "70": {
+     "type": "dropDownMenu",
+     "name": "SET_HUDNUDGEY",
+     "rows": [
       {
        "ItemText": {
         "value": "SID_CN_STATIC_0149",
@@ -1794,11 +1848,47 @@
         "value": "SID_CN_STATIC_0151",
         "type": "StringId"
        }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0152",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0153",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0154",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0155",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0156",
+        "type": "StringId"
+       }
+      },
+      {
+       "ItemText": {
+        "value": "SID_CN_STATIC_0157",
+        "type": "StringId"
+       }
       }
      ],
      "cells": {
       "HeaderText": {
-       "value": "SID_CN_STATIC_0152",
+       "value": "SID_CN_STATIC_0158",
        "type": "StringId"
       },
       "SelectedItem": {
@@ -1807,7 +1897,7 @@
       }
      }
     },
-    "68": {
+    "71": {
      "type": "title",
      "name": "HUD_TITLE",
      "rows": [
@@ -1827,11 +1917,11 @@
     }
    }
   },
-  "71": {
+  "74": {
    "type": "state",
    "name": "DIAG",
    "components": {
-    "72": {
+    "75": {
      "type": "button",
      "name": "BTN_READ_NOW",
      "properties": {
@@ -1853,7 +1943,7 @@
       }
      ]
     },
-    "73": {
+    "76": {
      "type": "button",
      "name": "BTN_PROBE_BRAKE",
      "properties": {
@@ -1875,165 +1965,9 @@
       }
      ]
     },
-    "74": {
-     "type": "button",
-     "name": "DIAG_RENDER",
-     "properties": {
-      "Visible": {
-       "value": 1,
-       "type": "UInt"
-      },
-      "Focusable": {
-       "value": 2,
-       "type": "UInt"
-      }
-     },
-     "rows": [
-      {
-       "Text1stRow": {
-        "value": "SID_CN_STATIC_0153",
-        "type": "StringId"
-       },
-       "Text2ndRow": {
-        "value": "",
-        "type": "Text"
-       }
-      }
-     ]
-    },
-    "75": {
-     "type": "button",
-     "name": "DIAG_NAV",
-     "properties": {
-      "Visible": {
-       "value": 1,
-       "type": "UInt"
-      },
-      "Focusable": {
-       "value": 2,
-       "type": "UInt"
-      }
-     },
-     "rows": [
-      {
-       "Text1stRow": {
-        "value": "SID_CN_STATIC_0154",
-        "type": "StringId"
-       },
-       "Text2ndRow": {
-        "value": "",
-        "type": "Text"
-       }
-      }
-     ]
-    },
-    "76": {
-     "type": "button",
-     "name": "DIAG_HEADWAY",
-     "properties": {
-      "Visible": {
-       "value": 1,
-       "type": "UInt"
-      },
-      "Focusable": {
-       "value": 2,
-       "type": "UInt"
-      }
-     },
-     "rows": [
-      {
-       "Text1stRow": {
-        "value": "SID_CN_STATIC_0155",
-        "type": "StringId"
-       },
-       "Text2ndRow": {
-        "value": "",
-        "type": "Text"
-       }
-      }
-     ]
-    },
     "77": {
      "type": "button",
-     "name": "DIAG_MEDIA",
-     "properties": {
-      "Visible": {
-       "value": 1,
-       "type": "UInt"
-      },
-      "Focusable": {
-       "value": 2,
-       "type": "UInt"
-      }
-     },
-     "rows": [
-      {
-       "Text1stRow": {
-        "value": "SID_CN_STATIC_0156",
-        "type": "StringId"
-       },
-       "Text2ndRow": {
-        "value": "",
-        "type": "Text"
-       }
-      }
-     ]
-    },
-    "78": {
-     "type": "button",
-     "name": "DIAG_CHARGING",
-     "properties": {
-      "Visible": {
-       "value": 1,
-       "type": "UInt"
-      },
-      "Focusable": {
-       "value": 2,
-       "type": "UInt"
-      }
-     },
-     "rows": [
-      {
-       "Text1stRow": {
-        "value": "SID_CN_STATIC_0157",
-        "type": "StringId"
-       },
-       "Text2ndRow": {
-        "value": "",
-        "type": "Text"
-       }
-      }
-     ]
-    },
-    "79": {
-     "type": "button",
-     "name": "DIAG_BRAKE_ECU",
-     "properties": {
-      "Visible": {
-       "value": 1,
-       "type": "UInt"
-      },
-      "Focusable": {
-       "value": 2,
-       "type": "UInt"
-      }
-     },
-     "rows": [
-      {
-       "Text1stRow": {
-        "value": "SID_CN_STATIC_0158",
-        "type": "StringId"
-       },
-       "Text2ndRow": {
-        "value": "",
-        "type": "Text"
-       }
-      }
-     ]
-    },
-    "80": {
-     "type": "button",
-     "name": "DIAG_POWERTRAIN",
+     "name": "DIAG_RENDER",
      "properties": {
       "Visible": {
        "value": 1,
@@ -2057,9 +1991,9 @@
       }
      ]
     },
-    "81": {
+    "78": {
      "type": "button",
-     "name": "DIAG_BATTERY",
+     "name": "DIAG_NAV",
      "properties": {
       "Visible": {
        "value": 1,
@@ -2083,9 +2017,9 @@
       }
      ]
     },
-    "82": {
+    "79": {
      "type": "button",
-     "name": "DIAG_TEMPS",
+     "name": "DIAG_HEADWAY",
      "properties": {
       "Visible": {
        "value": 1,
@@ -2109,9 +2043,9 @@
       }
      ]
     },
-    "83": {
+    "80": {
      "type": "button",
-     "name": "DIAG_CHASSIS",
+     "name": "DIAG_MEDIA",
      "properties": {
       "Visible": {
        "value": 1,
@@ -2135,9 +2069,9 @@
       }
      ]
     },
-    "84": {
+    "81": {
      "type": "button",
-     "name": "DIAG_UDS",
+     "name": "DIAG_CHARGING",
      "properties": {
       "Visible": {
        "value": 1,
@@ -2161,7 +2095,163 @@
       }
      ]
     },
+    "82": {
+     "type": "button",
+     "name": "DIAG_BRAKE_ECU",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 2,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text1stRow": {
+        "value": "SID_CN_STATIC_0164",
+        "type": "StringId"
+       },
+       "Text2ndRow": {
+        "value": "",
+        "type": "Text"
+       }
+      }
+     ]
+    },
+    "83": {
+     "type": "button",
+     "name": "DIAG_POWERTRAIN",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 2,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text1stRow": {
+        "value": "SID_CN_STATIC_0165",
+        "type": "StringId"
+       },
+       "Text2ndRow": {
+        "value": "",
+        "type": "Text"
+       }
+      }
+     ]
+    },
+    "84": {
+     "type": "button",
+     "name": "DIAG_BATTERY",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 2,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text1stRow": {
+        "value": "SID_CN_STATIC_0166",
+        "type": "StringId"
+       },
+       "Text2ndRow": {
+        "value": "",
+        "type": "Text"
+       }
+      }
+     ]
+    },
     "85": {
+     "type": "button",
+     "name": "DIAG_TEMPS",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 2,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text1stRow": {
+        "value": "SID_CN_STATIC_0167",
+        "type": "StringId"
+       },
+       "Text2ndRow": {
+        "value": "",
+        "type": "Text"
+       }
+      }
+     ]
+    },
+    "86": {
+     "type": "button",
+     "name": "DIAG_CHASSIS",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 2,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text1stRow": {
+        "value": "SID_CN_STATIC_0168",
+        "type": "StringId"
+       },
+       "Text2ndRow": {
+        "value": "",
+        "type": "Text"
+       }
+      }
+     ]
+    },
+    "87": {
+     "type": "button",
+     "name": "DIAG_UDS",
+     "properties": {
+      "Visible": {
+       "value": 1,
+       "type": "UInt"
+      },
+      "Focusable": {
+       "value": 2,
+       "type": "UInt"
+      }
+     },
+     "rows": [
+      {
+       "Text1stRow": {
+        "value": "SID_CN_STATIC_0169",
+        "type": "StringId"
+       },
+       "Text2ndRow": {
+        "value": "",
+        "type": "Text"
+       }
+      }
+     ]
+    },
+    "88": {
      "type": "title",
      "name": "DIAG_TITLE",
      "rows": [

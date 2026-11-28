@@ -212,7 +212,9 @@
         "guidingProvider": "rs",
         "conclusiveDart": "rs",
         "currentLaneGuiding": "rs",
-        "nextIntersection": "rs"
+        "nextIntersection": "rs",
+        "finalDestinationInfo": "rs",
+        "nextDestinationInfo": "rs"
       }
     },
     "de.bmw.infotainment.navigation.guiding.GuidanceEventList": {
@@ -237,7 +239,8 @@
     "de.bmw.infotainment.navigation.projectedmodeguiding.ProjectedModeGuiding": {
       "instances": "Main_Instance",
       "attributes": {
-        "currentLaneGuiding": "rs"
+        "currentLaneGuiding": "rs",
+        "waypoints": "rs"
       }
     },
     "de.bmw.infotainment.a4a.carplay.CarPlayManager": {

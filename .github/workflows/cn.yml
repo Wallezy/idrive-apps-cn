@@ -75,6 +75,8 @@ jobs:
         run: |
           node experiments/display-focus/test.js
           node tools/test_cluster_metrics.js
+          node tools/test_cluster_nav_cards.js
+          node tools/test_cluster_nav_signals.js
           python3 localized/cluster-metrics/kit/tools/build.py --omit-sdk cluster_metrics
           node localized/cluster-metrics/test/run_tests.js
       - name: Community application controls and offline rendering

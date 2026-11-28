@@ -150,5 +150,13 @@
   "kWh/100km": "kWh/100km",
   "km/L": "km/L",
   "mi/kWh": "mi/kWh",
-  "psi": "psi"
+  "psi": "psi",
+  "Cluster turn card": "仪表转向提示",
+  "Turn card distance": "转向提示距离",
+  "Throughout navigation": "导航期间显示",
+  "Within 200 m": "200 米以内",
+  "Within 350 m": "350 米以内",
+  "Within 500 m": "500 米以内",
+  "Within 800 m": "800 米以内",
+  "Cluster arrival information": "仪表到达信息"
 }

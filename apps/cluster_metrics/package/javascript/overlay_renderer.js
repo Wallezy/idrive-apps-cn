@@ -40,6 +40,8 @@ const {
 const { buildStockBackdrop } = require('./image_decode');
 const { COVER_SIDE, paginateTitle, resolveRightWidgetPage } = require('./media_tracker');
 const { computeIceBatteryCharge } = require('./signals');
+const { paintTurn, paintEta, etaParts, TURN_RECT, ETA_RECT } = require('./nav_cards');
+const { metres } = require('./redline_nav');
 
 const DEFAULT_CONF_DIR = '/var/opt/cluster-render';
 const DEFAULT_WAZE_STATUS = '/run/waze-on-cluster/status.json';
@@ -128,7 +130,8 @@ const MAP_LEFT_RECT = { x: 186, y: 380, w: 182, h: 68 };
 const MAP_RIGHT_RECT = { x: 680, y: 374, w: 228, h: 74 };
 
 const CLUSTER_LAYER_NAMES = ['below_speed', 'gear_d', 'brake_rail', 'corner_left', 'corner_right'];
-const PANEL_ALL_LAYERS = ['below_speed', 'gear_d', 'cabin_temp', 'brake_rail', 'corner_left', 'corner_right', 'hv_soc_gauge', 'right_widget'];
+const PANEL_ALL_LAYERS = ['below_speed', 'gear_d', 'cabin_temp', 'brake_rail', 'corner_left', 'corner_right', 'hv_soc_gauge', 'right_widget',
+    'guidance_turn_card', 'eta_pill'];
 const MAP_LAYER_NAMES = ['map_speed', 'map_left', 'map_right'];
 
 const COL = {
@@ -1115,6 +1118,23 @@ class OverlayRenderer {
             PANEL_ALL_LAYERS.forEach((n) => this._setVisible(n, false));
         }
 
+        // Cards share the existing panel target and its stock-content yielding.
+        // Map-only mode keeps the panel unmapped.
+        const card = routeOn && hn && hn.cardTurn;
+        const turnMetres = card ? metres(card) : null;
+        const limit = ['200', '350', '500', '800'].indexOf(String(s.turnCardTriggerM)) >= 0
+            ? Number(s.turnCardTriggerM) : Infinity;
+        const showTurn = Boolean(panelAllowed && s.clusterTurnCard === true && card &&
+            (card.dist || card.kind === 'destination') &&
+            (limit === Infinity || (turnMetres !== null && turnMetres <= limit)));
+        const eta = routeOn && hn && hn.eta;
+        const showEta = Boolean(panelAllowed && s.clusterEtaPill === true && eta &&
+            (eta.text || typeof eta.remainSec === 'number' || typeof eta.remainMeters === 'number'));
+        this._renderNavCard('guidance_turn_card', TURN_RECT, showTurn, card,
+            card ? JSON.stringify(card) : '', paintTurn, units, cx, cy);
+        this._renderNavCard('eta_pill', ETA_RECT, showEta, eta,
+            eta ? JSON.stringify(etaParts(eta, units)) : '', paintEta, units, cx, cy);
+
         // 2a. HUD FULL-WIDTH TOP-ROW ROAD + HIGHWAY EXIT BADGE BANNER (544x38 at x=132..676, y=100..138)
         const hudTopY = clamp(HUD_BASE.y + hy, 100, 102);
         if (showHudRoad) {
@@ -1273,6 +1293,23 @@ class OverlayRenderer {
             this.layers[name].rect.y = opts.y;
         }
         return this.layers[name];
+    }
+
+    _renderNavCard(name, rect, visible, data, key, paint, units, dx, dy) {
+        if (!visible) {
+            this._setVisible(name, false);
+            return;
+        }
+        const l = this._ensureOrLocal(name, {
+            target: 'panel', klass: 'overlay', x: rect.x + dx, y: rect.y + dy,
+            w: rect.w, h: rect.h, visible: true, z: 15,
+        });
+        if (l._renderedKey !== key || !l.prevBuf) {
+            paint(l.cv, data, units);
+            l._renderedKey = key;
+        }
+        this._upload(name);
+        this._setVisible(name, true);
     }
 
     _paintBelowSpeed(cv, hero, heroCol, heroUnitCol, subText, subCol, subBolt, gearStr, reserveGearSlot, heroRightX, showLine1, showLine2) {

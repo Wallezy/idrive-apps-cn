@@ -3,8 +3,8 @@
   "repository": "chyiz/idrive7-cluster-metrics",
   "commit": "815652e748e472e41b32e73041aefe2087912622",
   "upstreamVersion": "0.9.3",
-  "releaseVersion": "0.9.4",
-  "cnRevision": 1,
+  "releaseVersion": "0.9.6",
+  "cnRevision": 3,
   "channel": "beta-and-stable",
   "authorization": "Owner reports author permission; current upstream application source is GPL-3.0-only.",
   "changes": [
@@ -15,9 +15,18 @@
     "Fix upstream missing Canvas.disc calls when media art is absent; use supported filled circle"
   ],
   "releaseChanges": [
-    "新增 HUD 布局、油门与转速显示，完善混动充电信息。",
-    "优化媒体封面、单位和发动机数据，保留中文与导航避让。"
+    "新增仪表转向提示，显示方向、距离和中文道路名。",
+    "新增到达信息，显示预计时间、剩余时长和距离。",
+    "完善导航结束清理与车机时区处理。"
   ],
   "kitCommit": "83977e43f766508709404ebd0d1a20454626901b",
-  "kitScope": "Retained CN runtime with compatible background lifecycle; open bundled fonts selected"
+  "kitScope": "Retained CN runtime with compatible background lifecycle; open bundled fonts selected",
+  "additionalSources": [
+    {
+      "repository": "Hyperionism/idrive7-cockpit-plus",
+      "commit": "0ba2af68b4fe4c4825b2db2f69dab174cc617209",
+      "license": "GPL-3.0-only",
+      "scope": "Turn card and arrival strip drawing, destination data decoding; existing map and compositor retained."
+    }
+  ]
 }
