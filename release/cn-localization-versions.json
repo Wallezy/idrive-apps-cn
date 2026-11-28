@@ -3,9 +3,9 @@
   "purpose": "Pinned cauliflowermossgrape application set with CN compatibility fixes",
   "sourceCommit": "beffe76911bcf83df00a4b29332dc313bd574a65",
   "components": {
-    "cluster-render": "0.8.15",
-    "waze-on-cluster": "0.14.20",
-    "robertn_waze_cluster": "0.6.24",
+    "cluster-render": "0.8.16",
+    "waze-on-cluster": "0.14.22",
+    "robertn_waze_cluster": "0.6.25",
     "brake_test": "1.5.27",
     "car_vitals": "2.28.1",
     "doom": "1.7.28",

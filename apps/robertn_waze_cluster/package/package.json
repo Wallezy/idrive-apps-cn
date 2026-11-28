@@ -1,6 +1,6 @@
 {
   "name": "robertn_waze_cluster",
-  "version": "0.6.24",
+  "version": "0.6.25",
   "description": "Puts the CarPlay Waze map on the instrument cluster: enable the patch from the HMI and the map follows CarPlay",
   "private": false,
   "main": "javascript/runner.js",
@@ -28,7 +28,8 @@
     "LICENSE",
     "LICENSE-qrcodegen.txt",
     "ATTRIBUTION.json",
-    "CONTRIBUTORS.zh-CN.md"
+    "CONTRIBUTORS.zh-CN.md",
+    "locales"
   ],
   "dependencies": {
     "oap-sdk": "24.10.2"

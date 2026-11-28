@@ -1,6 +1,15 @@
 {
   "cluster-render": [
     {
+      "version": "0.8.16",
+      "changes": [
+        "降低仪表与抬头显示的资源占用，改善图层和日志处理。",
+        "保留全屏、主题地图与原厂告警避让。"
+      ],
+      "upstreamVersion": "0.8.15",
+      "cnRevision": 1
+    },
+    {
       "version": "0.8.15",
       "changes": [
         "减少隐藏地图的画面传输，改善切回地图时的恢复。",
@@ -108,6 +117,15 @@
     }
   ],
   "waze-on-cluster": [
+    {
+      "version": "0.14.22",
+      "changes": [
+        "改善 Android Auto 地图兼容性，降低地图显示延迟。",
+        "完善重启、时钟变化和降级后的补丁恢复。"
+      ],
+      "upstreamVersion": "0.14.21",
+      "cnRevision": 1
+    },
     {
       "version": "0.14.20",
       "changes": [
@@ -224,6 +242,15 @@
     }
   ],
   "robertn_waze_cluster": [
+    {
+      "version": "0.6.25",
+      "changes": [
+        "降低后台资源占用，加快日志二维码生成。",
+        "保留中文状态、全屏与显示位置设置。"
+      ],
+      "upstreamVersion": "0.6.19",
+      "cnRevision": 1
+    },
     {
       "version": "0.6.24",
       "changes": [
